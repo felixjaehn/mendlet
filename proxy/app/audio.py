@@ -1,0 +1,53 @@
+"""WAV normalisation for Muse Voice Transcribe (mono, 16-bit PCM, 16 or 24 kHz only)."""
+
+import io
+import wave
+
+import numpy as np
+
+from .errors import AppError
+
+MAX_BYTES = 32 * 1024 * 1024
+MAX_SECONDS = 600
+
+
+def _unsupported(msg: str) -> AppError:
+    return AppError("unsupported_audio", msg, 415)
+
+
+def ensure_wav(data: bytes) -> tuple[bytes, float]:
+    """Return (WAV bytes ready for the API, duration in seconds).
+
+    Accepts any 16-bit PCM WAV: downmixes to mono and resamples to 16 kHz if needed.
+    Other containers (m4a, webm, ...) are rejected with 415.
+    """
+    if len(data) > MAX_BYTES:
+        raise AppError("audio_too_large", "Die Audiodatei ist zu groß (maximal 32 MB).", 413)
+    try:
+        with wave.open(io.BytesIO(data)) as w:
+            channels, width, rate, frames = w.getnchannels(), w.getsampwidth(), w.getframerate(), w.getnframes()
+            raw = w.readframes(frames)
+    except (wave.Error, EOFError) as exc:
+        raise _unsupported("Nur WAV wird unterstützt (mono, 16 Bit, 16 kHz). Bitte als WAV aufnehmen.") from exc
+    if width != 2:
+        raise _unsupported("Nur 16-Bit-PCM-WAV wird unterstützt.")
+    duration = frames / rate if rate else 0.0
+    if duration > MAX_SECONDS:
+        raise AppError("audio_too_long", "Die Aufnahme ist länger als 10 Minuten.", 400)
+    if channels == 1 and rate in (16000, 24000):
+        return data, duration
+
+    samples = np.frombuffer(raw, dtype="<i2").astype(np.float32)
+    if channels > 1:
+        samples = samples[: len(samples) // channels * channels].reshape(-1, channels).mean(axis=1)
+    target = rate if rate in (16000, 24000) else 16000
+    if target != rate and len(samples):
+        n = int(len(samples) * target / rate)
+        samples = np.interp(np.linspace(0, len(samples) - 1, n), np.arange(len(samples)), samples)
+    out = io.BytesIO()
+    with wave.open(out, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(target)
+        w.writeframes(np.clip(samples, -32768, 32767).astype("<i2").tobytes())
+    return out.getvalue(), duration

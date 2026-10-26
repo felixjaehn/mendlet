@@ -1,0 +1,114 @@
+"""FastAPI app: /health, /analyze (SSE or JSON), /step-help, /transcribe."""
+
+import asyncio
+import json
+import logging
+from collections.abc import AsyncIterator
+
+from fastapi import FastAPI, File, Request, UploadFile
+from fastapi.responses import JSONResponse, StreamingResponse
+
+from . import safety
+from .audio import ensure_wav
+from .budget import Budget
+from .clients import ModelClient, build_client
+from .config import PROXY_DIR, Settings, load_dotenv
+from .errors import AppError
+from .images import downscale_b64, prepare_request
+from .models import AnalyzeRequest, AnalyzeResponse, Stage, StepHelpRequest, StepHelpResponse
+from .pipeline import STAGE_LABELS, analyze
+
+log = logging.getLogger("proxy")
+
+
+def _sse(event: str, data: dict) -> str:
+    return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+
+
+def _error_payload(exc: AppError) -> dict:
+    return {"code": exc.code, "message": exc.message}
+
+
+async def _event_stream(req: AnalyzeRequest, client: ModelClient) -> AsyncIterator[str]:
+    queue: asyncio.Queue[tuple[str, dict] | None] = asyncio.Queue()
+
+    async def progress(stage: Stage) -> None:
+        await queue.put(("progress", {"stage": stage, "label": STAGE_LABELS[stage]}))
+
+    async def runner() -> None:
+        try:
+            resp = await analyze(req, client, progress)
+            await queue.put(("result", resp.model_dump(mode="json")))
+        except AppError as exc:
+            await queue.put(("error", _error_payload(exc)))
+        except Exception as exc:  # noqa: BLE001
+            log.error("analyze failed: %s", type(exc).__name__)
+            await queue.put(("error", {"code": "internal", "message": "Unerwarteter Fehler. Bitte versuche es erneut."}))
+        finally:
+            await queue.put(None)
+
+    task = asyncio.create_task(runner())
+    try:
+        while (item := await queue.get()) is not None:
+            yield _sse(*item)
+    finally:
+        task.cancel()
+
+
+def create_app(settings: Settings | None = None, client: ModelClient | None = None, budget: Budget | None = None) -> FastAPI:
+    settings = settings or Settings.from_env()
+    budget = budget or Budget(settings.cache_dir / "budget.json", settings.daily_budget_usd)
+    client = client or build_client(settings, budget)
+    app = FastAPI(title="Reparatur-Assistent Proxy")
+
+    @app.exception_handler(AppError)
+    async def _app_error(_: Request, exc: AppError) -> JSONResponse:
+        return JSONResponse(status_code=exc.status, content={"error": _error_payload(exc)})
+
+    @app.get("/health")
+    async def health() -> dict:
+        return {
+            "status": "ok",
+            "mode": "mock" if settings.mock_mode else "real",
+            "spent_today_usd": round(budget.spent_today(), 4),
+            "daily_budget_usd": budget.limit_usd,
+        }
+
+    @app.post("/analyze", response_model=None)
+    async def analyze_endpoint(body: AnalyzeRequest, stream: bool = True):
+        budget.check()
+        req = prepare_request(body)
+        if stream:
+            return StreamingResponse(
+                _event_stream(req, client),
+                media_type="text/event-stream",
+                headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+            )
+        resp: AnalyzeResponse = await analyze(req, client)
+        return resp
+
+    @app.post("/step-help")
+    async def step_help(body: StepHelpRequest) -> StepHelpResponse:
+        budget.check()
+        if body.image_base64:
+            body = body.model_copy(update={"image_base64": downscale_b64(body.image_base64)})
+        if body.risk_level != "allowed":
+            return StepHelpResponse(
+                answer="Für diesen Fall gibt es keine Anleitung. Bitte wende dich an einen Fachbetrieb.",
+                retry_hint=None, escalate=True,
+            )
+        out = await client.step_help(body)
+        out.escalate = out.escalate or safety.step_help_escalation(body.issue_text, body.risk_level)
+        return out
+
+    @app.post("/transcribe")
+    async def transcribe(file: UploadFile = File(...)) -> dict:
+        budget.check()
+        wav, duration = ensure_wav(await file.read())  # audio stays in memory, never stored
+        return {"text": await client.transcribe(wav, duration)}
+
+    return app
+
+
+load_dotenv(PROXY_DIR / ".env")
+app = create_app()

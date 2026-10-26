@@ -1,0 +1,47 @@
+import json
+
+from app.budget import Budget, muse_cost, sam_cost, transcribe_cost
+from app.cache import ModelCache
+from app.errors import BudgetExceeded
+from app.prompts import MARKER, PROMPTS, load_prompt, schema_text
+import pytest
+
+
+def test_prices():
+    assert muse_cost(1_000_000, 0) == pytest.approx(1.25)
+    assert muse_cost(0, 1_000_000) == pytest.approx(4.25)
+    assert sam_cost(1000) == pytest.approx(2.5)
+    assert transcribe_cost(3600) == pytest.approx(0.18)
+
+
+def test_budget_limit_and_persistence(tmp_path):
+    p = tmp_path / "b.json"
+    b = Budget(p, 1.0, today=lambda: "2026-10-26")
+    b.check()
+    b.add(0.6)
+    b.check()
+    b.add(0.5)
+    with pytest.raises(BudgetExceeded) as e:
+        Budget(p, 1.0, today=lambda: "2026-10-26").check()  # persisted across instances
+    assert e.value.status == 429
+    Budget(p, 1.0, today=lambda: "2026-10-27").check()  # new day resets
+    assert json.loads(p.read_text())["spent_usd"] == pytest.approx(1.1)
+
+
+def test_cache_roundtrip(tmp_path):
+    c = ModelCache(tmp_path, True)
+    k = ModelCache.key("v1", "m", "input")
+    assert c.get(k) is None
+    c.set(k, '{"a":1}')
+    assert c.get(k) == '{"a":1}'
+    assert k != ModelCache.key("v2", "m", "input")
+    off = ModelCache(tmp_path, False)
+    assert off.get(k) is None
+
+
+@pytest.mark.parametrize("key", list(PROMPTS))
+def test_prompt_files_have_current_schema(key):
+    text = load_prompt(key)
+    assert text.endswith(MARKER.strip("\n") + "\n" + schema_text(PROMPTS[key][2]))
+    schema = text.split(MARKER.strip("\n") + "\n")[1]
+    assert "$ref" not in schema and "$defs" not in schema

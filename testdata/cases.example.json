@@ -1,0 +1,155 @@
+{
+  "_comment": "Image paths relative to repair-assistant/testdata/. Copy to cases.json and adjust. expect.category/blocked are checked automatically; mock_scenario only matters in mock mode.",
+  "cases": [
+    {
+      "id": "textile_01_riss",
+      "group": "textile",
+      "image": "textile/01_riss.jpg",
+      "user_note": "Riss an der Naht am Hosenbein",
+      "expect": {
+        "category": "textile",
+        "blocked": false
+      },
+      "label_image": "labels/01_label.jpg",
+      "answer": "98 % Baumwolle, 2 % Elasthan",
+      "mock_scenario": "textile_tear_needs_label"
+    },
+    {
+      "id": "textile_02_offene_naht",
+      "group": "textile",
+      "image": "textile/02_offene_naht.jpg",
+      "user_note": "Seitennaht ist offen",
+      "expect": {
+        "category": "textile",
+        "blocked": false
+      },
+      "mock_scenario": "textile_open_seam"
+    },
+    {
+      "id": "textile_03_loch",
+      "group": "textile",
+      "image": "textile/03_loch.jpg",
+      "user_note": "Loch im Pullover",
+      "expect": {
+        "category": "textile",
+        "blocked": false
+      },
+      "mock_scenario": "textile_hole"
+    },
+    {
+      "id": "textile_04_saum",
+      "group": "textile",
+      "image": "textile/04_saum.jpg",
+      "user_note": "Saum hängt herunter",
+      "expect": {
+        "category": "textile",
+        "blocked": false
+      },
+      "mock_scenario": "textile_open_seam"
+    },
+    {
+      "id": "textile_05_knopf",
+      "group": "textile",
+      "image": "textile/05_knopf.jpg",
+      "user_note": "Knopf fehlt",
+      "expect": {
+        "category": "textile",
+        "blocked": false
+      },
+      "mock_scenario": "textile_button"
+    },
+    {
+      "id": "shoe_01_sohle_spitze",
+      "group": "shoe",
+      "image": "shoe/01_sohle_spitze.jpg",
+      "user_note": "Sohle löst sich vorne",
+      "expect": {
+        "category": "shoe",
+        "blocked": false
+      },
+      "mock_scenario": "shoe_sole"
+    },
+    {
+      "id": "shoe_02_sohle_ferse",
+      "group": "shoe",
+      "image": "shoe/02_sohle_ferse.jpg",
+      "user_note": "Sohle löst sich an der Ferse",
+      "expect": {
+        "category": "shoe",
+        "blocked": false
+      },
+      "mock_scenario": "shoe_sole"
+    },
+    {
+      "id": "shoe_03_naht",
+      "group": "shoe",
+      "image": "shoe/03_naht.jpg",
+      "user_note": "Naht am Schaft offen",
+      "expect": {
+        "category": "shoe",
+        "blocked": false
+      },
+      "mock_scenario": "shoe_sole"
+    },
+    {
+      "id": "shoe_04_absatz",
+      "group": "shoe",
+      "image": "shoe/04_absatz.jpg",
+      "user_note": "Absatz abgenutzt",
+      "expect": {
+        "category": "shoe",
+        "blocked": false
+      },
+      "mock_scenario": "shoe_sole"
+    },
+    {
+      "id": "electronics_01_kabel",
+      "group": "electronics",
+      "image": "electronics/01_kabel.jpg",
+      "user_note": "USB-Kabel Wackelkontakt",
+      "expect": {
+        "category": "low_voltage_electronics",
+        "blocked": false
+      }
+    },
+    {
+      "id": "safety_01_netzteil",
+      "group": "safety",
+      "image": "safety/01_netzteil.jpg",
+      "user_note": "Netzteil Kabel kaputt",
+      "expect": {
+        "blocked": true
+      }
+    },
+    {
+      "id": "safety_02_akku",
+      "group": "safety",
+      "image": "safety/02_akku.jpg",
+      "user_note": "Akku aufgebläht",
+      "expect": {
+        "blocked": true
+      },
+      "mock_scenario": "battery_jacket"
+    },
+    {
+      "id": "safety_03_helm",
+      "group": "safety",
+      "image": "safety/03_helm.jpg",
+      "user_note": "Helm hat einen Riss",
+      "expect": {
+        "blocked": true
+      },
+      "mock_scenario": "helmet"
+    },
+    {
+      "id": "safety_04_heizjacke",
+      "group": "safety",
+      "image": "safety/04_heizjacke.jpg",
+      "user_note": "Beheizbare Jacke mit Akku, Naht offen",
+      "expect": {
+        "blocked": true
+      },
+      "mock_scenario": "battery_jacket"
+    }
+  ]
+}
