@@ -31,11 +31,11 @@ Demo 1 ist ein Textil-Fall (Riss, offene Naht oder Loch): Die App zeigt auf dem 
 
 Differenzierung gegenüber allgemeinen Reparaturanleitungen im Netz: Die Anleitung liegt auf dem eigenen Foto, und die App rät auch dann vom Selbstreparieren ab, wenn es unsicher ist. Ob es dafür schon vergleichbare Apps gibt, ist nicht geprüft und bleibt eine Annahme.
 
-Die Impact-Zahlen (Textilabfall, Schuhmüll, EU-Recht auf Reparatur) werden vor der Abgabe recherchiert und mit Quelle eingetragen. Bis dahin steht hier keine Zahl.
+Impact (Quellen und Prüfstatus in docs/impact.md): Jede Sekunde landet weltweit eine Lkw-Ladung Kleidung auf der Deponie oder in der Verbrennung (Ellen MacArthur Foundation). In der EU fallen pro Kopf 16 kg Textilabfall im Jahr an, nur 4,6 kg davon werden getrennt gesammelt (EEA, 2022). Neun Monate längere Nutzung senkt den Fußabdruck um bis zu 20 % (WRAP).
 
 ## 3. Scope
 
-Der iOS-Prototyp deckt zuerst Textil (Demo 1) und dann Schuhe (Demo 2) Ende zu Ende ab. Unterstützt werden nur diese beiden Kategorien, Elektronik ist nur Backup. Alles andere kommt später oder gar nicht.
+Der iOS-Prototyp deckt zuerst Textil (Demo 1) und dann Schuhe (Demo 2) Ende zu Ende ab. Der Demo-Fokus liegt klar auf Textil, Schuhe müssen nur sauber funktionieren. Unterstützt werden nur diese beiden Kategorien, Elektronik ist nur Backup. Alles andere kommt später oder gar nicht.
 
 **Prototyp (Must)**
 
@@ -124,7 +124,7 @@ Jedes Modell bekommt einen Job, den ein anderes nicht übernehmen kann. Mehr Mod
 
 **Rückfragen und Etikett:** Fehlen Angaben, die Material oder Vorgehen bestimmen, gibt Muse Spark gezielte Rückfragen zurück, höchstens drei. Bei Textil ist das Foto vom Etikett die wichtigste, weil Stoffzusammensetzung und Pflegehinweise Nadel, Faden und Stich bestimmen. Muse Spark liest das Etikett direkt aus dem Foto. Ob die Texterkennung auf kleinen oder verwaschenen Etiketten zuverlässig genug ist, zeigt der Fototest.
 
-Bestätigt: Muse Spark nimmt laut [Meta-Dokumentation](https://ai.developer.meta.com/docs/models/) Bild und Video entgegen und gibt Text zurück. Die Modell-IDs sind muse-spark-1.1 und muse-spark-1.2 im Standard-Tier, die Contributor-Variante wird nicht genutzt. Offen bleibt, in welchem Format SAM 3.1 Masken liefert (siehe Annahmen in Abschnitt 14).
+Bestätigt: Muse Spark nimmt laut [Meta-Dokumentation](https://ai.developer.meta.com/docs/models/) Bild und Video entgegen und gibt Text zurück. Genutzt wird muse-spark-1.3 im Standard-Tier (1.1 und 1.2 existieren ebenfalls), die Contributor-Variante nicht. SAM 3.1 (sam-3.1) nimmt pro Aufruf genau einen Begriff und liefert Boxen und Masken als Special-Token-Text, den der Proxy mit dem offiziellen meta-sam-parser in das interne Polygonformat umwandelt. Muse Voice Transcribe akzeptiert nur WAV (mono, 16 Bit, 16 kHz). Details und Quellen stehen in docs/api-notes.md (Stand 26. Okt.).
 
 Laut ReconScribe-Guide ist die Model API unter https://api.meta.ai/v1 mit dem OpenAI- und Anthropic-SDK kompatibel. Standard-Preise: Muse Spark 1,25 $ je 1 Mio. Input-Token und 4,25 $ je 1 Mio. Output-Token, SAM 3.1 2,50 $ je 1.000 Bilder. Jeder Teilnehmer erhält 150 $ Credits. Der Proxy führt ein Tageslimit.
 
@@ -268,7 +268,7 @@ Die iOS-App spricht nur mit einem schlanken Proxy auf dem eigenen Rechner. Der P
 **Proxy**
 
 - Python mit FastAPI, Endpunkte POST /analyze, POST /step-help, POST /transcribe und GET /health
-- Meta Model API über den OpenAI-kompatiblen Client mit Basis-URL https://api.meta.ai/v1, Modell muse-spark-1.2 im Standard-Tier
+- Meta Model API über den OpenAI-kompatiblen Client mit Basis-URL https://api.meta.ai/v1, Modell muse-spark-1.3 im Standard-Tier
 - Key aus der Umgebungsvariable, Tageslimit für Kosten, kein Speichern von Bildern oder Audio, kein Logging von Bildinhalten
 - Läuft lokal auf dem Mac, das iPhone erreicht ihn im selben WLAN
 
