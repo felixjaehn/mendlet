@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>de</string>
+	<key>CFBundleDisplayName</key>
+	<string>Reparatur-Assistent</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Die Kamera wird genutzt, um ein Foto des defekten Gegenstands aufzunehmen.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Die App verbindet sich mit dem Analyse-Server in deinem lokalen Netzwerk.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Das Mikrofon wird genutzt, um den Schaden per Sprache zu beschreiben.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Der Zugriff auf deine Fotos erlaubt dir, ein vorhandenes Bild des Schadens auszuwählen.</string>
+	<key>PROXY_BASE_URL</key>
+	<string>$(PROXY_BASE_URL)</string>
+	<key>UILaunchScreen</key>
+	<dict/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+</dict>
+</plist>

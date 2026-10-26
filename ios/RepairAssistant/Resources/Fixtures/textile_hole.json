@@ -1,0 +1,367 @@
+{
+ "case_id": "demo-hole",
+ "category": "textile",
+ "risk_level": "allowed",
+ "safety": {
+  "blocked": false,
+  "reason": null
+ },
+ "segments": [
+  {
+   "id": "seg_hole",
+   "label": "Loch",
+   "kind": "damage",
+   "prompt": "hole",
+   "box": [
+    0.3731,
+    0.352,
+    0.2746,
+    0.3266
+   ],
+   "mask": {
+    "format": "polygon",
+    "points": [
+     [
+      0.633,
+      0.52
+     ],
+     [
+      0.6477,
+      0.5621
+     ],
+     [
+      0.6284,
+      0.5973
+     ],
+     [
+      0.5943,
+      0.614
+     ],
+     [
+      0.5615,
+      0.6163
+     ],
+     [
+      0.5384,
+      0.6197
+     ],
+     [
+      0.5226,
+      0.6439
+     ],
+     [
+      0.5,
+      0.6786
+     ],
+     [
+      0.4722,
+      0.6721
+     ],
+     [
+      0.4471,
+      0.6574
+     ],
+     [
+      0.4176,
+      0.6491
+     ],
+     [
+      0.396,
+      0.6237
+     ],
+     [
+      0.3731,
+      0.5964
+     ],
+     [
+      0.3777,
+      0.5549
+     ],
+     [
+      0.3945,
+      0.52
+     ],
+     [
+      0.4173,
+      0.4964
+     ],
+     [
+      0.4121,
+      0.4671
+     ],
+     [
+      0.4023,
+      0.4226
+     ],
+     [
+      0.4107,
+      0.38
+     ],
+     [
+      0.4353,
+      0.352
+     ],
+     [
+      0.4701,
+      0.3561
+     ],
+     [
+      0.5,
+      0.3801
+     ],
+     [
+      0.5257,
+      0.3794
+     ],
+     [
+      0.5503,
+      0.3895
+     ],
+     [
+      0.5695,
+      0.4111
+     ],
+     [
+      0.5789,
+      0.4413
+     ],
+     [
+      0.5969,
+      0.4617
+     ],
+     [
+      0.6111,
+      0.4883
+     ]
+    ]
+   },
+   "score": 0.93
+  },
+  {
+   "id": "seg_knit",
+   "label": "Strickstoff",
+   "kind": "part",
+   "prompt": "knit fabric",
+   "box": [
+    0.06,
+    0.18,
+    0.88,
+    0.68
+   ],
+   "mask": {
+    "format": "polygon",
+    "points": [
+     [
+      0.14,
+      0.18
+     ],
+     [
+      0.86,
+      0.18
+     ],
+     [
+      0.94,
+      0.26
+     ],
+     [
+      0.94,
+      0.78
+     ],
+     [
+      0.86,
+      0.86
+     ],
+     [
+      0.14,
+      0.86
+     ],
+     [
+      0.06,
+      0.78
+     ],
+     [
+      0.06,
+      0.26
+     ]
+    ]
+   },
+   "score": 0.86
+  }
+ ],
+ "diagnosis": {
+  "summary": "Pullover mit Loch am Ellbogen, etwa 3 cm groß. Strick, Maschen sind gerissen.",
+  "likely_causes": [
+   "Reibung am Ellbogen",
+   "Das Garn ist an der Stelle dünn geworden"
+  ],
+  "confidence": 0.9,
+  "evidence_segment_ids": [
+   "seg_hole",
+   "seg_knit"
+  ],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [
+    "80 % Wolle",
+    "20 % Polyamid"
+   ],
+   "care": [
+    "Handwäsche 30 °C"
+   ]
+  }
+ },
+ "decision": {
+  "recommendation": "repair_self",
+  "reasoning": "Ein Loch in Strick lässt sich gut stopfen. Das Stopfgitter schließt die Lücke und hält ohne Naht.",
+  "effort": "medium",
+  "time_minutes": [
+   30,
+   50
+  ],
+  "cost_eur": [
+   2,
+   6
+  ],
+  "estimate_note": "Schätzung, keine Garantie"
+ },
+ "shopping_list": [
+  {
+   "id": "item_needle",
+   "name": "Stopfnadel",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "Stopfnadel stumpf Set",
+   "household_alternative": "Dicke Nähnadel"
+  },
+  {
+   "id": "item_yarn",
+   "name": "Wollgarn in Pulloverfarbe",
+   "kind": "material",
+   "quantity": "1 Knäuel",
+   "required": true,
+   "search_term": "Stopfgarn Wolle grau",
+   "household_alternative": "Garn aus einem alten Pullover"
+  },
+  {
+   "id": "item_scissors",
+   "name": "Schere",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "Nähschere klein",
+   "household_alternative": "Nagelschere"
+  },
+  {
+   "id": "item_mushroom",
+   "name": "Stopfpilz",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": false,
+   "search_term": "Stopfpilz Holz",
+   "household_alternative": "Glühbirne oder Glas"
+  }
+ ],
+ "guide": {
+  "steps": [
+   {
+    "n": 1,
+    "title": "Lose Fäden abschneiden",
+    "text": "Schneide ausgefranste Fäden am Lochrand ab. Nur die losen Enden.",
+    "common_mistake": "Maschen mit abschneiden, dann wird das Loch größer.",
+    "safety_critical": true,
+    "requires_confirmation": true,
+    "segment_ids": [
+     "seg_hole"
+    ],
+    "uses_items": [
+     "item_scissors"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_hole"
+    }
+   },
+   {
+    "n": 2,
+    "title": "Stopfunterlage einlegen",
+    "text": "Lege den Stopfpilz oder ein Glas unter das Loch, sodass der Stoff gespannt, aber nicht gezogen ist.",
+    "common_mistake": "Zu straff spannen. Danach wirft der Stoff Falten.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_hole"
+    ],
+    "uses_items": [
+     "item_mushroom"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_hole"
+    }
+   },
+   {
+    "n": 3,
+    "title": "Längsfäden spannen",
+    "text": "Spanne parallele Fäden über das Loch, jeweils vom gesunden Rand zum gegenüberliegenden Rand. Folge den Linien.",
+    "common_mistake": "Zu große Abstände. Die Lücken schließen sich später nicht.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_hole"
+    ],
+    "uses_items": [
+     "item_needle",
+     "item_yarn"
+    ],
+    "overlay": {
+     "type": "stitch_path",
+     "stitch_type": "darning",
+     "segment_id": "seg_hole"
+    }
+   },
+   {
+    "n": 4,
+    "title": "Querfäden einweben",
+    "text": "Webe nun quer dazu im Wechsel über und unter die gespannten Fäden. Am Rand etwas in den gesunden Stoff stechen.",
+    "common_mistake": "Nicht im Wechsel weben. Dann hält das Geflecht nicht.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_hole"
+    ],
+    "uses_items": [
+     "item_needle",
+     "item_yarn"
+    ],
+    "overlay": {
+     "type": "stitch_path",
+     "stitch_type": "darning",
+     "segment_id": "seg_hole"
+    }
+   },
+   {
+    "n": 5,
+    "title": "Vernähen",
+    "text": "Ziehe den Faden auf der Innenseite durch ein paar Maschen und schneide ihn ab.",
+    "common_mistake": "Den Faden an der Außenseite verknoten.",
+    "safety_critical": true,
+    "requires_confirmation": true,
+    "segment_ids": [
+     "seg_hole"
+    ],
+    "uses_items": [
+     "item_scissors"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_hole"
+    }
+   }
+  ]
+ }
+}

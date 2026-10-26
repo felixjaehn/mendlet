@@ -1,0 +1,77 @@
+{
+ "case_id": "demo-jacket",
+ "category": "textile",
+ "risk_level": "warn_only",
+ "safety": {
+  "blocked": true,
+  "reason": "In dieser Jacke steckt ein Lithium-Akku für die Heizung. Akkus können bei Beschädigung überhitzen oder Feuer fangen. Dafür gibt es hier bewusst keine Anleitung."
+ },
+ "segments": [
+  {
+   "id": "seg_battery",
+   "label": "Akku-Fach",
+   "kind": "part",
+   "prompt": "battery pack",
+   "box": [
+    0.54,
+    0.62,
+    0.16,
+    0.13
+   ],
+   "mask": {
+    "format": "polygon",
+    "points": [
+     [
+      0.552,
+      0.62
+     ],
+     [
+      0.688,
+      0.62
+     ],
+     [
+      0.7,
+      0.632
+     ],
+     [
+      0.7,
+      0.738
+     ],
+     [
+      0.688,
+      0.75
+     ],
+     [
+      0.552,
+      0.75
+     ],
+     [
+      0.54,
+      0.738
+     ],
+     [
+      0.54,
+      0.632
+     ]
+    ]
+   },
+   "score": 0.9
+  }
+ ],
+ "diagnosis": {
+  "summary": "Beheizbare Jacke mit Akku.",
+  "likely_causes": [],
+  "confidence": 0.9,
+  "evidence_segment_ids": [
+   "seg_battery"
+  ],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": null
+ },
+ "decision": null,
+ "shopping_list": [],
+ "guide": {
+  "steps": []
+ }
+}

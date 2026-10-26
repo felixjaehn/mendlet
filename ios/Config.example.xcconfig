@@ -1,0 +1,3 @@
+// Kopiere diese Datei nach Config.local.xcconfig (wird nicht eingecheckt).
+// Echtes iPhone: IP des Macs im WLAN eintragen. "//" in URLs als "/$()/" schreiben.
+PROXY_BASE_URL = http:/$()/192.168.0.10:8787

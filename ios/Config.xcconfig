@@ -1,0 +1,4 @@
+// Standard: Simulator spricht mit dem lokalen Proxy.
+PROXY_BASE_URL = http:/$()/localhost:8787
+// Lokale Überschreibung (nicht eingecheckt), z. B. für ein echtes iPhone im WLAN.
+#include? "Config.local.xcconfig"

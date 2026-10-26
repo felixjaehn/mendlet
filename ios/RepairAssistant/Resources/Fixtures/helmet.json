@@ -1,0 +1,41 @@
+{
+ "case_id": "demo-helmet",
+ "category": "unsupported",
+ "risk_level": "professional",
+ "safety": {
+  "blocked": true,
+  "reason": "Ein Helm schützt nur, wenn er unbeschädigt ist. Eine Reparatur zu Hause kann die Schutzwirkung unbemerkt zerstören."
+ },
+ "segments": [
+  {
+   "id": "seg_helmet",
+   "label": "Helmschale",
+   "kind": "part",
+   "prompt": "helmet",
+   "box": [
+    0.196,
+    0.2,
+    0.608,
+    0.5
+   ],
+   "mask": null,
+   "score": 0.9
+  }
+ ],
+ "diagnosis": {
+  "summary": "Helm mit Schaden an der Schale.",
+  "likely_causes": [],
+  "confidence": 0.9,
+  "evidence_segment_ids": [
+   "seg_helmet"
+  ],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": null
+ },
+ "decision": null,
+ "shopping_list": [],
+ "guide": {
+  "steps": []
+ }
+}

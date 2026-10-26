@@ -1,0 +1,286 @@
+{
+ "case_id": "demo-shoe",
+ "category": "shoe",
+ "risk_level": "allowed",
+ "safety": {
+  "blocked": false,
+  "reason": null
+ },
+ "segments": [
+  {
+   "id": "seg_gap",
+   "label": "Abgelöste Sohle",
+   "kind": "damage",
+   "prompt": "detached sole",
+   "box": [
+    0.075,
+    0.585,
+    0.325,
+    0.075
+   ],
+   "mask": {
+    "format": "polygon",
+    "points": [
+     [
+      0.075,
+      0.585
+     ],
+     [
+      0.22,
+      0.612
+     ],
+     [
+      0.4,
+      0.622
+     ],
+     [
+      0.4,
+      0.634
+     ],
+     [
+      0.22,
+      0.642
+     ],
+     [
+      0.075,
+      0.66
+     ]
+    ]
+   },
+   "score": 0.9
+  },
+  {
+   "id": "seg_sole",
+   "label": "Sohle",
+   "kind": "part",
+   "prompt": "shoe sole",
+   "box": [
+    0.07,
+    0.62,
+    0.86,
+    0.11
+   ],
+   "mask": {
+    "format": "polygon",
+    "points": [
+     [
+      0.11000000000000001,
+      0.62
+     ],
+     [
+      0.89,
+      0.62
+     ],
+     [
+      0.93,
+      0.66
+     ],
+     [
+      0.93,
+      0.69
+     ],
+     [
+      0.89,
+      0.73
+     ],
+     [
+      0.11000000000000001,
+      0.73
+     ],
+     [
+      0.07,
+      0.69
+     ],
+     [
+      0.07,
+      0.66
+     ]
+    ]
+   },
+   "score": 0.88
+  },
+  {
+   "id": "seg_upper",
+   "label": "Obermaterial",
+   "kind": "part",
+   "prompt": "shoe upper",
+   "box": [
+    0.1,
+    0.3,
+    0.8,
+    0.32
+   ],
+   "mask": null,
+   "score": 0.8
+  }
+ ],
+ "diagnosis": {
+  "summary": "Die Sohle hat sich vorne auf etwa 8 cm vom Obermaterial gelöst. Die Klebefuge ist trocken und sauber.",
+  "likely_causes": [
+   "Der Kleber ist über die Jahre ausgetrocknet",
+   "Feuchtigkeit hat die Verbindung geschwächt"
+  ],
+  "confidence": 0.86,
+  "evidence_segment_ids": [
+   "seg_gap",
+   "seg_sole"
+  ],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": null
+ },
+ "decision": {
+  "recommendation": "repair_self",
+  "reasoning": "Eine abgelöste Sohle ohne Risse im Material lässt sich gut neu kleben.",
+  "effort": "low",
+  "time_minutes": [
+   45,
+   90
+  ],
+  "cost_eur": [
+   6,
+   12
+  ],
+  "estimate_note": "Schätzung, keine Garantie"
+ },
+ "shopping_list": [
+  {
+   "id": "item_glue",
+   "name": "Kontaktkleber für Schuhe",
+   "kind": "material",
+   "quantity": "1 Tube",
+   "required": true,
+   "search_term": "Schuhkleber Kontaktkleber",
+   "household_alternative": "Sekundenkleber nur im Notfall"
+  },
+  {
+   "id": "item_brush",
+   "name": "Pinsel",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": false,
+   "search_term": "Kleberpinsel",
+   "household_alternative": "Zahnstocher"
+  },
+  {
+   "id": "item_sandpaper",
+   "name": "Schleifpapier fein",
+   "kind": "material",
+   "quantity": "1 Blatt",
+   "required": true,
+   "search_term": "Schleifpapier 120",
+   "household_alternative": "Nagelfeile"
+  },
+  {
+   "id": "item_cloth",
+   "name": "Lappen",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "Mikrofasertuch",
+   "household_alternative": "Altes T-Shirt"
+  },
+  {
+   "id": "item_band",
+   "name": "Gummiband oder Spanngurt",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "Spanngurt klein",
+   "household_alternative": "Einmachgummi"
+  }
+ ],
+ "guide": {
+  "steps": [
+   {
+    "n": 1,
+    "title": "Flächen reinigen",
+    "text": "Entferne Schmutz und alten Kleber von Sohle und Obermaterial und raue beide Flächen leicht an.",
+    "common_mistake": "Fettige Stellen vergessen. Dort hält der Kleber nicht.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_gap",
+     "seg_sole"
+    ],
+    "uses_items": [
+     "item_sandpaper",
+     "item_cloth"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_gap"
+    }
+   },
+   {
+    "n": 2,
+    "title": "Kleber dünn auftragen",
+    "text": "Trage Kontaktkleber dünn auf beide Flächen auf. Lüfte den Raum, die Dämpfe sind gesundheitsschädlich. Keine offene Flamme.",
+    "common_mistake": "Zu dick auftragen. Dann bindet der Kleber schlecht.",
+    "safety_critical": true,
+    "requires_confirmation": true,
+    "segment_ids": [
+     "seg_gap"
+    ],
+    "uses_items": [
+     "item_glue",
+     "item_brush"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_gap"
+    }
+   },
+   {
+    "n": 3,
+    "title": "Ablüften lassen",
+    "text": "Warte etwa 10 bis 15 Minuten, bis der Kleber fast trocken und klebrig ist.",
+    "common_mistake": "Zu früh zusammendrücken.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_gap"
+    ],
+    "uses_items": [],
+    "overlay": null
+   },
+   {
+    "n": 4,
+    "title": "Sohle andrücken",
+    "text": "Drücke Sohle und Schuh fest zusammen und richte sie genau aus. Beim ersten Kontakt sitzt der Kleber sofort.",
+    "common_mistake": "Verrutscht ansetzen. Korrigieren geht danach nicht mehr.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_gap",
+     "seg_sole"
+    ],
+    "uses_items": [
+     "item_band"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_gap"
+    }
+   },
+   {
+    "n": 5,
+    "title": "Fixieren und aushärten",
+    "text": "Wickle ein Gummiband um den Schuh und lasse ihn 24 Stunden liegen.",
+    "common_mistake": "Den Schuh zu früh belasten.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_sole"
+    ],
+    "uses_items": [
+     "item_band"
+    ],
+    "overlay": null
+   }
+  ]
+ }
+}
