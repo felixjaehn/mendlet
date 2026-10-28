@@ -26,7 +26,7 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Die Kamera wird genutzt, um ein Foto des defekten Gegenstands aufzunehmen.</string>
+	<string>Die Kamera erkennt Schäden im Live-Bild, nimmt ein Foto auf und zeigt Stichpunkte auf dem Stoff.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Die App verbindet sich mit dem Analyse-Server in deinem lokalen Netzwerk.</string>
 	<key>NSMicrophoneUsageDescription</key>

@@ -16,6 +16,9 @@ struct GuideView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         photo(step, r)
+                        if step.overlay?.type == .stitchPath, let image = flow.photo {
+                            LiveStitchButton(image: image, step: step, response: r, phase: darningPhase(for: step, in: r), demoMode: flow.settings.demoMode)
+                        }
                         stepContent(step, r)
                     }
                     .id(step.n)

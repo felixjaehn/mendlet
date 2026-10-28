@@ -28,7 +28,7 @@ targets:
         CFBundleDevelopmentRegion: de
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
-        NSCameraUsageDescription: "Die Kamera wird genutzt, um ein Foto des defekten Gegenstands aufzunehmen."
+        NSCameraUsageDescription: "Die Kamera erkennt Schäden im Live-Bild, nimmt ein Foto auf und zeigt Stichpunkte auf dem Stoff."
         NSMicrophoneUsageDescription: "Das Mikrofon wird genutzt, um den Schaden per Sprache zu beschreiben."
         NSPhotoLibraryUsageDescription: "Der Zugriff auf deine Fotos erlaubt dir, ein vorhandenes Bild des Schadens auszuwählen."
         NSLocalNetworkUsageDescription: "Die App verbindet sich mit dem Analyse-Server in deinem lokalen Netzwerk."

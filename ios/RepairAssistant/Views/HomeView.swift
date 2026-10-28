@@ -3,6 +3,8 @@ import PhotosUI
 
 struct HomeView: View {
     @Environment(FlowModel.self) private var flow
+    @State private var showLiveScan = false
+    @State private var liveCapture: (UIImage, DemoScenario?)?
     @State private var showCamera = false
     @State private var showGallery = false
     @State private var pickerItem: PhotosPickerItem?
@@ -15,6 +17,7 @@ struct HomeView: View {
                 headline
                 ThreadHero().frame(height: 132)
                 VStack(spacing: 12) {
+                    PrimaryButton(title: "Live-Scan", systemImage: "viewfinder") { showLiveScan = true }
                     PrimaryButton(title: "Foto aufnehmen", systemImage: "camera.fill") {
                         if CameraPicker.isAvailable { showCamera = true } else { showGallery = true }
                     }
@@ -37,6 +40,17 @@ struct HomeView: View {
         .navigationBarHidden(true)
         .fullScreenCover(isPresented: $showCamera) {
             CameraPicker { flow.choose($0) }.ignoresSafeArea()
+        }
+        .fullScreenCover(isPresented: $showLiveScan, onDismiss: {
+            if let (photo, scenario) = liveCapture {
+                liveCapture = nil
+                flow.choose(photo, scenarioHint: scenario)
+            }
+        }) {
+            LiveScanView(settings: flow.settings) { photo, scenario in
+                liveCapture = (photo, scenario)
+                showLiveScan = false
+            }
         }
         .photosPicker(isPresented: $showGallery, selection: $pickerItem, matching: .images)
         .onChange(of: pickerItem) { _, item in
