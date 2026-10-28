@@ -15,7 +15,8 @@ from .models import Mask, MaskRing, RefinePoint, Segment, TrackFrame, TrackedSeg
 
 # Short English noun phrases (SAM handles one concept per request).
 SEGMENT_PROMPTS: dict[str, list[str]] = {
-    "textile": ["tear", "rip", "hole", "open seam", "frayed edge", "garment", "button"],
+    # "tear" found nothing on a clear tear live (docs/benchmark.md); "rip" did, grounding covers the rest.
+    "textile": ["rip", "hole", "open seam", "frayed edge", "garment", "button"],
     "shoe": ["shoe sole", "seam", "detached sole", "heel"],
     "low_voltage_electronics": ["cable", "connector", "housing"],
 }

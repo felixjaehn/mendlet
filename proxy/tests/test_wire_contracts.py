@@ -197,7 +197,7 @@ async def test_full_real_pipeline_raw_wire_and_cached_replay(tmp_path):
         seen.append((req.url.path, data))
         if req.url.path == '/v1/responses':
             concept = data['input'][0]['content'][0]['text']
-            return sam_response(SAM.read_text() if concept == 'tear' else '')
+            return sam_response(SAM.read_text() if concept == 'rip' else '')
         name = data['response_format']['json_schema']['name']
         if name == 'diagnose':
             payload = json.loads(data['messages'][1]['content'][0]['text'])
@@ -214,7 +214,7 @@ async def test_full_real_pipeline_raw_wire_and_cached_replay(tmp_path):
         assert all(set(s.segment_ids) <= {'seg_1'} for s in result.guide.steps)
         assert all(s.overlay is None or s.overlay.segment_id == 'seg_1' for s in result.guide.steps)
         calls = len(seen)
-        assert calls == 11  # SAM concepts + classify + diagnose + parallel grounding (Spark box, SAM box)
+        assert calls == 10  # 6 SAM concepts + classify + diagnose + parallel grounding (Spark box, SAM box)
         await analyze(req, c)
         assert len(seen) == calls
     finally:
@@ -351,9 +351,9 @@ async def test_grounding_full_pipeline_structured_wire_clipping_mask_and_cache(t
         assert [s.source for s in result.segments] == ['text', 'grounding']
         assert result.segments[1].mask.points and result.instances == {'tear': 1}
         cost = c.budget.spent_today()
-        assert len(seen) == 11
+        assert len(seen) == 10  # 6 SAM concepts + classify + grounding (Spark, SAM box) + diagnose
         await analyze(req, c)
-        assert len(seen) == 11 and c.budget.spent_today() == cost
+        assert len(seen) == 10 and c.budget.spent_today() == cost
     finally:
         await c.aclose()
 

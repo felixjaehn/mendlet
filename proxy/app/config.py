@@ -42,6 +42,8 @@ class Settings:
     prompts_dir: Path = field(default_factory=lambda: REPO_DIR / "prompts")
     mock_delay_scale: float = 1.0
     muse_max_completion_tokens: int = 16000
+    # Spark reasoning effort (docs: minimal..max). "low" halved diagnose latency live at equal quality (benchmark.md).
+    muse_reasoning_effort: str = "low"
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] | None = None) -> "Settings":
@@ -62,4 +64,5 @@ class Settings:
             prompts_dir=Path(e.get("PROMPTS_DIR") or REPO_DIR / "prompts"),
             mock_delay_scale=float(e.get("MOCK_DELAY_SCALE") or 1.0),
             muse_max_completion_tokens=int(e.get("MUSE_MAX_COMPLETION_TOKENS") or 16000),
+            muse_reasoning_effort=(e.get("MUSE_REASONING_EFFORT") or "low").strip(),
         )

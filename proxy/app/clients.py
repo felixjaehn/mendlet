@@ -68,6 +68,9 @@ def preview_prompt(req: AfterPreviewRequest) -> str:
             "Keep the same object, material, lighting, perspective and background; nothing else changed.")
 
 
+SAM_TEXT_MAX_EDGE = 1024
+
+
 class RealMetaClient:
     plan_delay = 0.0
 
@@ -101,6 +104,7 @@ class RealMetaClient:
                 },
                 temperature=0.2,
                 max_completion_tokens=self.s.muse_max_completion_tokens,
+                **({"reasoning_effort": self.s.muse_reasoning_effort} if self.s.muse_reasoning_effort else {}),
             )
         except APITimeoutError as exc:
             raise AppError("timeout", "Das Modell hat zu lange gebraucht. Bitte versuche es erneut.", 504) from exc
@@ -166,9 +170,12 @@ class RealMetaClient:
     # ---- SAM 3.1 (responses API, one concept per request) -----------------------
 
     async def segment(self, req: AnalyzeRequest, category: str, prompts: list[str]) -> list[Segment]:
-        width, height = Image.open(io.BytesIO(base64.b64decode(req.image_base64))).size
+        # Text concepts run in parallel and Meta queues them; 1024 px kept masks precise and halved
+        # per-call latency in the live probe (docs/benchmark.md). Results are normalized, so size is free.
+        image = downscale_b64(req.image_base64, SAM_TEXT_MAX_EDGE)
+        width, height = Image.open(io.BytesIO(base64.b64decode(image))).size
         results = await asyncio.gather(
-            *(self._sam_one(req.image_base64, p, width, height) for p in prompts), return_exceptions=True
+            *(self._sam_one(image, p, width, height) for p in prompts), return_exceptions=True
         )
         dets: list[SamDetection] = []
         errors = [r for r in results if isinstance(r, BaseException)]

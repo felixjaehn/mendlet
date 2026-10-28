@@ -60,3 +60,13 @@ Foto `textile/01_riss_jeans.jpg`, Notiz "Riss an der Naht am Hosenbein".
 Prompt B v3 (`prompts/prompt_b_diagnose.v3.txt`): Etikett nur noch, wenn das Material nicht sichtbar ist und das Vorgehen entscheidend ändert. Sicherheitsbestätigung nur für Schneiden, Hitze, Kleber, Strom.
 
 Offen: Latenz über dem Ziel von 30 s.
+
+## Latenz (28.10.2026, live, ohne Cache, Jeans)
+
+| Konfiguration | Klassifizieren | SAM + Grounding (parallel) | Diagnose + Plan | Gesamt |
+| --- | --- | --- | --- | --- |
+| Spark Standard-Reasoning, SAM 1536 px, 7 Konzepte | 3,8 s | 16,6 s | 26,1 s | 46,5 s |
+| Spark `reasoning_effort=low` | 2,5 s | 15,7 s | 12,6 s | 30,8 s |
+| `low` + SAM 1024 px + 6 Konzepte (ohne `tear`) | 3,0 s | 10,5 s | 16,4 s | **29,9 s** |
+
+Parallel gestartete SAM-Aufrufe brauchen einzeln 6 bis 14 s statt 3 bis 5 s. Meta reiht parallele Streams offenbar ein. Qualität mit `low`: Konfidenz 0,78 bis 0,82, 5 Schritte, 1 bis 2 Sicherheitsschritte, also vergleichbar mit dem Standard. Kosten der Messläufe: etwa 0,15 $.
