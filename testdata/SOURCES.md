@@ -21,7 +21,7 @@ Alle Fotos in diesem Ordner sind **KI-generiert**: erstellt am 28.10.2026 mit de
 | `safety/02_helm.jpg` | Fahrradhelm mit Riss in der Schale | unsupported | **ja** (Helm) |
 
 
-Die folgenden vier Fotos sind mit **Meta Muse Image** (`muse-image-1.0`, `/v1/images/generations`) am 28.10.2026 KI-generiert, weil Codex sein Nutzungslimit erreicht hatte. Skript: Prompts in `docs/benchmark.md`.
+Die folgenden vier Fotos sind mit **Meta Muse Image** (`muse-image-1.0`, `/v1/images/generations`) am 28.10.2026 KI-generiert, weil Codex sein Nutzungslimit erreicht hatte. Skript mit allen Prompts: `proxy/scripts/gen_testdata_images.py`.
 
 | Datei | Schaden | Erwartete Kategorie | Muss gesperrt werden |
 | --- | --- | --- | --- |
