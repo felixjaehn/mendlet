@@ -30,6 +30,10 @@ struct AnalysisView: View {
                 } else {
                     VStack(spacing: 0) {
                         ForEach(Array(stages.enumerated()), id: \.offset) { i, s in
+                            if s.0 == .segment && flow.groundingSeen {
+                                StageRow(title: "Muse Spark lokalisiert → SAM segmentiert", subtitle: "Zweiter Versuch mit Spark-Box", state: state(for: .segment))
+                                Divider().overlay(Theme.hairline).padding(.leading, 46)
+                            }
                             StageRow(title: s.1, subtitle: s.2, state: state(for: s.0))
                             if i < stages.count - 1 { Divider().overlay(Theme.hairline).padding(.leading, 46) }
                         }

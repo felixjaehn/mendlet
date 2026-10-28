@@ -85,7 +85,7 @@ final class LiveScanStateTests: XCTestCase {
 
     func testInvalidAndOffscreenMasksCannotCapture() {
         var machine = LiveScanStateMachine()
-        machine.observe(polygon: [CGPoint(x: .nan, y: 0), .zero, CGPoint(x: 1, y: 1)], at: 0, trackingValid: true)
+        machine.observe(polygon: [CGPoint(x: CGFloat.nan, y: 0), .zero, CGPoint(x: 1, y: 1)], at: 0, trackingValid: true)
         XCTAssertEqual(machine.state, .searching)
         machine.observe(polygon: mask.map { CGPoint(x: $0.x + 1, y: $0.y) }, at: 1, trackingValid: true)
         XCTAssertEqual(machine.state, .searching)

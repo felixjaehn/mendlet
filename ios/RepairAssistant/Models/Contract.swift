@@ -415,10 +415,13 @@ struct AnalyzeResponse: Codable, Sendable, Hashable {
     var decision: Decision?
     var shoppingList: [ShoppingItem]
     var guide: Guide
+    /// Optional: number of emitted damage segments per prompt (e.g. ["tear": 2]).
+    var instances: [String: Int]?
 
-    private enum CodingKeys: String, CodingKey { case caseId, category, riskLevel, safety, segments, diagnosis, decision, shoppingList, guide }
+    private enum CodingKeys: String, CodingKey { case caseId, category, riskLevel, safety, segments, diagnosis, decision, shoppingList, guide, instances }
 
-    init(caseId: String = UUID().uuidString, category: Category, riskLevel: RiskLevel, safety: Safety = Safety(), segments: [Segment] = [], diagnosis: Diagnosis = .empty, decision: Decision? = nil, shoppingList: [ShoppingItem] = [], guide: Guide = .empty) {
+    init(caseId: String = UUID().uuidString, category: Category, riskLevel: RiskLevel, safety: Safety = Safety(), segments: [Segment] = [], diagnosis: Diagnosis = .empty, decision: Decision? = nil, shoppingList: [ShoppingItem] = [], guide: Guide = .empty, instances: [String: Int]? = nil) {
+        self.instances = instances
         self.caseId = caseId; self.category = category; self.riskLevel = riskLevel; self.safety = safety
         self.segments = segments; self.diagnosis = diagnosis; self.decision = decision
         self.shoppingList = shoppingList; self.guide = guide
@@ -435,6 +438,7 @@ struct AnalyzeResponse: Codable, Sendable, Hashable {
         decision = (try? c.decodeIfPresent(Decision.self, forKey: .decision)) ?? nil
         shoppingList = (try? c.decode([ShoppingItem].self, forKey: .shoppingList)) ?? []
         guide = (try? c.decode(Guide.self, forKey: .guide)) ?? .empty
+        instances = (try? c.decodeIfPresent([String: Int].self, forKey: .instances)) ?? nil
     }
 
     func segment(_ id: String) -> Segment? { segments.first { $0.id == id } }
@@ -489,6 +493,87 @@ struct StepHelpResponse: Codable, Sendable, Hashable {
         retryHint = (try? c.decodeIfPresent(String.self, forKey: .retryHint)) ?? nil
         escalate = (try? c.decode(Bool.self, forKey: .escalate)) ?? false
     }
+}
+
+// MARK: - /refine, /track, /after-preview
+
+struct RefinePoint: Codable, Sendable, Hashable {
+    var x: Double
+    var y: Double
+    /// "positive" or "negative"
+    var label: String
+}
+
+struct RefineRequest: Codable, Sendable {
+    var imageBase64: String
+    var points: [RefinePoint] = []
+    /// [x, y, w, h] normalized to the EXIF-oriented photo.
+    var box: [Double]?
+    var label: String
+}
+
+struct TrackRequest: Codable, Sendable {
+    var videoBase64: String
+    var concept: String
+}
+
+/// A segment inside a tracked frame; carries SAM's decimal `object_id` as string.
+struct TrackedSegment: Codable, Sendable, Hashable, Identifiable {
+    var segment: Segment
+    var objectId: String
+    var id: String { segment.id }
+
+    private enum ExtraKeys: String, CodingKey { case objectId }
+    init(segment: Segment, objectId: String) { self.segment = segment; self.objectId = objectId }
+    init(from decoder: Decoder) throws {
+        segment = try Segment(from: decoder)
+        let c = try decoder.container(keyedBy: ExtraKeys.self)
+        if let s = try? c.decode(String.self, forKey: .objectId) { objectId = s }
+        else if let i = try? c.decode(Int.self, forKey: .objectId) { objectId = String(i) }
+        else { objectId = "" }
+    }
+    func encode(to encoder: Encoder) throws {
+        try segment.encode(to: encoder)
+        var c = encoder.container(keyedBy: ExtraKeys.self)
+        try c.encode(objectId, forKey: .objectId)
+    }
+}
+
+struct TrackFrame: Codable, Sendable, Hashable {
+    var index: Int
+    var segments: [TrackedSegment]
+    private enum CodingKeys: String, CodingKey { case index, segments }
+    init(index: Int, segments: [TrackedSegment]) { self.index = index; self.segments = segments }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        index = (try? c.decode(Int.self, forKey: .index)) ?? 0
+        segments = (try? c.decode([TrackedSegment].self, forKey: .segments)) ?? []
+    }
+}
+
+struct TrackResponse: Codable, Sendable, Hashable {
+    var frames: [TrackFrame]
+    var fps: Double?
+    private enum CodingKeys: String, CodingKey { case frames, fps }
+    init(frames: [TrackFrame], fps: Double? = nil) { self.frames = frames; self.fps = fps }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        frames = (try? c.decode([TrackFrame].self, forKey: .frames)) ?? []
+        fps = (try? c.decodeIfPresent(Double.self, forKey: .fps)) ?? nil
+    }
+}
+
+struct AfterPreviewRequest: Codable, Sendable {
+    var imageBase64: String
+    var diagnosisSummary: String
+    var stitchType: StitchType
+}
+
+struct AfterPreviewResponse: Codable, Sendable, Hashable {
+    /// Plain base64 image (PNG/JPEG/WebP), no data URL.
+    var imageBase64: String
+    var model: String
+    var imageData: Data? { Data(base64Encoded: imageBase64, options: .ignoreUnknownCharacters) }
 }
 
 enum ContractCoding {

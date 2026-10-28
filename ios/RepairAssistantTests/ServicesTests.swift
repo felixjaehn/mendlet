@@ -39,7 +39,7 @@ final class ServicesTests: XCTestCase {
         var last: AnalyzeResponse?
         var stages: [AnalysisStage] = []
         for try await e in mock.analyze(req) {
-            switch e { case .progress(let s, _, _): stages.append(s); case .result(let r): last = r }
+            switch e { case .progress(let s, _, _): stages.append(s); case .result(let r): last = r; case .grounding: break }
         }
         XCTAssertEqual(last?.diagnosis.needsMoreInfo, true)
         XCTAssertEqual(stages, [.classify, .segment, .diagnose])
@@ -52,5 +52,35 @@ final class ServicesTests: XCTestCase {
     func testDemoImagesGenerate() {
         for s in DemoScenario.allCases { XCTAssertEqual(DemoImageFactory.image(for: s).size.width, 1500) }
         XCTAssertGreaterThan(DemoImageFactory.labelImage().size.width, 0)
+    }
+}
+
+final class ContractExtensionTests: XCTestCase {
+    func testGroundingSSEAndInstances() throws {
+        let e = try SSEDecoder.decode(SSEMessage(event: "grounding", data: #"{"label":"Schadstelle genauer lokalisieren"}"#))
+        if case .grounding(let l)? = e { XCTAssertEqual(l, "Schadstelle genauer lokalisieren") } else { XCTFail() }
+        let r = try ContractCoding.decoder().decode(AnalyzeResponse.self, from: Data(#"{"category":"textile","risk_level":"allowed","instances":{"tear":2}}"#.utf8))
+        XCTAssertEqual(r.instances?["tear"], 2)
+    }
+
+    func testTrackDecodingKeepsObjectIdString() throws {
+        let json = #"{"frames":[{"index":3,"segments":[{"id":"seg_7","label":"Riss","kind":"damage","prompt":"tear","box":[0.1,0.1,0.2,0.2],"score":0.8,"object_id":"7"}]},{"index":4,"segments":[]}],"fps":10}"#
+        let t = try ContractCoding.decoder().decode(TrackResponse.self, from: Data(json.utf8))
+        XCTAssertEqual(t.frames.count, 2)
+        XCTAssertEqual(t.frames[0].segments[0].objectId, "7")
+        XCTAssertEqual(t.frames[0].segments[0].segment.id, "seg_7")
+        XCTAssertEqual(t.fps, 10)
+    }
+
+    func testMockRefineTrackAfterPreview() async throws {
+        let m = MockAPIClient(speed: 100)
+        let s = try await m.refine(RefineRequest(imageBase64: "", points: [RefinePoint(x: 0.5, y: 0.5, label: "positive")], box: nil, label: "Riss"))
+        XCTAssertEqual(s.source, .tap)
+        let t = try await m.track(TrackRequest(videoBase64: "", concept: "tear"))
+        XCTAssertEqual(t.frames.count, 10)
+        let a = try await m.afterPreview(AfterPreviewRequest(imageBase64: "AAAA", diagnosisSummary: "x", stitchType: .ladderStitch))
+        XCTAssertEqual(a.imageBase64, "AAAA")
+        let enc = try ContractCoding.encoder().encode(AfterPreviewRequest(imageBase64: "A", diagnosisSummary: "x", stitchType: .darning))
+        XCTAssertTrue(String(decoding: enc, as: UTF8.self).contains("diagnosis_summary"))
     }
 }

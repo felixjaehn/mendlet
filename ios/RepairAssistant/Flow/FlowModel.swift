@@ -19,6 +19,8 @@ final class FlowModel {
     // Analysis
     var stageStates: [AnalysisStage: StageState] = [:]
     var earlySegments: [Segment] = []
+    /// true once the proxy announced the Spark grounding fallback (extra live step).
+    var groundingSeen = false
     var isAnalyzing = false
     var analysisError: String?
     var response: AnalyzeResponse?
@@ -66,7 +68,7 @@ final class FlowModel {
         showFollowUp = false
         analysisError = nil
         response = resetExtras ? nil : response
-        stageStates = [:]
+        stageStates = [:]; groundingSeen = false
         earlySegments = resetExtras ? [] : (response?.segments ?? earlySegments)
         isAnalyzing = true
         path = [.analysis]
@@ -99,6 +101,8 @@ final class FlowModel {
             let idx = order.firstIndex(of: stage) ?? 0
             for (i, s) in order.enumerated() { stageStates[s] = i < idx ? .done : (i == idx ? .active : .pending) }
             if let segments, !segments.isEmpty { earlySegments = segments }
+        case .grounding:
+            groundingSeen = true
         case .result(let r):
             finish(with: FlowGate.sanitized(r))
         }
@@ -207,7 +211,7 @@ final class FlowModel {
         photo = nil; note = ""; response = nil; showReview = false; showFollowUp = false
         extraImages = []; answers = []; followUpUsed = false; labelImage = nil; resultPhoto = nil
         statuses = [:]; currentStep = 0; completedSteps = []; guideStartedAt = nil
-        earlySegments = []; analysisError = nil; isAnalyzing = false; stageStates = [:]
+        earlySegments = []; analysisError = nil; isAnalyzing = false; stageStates = [:]; groundingSeen = false
         newInfoBanner = nil
     }
 

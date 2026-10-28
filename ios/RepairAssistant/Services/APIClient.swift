@@ -7,6 +7,8 @@ enum AnalysisStage: String, CaseIterable, Sendable, Codable {
 enum AnalyzeEvent: Sendable {
     case progress(stage: AnalysisStage, label: String, segments: [Segment]?)
     case result(AnalyzeResponse)
+    /// Spark fallback: no SAM text hit, Muse Spark localizes the damage, SAM segments with the box.
+    case grounding(label: String)
 }
 
 enum APIError: LocalizedError, Sendable, Equatable {
@@ -48,6 +50,9 @@ protocol AnalysisService: Sendable {
     func analyze(_ request: AnalyzeRequest) -> AsyncThrowingStream<AnalyzeEvent, Error>
     func stepHelp(_ request: StepHelpRequest) async throws -> StepHelpResponse
     func transcribe(fileURL: URL) async throws -> String
+    func refine(_ request: RefineRequest) async throws -> Segment
+    func track(_ request: TrackRequest) async throws -> TrackResponse
+    func afterPreview(_ request: AfterPreviewRequest) async throws -> AfterPreviewResponse
 }
 
 // MARK: - SSE
@@ -100,6 +105,7 @@ enum SSEDecoder {
         var label: String?
         var segments: [Segment]?
     }
+    struct GroundingPayload: Decodable { var label: String? }
     struct ErrorPayload: Decodable { var message: String? }
 
     /// Returns nil for events to ignore.
@@ -114,6 +120,9 @@ enum SSEDecoder {
         case "result":
             do { return .result(try decoder.decode(AnalyzeResponse.self, from: data)) }
             catch { throw APIError.decoding }
+        case "grounding":
+            let g = try? decoder.decode(GroundingPayload.self, from: data)
+            return .grounding(label: g?.label ?? "Schadstelle genauer lokalisieren")
         case "error":
             let e = try? decoder.decode(ErrorPayload.self, from: data)
             throw APIError.server(e?.message ?? "")
@@ -121,6 +130,11 @@ enum SSEDecoder {
             return nil
         }
     }
+}
+
+private struct ErrorEnvelope: Decodable {
+    struct Inner: Decodable { var code: String?; var message: String? }
+    var error: Inner?
 }
 
 // MARK: - Live client
@@ -202,6 +216,34 @@ struct LiveAPIClient: AnalysisService {
             if let h = resp as? HTTPURLResponse, h.statusCode != 200 { throw APIError.http(h.statusCode) }
             return try ContractCoding.decoder().decode(StepHelpResponse.self, from: data)
         } catch { throw APIError.from(error) }
+    }
+
+    private func postJSON<Body: Encodable, Out: Decodable>(_ path: String, _ body: Body, as: Out.Type, timeout: TimeInterval = 120) async throws -> Out {
+        var req = URLRequest(url: url(path))
+        req.httpMethod = "POST"
+        req.timeoutInterval = timeout
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = try ContractCoding.encoder().encode(body)
+        do {
+            let (data, resp) = try await session.data(for: req)
+            if let h = resp as? HTTPURLResponse, h.statusCode != 200 {
+                if let m = (try? JSONDecoder().decode(ErrorEnvelope.self, from: data))?.error?.message, !m.isEmpty { throw APIError.server(m) }
+                throw APIError.http(h.statusCode)
+            }
+            return try ContractCoding.decoder().decode(Out.self, from: data)
+        } catch { throw APIError.from(error) }
+    }
+
+    func refine(_ request: RefineRequest) async throws -> Segment {
+        try await postJSON("refine", request, as: Segment.self)
+    }
+
+    func track(_ request: TrackRequest) async throws -> TrackResponse {
+        try await postJSON("track", request, as: TrackResponse.self, timeout: 180)
+    }
+
+    func afterPreview(_ request: AfterPreviewRequest) async throws -> AfterPreviewResponse {
+        try await postJSON("after-preview", request, as: AfterPreviewResponse.self)
     }
 
     func transcribe(fileURL: URL) async throws -> String {
