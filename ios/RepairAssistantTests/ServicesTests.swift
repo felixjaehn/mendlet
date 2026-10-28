@@ -34,12 +34,12 @@ final class ServicesTests: XCTestCase {
     }
 
     func testMockTearFlowAsksForLabelThenResolves() async throws {
-        let mock = MockAPIClient(speed: 100)
+        let mock = MockAPIClient(speed: 100, useRecordings: false)
         var req = AnalyzeRequest(imageBase64: "", userNote: "", mockScenario: "textile_tear")
         var last: AnalyzeResponse?
         var stages: [AnalysisStage] = []
         for try await e in mock.analyze(req) {
-            switch e { case .progress(let s, _, _): stages.append(s); case .result(let r): last = r; case .grounding: break }
+            switch e { case .progress(let s, _, _): stages.append(s); case .result(let r): last = r; default: break }
         }
         XCTAssertEqual(last?.diagnosis.needsMoreInfo, true)
         XCTAssertEqual(stages, [.classify, .segment, .diagnose])
