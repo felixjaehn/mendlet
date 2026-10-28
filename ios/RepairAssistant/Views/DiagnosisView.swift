@@ -14,7 +14,7 @@ struct DiagnosisView: View {
             VStack(alignment: .leading, spacing: 18) {
                 if let photo = flow.photo, let r {
                     PhotoStage(image: photo) { size in
-                        SegmentOverlayView(segments: r.segments, size: size, hidden: hidden, pulsingIDs: pulsing, appeared: appeared, showDimension: true)
+                        SegmentOverlayView(segments: r.segments, size: size, hidden: hidden, pulsingIDs: pulsing, appeared: appeared)
                     }
                     chipBar(r)
                 }
