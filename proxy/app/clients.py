@@ -112,6 +112,9 @@ class RealMetaClient:
         tokens_out = usage.completion_tokens if usage else 800
         self.budget.add(muse_cost(tokens_in, tokens_out))
         if not resp.choices or resp.choices[0].finish_reason == "length":
+            log.warning("muse %s incomplete: finish=%s out_tokens=%s limit=%s", schema_name,
+                        resp.choices[0].finish_reason if resp.choices else None, tokens_out,
+                        self.s.muse_max_completion_tokens)
             raise ModelOutputError("Muse returned no complete choice")
         return resp.choices[0].message.content or ""
 

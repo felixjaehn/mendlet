@@ -41,7 +41,7 @@ class Settings:
     cache_dir: Path = field(default_factory=lambda: PROXY_DIR / ".cache")
     prompts_dir: Path = field(default_factory=lambda: REPO_DIR / "prompts")
     mock_delay_scale: float = 1.0
-    muse_max_completion_tokens: int = 4096
+    muse_max_completion_tokens: int = 16000
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] | None = None) -> "Settings":
@@ -61,5 +61,5 @@ class Settings:
             cache_dir=Path(e.get("CACHE_DIR") or PROXY_DIR / ".cache"),
             prompts_dir=Path(e.get("PROMPTS_DIR") or REPO_DIR / "prompts"),
             mock_delay_scale=float(e.get("MOCK_DELAY_SCALE") or 1.0),
-            muse_max_completion_tokens=int(e.get("MUSE_MAX_COMPLETION_TOKENS") or 4096),
+            muse_max_completion_tokens=int(e.get("MUSE_MAX_COMPLETION_TOKENS") or 16000),
         )

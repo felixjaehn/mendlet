@@ -45,3 +45,18 @@ Smoke-Test plus Sondierung: etwa 0,06 $ (geschätzt aus Token und Bildzahl, Rech
 ## Vollständiger Benchmark
 
 Ausstehend: alle Fälle aus `testdata/` über `/analyze` (Ziele aus PRD §11).
+
+## Erste Ende-zu-Ende-Läufe über `/analyze` (28.10.2026, live)
+
+Foto `textile/01_riss_jeans.jpg`, Notiz "Riss an der Naht am Hosenbein".
+
+| Lauf | Prompt B | Ergebnis | Latenz | Kosten kumuliert |
+| --- | --- | --- | --- | --- |
+| 1 | v2 | SAM per Text: `rip` 0,91, `frayed edge` 0,59, `garment` 0,90. Diagnose korrekt (Riss neben intakter Seitennaht), Konfidenz 0,5, fragt nach Etikett, keine Anleitung | 30 s | 0,047 $ |
+| 2 | v2 + Etikettfoto | **Fehler**: Antwort bei 4096 Output-Token abgeschnitten (`finish_reason=length`). Limit auf 16.000 erhöht | 25 s | 0,073 $ |
+| 2b | v2 + Etikettfoto, 16k | Etikett gelesen (98 % Baumwolle, 2 % Elasthan, Pflege). Konfidenz 0,82. Einkaufsliste mit **dehnbarem** Flickstoff, Denim-Nadel. 5 Schritte mit Heften (Vorstich) und Stopfen. Aber: alle 5 Schritte als sicherheitskritisch markiert | 9 s (Cache) | – |
+| 3 | v3 | Fragt **nicht** nach dem Etikett ("Vermutlich Denim … Annahme"), Konfidenz 0,8, vollständige Anleitung. Nur 2 von 5 Schritten sicherheitskritisch (Schere) | 35 s | 0,176 $ |
+
+Prompt B v3 (`prompts/prompt_b_diagnose.v3.txt`): Etikett nur noch, wenn das Material nicht sichtbar ist und das Vorgehen entscheidend ändert. Sicherheitsbestätigung nur für Schneiden, Hitze, Kleber, Strom.
+
+Offen: Latenz über dem Ziel von 30 s.

@@ -56,4 +56,13 @@ def test_schema_preserves_actual_title_property():
     step = inline_schema(DiagnosePlan)['properties']['guide']['properties']['steps']['items']
     assert step['properties']['title'] == {'type': 'string'}
     assert set(step['required']) <= set(step['properties'])
-    assert prompt_version('diagnose') == 'v2'
+    assert prompt_version('diagnose') == 'v3'
+
+
+def test_prompt_b_v3_label_and_safety_rules():
+    """Live 2026-10-28: v2 asked for the label on obvious denim and flagged every sewing step as safety-critical."""
+    from app.prompts import load_prompt
+    from app.config import Settings
+    text = load_prompt('diagnose', Settings.from_env({}).prompts_dir)
+    assert 'NICHT routinemäßig nach dem Etikett' in text
+    assert 'Normales Nähen mit der Handnadel' in text
