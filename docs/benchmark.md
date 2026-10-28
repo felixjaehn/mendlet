@@ -82,3 +82,17 @@ Parallel gestartete SAM-Aufrufe brauchen einzeln 6 bis 14 s statt 3 bis 5 s. Met
 Muse Image Nachher-Vorschau (`/after-preview`, `reasoning_strength=low`): Jeans 12 s, Pulli 11 s. Bildausschnitt, Licht und Material bleiben gleich, nur der Schaden ist repariert ([Jeans](live-probes/2026-10-28_jeans_muse-image_after.jpg)). Kosten gesamt bis hier: 0,47 $.
 
 Offene Qualitätspunkte: schwache Fehltreffer (Score < 0,6), die einen stärkeren Schaden überlappen oder nur Teile sind, sollten gefiltert werden.
+
+## Elektronik-Ausblick: SAM auf der USB-Platine (28.10.2026, live)
+
+Foto `electronics/01_kabel_platine.jpg` (Muse Image generiert).
+
+| Konzept | Treffer | Score | Latenz |
+| --- | --- | --- | --- |
+| `red wire` | 1 | 0,88 | 2,4 s |
+| `black wire` | 1 | 0,95 | 3,8 s |
+| `copper wire strands` | 2 (beide Kabelenden) | 0,61 / 0,57 | 2,3 s |
+| `circuit board` | 1 | 0,79 | 2,7 s |
+| `solder pad` | 0 | – | 1,8 s |
+
+Folgerung für das Löt-Overlay: Kabel und blanke Enden liefert SAM per Text. Die Ziel-Pads mit Polarität (+/− im Siebdruck) lokalisiert Spark, SAM segmentiert sie per Box, wie beim Riss.
