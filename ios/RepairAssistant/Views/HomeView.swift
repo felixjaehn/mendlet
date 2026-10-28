@@ -52,6 +52,9 @@ struct HomeView: View {
                 showLiveScan = false
             }
         }
+        #if DEBUG
+        .task { await debugJump() }
+        #endif
         .photosPicker(isPresented: $showGallery, selection: $pickerItem, matching: .images)
         .onChange(of: pickerItem) { _, item in
             guard let item else { return }
@@ -252,3 +255,29 @@ private struct ThreadHero: View {
         .accessibilityHidden(true)
     }
 }
+
+#if DEBUG
+extension HomeView {
+    /// Screenshot helper: `-uiScreen liveScan|analysis|diagnosis|guide` (+ `-uiScenario textile_hole`) jumps straight to a screen.
+    @MainActor func debugJump() async {
+        let d = UserDefaults.standard
+        guard let screen = d.string(forKey: "uiScreen") else { return }
+        flow.settings.demoMode = true
+        if screen == "liveScan" { try? await Task.sleep(for: .milliseconds(400)); showLiveScan = true; return }
+        let scenario = DemoScenario(rawValue: d.string(forKey: "uiScenario") ?? "") ?? .textileTear
+        let img = await DemoImageFactory.imageAsync(for: scenario)
+        flow.choose(img, scenarioHint: scenario, note: scenario.userNote)
+        flow.answers = [AnswerPayload(questionId: "debug", text: "Jeans, Baumwolle")]
+        flow.startAnalysis(resetExtras: false)
+        guard screen == "guide" else { return }
+        let flow = self.flow
+        Task { @MainActor in  // unstructured: survives HomeView's .task cancellation on navigation
+        while flow.isAnalyzing || flow.response == nil { try? await Task.sleep(for: .milliseconds(200)) }
+        try? await Task.sleep(for: .milliseconds(900))
+        for i in flow.shoppingItems { flow.statuses[i.id] = .have }
+        flow.currentStep = d.integer(forKey: "uiStep")
+        flow.startRepair()
+        }
+    }
+}
+#endif

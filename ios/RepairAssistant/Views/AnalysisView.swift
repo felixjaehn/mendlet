@@ -34,7 +34,7 @@ struct AnalysisView: View {
                                 StageRow(title: "Muse Spark lokalisiert → SAM segmentiert", subtitle: "Zweiter Versuch mit Spark-Box", state: state(for: .segment))
                                 Divider().overlay(Theme.hairline).padding(.leading, 46)
                             }
-                            StageRow(title: s.1, subtitle: s.2, state: state(for: s.0))
+                            StageRow(title: s.1, subtitle: s.2, state: s.0 == .segment && flow.groundingSeen && state(for: .segment) == .active ? .done : state(for: s.0))
                             if i < stages.count - 1 { Divider().overlay(Theme.hairline).padding(.leading, 46) }
                         }
                     }
