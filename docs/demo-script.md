@@ -1,24 +1,29 @@
 # Demo-Skript (3:00)
 
-Heldenfall: Lieblingsshirt oder -jeans mit Riss an der Naht. Gedreht wird mit echtem Kleidungsstück und echtem iPhone, dazu Bildschirmaufnahmen. Jede Zahl im Video stammt aus `impact.md` (belegt) oder aus `benchmark.md` (gemessen).
+Das Video ist im Finale das wichtigste Artefakt: Die Top 5 je Track werden nur noch anhand der Videos gerankt ("Is the demo video genuinely cool to watch?"). Es zeigt ausschließlich, was in der Bauphase entstanden ist, und sagt das auch.
 
-| Zeit | Bild | Ton (Sprechertext, Deutsch oder Englisch mit Untertitel) | Bewertungskriterium |
+Heldenfall: eine echte Jeans mit Riss neben der Seitennaht. Gedreht wird mit echtem Kleidungsstück, echtem iPhone und Live-Proxy. Jede Zahl stammt aus `impact.md` (belegt) oder `benchmark.md` (gemessen).
+
+| Zeit | Bild | Ton (Englisch, deutsche UI mit Untertiteln) | Kriterium |
 | --- | --- | --- | --- |
-| 0:00–0:12 | Nahaufnahme: Hände halten ein Shirt mit Riss. Schnitt auf Mülltonne. Texteinblendung "1 Lkw-Ladung pro Sekunde" mit Quelle Ellen MacArthur Foundation | "Jede Sekunde landet weltweit eine Lkw-Ladung Kleidung auf der Deponie oder in der Verbrennung. Oft wegen eines Risses, den man in 20 Minuten nähen könnte." | Impact |
-| 0:12–0:20 | Titelkarte: App-Name und "Built with Muse Spark + SAM 3.1" | "Ich habe einen Reparatur-Assistenten gebaut, der dir genau das zeigt: auf deinem eigenen Foto." | Meta-Tools |
-| 0:20–0:40 | Screen: Foto aufnehmen, "Riss an der Naht" diktieren (Mikro). Analyse-Screen: die vier Stufen haken sich ab, die SAM-Masken blenden auf dem Foto ein | "Muse Spark prüft zuerst Objekt und Sicherheit. SAM 3.1 markiert den Riss pixelgenau. Dann stellt Muse Spark die Diagnose." | Tech-Tiefe, Meta-Tools |
-| 0:40–1:00 | Rückfrage-Sheet: "Zeig mir das Etikett". Etikett fotografieren. Banner "98 % Baumwolle, 2 % Elasthan erkannt". Diagnose aktualisiert sich: dehnbarer Stich, Rundspitz-Nadel | "Statt zu raten, fragt die App nach. Das Etikett verändert das Ergebnis: Elasthan braucht einen elastischeren Stich." | Demo, Tech-Tiefe |
-| 1:00–1:15 | Entscheidungs-Screen: "Selbst reparieren", 20–40 Min., 3–8 €, Pille "Schätzung, keine Garantie" | "Ehrliche Empfehlung: selbst reparieren, Profi oder ersetzen, mit Zeit und Kosten als Spanne." | Impact |
-| 1:15–1:30 | Einkaufsliste: zwei Einträge auf "Habe ich", einer auf "Kaufen", Haushaltsalternative sichtbar, Teilen | "Die Einkaufsliste enthält genau das, was die Schritte brauchen, mit Alternativen aus dem Haushalt." | Demo |
-| 1:30–2:10 | Geführte Reparatur: **Stichpfad zeichnet sich über den echten Riss** (3 s Close-up). Sicherheitsschritt "Schere" mit Bestätigung. Schnitt auf echte Hände, die den Leiterstich nähen. "Hilft nicht" → Schritthilfe antwortet zu diesem einen Schritt | "Den Stichpfad berechnet die App selbst aus der SAM-Maske: Skelett, Mittellinie, Stiche im gleichen Abstand. Das Modell wählt nur die Stichart." | Demo, Tech-Tiefe (Signature-Moment) |
-| 2:10–2:22 | Abschluss-Screen: Häkchen, Vorher-Nachher, "≈ 0,25 kg Textil vor Deponie oder Verbrennung bewahrt" | "Repariert. Ein Kleidungsstück weniger auf der Deponie." | Impact |
-| 2:22–2:37 | Neues Foto: beheizbare Jacke mit Akku → Sperr-Screen | "Und wo es gefährlich wird, gibt es keine Anleitung. Akkus, Helme, Netzteile sperrt die App, bevor eine Diagnose entsteht." | Tech-Tiefe, Verantwortung |
-| 2:37–2:52 | Grafik der Pipeline (Muse Spark → SAM 3.1 → App-Geometrie → Muse Spark), danach die Benchmark-Tabelle mit echten Zahlen inklusive Fehlerquote | "Getestet an X eigenen Fällen: Schadstelle in X von Y korrekt markiert, alle Sicherheitsfälle gesperrt. Auch die Fehler stehen im Repo." | Tech-Tiefe |
-| 2:52–3:00 | Shirt wird angezogen, Endkarte mit Repo-Link | "Reparieren statt wegwerfen. Mit deinem eigenen Foto." | Impact |
+| 0:00–0:10 | Hände halten die Jeans mit Riss. Schnitt auf eine Mülltonne. Einblendung "1 truck of clothing per second" (Ellen MacArthur Foundation) | "Every second, a truckload of clothing is landfilled or burned. Often because of a tear you could fix in 20 minutes." | Impact |
+| 0:10–0:28 | **Live-Scan:** Kamera fährt über die Jeans, Eckklammern suchen, der Rahmen wird orange: "Riss erkannt – halt still". Die Maske klebt am Stoff, während die Kamera sich bewegt. Badge "SAM 3.1 · live 790 ms". Auto-Aufnahme | "Point your phone at it. SAM 3.1 finds the damage live, and the overlay sticks to the fabric while you move." | Meta-Tools, Demo |
+| 0:28–0:50 | **Analyse mit Agenten-Trace:** Scan-Strahl läuft über das Foto, darunter die Schritte live: "Muse Spark prüft Objekt und Sicherheit", "SAM 3.1 sucht „rip“", "Muse Spark lokalisiert Schaden", "SAM 3.1 segmentiert", "Muse Spark prüft Maske ✓". Die Masken erscheinen pixelgenau entlang der ausgefransten Ränder | "SAM can't find a tear by name, because a tear is a gap, not an object. So Muse Spark locates it and hands SAM a box, and SAM returns a pixel-accurate mask. A Muse Wonder agent checks its own masks and re-segments if they're off." | Meta-Tools (überrascht), Tech |
+| 0:50–1:05 | **Diagnose:** Label-Pins mit Score, "Vermutlich Denim". Optionale Karte "Etikett fotografieren" → Etikett → Banner "98 % Baumwolle · 2 % Elasthan", Einkaufsliste wechselt animiert auf dehnbaren Flicken | "It doesn't interrogate you. It assumes denim and tells you so. Add the label if you want, and the plan changes: elastane needs a stretchy patch." | Demo, Tech |
+| 1:05–1:22 | **Entscheidung mit Muse Image:** Vorher/Nachher-Slider auf dem eigenen Foto. Daumen zieht den Slider, der Riss ist gestopft. "Selbst reparieren · 40–70 Min · 5–12 €" | "Honest recommendation, and Muse Image shows your own jeans repaired, before you thread a needle." | Meta-Tools, Demo |
+| 1:22–1:32 | Einkaufsliste: abhaken, teilen | "Exactly what the steps need. Nothing else." | Impact |
+| 1:32–2:05 | **Stichpfad, Signature-Moment:** Der Stichpfad zeichnet sich über den echten Riss (3 s ungeschnitten). Dann "Live auf dem Stoff": derselbe Pfad liegt auf dem Kamerabild der echten Jeans. Schnitt auf echte Hände, die nach dem Pfad nähen. Sprachbefehl "weiter" (Muse Voice) | "The app computes the stitch path itself from SAM's mask: skeleton, centerline, evenly spaced stitches. Then it projects it onto the real fabric. Hands busy? Just say 'next'." | Demo (Signature), Tech |
+| 2:05–2:15 | **Pulli:** drei Mottenlöcher, drei Masken, drei Stopf-Schritte. Muse-Image-Vorschau: alle drei gestopft | "Three holes, three masks, three darning steps." | Meta-Tools |
+| 2:15–2:27 | **Sneaker:** Klebezone als schraffiertes Band entlang der gelösten Sohle, Pressrichtungspfeile, Countdown-Ring | "Shoes too: where to glue, which way to press, how long to wait." | Demo |
+| 2:27–2:37 | **Heizjacke mit Akku:** Sperre nach 3 s | "And where it gets dangerous, there are no instructions. Batteries, helmets, mains power are blocked before any diagnosis." | Tech, Verantwortung |
+| 2:37–2:47 | **Ausblick Elektronik:** USB-Platine, SAM markiert rotes und schwarzes Kabel, Spark liest +/− und verbindet Kabelende und Pad | "Next: low-voltage electronics. Which wire goes where, and where to solder." | Impact |
+| 2:47–3:00 | Pipeline-Grafik (Spark → SAM → App-Geometrie → Wonder → Image), Benchmark-Zahlen mit Fehlern, Endkarte "Built during the hackathon · repo link" | "Five Meta models, each with a job only it can do. Tested on our own cases, failures included. Repair instead of replace." | Tech, Impact |
 
 ## Drehhinweise
 
-- Erst den echten Riss fotografieren, die Analyse laufen lassen und das Ergebnis aufzeichnen. Danach wirklich nähen, so entsteht echte B-Roll. Nichts faken: Die Platzhalter X und Y kommen aus dem echten Benchmark.
-- Bildschirmaufnahme auf dem iPhone (Kontrollzentrum), Hochformat, danach in 9:16 oder 16:9 mit Rand schneiden.
-- Den Stichpfad 2 bis 3 Sekunden ungeschnitten zeigen, er ist der stärkste Moment.
-- Video und README müssen kennzeichnen, dass alles in der Bauphase entstand (PRD §13).
+- Erst die echte Jeans live analysieren und die Bildschirmaufnahme laufen lassen, dann wirklich nähen. So entsteht echte B-Roll. Nichts faken: Benchmark-Zahlen nur aus `benchmark.md`.
+- Live-Scan und "Live auf dem Stoff" auf dem echten iPhone drehen, denn der Simulator hat keine Kamera.
+- Für ruhige Takes in der Analyse: Einstellung "schnell" im Demo-Modus. Im Video die echte Latenz ehrlich nennen (etwa 30 s).
+- Bildschirmaufnahme im Hochformat, für 16:9 mit Rand schneiden. Untertitel auf Englisch.
+- Video und README kennzeichnen, dass alles in der Bauphase entstand (Official Rules, sonst Disqualifikation).
+- Für den Bonus "Most Viral": 30-s-Schnitt von 1:32–2:05 als X-Post.
