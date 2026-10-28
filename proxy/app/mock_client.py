@@ -1,21 +1,36 @@
 """Deterministic mock client (MOCK_MODE): realistic German fixtures with realistic delays."""
 
 import asyncio
+import base64
+import io
 import re
 
+import numpy as np
+from PIL import Image
+
 from . import mock_data as md
+from .errors import AppError
+from .images import downscale_b64
 from .models import (
+    AfterPreviewRequest,
+    AfterPreviewResponse,
     AnalyzeRequest,
     ClassifyResult,
     DiagnosePlan,
+    RefineRequest,
     Segment,
     StepHelpRequest,
     StepHelpResponse,
+    TrackRequest,
+    TrackResponse,
 )
+from .sam import bitmap_to_rings
+from .video import prepare_video
 
 SCENARIOS = {
     "textile_tear_needs_label", "textile_tear", "textile_hole", "textile_open_seam", "textile_button",
     "shoe_sole", "battery_jacket", "helmet", "unsupported",
+    "textile_grounding", "textile_multi", "textile_rings",
 }
 
 # keyword (lowercase) -> scenario; first match wins
@@ -81,7 +96,7 @@ class MockClient:
         scenario = pick_scenario(req)
         if scenario == "textile_tear_needs_label":
             return md.textile_tear_needs_label()
-        if scenario == "textile_tear":
+        if scenario in {"textile_tear", "textile_grounding", "textile_multi", "textile_rings"}:
             return md.textile_tear(stretch=_stretch_from_answers(req))
         builders = {
             "textile_hole": md.textile_hole,
@@ -118,3 +133,50 @@ class MockClient:
     async def transcribe(self, wav: bytes, duration_s: float) -> str:
         await self._sleep(0.6)
         return "Am Hosenbein ist ein Riss entlang der Naht, etwa sechs Zentimeter lang."
+
+    async def ground(self, req: AnalyzeRequest, category: str) -> list[Segment]:
+        await self._sleep(0.6)
+        return [md.segments("shoe_sole" if category == "shoe" else "textile_tear")[1].model_copy(
+            update={"source": "grounding"})]
+
+    async def refine(self, req: RefineRequest) -> Segment:
+        image = downscale_b64(req.image_base64)
+        with Image.open(io.BytesIO(base64.b64decode(image))) as photo:
+            width, height = photo.size
+        yy, xx = np.indices((height, width))
+        mask = np.zeros((height, width), dtype=bool)
+        if req.box:
+            x, y, w, h = req.box
+            mask[int(y * height):max(int(y * height) + 1, int(np.ceil((y + h) * height))),
+                 int(x * width):max(int(x * width) + 1, int(np.ceil((x + w) * width)))] = True
+        for label in ("positive", "negative"):
+            for p in (p for p in req.points if p.label == label):
+                cx, cy = min(width - 1, int(p.x * width)), min(height - 1, int(p.y * height))
+                region = ((xx - cx) / max(1, width * 0.04)) ** 2 + ((yy - cy) / max(1, height * 0.04)) ** 2 <= 1
+                mask[region] = label == "positive"
+        rings = bitmap_to_rings(mask)
+        if not rings:
+            raise AppError("no_segment", "Die markierte Stelle konnte nicht erkannt werden. Bitte markiere sie erneut.", 422)
+        result = md.seg("seg_1", req.label, "damage", req.label, 0.9, rings[0].points)
+        ys, xs = np.nonzero(mask)
+        result.box = [min(xs) / width, min(ys) / height, (max(xs) + 1 - min(xs)) / width, (max(ys) + 1 - min(ys)) / height]
+        result.mask.rings = rings
+        result.source = "tap"
+        return result
+
+    async def track(self, req: TrackRequest) -> TrackResponse:
+        prepare_video(req.video_base64)
+        await self._sleep(0.8)
+        return md.tracking(req.concept)
+
+    async def after_preview(self, req: AfterPreviewRequest) -> AfterPreviewResponse:
+        image = downscale_b64(req.image_base64)
+        with Image.open(io.BytesIO(base64.b64decode(image))) as photo:
+            photo = photo.convert("RGB")
+            # A small, deterministic local change; this fixture is not a generated repair.
+            y = photo.height // 2
+            for x in range(photo.width // 3, max(photo.width // 3 + 1, 2 * photo.width // 3)):
+                photo.putpixel((x, y), tuple(v + 3 if v <= 252 else v - 3 for v in photo.getpixel((x, y))))
+            out = io.BytesIO()
+            photo.save(out, format="PNG")
+        return AfterPreviewResponse(image_base64=base64.b64encode(out.getvalue()).decode("ascii"), model="muse-image-1.0")

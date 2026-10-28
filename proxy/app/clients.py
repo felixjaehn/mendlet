@@ -14,21 +14,29 @@ from PIL import Image
 from pydantic import BaseModel
 
 from .audio import ensure_wav
-from .budget import Budget, muse_cost, sam_cost, transcribe_cost
+from .budget import Budget, image_cost, muse_cost, sam_cost, sam_video_cost, transcribe_cost
 from .cache import ModelCache
 from .config import Settings
 from .errors import AppError, BudgetExceeded, ModelOutputError
+from .images import downscale_b64
 from .models import (
+    AfterPreviewRequest,
+    AfterPreviewResponse,
     AnalyzeRequest,
     ClassifyResult,
     DiagnosePlan,
+    GroundingResult,
+    RefineRequest,
     Segment,
     StepHelpRequest,
     StepHelpResponse,
+    TrackRequest,
+    TrackResponse,
 )
 from .parsing import call_validated, parse_model_json
 from .prompts import inline_schema, load_prompt, prompt_version
-from .sam import SamDetection, detections_to_segments, parse_sam_output
+from .sam import SamDetection, detections_to_segments, geometric_prompt, parse_sam_output, parse_sam_video
+from .video import prepare_video
 
 log = logging.getLogger("proxy.client")
 T = TypeVar("T", bound=BaseModel)
@@ -42,10 +50,22 @@ class ModelClient(Protocol):
     async def diagnose(self, req: AnalyzeRequest, cls: ClassifyResult, segments: list[Segment]) -> DiagnosePlan: ...
     async def step_help(self, req: StepHelpRequest) -> StepHelpResponse: ...
     async def transcribe(self, wav: bytes, duration_s: float) -> str: ...
+    async def refine(self, req: RefineRequest) -> Segment: ...
+    async def ground(self, req: AnalyzeRequest, category: str) -> list[Segment]: ...
+    async def track(self, req: TrackRequest) -> TrackResponse: ...
+    async def after_preview(self, req: AfterPreviewRequest) -> AfterPreviewResponse: ...
 
 
 def _data_url(b64: str) -> str:
     return f"data:image/jpeg;base64,{b64}"
+
+
+def preview_prompt(req: AfterPreviewRequest) -> str:
+    stitch = {"ladder_stitch": "ladder stitch", "running_stitch": "running stitch",
+              "darning": "darning", "whip_stitch": "whip stitch"}[req.stitch_type]
+    return (f"Same photo, show the repaired state of this damage: {req.diagnosis_summary}. "
+            f"Neatly close or mend it with {stitch} in matching thread. "
+            "Keep the same object, material, lighting, perspective and background; nothing else changed.")
 
 
 class RealMetaClient:
@@ -159,6 +179,46 @@ class RealMetaClient:
             raise errors[0]
         return detections_to_segments(dets)
 
+    async def _sam_stream(self, prompt: str, media: dict) -> str:
+        self.budget.check()
+        try:
+            stream = await self.oai.responses.create(
+                model=self.s.sam_model,
+                input=[
+                    {
+                        "type": "message",
+                        "role": "user",
+                        "content": [
+                            {"type": "input_text", "text": prompt},
+                            media,
+                        ],
+                    }
+                ],
+                metadata={"include_confidence": "true", "mask_encoding": "one_bit"},
+                stream=True,
+                extra_headers={"Accept": "text/event-stream"},
+            )
+            parts: list[str] = []
+            completed = False
+            async with stream:
+                async for event in stream:
+                    if event.type == "response.output_text.delta":
+                        if not isinstance(event.delta, str):
+                            raise ModelOutputError("SAM text delta was not a string")
+                        parts.append(event.delta)
+                    elif event.type == "response.completed":
+                        completed = True
+                    elif event.type in {"error", "response.failed", "response.incomplete"}:
+                        raise ModelOutputError("SAM stream failed or incomplete")
+            if not completed:
+                raise ModelOutputError("SAM stream ended without response.completed")
+        except (APITimeoutError, httpx.TimeoutException) as exc:
+            raise AppError("timeout", "Die Segmentierung hat zu lange gebraucht.", 504) from exc
+        except (APIError, httpx.HTTPError) as exc:
+            log.warning("sam call failed: %s", type(exc).__name__)
+            raise AppError("upstream_error", "Der Segmentierungsdienst ist gerade nicht erreichbar.", 502) from exc
+        return "".join(parts)
+
     async def _sam_one(self, image_b64: str, prompt: str, width: int, height: int) -> list[SamDetection]:
         key = ModelCache.key("sam-v2", self.s.sam_model, prompt, ModelCache.key(image_b64))
         text = self.cache.get(key)
@@ -169,49 +229,110 @@ class RealMetaClient:
             with Image.open(io.BytesIO(base64.b64decode(image_b64))) as image:
                 image.convert("RGB").save(png, format="PNG")
             image_url = "data:image/png;base64," + base64.b64encode(png.getvalue()).decode("ascii")
-            try:
-                stream = await self.oai.responses.create(
-                    model=self.s.sam_model,
-                    input=[
-                        {
-                            "type": "message",
-                            "role": "user",
-                            "content": [
-                                {"type": "input_text", "text": prompt},
-                                {"type": "input_image", "image_url": image_url},
-                            ],
-                        }
-                    ],
-                    metadata={"include_confidence": "true", "mask_encoding": "one_bit"},
-                    stream=True,
-                    extra_headers={"Accept": "text/event-stream"},
-                )
-                parts: list[str] = []
-                completed = False
-                async with stream:
-                    async for event in stream:
-                        if event.type == "response.output_text.delta":
-                            if not isinstance(event.delta, str):
-                                raise ModelOutputError("SAM text delta was not a string")
-                            parts.append(event.delta)
-                        elif event.type == "response.completed":
-                            completed = True
-                        elif event.type in {"error", "response.failed", "response.incomplete"}:
-                            raise ModelOutputError("SAM stream failed or incomplete")
-                if not completed:
-                    raise ModelOutputError("SAM stream ended without response.completed")
-            except (APITimeoutError, httpx.TimeoutException) as exc:
-                raise AppError("timeout", "Die Segmentierung hat zu lange gebraucht.", 504) from exc
-            except (APIError, httpx.HTTPError) as exc:
-                log.warning("sam call failed: %s", type(exc).__name__)
-                raise AppError("upstream_error", "Der Segmentierungsdienst ist gerade nicht erreichbar.", 502) from exc
+            text = await self._sam_stream(prompt, {"type": "input_image", "image_url": image_url})
             self.budget.add(sam_cost(1))  # one image per prompt call
-            text = "".join(parts)
         detections = parse_sam_output(text, prompt, width, height)
         if text.strip() and not detections:
             raise ModelOutputError("SAM returned nonempty text without valid image records")
         self.cache.set(key, text)
         return detections
+
+    async def refine(self, req: RefineRequest) -> Segment:
+        image = downscale_b64(req.image_base64)
+        with Image.open(io.BytesIO(base64.b64decode(image))) as photo:
+            width, height = photo.size
+        prompt = geometric_prompt(width, height, req.points, req.box)
+        dets = await self._sam_one(image, prompt, width, height)
+        # One prompted object (id 1), never silently select another object.
+        matches = detections_to_segments([d for d in dets if d.object_id == "1"])
+        if not matches:
+            raise AppError("no_segment", "Die markierte Stelle konnte nicht erkannt werden. Bitte markiere sie erneut.", 422)
+        return matches[0].model_copy(update={"label": req.label, "kind": "damage", "prompt": req.label, "source": "tap"})
+
+    async def ground(self, req: AnalyzeRequest, category: str) -> list[Segment]:
+        system = (
+            "Locate the visible clothing or shoe damage in the main photo. Return one bounding box "
+            "[x1,y1,x2,y2] on the normalized 0-1000 perception grounding grid, origin top left. "
+            "Choose the closest damage concept. If no damage is visible, return box=null. Do not invent damage."
+        )
+        text = json.dumps({"category": category, "user_note": req.note}, ensure_ascii=False)
+        key = ModelCache.key("grounding-v1", self.s.muse_model, system, text, ModelCache.key(req.image_base64))
+        raw = self.cache.get(key)
+        result = None
+        if raw is not None:
+            try:
+                result = parse_model_json(raw, GroundingResult)
+            except AppError:
+                pass
+        if result is None:
+            result, raw = await call_validated(
+                lambda: self._chat(system, text, [req.image_base64], "grounding", GroundingResult), GroundingResult, retries=1)
+            self.cache.set(key, raw)
+        if result.box is None:
+            return []
+        x1, y1, x2, y2 = [max(0.0, min(1.0, v / 1000)) for v in result.box]
+        if x2 <= x1 or y2 <= y1:
+            raise ModelOutputError("Grounding box has no area")
+        with Image.open(io.BytesIO(base64.b64decode(req.image_base64))) as photo:
+            width, height = photo.size
+        prompt = geometric_prompt(width, height, [], [x1, y1, x2 - x1, y2 - y1])
+        dets = await self._sam_one(req.image_base64, prompt, width, height)
+        for det in dets:
+            det.prompt = result.concept
+        # Grounding alone is no mask evidence. Only return the prompted SAM mask.
+        return [s.model_copy(update={"source": "grounding"}) for s in detections_to_segments(
+            [d for d in dets if d.object_id == "1"]) if s.mask is not None]
+
+    async def track(self, req: TrackRequest) -> TrackResponse:
+        video = prepare_video(req.video_base64)
+        key = ModelCache.key("sam-video-v1", self.s.sam_model, req.concept, ModelCache.key(video))
+        text = self.cache.get(key)
+        cached = text is not None
+        if text is None:
+            text = await self._sam_stream(req.concept, {"type": "input_video", "video_url": f"data:video/mp4;base64,{video}"})
+        frames = parse_sam_video(text, req.concept)
+        if not cached:
+            self.budget.add(sam_video_cost(max((f.index + 1 for f in frames), default=0)))
+        if text.strip() and not frames:
+            raise ModelOutputError("SAM returned nonempty text without valid video frames")
+        self.cache.set(key, text)
+        return TrackResponse(frames=frames)
+
+    async def after_preview(self, req: AfterPreviewRequest) -> AfterPreviewResponse:
+        image = downscale_b64(req.image_base64)
+        prompt = preview_prompt(req)
+        key = ModelCache.key("after-preview-v1", self.s.image_model, prompt, ModelCache.key(image))
+        cached = self.cache.get(key)
+        if cached is not None:
+            return AfterPreviewResponse(image_base64=cached, model=self.s.image_model)
+        self.budget.check()
+        png = io.BytesIO()
+        with Image.open(io.BytesIO(base64.b64decode(image))) as photo:
+            photo.save(png, format="PNG")
+        try:
+            result = await self.oai.images.edit(
+                model=self.s.image_model, image=("repair.png", png.getvalue(), "image/png"),
+                prompt=prompt, n=1, response_format="b64_json",
+                # Meta extensions (docs/muse-image-notes.md): one pass, no web/image search, no shell.
+                extra_body={"reasoning_strength": "low", "tool_enablement": {
+                    "enable_image_search": False, "enable_web_search": False, "enable_shell": False}},
+            )
+        except (APITimeoutError, httpx.TimeoutException) as exc:
+            raise AppError("timeout", "Die Vorschau hat zu lange gebraucht. Bitte versuche es erneut.", 504) from exc
+        except (APIError, httpx.HTTPError) as exc:
+            log.warning("image edit failed: %s", type(exc).__name__)
+            raise AppError("upstream_error", "Die Bildvorschau ist gerade nicht erreichbar.", 502) from exc
+        self.budget.add(image_cost())
+        try:
+            output = result.data[0].b64_json if result.data else None
+            if not isinstance(output, str) or not output or len(output) > 66_666_668:
+                raise ValueError("missing image")
+            with Image.open(io.BytesIO(base64.b64decode(output, validate=True))) as edited:
+                edited.verify()
+        except (ValueError, OSError, AttributeError, TypeError, KeyError, Image.DecompressionBombError) as exc:
+            raise ModelOutputError("Image edit returned no valid base64 image") from exc
+        self.cache.set(key, output)
+        return AfterPreviewResponse(image_base64=output, model=self.s.image_model)
 
     # ---- Muse Voice Transcribe ----------------------------------------------------
 

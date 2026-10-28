@@ -3,6 +3,7 @@
 import asyncio
 import logging
 import uuid
+from collections import Counter
 from collections.abc import Awaitable, Callable
 
 from . import safety
@@ -30,9 +31,14 @@ STAGE_LABELS: dict[str, str] = {
 }
 
 Progress = Callable[[Stage], Awaitable[None]]
+GroundingProgress = Callable[[], Awaitable[None]]
 
 
 async def _noop(_: Stage) -> None:
+    return None
+
+
+async def _noop_grounding() -> None:
     return None
 
 
@@ -57,7 +63,8 @@ def blocked_response(cls: ClassifyResult, pre: safety.PreCheck) -> AnalyzeRespon
     return safety.enforce(resp, has_answers=False, precheck=pre)
 
 
-async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress = _noop) -> AnalyzeResponse:
+async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress = _noop,
+                  grounding: GroundingProgress = _noop_grounding) -> AnalyzeResponse:
     """Run the pipeline on an already prepared (downscaled) request."""
     pre = safety.precheck_note("\n".join([req.note, *(a.text for a in req.answers)]))
 
@@ -77,6 +84,19 @@ async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress =
     await progress("segment")
     try:
         segments = await client.segment(req, cls.category, SEGMENT_PROMPTS.get(cls.category, []))
+        if not any(s.kind == "damage" for s in segments):
+            await grounding()
+            try:
+                grounded = await client.ground(req, cls.category)
+                for segment in grounded:
+                    index = len(segments) + 1
+                    while f"seg_{index}" in {s.id for s in segments}:
+                        index += 1
+                    segments.append(segment.model_copy(update={"id": f"seg_{index}"}))
+            except BudgetExceeded:
+                raise
+            except AppError as exc:
+                log.warning("grounding unavailable: %s", exc.code)
     except BudgetExceeded:
         raise
     except AppError as exc:
@@ -102,4 +122,6 @@ async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress =
         shopping_list=plan.shopping_list,
         guide=plan.guide,
     )
-    return safety.enforce(resp, has_answers=req.is_followup_round, precheck=pre)
+    resp = safety.enforce(resp, has_answers=req.is_followup_round, precheck=pre)
+    resp.instances = dict(Counter(s.prompt for s in resp.segments if s.kind == "damage"))
+    return resp

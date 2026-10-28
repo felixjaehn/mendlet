@@ -1,6 +1,6 @@
 import json
 
-from app.budget import Budget, muse_cost, sam_cost, transcribe_cost
+from app.budget import Budget, image_cost, muse_cost, sam_cost, sam_video_cost, transcribe_cost
 from app.cache import ModelCache
 from app.errors import BudgetExceeded
 from app.prompts import MARKER, PROMPTS, load_prompt, schema_text
@@ -12,6 +12,9 @@ def test_prices():
     assert muse_cost(0, 1_000_000) == pytest.approx(4.25)
     assert sam_cost(1000) == pytest.approx(2.5)
     assert transcribe_cost(3600) == pytest.approx(0.18)
+    assert image_cost() == pytest.approx(0.01)
+    assert sam_video_cost(10) == pytest.approx(0.01)
+    assert sam_video_cost(1000) == pytest.approx(0.2)
 
 
 def test_budget_limit_and_persistence(tmp_path):

@@ -1,4 +1,6 @@
 """Actual SDK/httpx serialization against notes; MockTransport never leaves process."""
+import base64
+import io
 import json
 from email import policy
 from email.parser import BytesParser
@@ -6,6 +8,7 @@ from pathlib import Path
 
 import httpx
 import pytest
+from PIL import Image
 
 from app.budget import Budget
 from app.clients import RealMetaClient
@@ -13,10 +16,11 @@ from app.config import Settings
 from app.errors import AppError, ModelOutputError
 from app.images import prepare_request
 from app.mock_data import textile_tear
-from app.models import ClassifyResult, StepHelpRequest
+from app.models import AfterPreviewRequest, ClassifyResult, RefineRequest, StepHelpRequest, TrackRequest
 from app.pipeline import analyze
 from tests.conftest import make_req
 from tests.test_api import wav_bytes
+from tests.test_new_endpoints import VIDEO_B64
 
 SAM = Path(__file__).parent / 'fixtures/sam/thin_tear.txt'
 CLASSIFY = {'category': 'textile', 'risk_level': 'allowed', 'reason': 'Textil'}
@@ -253,5 +257,273 @@ async def test_partial_sam_success_cannot_hide_budget_exceeded(tmp_path, image_b
     try:
         with pytest.raises(BudgetExceeded):
             await c.segment(make_req(image_b64), 'textile', ['tear','hole'])
+    finally:
+        await c.aclose()
+
+
+@pytest.mark.parametrize('size,expected', [((480, 640), (640, 480)), ((2400, 3200), (1536, 1152))])
+async def test_refine_geometric_wire_after_exif_orientation_and_downscale(tmp_path, size, expected):
+    seen = []
+    photo = Image.new('RGB', size, (80, 90, 100))
+    exif = Image.Exif()
+    exif[274] = 6
+    raw = io.BytesIO()
+    photo.save(raw, format='JPEG', exif=exif)
+    width, height = expected
+    def handler(req):
+        data = json.loads(req.content)
+        seen.append(data)
+        assert req.url.path == '/v1/responses' and data['stream'] is True
+        assert data['metadata'] == {'mask_encoding': 'one_bit', 'include_confidence': 'true'}
+        content = data['input'][0]['content']
+        expected_prompt = (f'<0f>1<|box;x1={width//4};y1={height//4};x2={3*width//4-1};y2={3*height//4-1};w={width};h={height}|>'
+                           f'<|point;x={width//2};y={height//2};w={width};h={height}|>'
+                           f'<|point;x={width-1};y={height-1};w={width};h={height}|>'
+                           f'-<|point;x=0;y=0;w={width};h={height}|>')
+        assert content[0] == {'type': 'input_text', 'text': expected_prompt}
+        image = Image.open(io.BytesIO(base64.b64decode(content[1]['image_url'].split(',')[1])))
+        assert image.format == 'PNG' and image.size == expected and not image.getexif()
+        from meta_sam_parser._mask_codec import _encode_raster
+        mask = _encode_raster([1] * 16, 4, 4)
+        return sam_response(f'<0f>1<|box;x1=10;y1=10;x2=13;y2=13;w={width};h={height};c=0.9|>'
+                            f'<|mask;x=0;y=0;data=4,4,{mask}|>')
+    c = client_for(tmp_path, handler)
+    body = RefineRequest(image_base64=base64.b64encode(raw.getvalue()).decode(), label='Riss',
+                         box=[0.25, 0.25, 0.5, 0.5], points=[
+                             {'x': 0.5, 'y': 0.5, 'label': 'positive'}, {'x': 1, 'y': 1, 'label': 'positive'},
+                             {'x': 0, 'y': 0, 'label': 'negative'}])
+    try:
+        first = await c.refine(body)
+        assert first.source == 'tap' and first.label == 'Riss' and first.mask.points
+        assert first == await c.refine(body) and len(seen) == 1
+        assert c.budget.spent_today() == pytest.approx(0.0025)
+    finally:
+        await c.aclose()
+
+
+async def test_refine_empty_result_is_controlled_error(tmp_path, image_b64):
+    c = client_for(tmp_path, lambda r: sam_response(''))
+    try:
+        with pytest.raises(AppError) as exc:
+            await c.refine(RefineRequest(image_base64=image_b64, box=[0, 0, 1, 1], label='Riss'))
+        assert exc.value.code == 'no_segment'
+    finally:
+        await c.aclose()
+
+
+async def test_grounding_full_pipeline_structured_wire_clipping_mask_and_cache(tmp_path):
+    from tests.conftest import make_image_b64
+    seen = []
+    events = []
+    def handler(req):
+        data = json.loads(req.content)
+        seen.append(data)
+        if req.url.path == '/v1/responses':
+            prompt = data['input'][0]['content'][0]['text']
+            if prompt.startswith('<0f>'):
+                assert prompt == '<0f>1<|box;x1=0;y1=120;x2=639;y2=359;w=640;h=480|>'
+                assert data['metadata']['mask_encoding'] == 'one_bit'
+                return sam_response(SAM.read_text().replace('<0f>7', '<0f>1'))
+            # Even a part match does not suppress damage grounding.
+            return sam_response(SAM.read_text() if prompt == 'garment' else '')
+        schema = data['response_format']['json_schema']
+        if schema['name'] == 'grounding':
+            assert data['response_format']['type'] == 'json_schema'
+            assert '$ref' not in json.dumps(schema['schema'])
+            assert '0-1000' in data['messages'][0]['content']
+            assert data['messages'][1]['content'][1]['image_url']['url'].startswith('data:image/jpeg;base64,')
+            return chat_response({'concept': 'tear', 'box': [-1, 250, 1001, 750]})
+        if schema['name'] == 'diagnose':
+            payload = json.loads(data['messages'][1]['content'][0]['text'])
+            assert [(s['id'], s['kind']) for s in payload['segments']] == [('seg_1', 'part'), ('seg_2', 'damage')]
+        return chat_response(CLASSIFY if schema['name'] == 'classify' else textile_tear().model_dump())
+    async def progress(stage):
+        events.append(stage)
+    async def grounding():
+        events.append('grounding')
+    c = client_for(tmp_path, handler)
+    try:
+        req = prepare_request(make_req(make_image_b64((640, 480))))
+        result = await analyze(req, c, progress, grounding)
+        assert events == ['classify', 'segment', 'grounding', 'diagnose', 'plan']
+        assert [s.source for s in result.segments] == ['text', 'grounding']
+        assert result.segments[1].mask.points and result.instances == {'tear': 1}
+        cost = c.budget.spent_today()
+        assert len(seen) == 11
+        await analyze(req, c)
+        assert len(seen) == 11 and c.budget.spent_today() == cost
+    finally:
+        await c.aclose()
+
+
+@pytest.mark.parametrize('box', [None, [600, 500, 200, 300], [1001, 1001, 1002, 1002]])
+async def test_grounding_no_damage_or_invalid_box_never_calls_sam(tmp_path, image_b64, box):
+    def handler(req):
+        assert req.url.path == '/v1/chat/completions'
+        return chat_response({'concept': 'tear', 'box': box})
+    c = client_for(tmp_path, handler)
+    try:
+        if box is None:
+            assert await c.ground(make_req(image_b64), 'textile') == []
+        else:
+            with pytest.raises(ModelOutputError):
+                await c.ground(make_req(image_b64), 'textile')
+            assert not list((tmp_path / 'model_calls').glob('*.json'))
+    finally:
+        await c.aclose()
+
+
+async def test_grounding_requires_sam_mask_not_just_spark_box(tmp_path, image_b64):
+    def handler(req):
+        if req.url.path == '/v1/chat/completions':
+            return chat_response({'concept': 'tear', 'box': [100, 100, 500, 500]})
+        return sam_response('<0f>1<|box;x1=10;y1=10;x2=15;y2=15;w=64;h=48;c=0.9|>')
+    c = client_for(tmp_path, handler)
+    try:
+        assert await c.ground(make_req(image_b64), 'textile') == []
+    finally:
+        await c.aclose()
+
+
+async def test_tracking_input_video_stream_official_parser_cache_and_cost(tmp_path):
+    seen = []
+    def handler(req):
+        assert req.url.path == '/v1/responses'
+        data = json.loads(req.content)
+        seen.append(data)
+        assert data['input'][0]['content'] == [
+            {'type': 'input_text', 'text': 'tear'},
+            {'type': 'input_video', 'video_url': 'data:video/mp4;base64,' + VIDEO_B64}]
+        assert data['metadata'] == {'mask_encoding': 'one_bit', 'include_confidence': 'true'}
+        assert data['stream'] is True and req.headers['accept'] == 'text/event-stream'
+        return sam_response((SAM.parent / 'tracking.txt').read_text())
+    c = client_for(tmp_path, handler)
+    try:
+        body = TrackRequest(video_base64=VIDEO_B64, concept='tear')
+        result = await c.track(body)
+        assert len(result.frames) == 10 and result.fps is None
+        assert result.frames[5].segments == []
+        assert result.frames[9].segments[0].object_id == '7'
+        assert result.frames[9].segments[0].mask.rings
+        assert result == await c.track(body) and len(seen) == 1
+        assert c.budget.spent_today() == pytest.approx(0.01)  # minimum 50 frames
+    finally:
+        await c.aclose()
+
+
+@pytest.mark.parametrize('text,status', [('', 'incomplete'), ('<3f>bad record', 'completed')])
+async def test_invalid_tracking_is_not_cached(tmp_path, text, status):
+    c = client_for(tmp_path, lambda r: sam_response(text, status))
+    try:
+        with pytest.raises(ModelOutputError):
+            await c.track(TrackRequest(video_base64=VIDEO_B64, concept='tear'))
+        assert not list((tmp_path / 'model_calls').glob('*.json'))
+    finally:
+        await c.aclose()
+
+
+async def test_preview_actual_images_edit_multipart_cache_and_cost(tmp_path, image_b64):
+    seen = []
+    def handler(req):
+        seen.append(req)
+        assert req.url.path == '/v1/images/edits'
+        assert req.headers['authorization'] == 'Bearer LLM_fake'
+        msg = BytesParser(policy=policy.default).parsebytes(
+            ('Content-Type: ' + req.headers['content-type'] + '\r\n\r\n').encode() + req.content)
+        parts = {p.get_param('name', header='content-disposition'): p for p in msg.iter_parts()}
+        assert set(parts) == {'image', 'model', 'prompt', 'n', 'response_format'}
+        assert parts['model'].get_payload(decode=True) == b'muse-image-1.0'
+        assert parts['response_format'].get_payload(decode=True) == b'b64_json'
+        assert parts['n'].get_payload(decode=True) == b'1'
+        prompt = parts['prompt'].get_payload(decode=True).decode()
+        assert 'Riss entlang der Naht' in prompt and 'ladder stitch' in prompt and 'nothing else changed' in prompt
+        assert parts['image'].get_content_type() == 'image/png'
+        photo = Image.open(io.BytesIO(parts['image'].get_payload(decode=True)))
+        assert photo.format == 'PNG' and photo.size == (64, 48)
+        return httpx.Response(200, json={'created': 0, 'data': [{'b64_json': image_b64}]})
+    c = client_for(tmp_path, handler)
+    try:
+        body = AfterPreviewRequest(image_base64=image_b64, diagnosis_summary='Riss entlang der Naht', stitch_type='ladder_stitch')
+        first = await c.after_preview(body)
+        assert first.model_dump() == {'image_base64': image_b64, 'model': 'muse-image-1.0'}
+        assert first == await c.after_preview(body) and len(seen) == 1
+        assert c.budget.spent_today() == pytest.approx(0.01)
+        await c.after_preview(body.model_copy(update={'diagnosis_summary': 'Riss entlang der Naht, 5 cm'}))
+        assert len(seen) == 2 and c.budget.spent_today() == pytest.approx(0.02)
+    finally:
+        await c.aclose()
+
+
+@pytest.mark.parametrize('data', [[], [{'url': 'https://example.com/do-not-fetch.png'}], [{'b64_json': 'AAAA'}],
+                                  ['bad item'], {'bad': 'envelope'}, [{'b64_json': 123}]])
+async def test_preview_invalid_output_never_caches_or_fetches_url(tmp_path, image_b64, data):
+    seen = []
+    def handler(req):
+        seen.append(req)
+        assert req.url.path == '/v1/images/edits'
+        return httpx.Response(200, json={'created': 0, 'data': data})
+    c = client_for(tmp_path, handler)
+    try:
+        with pytest.raises(ModelOutputError):
+            await c.after_preview(AfterPreviewRequest(image_base64=image_b64, diagnosis_summary='Riss', stitch_type='darning'))
+        assert len(seen) == 1 and c.budget.spent_today() == pytest.approx(0.01)
+        assert not list((tmp_path / 'model_calls').glob('*.json'))
+    finally:
+        await c.aclose()
+
+
+@pytest.mark.parametrize('status', [400, 429, 500])
+async def test_preview_http_errors_have_no_sdk_retries(tmp_path, image_b64, status):
+    seen = []
+    def handler(req):
+        seen.append(req)
+        return httpx.Response(status, json={'error': {'message': 'offline failure'}})
+    c = client_for(tmp_path, handler)
+    try:
+        with pytest.raises(AppError) as exc:
+            await c.after_preview(AfterPreviewRequest(image_base64=image_b64, diagnosis_summary='Riss', stitch_type='darning'))
+        assert exc.value.code == 'upstream_error' and len(seen) == 1
+    finally:
+        await c.aclose()
+
+
+async def test_preview_timeout_is_controlled(tmp_path, image_b64):
+    def handler(req):
+        raise httpx.ReadTimeout('offline timeout', request=req)
+    c = client_for(tmp_path, handler)
+    try:
+        with pytest.raises(AppError) as exc:
+            await c.after_preview(AfterPreviewRequest(image_base64=image_b64, diagnosis_summary='Riss', stitch_type='darning'))
+        assert exc.value.code == 'timeout'
+    finally:
+        await c.aclose()
+
+
+@pytest.mark.parametrize('text', ['', '<0f>\n<1f>\n'])
+async def test_tracking_zero_matches_and_empty_frames_are_cached(tmp_path, text):
+    seen = []
+    def handler(req):
+        seen.append(req)
+        return sam_response(text)
+    c = client_for(tmp_path, handler)
+    try:
+        req = TrackRequest(video_base64=VIDEO_B64, concept='tear')
+        first = await c.track(req)
+        assert all(not f.segments for f in first.frames)
+        assert first == await c.track(req) and len(seen) == 1
+    finally:
+        await c.aclose()
+
+
+async def test_tracking_missing_completion_is_not_cached(tmp_path):
+    def handler(req):
+        event = {'type': 'response.output_text.delta', 'delta': (SAM.parent / 'tracking.txt').read_text(),
+                 'item_id': 'msg', 'output_index': 0, 'content_index': 0, 'sequence_number': 0}
+        return httpx.Response(200, headers={'Content-Type': 'text/event-stream'}, text='data: ' + json.dumps(event) + '\n\n')
+    c = client_for(tmp_path, handler)
+    try:
+        with pytest.raises(ModelOutputError):
+            await c.track(TrackRequest(video_base64=VIDEO_B64, concept='tear'))
+        assert not list((tmp_path / 'model_calls').glob('*.json'))
     finally:
         await c.aclose()

@@ -17,6 +17,12 @@
     "height": 480,
     "synthetic": true
   },
+  "multiple_holes": {
+    "prompt": "hole",
+    "width": 640,
+    "height": 480,
+    "synthetic": true
+  },
   "multi_match": {
     "prompt": "tear",
     "width": 640,

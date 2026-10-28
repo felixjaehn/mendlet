@@ -12,6 +12,8 @@ from .errors import BudgetExceeded
 MUSE_IN_PER_TOKEN = 1.25 / 1_000_000
 MUSE_OUT_PER_TOKEN = 4.25 / 1_000_000
 SAM_PER_IMAGE = 2.50 / 1000
+SAM_PER_FRAME = 0.20 / 1000
+MUSE_IMAGE_PER_IMAGE = 0.01
 TRANSCRIBE_PER_HOUR = 0.18
 
 
@@ -21,6 +23,14 @@ def muse_cost(input_tokens: int, output_tokens: int) -> float:
 
 def sam_cost(images: int) -> float:
     return images * SAM_PER_IMAGE
+
+
+def sam_video_cost(frames: int) -> float:
+    return max(50, frames) * SAM_PER_FRAME
+
+
+def image_cost(images: int = 1) -> float:
+    return images * MUSE_IMAGE_PER_IMAGE
 
 
 class Budget:

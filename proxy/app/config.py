@@ -33,6 +33,7 @@ class Settings:
     base_url: str = "https://api.meta.ai/v1"
     muse_model: str = "muse-spark-1.3"
     sam_model: str = "sam-3.1"
+    image_model: str = "muse-image-1.0"
     transcribe_model: str = "muse-voice-transcribe-1.0"
     daily_budget_usd: float = 5.0
     mock_mode: bool = True
@@ -52,6 +53,7 @@ class Settings:
             base_url=e.get("META_BASE_URL", "https://api.meta.ai/v1"),
             muse_model=e.get("MUSE_MODEL") or "muse-spark-1.3",
             sam_model=e.get("SAM_MODEL") or "sam-3.1",
+            image_model=e.get("IMAGE_MODEL") or "muse-image-1.0",
             transcribe_model=e.get("TRANSCRIBE_MODEL") or "muse-voice-transcribe-1.0",
             daily_budget_usd=float(e.get("DAILY_BUDGET_USD") or 5.0),
             mock_mode=explicit if explicit is not None else not key,

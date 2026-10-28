@@ -16,7 +16,10 @@ from .clients import ModelClient, build_client
 from .config import PROXY_DIR, Settings, load_dotenv
 from .errors import AppError
 from .images import downscale_b64, prepare_request
-from .models import AnalyzeRequest, AnalyzeResponse, Stage, StepHelpRequest, StepHelpResponse
+from .models import (
+    AfterPreviewRequest, AfterPreviewResponse, AnalyzeRequest, AnalyzeResponse, RefineRequest,
+    Segment, Stage, StepHelpRequest, StepHelpResponse, TrackRequest, TrackResponse,
+)
 from .pipeline import STAGE_LABELS, analyze
 
 log = logging.getLogger("proxy")
@@ -36,9 +39,12 @@ async def _event_stream(req: AnalyzeRequest, client: ModelClient) -> AsyncIterat
     async def progress(stage: Stage) -> None:
         await queue.put(("progress", {"stage": stage, "label": STAGE_LABELS[stage]}))
 
+    async def grounding() -> None:
+        await queue.put(("grounding", {"label": "Schadstelle genauer lokalisieren"}))
+
     async def runner() -> None:
         try:
-            resp = await analyze(req, client, progress)
+            resp = await analyze(req, client, progress, grounding)
             await queue.put(("result", resp.model_dump(mode="json")))
         except AppError as exc:
             await queue.put(("error", _error_payload(exc)))
@@ -116,6 +122,21 @@ def create_app(settings: Settings | None = None, client: ModelClient | None = No
         budget.check()
         wav, duration = ensure_wav(await file.read(MAX_BYTES + 1))  # bounded; never stored
         return {"text": await client.transcribe(wav, duration)}
+
+    @app.post("/refine")
+    async def refine(body: RefineRequest) -> Segment:
+        budget.check()
+        return await client.refine(body)
+
+    @app.post("/track", response_model_exclude_none=True)
+    async def track(body: TrackRequest) -> TrackResponse:
+        budget.check()
+        return await client.track(body)
+
+    @app.post("/after-preview")
+    async def after_preview(body: AfterPreviewRequest) -> AfterPreviewResponse:
+        budget.check()
+        return await client.after_preview(body)
 
     return app
 

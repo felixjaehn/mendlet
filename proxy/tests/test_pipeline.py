@@ -150,3 +150,31 @@ async def test_followup_battery_disclosure_blocks_guide(image_b64):
     r = await analyze(make_req(image_b64, mock_scenario='textile_tear',
                               answers=[{'question_id':'q1','text':'Die Jacke hat einen Akku'}]), NaiveClient(0))
     assert r.safety.blocked and r.guide.steps == []
+
+
+@pytest.mark.parametrize('failure', ['upstream_error', 'model_output_invalid', 'budget_exceeded'])
+async def test_grounding_failures_keep_parts_and_budget_errors_propagate(image_b64, failure):
+    from app.errors import AppError, BudgetExceeded, ModelOutputError
+    class BrokenGrounding(MockClient):
+        async def ground(self, *args):
+            if failure == 'budget_exceeded':
+                raise BudgetExceeded(0.1)
+            if failure == 'model_output_invalid':
+                raise ModelOutputError('invalid box')
+            raise AppError('upstream_error', 'offline', 502)
+    req = make_req(image_b64, mock_scenario='textile_grounding')
+    if failure == 'budget_exceeded':
+        with pytest.raises(BudgetExceeded):
+            await analyze(req, BrokenGrounding(0))
+    else:
+        result = await analyze(req, BrokenGrounding(0))
+        assert len(result.segments) == 1 and result.segments[0].kind == 'part'
+        assert result.instances == {} and result.diagnosis.evidence_segment_ids == []
+
+
+@pytest.mark.parametrize('scenario', ['textile_tear', 'battery_jacket'])
+async def test_grounding_never_runs_for_damage_matches_or_blocked_cases(image_b64, scenario):
+    class NoGrounding(MockClient):
+        async def ground(self, *args):
+            pytest.fail('grounding must not run')
+    await analyze(make_req(image_b64, mock_scenario=scenario), NoGrounding(0))

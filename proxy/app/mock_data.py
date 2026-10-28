@@ -3,7 +3,7 @@
 import math
 from typing import Any
 
-from .models import ClassifyResult, DiagnosePlan, Mask, Segment
+from .models import ClassifyResult, DiagnosePlan, Mask, MaskRing, Segment, TrackFrame, TrackedSegment, TrackResponse
 
 # ---- geometry helpers (normalized coordinates, polygon masks) ----------------------
 
@@ -42,7 +42,8 @@ def rect(x: float, y: float, w: float, h: float, cut: float = 0.02) -> list[list
 def seg(sid: str, label: str, kind: str, prompt: str, score: float, poly: list[list[float]]) -> Segment:
     xs, ys = [p[0] for p in poly], [p[1] for p in poly]
     box = [round(min(xs), 4), round(min(ys), 4), round(max(xs) - min(xs), 4), round(max(ys) - min(ys), 4)]
-    return Segment(id=sid, label=label, kind=kind, prompt=prompt, box=box, mask=Mask(points=poly), score=score)  # type: ignore[arg-type]
+    return Segment(id=sid, label=label, kind=kind, prompt=prompt, box=box,
+                   mask=Mask(points=poly, rings=[MaskRing(points=poly, hole=False)]), score=score, source="text")  # type: ignore[arg-type]
 
 
 # ---- builders ----------------------------------------------------------------------
@@ -99,6 +100,18 @@ CLASSIFY: dict[str, ClassifyResult] = {
 
 
 def segments(scenario: str) -> list[Segment]:
+    if scenario == "textile_grounding":
+        return segments("textile_tear")[:1]
+    if scenario == "textile_multi":
+        result = segments("textile_tear")[:2]
+        result.append(seg("seg_3", "Riss", "damage", "tear", 0.78, ribbon((0.2, 0.3), (0.45, 0.27), 0.02)))
+        return result
+    if scenario == "textile_rings":
+        result = segments("textile_hole")[:2]
+        result[1].mask.rings += [MaskRing(points=blob(0.50, 0.5, 0.008), hole=True),
+                                 MaskRing(points=blob(0.54, 0.5, 0.008), hole=True),
+                                 MaskRing(points=blob(0.50, 0.5, 0.003), hole=False)]
+        return result
     if scenario in ("textile_tear", "textile_tear_needs_label"):
         return [
             seg("seg_1", "Kleidungsstück", "part", "garment", 0.93, rect(0.06, 0.08, 0.88, 0.86)),
@@ -131,6 +144,19 @@ def segments(scenario: str) -> list[Segment]:
             seg("seg_4", "Absatz", "part", "heel", 0.8, rect(0.72, 0.64, 0.2, 0.17, 0.03)),
         ]
     return []
+
+
+def tracking(concept: str) -> TrackResponse:
+    from .sam import PROMPT_META
+
+    label, kind = PROMPT_META.get(concept, (concept, "part"))
+    frames = []
+    for index in range(10):
+        offset = index * 0.02
+        segment = seg("seg_7", label, kind, concept, 0.9,
+                      ribbon((0.2 + offset, 0.5), (0.45 + offset, 0.45), 0.02))
+        frames.append(TrackFrame(index=index, segments=[TrackedSegment(**segment.model_dump(), object_id="7")]))
+    return TrackResponse(frames=frames, fps=10.0)
 
 
 # ---- textile: tear -----------------------------------------------------------------

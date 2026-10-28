@@ -1,6 +1,6 @@
 # Proxy
 
-FastAPI-Proxy zwischen iOS-App und Meta Model API. Er hält den API-Key, setzt das Tageslimit durch, validiert jede Modellantwort gegen den Vertrag (PRD §8) und erzwingt die Sicherheitsregeln (PRD §7). Bilder und Audio werden nie gespeichert oder geloggt.
+FastAPI-Proxy zwischen iOS-App und Meta Model API. Er hält den API-Key, setzt das Tageslimit durch, validiert jede Modellantwort gegen den Vertrag (PRD §8) und erzwingt die Sicherheitsregeln (PRD §7). Eingabebilder, Videos und Audio werden nie gespeichert oder geloggt. Bei aktiviertem Modellcache werden auch die generierten Vorschaubilder gecacht.
 
 ## Starten
 
@@ -24,6 +24,19 @@ uv run pytest -q              # alle Tests offline
 | POST | `/analyze` | SSE: `progress` (classify, segment, diagnose, plan), dann `result` oder `error`. Mit `?stream=false` reines JSON |
 | POST | `/step-help` | Hilfe zu genau einem Schritt |
 | POST | `/transcribe` | Multipart `file` (WAV) → `{"text": …}` |
+| POST | `/refine` | Normalisierte Punkte/Box → ein Schadsegment mit `source: "tap"` |
+| POST | `/track` | Base64-MP4 und ein Konzept → Frames mit stabilen SAM-Objekt-IDs |
+| POST | `/after-preview` | Foto, `diagnosis_summary`, `stitch_type` → reparierte Bildvorschau |
+
+Die exakten JSON-Erweiterungen für iOS stehen in [CONTRACT-CHANGES.md](CONTRACT-CHANGES.md). `/analyze` ergänzt `instances` (Anzahl ausgegebener Schadsegmente pro Konzept) und `segments[].source`. Bei erfolgreicher SAM-Textsuche ohne Schadtreffer lokalisiert Spark einen Schaden auf dem 0–1000-Raster; dessen Box geht als geometrischer Prompt an SAM. Nur eine erhaltene SAM-Maske wird als `source: "grounding"` ausgegeben. Im SSE erscheint davor optional `grounding`; die vier bestehenden `progress`-Stufen und `result`/`error` bleiben erhalten. SAM-Ausfälle sind keine Nulltreffer.
+
+`/refine` orientiert das Bild nach EXIF und verkleinert es wie `/analyze` auf maximal 1536 Pixel. Punkte beziehen sich auf das bereits orientierte ganze Foto (0..1). Der offizielle `build_object_prompt` erzeugt ein Objekt mit ID 1; positive Punkt-Tokens stehen direkt nebeneinander, negative haben `-`, Kommas würden verschiedene Objekte trennen. Das Feld `label` wird nicht mit dem geometrischen SAM-Prompt vermischt.
+
+`/track` sendet genau ein `input_video` mit MP4-Data-URL und parst den abgeschlossenen SAM-Stream mit `meta-sam-parser`. `object_id` ist ein String, `index` der Quellframe. Real wird `fps` weggelassen, weil SAM hier keine verlässliche Bildrate liefert. MP4-Prüfung: Base64, maximal 50 MB, ISO-BMFF-Header; keine lokale Codec-/Abspielbarkeitsprüfung. Kosten lokal geschätzt anhand des höchsten ausgegebenen Frame-Index + 1, mindestens 50 Frames ($0,20/1000 Frames). Nicht ausgegebene Endframes sind damit nicht gezählt; die echte Videoabrechnung ist **UNBESTÄTIGT**.
+
+`/after-preview` nutzt `muse-image-1.0` (`IMAGE_MODEL` überschreibbar) und `POST /v1/images/edits` als OpenAI-kompatibles Multipart mit PNG, Prompt, `n=1`, `response_format=b64_json`. Der Prompt kombiniert Diagnose und Stichart und verlangt unveränderte Umgebung. Lokal werden $0,01 pro erfolgreicher HTTP-Antwort gebucht; ungültige Bildantworten werden nicht gecacht. Cache-Treffer verursachen keine weitere Buchung. Das vorhandene Tagesbudget bleibt eine nachträgliche Bilanz, kein harter Reservierungsdeckel.
+
+Zusätzliche Mock-Szenarien: `textile_grounding` (Fallback), `textile_multi` (zwei Risse), `textile_rings` (zwei Innenlöcher und eine Insel). Mock-Refinement berücksichtigt positive/negative Punkte und Boxen; Mock-Tracking liefert zehn bewegte Frames mit Objekt 7 bei 10 fps. Die Mock-Vorschau ändert nur eine kleine Pixelzeile dezent und deterministisch, sie simuliert keine echte Reparatur. Mock-Aufrufe buchen keine Modellkosten. Alle neuen Modellpfade sind offline geprüft, live **UNBESTÄTIGT**.
 
 ## Maskenformat (intern)
 
@@ -33,7 +46,7 @@ SAM 3.1 liefert Boxen und Masken als Special-Token-Text. Der Proxy parst ihn mit
 { "box": [x, y, w, h], "mask": { "format": "polygon", "points": [[x, y], ...] } }
 ```
 
-Fehlt die Maske oder ist ihr Payload defekt, nutzt die App die gültige Box. Ungültige Boxen werden verworfen. Der offizielle Parser bestätigt offline Box-lokale, halb offene Maskengrenzen. Die Übereinstimmung auf echten Fotos bleibt **UNBESTÄTIGT**. Ein Polygon enthält den größten äußeren Ring; Innenlöcher und kleinere getrennte Inseln sind im bestehenden App-Vertrag nicht darstellbar. Ein-Pixel-Risse bleiben ohne Downsampling erhalten.
+Fehlt die Maske oder ist ihr Payload defekt, nutzt die App die gültige Box. Ungültige Boxen werden verworfen. Der offizielle Parser bestätigt offline Box-lokale, halb offene Maskengrenzen. Die Übereinstimmung auf echten Fotos bleibt **UNBESTÄTIGT**. `points` enthält weiterhin unverändert den größten äußeren Ring. Das optionale `rings: [{"points": [[x,y], ...], "hole": false}, ...]` ergänzt weitere Außenringe, Innenlöcher (`hole: true`) und Inseln. Ein-Pixel-Risse bleiben ohne Downsampling erhalten. Mehrere Treffer desselben Konzepts bleiben auch bei überlappenden Boxen erhalten; die bisherige Begrenzung auf acht Segmente entfällt. Überlappende Synonyme wie `tear`/`rip` werden weiterhin zusammengeführt.
 
 ## Erster echter Aufruf am 27.10.2026
 
