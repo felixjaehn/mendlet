@@ -7,7 +7,7 @@ import numpy as np
 
 from .errors import AppError
 
-MAX_BYTES = 32 * 1024 * 1024
+MAX_BYTES = 32_000_000  # documented body limit; leave room for multipart headers
 MAX_SECONDS = 600
 
 
@@ -23,19 +23,31 @@ def ensure_wav(data: bytes) -> tuple[bytes, float]:
     """
     if len(data) > MAX_BYTES:
         raise AppError("audio_too_large", "Die Audiodatei ist zu groß (maximal 32 MB).", 413)
+    if data[:4] != b"RIFF" or data[8:12] != b"WAVE":
+        raise _unsupported("Nur RIFF/WAVE mit 16-Bit-PCM wird unterstützt.")
     try:
         with wave.open(io.BytesIO(data)) as w:
             channels, width, rate, frames = w.getnchannels(), w.getsampwidth(), w.getframerate(), w.getnframes()
             raw = w.readframes(frames)
     except (wave.Error, EOFError) as exc:
         raise _unsupported("Nur WAV wird unterstützt (mono, 16 Bit, 16 kHz). Bitte als WAV aufnehmen.") from exc
-    if width != 2:
+    if width != 2 or channels < 1 or rate < 1:
         raise _unsupported("Nur 16-Bit-PCM-WAV wird unterstützt.")
+    if not frames or len(raw) != frames * channels * width:
+        raise _unsupported("Die WAV-Aufnahme ist leer oder unvollständig.")
     duration = frames / rate if rate else 0.0
     if duration > MAX_SECONDS:
         raise AppError("audio_too_long", "Die Aufnahme ist länger als 10 Minuten.", 400)
     if channels == 1 and rate in (16000, 24000):
-        return data, duration
+        # Canonicalize RIFF too: remove metadata/trailing chunks and guarantee a
+        # small multipart body (max 600s * 24000 * 2 bytes, plus WAV headers).
+        out = io.BytesIO()
+        with wave.open(out, "wb") as w:
+            w.setnchannels(1)
+            w.setsampwidth(2)
+            w.setframerate(rate)
+            w.writeframes(raw)
+        return out.getvalue(), duration
 
     samples = np.frombuffer(raw, dtype="<i2").astype(np.float32)
     if channels > 1:

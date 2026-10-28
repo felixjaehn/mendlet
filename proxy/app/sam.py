@@ -5,11 +5,11 @@ App-facing mask format is a polygon in normalized image coordinates:
     {"format": "polygon", "points": [[x, y], ...]}
 """
 
+import math
 import re
 from dataclasses import dataclass
 
 import numpy as np
-from PIL import Image
 
 from .models import Mask, Segment
 
@@ -118,84 +118,139 @@ def _simplify_closed(pts: list[tuple[float, float]], tol: float) -> list[tuple[f
 
 
 def bitmap_to_polygon(raster: np.ndarray, max_points: int = 80) -> list[list[float]]:
-    """Binary raster (H x W) -> simplified polygon in coordinates normalized to the raster (0..1)."""
-    h, w = raster.shape
-    scale = min(1.0, 160 / max(h, w))
-    if scale < 1.0:
-        img = Image.fromarray((raster.astype(np.uint8)) * 255).resize(
-            (max(1, round(w * scale)), max(1, round(h * scale))), Image.Resampling.NEAREST
-        )
-        raster = np.asarray(img) > 127
-        h, w = raster.shape
-    contour = trace_contour(raster)
-    if len(contour) < 3:
+    """Largest exterior ring at pixel edges, normalized to the raster.
+
+    Do not downsample: a one-pixel tear must retain its area. The app contract has
+    one polygon, so interior holes and smaller disconnected islands are omitted.
+    """
+    mask = np.asarray(raster, dtype=bool)
+    h, w = mask.shape
+    if not h or not w or not mask.any():
         return []
-    pts = [(x + 0.5, y + 0.5) for y, x in contour]
-    tol = 0.6
+    pad = np.pad(mask, 1)
+    edges: dict[tuple[int, int], list[tuple[int, int]]] = {}
+
+    def add(boundary, dx1, dy1, dx2, dy2):
+        ys, xs = np.nonzero(boundary)
+        for y, x in zip(ys.tolist(), xs.tolist()):
+            edges.setdefault((x + dx1, y + dy1), []).append((x + dx2, y + dy2))
+
+    add(mask & ~pad[:-2, 1:-1], 0, 0, 1, 0)
+    add(mask & ~pad[1:-1, 2:], 1, 0, 1, 1)
+    add(mask & ~pad[2:, 1:-1], 1, 1, 0, 1)
+    add(mask & ~pad[1:-1, :-2], 0, 1, 0, 0)
+    rings = []
+    while edges:
+        start = next(iter(edges))
+        point, previous = start, (start[0] - 1, start[1])
+        ring = []
+        while point in edges:
+            ring.append(point)
+            options = edges[point]
+            dx, dy = point[0] - previous[0], point[1] - previous[1]
+            # Follow diagonal contacts too: thin tears can be 8-connected.
+            target = (point[0] + dy, point[1] - dx)
+            nxt = target if target in options else options[0]
+            options.remove(nxt)
+            if not options:
+                del edges[point]
+            previous, point = point, nxt
+            if point == start:
+                break
+        if point == start and len(ring) >= 4:
+            rings.append(ring)
+    if not rings:
+        return []
+
+    def area(ring):
+        return abs(sum(x * yy - xx * y for (x, y), (xx, yy) in zip(ring, ring[1:] + ring[:1])))
+
+    pts = max(rings, key=area)
+    tol = 0.2
     simp = _simplify_closed(pts, tol)
     while len(simp) > max_points:
         tol *= 1.5
         simp = _simplify_closed(pts, tol)
-    return [[round(x / w, 4), round(y / h, 4)] for x, y in simp]
+    if len(simp) < 3 or not area(simp):
+        return []
+    return [[round(x / w, 6), round(y / h, 6)] for x, y in simp]
 
 
 # ---- SAM output text -> detections -------------------------------------------
 
-_BOX_RE = re.compile(r"<\|box;x1=(\d+);y1=(\d+);x2=(\d+);y2=(\d+);w=(\d+);h=(\d+)(?:;c=([\d.]+))?\|>")
+# Parse each record independently: a corrupt mask must not discard other matches
+# or valid boxes in the same frame. Base85 excludes commas/semicolons/angle bars.
+_RECORD_RE = re.compile(r"(?:^|,)(\d+)(<\|box;[^<>|]*\|>)(<\|mask;[^<>|]*\|>)?(?=,|$)")
 
 
-def _parse_boxes_only(text: str, prompt: str) -> list[SamDetection]:
-    """Fallback parser: boxes + scores only (no masks)."""
-    out = []
-    for m in _BOX_RE.finditer(text):
-        x1, y1, x2, y2, w, h = (int(v) for v in m.groups()[:6])
-        out.append(
-            SamDetection(prompt, float(m.group(7) or 0.5), (x1 / w, y1 / h, min(1.0, (x2 + 1) / w), min(1.0, (y2 + 1) / h)))
-        )
-    return out
+def _box_fields(token: str, img_w: int, img_h: int):
+    try:
+        pairs = [field.split("=", 1) for field in token[6:-2].split(";")]
+        fields = dict(pairs)
+        if len(fields) != len(pairs):
+            return None
+        x1, y1, x2, y2, w, h = (int(fields[k]) for k in ("x1", "y1", "x2", "y2", "w", "h"))
+        score = float(fields.get("c", "0.5"))
+        if not math.isfinite(score) or not 0 <= score <= 1:
+            return None
+        if (w, h) != (img_w, img_h) or not (0 <= x1 <= x2 < w and 0 <= y1 <= y2 < h):
+            return None
+        return score, (x1 / w, y1 / h, (x2 + 1) / w, (y2 + 1) / h)
+    except (ValueError, KeyError, TypeError):
+        return None
 
 
 def parse_sam_output(text: str, prompt: str, img_w: int, img_h: int) -> list[SamDetection]:
-    """Parse SAM output_text for one prompt using the official meta-sam-parser; boxes-only fallback.
+    """Documented key=value wire records -> validated boxes and polygons.
 
-    TODO(UNBESTÄTIGT, see docs/api-notes.md): the mask is assumed to be the crop of the box placed at
-    (x1, y1). meta-sam-parser exposes this as `bounds`; verify against the first live response.
+    The official library confirms box-local half-open mask bounds offline. Actual
+    non-stream response envelopes and placement on real photos are UNBESTÄTIGT.
+    Invalid masks degrade to boxes; invalid coordinates/frames are discarded.
     """
+    if img_w <= 0 or img_h <= 0:
+        return []
     try:
         from meta_sam_parser import CompletedOutcome, decode_mask_to_raster, image_segmentation_format
-
-        parser = image_segmentation_format().create_parser()
-        parser.push(text + "\n")
-        result = parser.finish(CompletedOutcome()).result
-        boxes: dict[str, object] = {}
-        masks: dict[str, object] = {}
-        for rec in result.records:
-            if rec.kind == "box":
-                boxes[rec.object_id] = rec
-            elif rec.kind == "mask":
-                masks[rec.object_id] = rec
-        dets: list[SamDetection] = []
-        for oid, box in boxes.items():
-            det = SamDetection(
-                prompt,
-                box.confidence if box.confidence is not None else 0.5,  # type: ignore[attr-defined]
-                (box.left / img_w, box.top / img_h, box.right / img_w, box.bottom / img_h),  # type: ignore[attr-defined]
-            )
-            mrec = masks.get(oid)
-            if mrec is not None:
-                raster = np.frombuffer(decode_mask_to_raster(mrec.mask), dtype=np.uint8)  # type: ignore[attr-defined]
-                raster = raster.reshape(mrec.mask.height, mrec.mask.width)  # type: ignore[attr-defined]
-                b = mrec.bounds  # type: ignore[attr-defined]
-                det.polygon = [
-                    [round((b.left + u * (b.right - b.left)) / img_w, 4), round((b.top + v * (b.bottom - b.top)) / img_h, 4)]
-                    for u, v in bitmap_to_polygon(raster)
-                ]
-            dets.append(det)
-        if dets:
-            return dets
     except ImportError:
-        pass
-    return _parse_boxes_only(text, prompt)
+        image_segmentation_format = None
+    dets = []
+    for line in text.splitlines():
+        if not line.startswith("<0f>"):
+            continue
+        for match in _RECORD_RE.finditer(line[4:].strip()):
+            oid, box_token, mask_token = match.groups()
+            parsed = _box_fields(box_token, img_w, img_h)
+            if parsed is None:
+                continue
+            score, box = parsed
+            det = SamDetection(prompt, score, box)
+            dets.append(det)
+            if mask_token is None or image_segmentation_format is None:
+                continue
+            # Bound allocations before the library decodes a claimed raster size.
+            dims = re.search(r";data=(\d+),(\d+),[!~]", mask_token)
+            if not dims or not (0 < int(dims[1]) * int(dims[2]) <= min(img_w * img_h, 4_000_000)):
+                continue
+            try:
+                parser = image_segmentation_format().create_parser()
+                parser.push(f"<0f>{oid}{box_token}{mask_token}\n")
+                records = parser.finish(CompletedOutcome()).result.records
+                mrec = next((r for r in records if r.kind == "mask"), None)
+                if mrec is None:
+                    continue
+                raster = np.frombuffer(decode_mask_to_raster(mrec.mask), dtype=np.uint8)
+                raster = raster.reshape(mrec.mask.height, mrec.mask.width)
+                b = mrec.bounds
+                det.polygon = [
+                    [round((b.left + u * (b.right - b.left)) / img_w, 6),
+                     round((b.top + v * (b.bottom - b.top)) / img_h, 6)]
+                    for u, v in bitmap_to_polygon(raster)
+                ] or None
+            except (ValueError, ArithmeticError):
+                # InvalidSegmentationMaskError is normally retained as a parser
+                # diagnostic. No raw payloads are logged or exposed to the app.
+                continue
+    return dets
 
 
 # ---- detections -> segments --------------------------------------------------

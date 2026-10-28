@@ -20,7 +20,7 @@ class Base(BaseModel):
 
 class ExtraImage(Base):
     purpose: Literal["label", "closeup", "other"]
-    image_base64: str
+    image_base64: Annotated[str, Field(max_length=25_000_000)]
 
 
 class Answer(Base):
@@ -31,7 +31,7 @@ class Answer(Base):
 class AnalyzeRequest(Base):
     image_base64: Annotated[str, Field(max_length=25_000_000)]
     user_note: str | None = None
-    extra_images: list[ExtraImage] = []
+    extra_images: list[ExtraImage] = Field(default_factory=list, max_length=49)  # 50 images incl. main
     answers: list[Answer] = []
     locale: str = "de"
     mock_scenario: str | None = None  # ignored in real mode

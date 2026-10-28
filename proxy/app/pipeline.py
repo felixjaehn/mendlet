@@ -7,7 +7,7 @@ from collections.abc import Awaitable, Callable
 
 from . import safety
 from .clients import ModelClient
-from .errors import ModelOutputError
+from .errors import AppError, BudgetExceeded, ModelOutputError
 from .models import (
     AnalyzeRequest,
     AnalyzeResponse,
@@ -59,7 +59,7 @@ def blocked_response(cls: ClassifyResult, pre: safety.PreCheck) -> AnalyzeRespon
 
 async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress = _noop) -> AnalyzeResponse:
     """Run the pipeline on an already prepared (downscaled) request."""
-    pre = safety.precheck_note(req.note)
+    pre = safety.precheck_note("\n".join([req.note, *(a.text for a in req.answers)]))
 
     await progress("classify")
     try:
@@ -75,7 +75,14 @@ async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress =
         return blocked_response(cls, pre)
 
     await progress("segment")
-    segments = await client.segment(req, cls.category, SEGMENT_PROMPTS.get(cls.category, []))
+    try:
+        segments = await client.segment(req, cls.category, SEGMENT_PROMPTS.get(cls.category, []))
+    except BudgetExceeded:
+        raise
+    except AppError as exc:
+        # PRD §6: continue with text guidance when segmentation is unavailable.
+        log.warning("segmentation unavailable: %s", exc.code)
+        segments = []
 
     await progress("diagnose")
     plan = await client.diagnose(req, cls, segments)

@@ -63,7 +63,16 @@ def test_answers_force_needs_more_info_false():
     plan.diagnosis.follow_up_questions = [FollowUpQuestion(id="q1", type="photo", prompt="x")]
     r = safety.enforce(resp(plan=plan), has_answers=True)
     assert r.diagnosis.needs_more_info is False and r.diagnosis.follow_up_questions == []
-    assert r.decision.recommendation == "repair_self"  # confidence still fine
+    assert r.decision.recommendation == "repair_pro"  # unresolved despite high confidence
+    assert r.guide.steps == [] and r.shopping_list == []
+
+
+@pytest.mark.parametrize("recommendation", ["repair_pro", "replace"])
+def test_non_self_repair_has_no_actionable_guide(recommendation):
+    plan = textile_tear()
+    plan.decision.recommendation = recommendation
+    r = safety.enforce(resp(plan=plan), has_answers=True)
+    assert r.guide.steps == [] and r.shopping_list == []
 
 
 def test_answers_low_confidence_repair_pro():

@@ -121,9 +121,10 @@ def enforce(resp: AnalyzeResponse, *, has_answers: bool, precheck: PreCheck | No
     forced_pro = False
     if has_answers:
         # at most one follow-up round
+        unresolved = low or d.needs_more_info
         d.needs_more_info = False
         d.follow_up_questions = []
-        if low and not blocked:
+        if unresolved and not blocked:
             dec.recommendation = "repair_pro"
             forced_pro = True
     elif not blocked and (low or d.needs_more_info):
@@ -142,7 +143,7 @@ def enforce(resp: AnalyzeResponse, *, has_answers: bool, precheck: PreCheck | No
     dec.cost_eur = sorted(max(0.0, c) for c in dec.cost_eur)
 
     # --- empty lists when no guide may exist ---
-    if blocked or d.needs_more_info or forced_pro:
+    if blocked or d.needs_more_info or forced_pro or dec.recommendation != "repair_self":
         r.shopping_list = []
         r.guide = Guide(steps=[])
 
@@ -157,6 +158,8 @@ def enforce(resp: AnalyzeResponse, *, has_answers: bool, precheck: PreCheck | No
         used.update(step.uses_items)
         if step.overlay and step.overlay.segment_id not in seg_ids:
             step.overlay = None
+        if step.overlay and step.overlay.segment_id not in step.segment_ids:
+            step.segment_ids.append(step.overlay.segment_id)
         if step.safety_critical:
             step.requires_confirmation = True
     r.shopping_list = [i for i in r.shopping_list if i.id in used]

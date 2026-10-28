@@ -2,20 +2,22 @@
 
 import asyncio
 import base64
+import hashlib
 import io
 import json
 import logging
 from typing import Protocol, TypeVar
 
 import httpx
-from openai import APIConnectionError, APIStatusError, APITimeoutError, AsyncOpenAI
+from openai import APIConnectionError, APIError, APIStatusError, APITimeoutError, AsyncOpenAI
 from PIL import Image
 from pydantic import BaseModel
 
+from .audio import ensure_wav
 from .budget import Budget, muse_cost, sam_cost, transcribe_cost
 from .cache import ModelCache
 from .config import Settings
-from .errors import AppError
+from .errors import AppError, BudgetExceeded, ModelOutputError
 from .models import (
     AnalyzeRequest,
     ClassifyResult,
@@ -49,11 +51,19 @@ def _data_url(b64: str) -> str:
 class RealMetaClient:
     plan_delay = 0.0
 
-    def __init__(self, settings: Settings, budget: Budget) -> None:
+    def __init__(self, settings: Settings, budget: Budget, http_client: httpx.AsyncClient | None = None) -> None:
         self.s = settings
         self.budget = budget
         self.cache = ModelCache(settings.cache_dir, settings.cache_model_calls)
-        self.oai = AsyncOpenAI(api_key=settings.meta_api_key, base_url=settings.base_url, timeout=60.0)
+        # SDK defaults retry billable requests. Application validation owns its one retry.
+        self.http = http_client or httpx.AsyncClient(timeout=60.0)
+        self.oai = AsyncOpenAI(
+            api_key=settings.meta_api_key, base_url=settings.base_url, timeout=60.0,
+            max_retries=0, http_client=self.http,
+        )
+
+    async def aclose(self) -> None:
+        await self.oai.close()
 
     # ---- Muse Spark (chat completions, JSON schema output) ----------------------
 
@@ -70,6 +80,7 @@ class RealMetaClient:
                     "json_schema": {"name": schema_name, "schema": inline_schema(cls)},
                 },
                 temperature=0.2,
+                max_completion_tokens=self.s.muse_max_completion_tokens,
             )
         except APITimeoutError as exc:
             raise AppError("timeout", "Das Modell hat zu lange gebraucht. Bitte versuche es erneut.", 504) from exc
@@ -80,6 +91,8 @@ class RealMetaClient:
         tokens_in = usage.prompt_tokens if usage else (len(system) + len(text)) // 4 + 800 * len(images)
         tokens_out = usage.completion_tokens if usage else 800
         self.budget.add(muse_cost(tokens_in, tokens_out))
+        if not resp.choices or resp.choices[0].finish_reason == "length":
+            raise ModelOutputError("Muse returned no complete choice")
         return resp.choices[0].message.content or ""
 
     async def _json_call(self, key: str, text: str, images: list[str], cls: type[T]) -> T:
@@ -108,6 +121,7 @@ class RealMetaClient:
     async def diagnose(self, req: AnalyzeRequest, cls: ClassifyResult, segments: list[Segment]) -> DiagnosePlan:
         payload = {
             "category": cls.category,
+            "risk_level": cls.risk_level,
             "user_note": req.note,
             "answers": [a.model_dump() for a in req.answers],
             "image_order": ["main"] + [e.purpose for e in req.extra_images],
@@ -135,6 +149,9 @@ class RealMetaClient:
         )
         dets: list[SamDetection] = []
         errors = [r for r in results if isinstance(r, BaseException)]
+        for error in errors:
+            if isinstance(error, (BudgetExceeded, asyncio.CancelledError)):
+                raise error
         for r in results:
             if not isinstance(r, BaseException):
                 dets += r
@@ -143,12 +160,17 @@ class RealMetaClient:
         return detections_to_segments(dets)
 
     async def _sam_one(self, image_b64: str, prompt: str, width: int, height: int) -> list[SamDetection]:
-        key = ModelCache.key("sam", self.s.sam_model, prompt, ModelCache.key(image_b64))
+        key = ModelCache.key("sam-v2", self.s.sam_model, prompt, ModelCache.key(image_b64))
         text = self.cache.get(key)
         if text is None:
             self.budget.check()
+            # SAM's documented examples use PNG; JPEG support is UNBESTÄTIGT.
+            png = io.BytesIO()
+            with Image.open(io.BytesIO(base64.b64decode(image_b64))) as image:
+                image.convert("RGB").save(png, format="PNG")
+            image_url = "data:image/png;base64," + base64.b64encode(png.getvalue()).decode("ascii")
             try:
-                resp = await self.oai.responses.create(
+                stream = await self.oai.responses.create(
                     model=self.s.sam_model,
                     input=[
                         {
@@ -156,42 +178,66 @@ class RealMetaClient:
                             "role": "user",
                             "content": [
                                 {"type": "input_text", "text": prompt},
-                                {"type": "input_image", "image_url": _data_url(image_b64)},
+                                {"type": "input_image", "image_url": image_url},
                             ],
                         }
                     ],
-                    metadata={"include_confidence": "true"},
+                    metadata={"include_confidence": "true", "mask_encoding": "one_bit"},
+                    stream=True,
+                    extra_headers={"Accept": "text/event-stream"},
                 )
-            except APITimeoutError as exc:
+                parts: list[str] = []
+                completed = False
+                async with stream:
+                    async for event in stream:
+                        if event.type == "response.output_text.delta":
+                            if not isinstance(event.delta, str):
+                                raise ModelOutputError("SAM text delta was not a string")
+                            parts.append(event.delta)
+                        elif event.type == "response.completed":
+                            completed = True
+                        elif event.type in {"error", "response.failed", "response.incomplete"}:
+                            raise ModelOutputError("SAM stream failed or incomplete")
+                if not completed:
+                    raise ModelOutputError("SAM stream ended without response.completed")
+            except (APITimeoutError, httpx.TimeoutException) as exc:
                 raise AppError("timeout", "Die Segmentierung hat zu lange gebraucht.", 504) from exc
-            except (APIConnectionError, APIStatusError) as exc:
+            except (APIError, httpx.HTTPError) as exc:
                 log.warning("sam call failed: %s", type(exc).__name__)
                 raise AppError("upstream_error", "Der Segmentierungsdienst ist gerade nicht erreichbar.", 502) from exc
             self.budget.add(sam_cost(1))  # one image per prompt call
-            text = resp.output_text or ""
-            self.cache.set(key, text)
-        return parse_sam_output(text, prompt, width, height)
+            text = "".join(parts)
+        detections = parse_sam_output(text, prompt, width, height)
+        if text.strip() and not detections:
+            raise ModelOutputError("SAM returned nonempty text without valid image records")
+        self.cache.set(key, text)
+        return detections
 
     # ---- Muse Voice Transcribe ----------------------------------------------------
 
     async def transcribe(self, wav: bytes, duration_s: float) -> str:
-        self.budget.check()
+        # Revalidate at this boundary too: callers must not bypass the wire contract.
+        wav, duration_s = ensure_wav(wav)
         request = {
             "model": self.s.transcribe_model,
             "audioEncoding": "WAV",
             "mode": "PUSH_TO_TALK",
             "languageBias": ["German"],
         }
+        key = ModelCache.key("transcribe-v1", self.s.transcribe_model, request, hashlib.sha256(wav).hexdigest())
+        cached = self.cache.get(key)
+        if cached is not None:
+            return cached
+        self.budget.check()
         try:
-            async with httpx.AsyncClient(timeout=60.0) as http:
-                r = await http.post(
-                    f"{self.s.base_url}/asr/transcribe",
-                    headers={"Authorization": f"Bearer {self.s.meta_api_key}", "Accept": "application/json"},
-                    files={
-                        "request": (None, json.dumps(request), "application/json"),
-                        "audio": ("audio.wav", wav, "audio/wav"),
-                    },
-                )
+            r = await self.http.post(
+                f"{self.s.base_url.rstrip('/')}/asr/transcribe",
+                headers={"Authorization": f"Bearer {self.s.meta_api_key}", "Accept": "application/json"},
+                files={
+                    "request": (None, json.dumps(request), "application/json"),
+                    "audio": ("audio.wav", wav, "audio/wav"),
+                },
+            )
             r.raise_for_status()
         except httpx.TimeoutException as exc:
             raise AppError("timeout", "Die Transkription hat zu lange gebraucht.", 504) from exc
@@ -199,7 +245,15 @@ class RealMetaClient:
             log.warning("transcribe failed: %s", type(exc).__name__)
             raise AppError("upstream_error", "Die Transkription ist gerade nicht erreichbar.", 502) from exc
         self.budget.add(transcribe_cost(duration_s))
-        return str(r.json().get("transcript", "")).strip()
+        try:
+            data = r.json()
+        except ValueError as exc:
+            raise ModelOutputError("ASR returned invalid JSON") from exc
+        if not isinstance(data, dict) or not isinstance(data.get("transcript"), str):
+            raise ModelOutputError("ASR transcript missing or not a string")
+        text = data["transcript"].strip()
+        self.cache.set(key, text)
+        return text
 
 
 def build_client(settings: Settings, budget: Budget) -> ModelClient:

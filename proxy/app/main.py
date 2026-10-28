@@ -4,12 +4,13 @@ import asyncio
 import json
 import logging
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, File, Request, UploadFile
 from fastapi.responses import JSONResponse, StreamingResponse
 
 from . import safety
-from .audio import ensure_wav
+from .audio import MAX_BYTES, ensure_wav
 from .budget import Budget
 from .clients import ModelClient, build_client
 from .config import PROXY_DIR, Settings, load_dotenv
@@ -59,7 +60,16 @@ def create_app(settings: Settings | None = None, client: ModelClient | None = No
     settings = settings or Settings.from_env()
     budget = budget or Budget(settings.cache_dir / "budget.json", settings.daily_budget_usd)
     client = client or build_client(settings, budget)
-    app = FastAPI(title="Reparatur-Assistent Proxy")
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        try:
+            yield
+        finally:
+            close = getattr(client, "aclose", None)
+            if close:
+                await close()
+
+    app = FastAPI(title="Reparatur-Assistent Proxy", lifespan=lifespan)
 
     @app.exception_handler(AppError)
     async def _app_error(_: Request, exc: AppError) -> JSONResponse:
@@ -104,7 +114,7 @@ def create_app(settings: Settings | None = None, client: ModelClient | None = No
     @app.post("/transcribe")
     async def transcribe(file: UploadFile = File(...)) -> dict:
         budget.check()
-        wav, duration = ensure_wav(await file.read())  # audio stays in memory, never stored
+        wav, duration = ensure_wav(await file.read(MAX_BYTES + 1))  # bounded; never stored
         return {"text": await client.transcribe(wav, duration)}
 
     return app

@@ -1,0 +1,38 @@
+{
+  "thin_tear": {
+    "prompt": "tear",
+    "width": 640,
+    "height": 480,
+    "synthetic": true
+  },
+  "hole": {
+    "prompt": "hole",
+    "width": 640,
+    "height": 480,
+    "synthetic": true
+  },
+  "interior_hole": {
+    "prompt": "hole",
+    "width": 640,
+    "height": 480,
+    "synthetic": true
+  },
+  "multi_match": {
+    "prompt": "tear",
+    "width": 640,
+    "height": 480,
+    "synthetic": true
+  },
+  "zero_match": {
+    "prompt": "tear",
+    "width": 640,
+    "height": 480,
+    "synthetic": true
+  },
+  "malformed_lines": {
+    "prompt": "tear",
+    "width": 640,
+    "height": 480,
+    "synthetic": true
+  }
+}

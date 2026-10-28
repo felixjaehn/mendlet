@@ -45,3 +45,12 @@ def test_prompt_files_have_current_schema(key):
     assert text.endswith(MARKER.strip("\n") + "\n" + schema_text(PROMPTS[key][2]))
     schema = text.split(MARKER.strip("\n") + "\n")[1]
     assert "$ref" not in schema and "$defs" not in schema
+
+
+def test_schema_preserves_actual_title_property():
+    from app.models import DiagnosePlan
+    from app.prompts import inline_schema, prompt_version
+    step = inline_schema(DiagnosePlan)['properties']['guide']['properties']['steps']['items']
+    assert step['properties']['title'] == {'type': 'string'}
+    assert set(step['required']) <= set(step['properties'])
+    assert prompt_version('diagnose') == 'v2'

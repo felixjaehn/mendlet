@@ -103,3 +103,10 @@ def test_ensure_wav_converts_stereo_44k():
     with wave.open(io.BytesIO(out)) as w:
         assert (w.getnchannels(), w.getframerate(), w.getsampwidth()) == (1, 16000, 2)
     assert dur == pytest.approx(0.2, abs=0.01)
+
+
+def test_more_than_50_images_rejected_before_any_model_call(client, image_b64):
+    r = client.post('/analyze?stream=false', json={
+        'image_base64': image_b64,
+        'extra_images': [{'purpose':'other', 'image_base64':image_b64}] * 50})
+    assert r.status_code == 422

@@ -2,6 +2,7 @@ import base64
 import io
 
 import pytest
+import httpx
 from fastapi.testclient import TestClient
 from PIL import Image
 
@@ -9,6 +10,19 @@ from app.budget import Budget
 from app.config import Settings
 from app.main import create_app
 from app.models import AnalyzeRequest
+
+
+@pytest.fixture(autouse=True)
+def forbid_external_http(monkeypatch):
+    """Real-mode tests must inject MockTransport; never consume API credits."""
+    async def blocked_async(*args, **kwargs):
+        raise AssertionError("External HTTP forbidden in offline tests")
+
+    def blocked_sync(*args, **kwargs):
+        raise AssertionError("External HTTP forbidden in offline tests")
+
+    monkeypatch.setattr(httpx.AsyncHTTPTransport, "handle_async_request", blocked_async)
+    monkeypatch.setattr(httpx.HTTPTransport, "handle_request", blocked_sync)
 
 
 def make_image_b64(size=(64, 48), color=(120, 90, 60)) -> str:

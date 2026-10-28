@@ -1,0 +1,5 @@
+not SAM
+<1f>7<|box;x1=130;y1=180;x2=369;y2=195;w=640;h=480;c=0.93|><|mask;x=0;y=0;c=0.93;data=16,240,!!!!!35oL0juDZ@.QTVQ]4KWYL|>
+<0f>bad record
+<0f>7<|box;x1=130;y1=180;x2=369;y2=195;w=640;h=480;c=0.93|><|mask;x=0;y=0;c=0.93;data=16,240,!!!!!35oL0juDZ@.QTVQ]4KWYL|>,8<|box;x1=0;y1=0;x2=9;y2=9;w=640;h=480;c=0.8|><|mask;x=0;y=0;c=0.8;data=10,10,!BROKEN|>
+<0f>99<|box;x1=0;y1=0;x2=3;y2=3;w=0;h=0;c=NaN|>

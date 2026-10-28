@@ -125,3 +125,28 @@ async def test_classify_invalid_output_falls_back_to_warn_only(image_b64):
 
     r = await analyze(make_req(image_b64), Broken(0.0))
     assert r.risk_level == "warn_only" and r.safety.blocked
+
+
+async def test_sam_outage_falls_back_to_text_without_invented_segments(image_b64):
+    from app.errors import AppError
+    class MissingSam(MockClient):
+        async def segment(self, *args):
+            raise AppError('upstream_error', 'offline', 502)
+    r = await analyze(make_req(image_b64, mock_scenario='textile_tear'), MissingSam(0))
+    assert r.segments == [] and r.guide.steps
+    assert all(s.overlay is None and s.segment_ids == [] for s in r.guide.steps)
+
+
+async def test_sam_budget_error_is_never_swallowed(image_b64):
+    from app.errors import BudgetExceeded
+    class OverBudget(MockClient):
+        async def segment(self, *args):
+            raise BudgetExceeded(0.1)
+    with pytest.raises(BudgetExceeded):
+        await analyze(make_req(image_b64, mock_scenario='textile_tear'), OverBudget(0))
+
+
+async def test_followup_battery_disclosure_blocks_guide(image_b64):
+    r = await analyze(make_req(image_b64, mock_scenario='textile_tear',
+                              answers=[{'question_id':'q1','text':'Die Jacke hat einen Akku'}]), NaiveClient(0))
+    assert r.safety.blocked and r.guide.steps == []

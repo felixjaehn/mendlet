@@ -18,7 +18,7 @@ MARKER = "\n\nJSON-Schema der Antwort (strikt einhalten, keine zusätzlichen Fel
 PROMPTS: dict[str, tuple[str, str, type[BaseModel]]] = {
     # key: (version, file name, answer model)
     "classify": ("v1", "prompt_a_classify.v1.txt", ClassifyResult),
-    "diagnose": ("v1", "prompt_b_diagnose.v1.txt", DiagnosePlan),
+    "diagnose": ("v2", "prompt_b_diagnose.v2.txt", DiagnosePlan),
     "step_help": ("v1", "prompt_c_step_help.v1.txt", StepHelpResponse),
 }
 
@@ -32,7 +32,10 @@ def inline_schema(cls: type[BaseModel]) -> dict[str, Any]:
         if isinstance(node, dict):
             if "$ref" in node:
                 return walk(defs[node["$ref"].split("/")[-1]])
-            return {k: walk(v) for k, v in node.items() if k not in {"title", "default"}}
+            return {
+                k: ({name: walk(prop) for name, prop in v.items()} if k == "properties" else walk(v))
+                for k, v in node.items() if k not in {"title", "default"}
+            }
         if isinstance(node, list):
             return [walk(v) for v in node]
         return node
