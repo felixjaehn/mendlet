@@ -1,0 +1,149 @@
+import SwiftUI
+
+/// Greedy label placement: chips sit outside their mask, never overlap each other, and keep a leader line to a dot on the mask.
+enum LabelPlacer {
+    static let chipHeight: CGFloat = 24
+
+    struct Item: Identifiable {
+        let id: String
+        let text: String, score: String?, badge: String?
+        let anchor: CGPoint          // pin dot on the mask (px)
+        let bounds: CGRect           // mask bounds (px), chips avoid it
+        let width: CGFloat
+        let large: Bool              // mask fills much of the photo: chip goes inside a corner
+        var corners: [CGPoint] = []  // for large masks: candidate dot positions on the contour
+    }
+    struct Placed: Identifiable { let item: Item; let dot: CGPoint; let rect: CGRect; var id: String { item.id } }
+
+    static func width(text: String, score: String?, badge: String?) -> CGFloat {
+        func w(_ s: String, _ size: CGFloat, _ weight: UIFont.Weight) -> CGFloat {
+            ceil((s as NSString).size(withAttributes: [.font: UIFont.systemFont(ofSize: size, weight: weight)]).width)
+        }
+        var x = 18 + w(text, 11.5, .semibold)
+        if let score { x += 5 + w(score, 11, .medium) }
+        if let badge { x += 5 + w(badge, 8.5, .bold) + 9 }
+        return x
+    }
+
+    static func place(_ items: [Item], in size: CGSize, obstacles: [CGRect] = []) -> [Placed] {
+        var taken = obstacles
+        var out: [Placed] = []
+        let h = chipHeight, bounds = CGRect(origin: .zero, size: size).insetBy(dx: 4, dy: 4)
+        for it in items {
+            let w = it.width
+            func rect(_ c: CGPoint) -> CGRect {
+                var r = CGRect(x: c.x - w / 2, y: c.y - h / 2, width: w, height: h)
+                r.origin.x = min(max(r.origin.x, bounds.minX), max(bounds.minX, bounds.maxX - w))
+                r.origin.y = min(max(r.origin.y, bounds.minY), max(bounds.minY, bounds.maxY - h))
+                return r
+            }
+            var cands: [(CGPoint, CGRect)] = []
+            let a = it.anchor, b = it.bounds
+            if it.large {
+                for (i, c) in it.corners.enumerated() {
+                    let sx: CGFloat = i % 2 == 0 ? 1 : -1, sy: CGFloat = i < 2 ? 1 : -1
+                    cands.append((c, rect(CGPoint(x: c.x + sx * (14 + w / 2), y: c.y + sy * (16 + h / 2)))))
+                }
+            } else {
+                for gap in [20.0, 40.0] as [CGFloat] {
+                    cands += [
+                        (a, rect(CGPoint(x: a.x, y: b.minY - gap - h / 2))),
+                        (a, rect(CGPoint(x: a.x, y: b.maxY + gap + h / 2))),
+                        (a, rect(CGPoint(x: b.maxX + gap + w / 2, y: a.y))),
+                        (a, rect(CGPoint(x: b.minX - gap - w / 2, y: a.y))),
+                        (a, rect(CGPoint(x: b.maxX + gap + w / 2, y: b.minY - gap))),
+                        (a, rect(CGPoint(x: b.minX - gap - w / 2, y: b.maxY + gap))),
+                    ]
+                }
+            }
+            func cost(_ r: CGRect) -> CGFloat {
+                var c: CGFloat = 0
+                for t in taken { let i = r.insetBy(dx: -4, dy: -3).intersection(t); if !i.isNull { c += i.width * i.height + 1 } }
+                if !it.large { let i = r.intersection(b.insetBy(dx: -4, dy: -4)); if !i.isNull { c += i.width * i.height + 1 } }
+                return c
+            }
+            let best = cands.first { cost($0.1) == 0 } ?? cands.min { cost($0.1) < cost($1.1) }
+            guard let best else { continue }
+            taken.append(best.1)
+            out.append(Placed(item: it, dot: best.0, rect: best.1))
+        }
+        return out
+    }
+}
+
+struct LabelPinsLayer: View {
+    let segments: [Segment]
+    let all: [Segment]
+    let size: CGSize
+    var reveal: Double? = nil
+    var extraObstacles: [CGRect] = []
+
+    var body: some View {
+        let placed = LabelPlacer.place(items(), in: size, obstacles: extraObstacles)
+        ZStack(alignment: .topLeading) {
+            ForEach(placed) { p in
+                let seg = segments.first { $0.id == p.id }
+                PinView(placed: p, color: seg.map { segmentColor($0, in: all) } ?? Theme.thread, emphasized: seg?.isDamage == true)
+                    .opacity(reveal.map { min(1, max(0, ($0 - p.dot.y / max(size.height, 1)) * 10)) } ?? 1)
+                    .transition(.opacity)
+            }
+        }
+        .frame(width: size.width, height: size.height, alignment: .topLeading)
+        .allowsHitTesting(false)
+    }
+
+    func items() -> [LabelPlacer.Item] {
+        // damage first so it gets the best spot
+        segments.filter { !$0.label.isEmpty }.sorted { $0.isDamage && !$1.isDamage }.compactMap { s -> LabelPlacer.Item? in
+            guard let nb = s.normalizedBounds else { return nil }
+            let b = CGRect(x: nb.minX * size.width, y: nb.minY * size.height, width: nb.width * size.width, height: nb.height * size.height)
+            let pts = s.ringPolygons.filter { !$0.hole }.flatMap(\.points).map { CGPoint(x: $0.x * size.width, y: $0.y * size.height) }
+            func nearest(_ t: CGPoint) -> CGPoint { pts.min { hypot($0.x - t.x, $0.y - t.y) < hypot($1.x - t.x, $1.y - t.y) } ?? t }
+            let centroid = pts.isEmpty ? CGPoint(x: b.midX, y: b.midY) : CGPoint(x: pts.map(\.x).reduce(0, +) / CGFloat(pts.count), y: pts.map(\.y).reduce(0, +) / CGFloat(pts.count))
+            let anchor = pts.isEmpty ? CGPoint(x: b.midX, y: b.minY) : nearest(centroid)
+            let score = s.score > 0 ? "\(Int((s.score * 100).rounded())) %" : nil
+            let badge = s.source?.badge
+            let large = !s.isDamage && b.width * b.height > 0.3 * size.width * size.height
+            let corners = [b.origin, CGPoint(x: b.maxX, y: b.minY), CGPoint(x: b.minX, y: b.maxY), CGPoint(x: b.maxX, y: b.maxY)].map { pts.isEmpty ? $0 : nearest($0) }
+            return LabelPlacer.Item(id: s.id, text: s.label, score: score, badge: badge, anchor: anchor, bounds: b,
+                                    width: LabelPlacer.width(text: s.label, score: score, badge: badge), large: large, corners: corners)
+        }
+    }
+}
+
+private struct PinView: View {
+    let placed: LabelPlacer.Placed
+    let color: Color
+    let emphasized: Bool
+
+    var body: some View {
+        let it = placed.item, r = placed.rect
+        let beside = placed.dot.y >= r.minY && placed.dot.y <= r.maxY
+        let tail = beside ? CGPoint(x: placed.dot.x < r.midX ? r.minX : r.maxX, y: r.midY)
+                          : CGPoint(x: min(max(placed.dot.x, r.minX + 12), r.maxX - 12), y: placed.dot.y < r.midY ? r.minY : r.maxY)
+        ZStack(alignment: .topLeading) {
+            Path { p in p.move(to: placed.dot); p.addLine(to: tail) }
+                .stroke(.white.opacity(0.9), style: StrokeStyle(lineWidth: 1, lineCap: .round))
+                .shadow(color: .black.opacity(0.5), radius: 1.5)
+            Circle().fill(color).frame(width: 8, height: 8)
+                .overlay(Circle().strokeBorder(.white, lineWidth: 1.5))
+                .shadow(color: .black.opacity(0.45), radius: 2)
+                .position(placed.dot)
+            HStack(spacing: 5) {
+                Text(it.text).font(.system(size: 11.5, weight: .semibold))
+                if let s = it.score { Text(s).font(.system(size: 11, weight: .medium, design: .rounded)).monospacedDigit().opacity(0.7) }
+                if let b = it.badge {
+                    Text(b).font(.system(size: 8.5, weight: .bold)).padding(.horizontal, 4).padding(.vertical, 1.5)
+                        .background(.white.opacity(0.18), in: Capsule())
+                }
+            }
+            .lineLimit(1).foregroundStyle(.white)
+            .frame(width: r.width, height: r.height)
+            .background(Capsule().fill(.black.opacity(0.58)))
+            .background(.ultraThinMaterial, in: Capsule())
+            .overlay(Capsule().strokeBorder(emphasized ? color.opacity(0.9) : .white.opacity(0.28), lineWidth: 0.75))
+            .shadow(color: .black.opacity(0.3), radius: 4, y: 1)
+            .position(x: r.midX, y: r.midY)
+        }
+    }
+}
