@@ -202,6 +202,8 @@ async def test_full_real_pipeline_raw_wire_and_cached_replay(tmp_path):
         if name == 'diagnose':
             payload = json.loads(data['messages'][1]['content'][0]['text'])
             assert [s['id'] for s in payload['segments']] == ['seg_1']
+        if name == 'grounding':
+            return chat_response({'concept': 'tear', 'box': [100, 100, 400, 400]})
         return chat_response(CLASSIFY if name == 'classify' else plan)
     c = client_for(tmp_path, handler)
     req = prepare_request(make_req(make_image_b64((640,480)), answers=[{'question_id':'q1','text':'100 % Baumwolle'}]))
@@ -212,7 +214,7 @@ async def test_full_real_pipeline_raw_wire_and_cached_replay(tmp_path):
         assert all(set(s.segment_ids) <= {'seg_1'} for s in result.guide.steps)
         assert all(s.overlay is None or s.overlay.segment_id == 'seg_1' for s in result.guide.steps)
         calls = len(seen)
-        assert calls == 9  # one call per SAM concept + classify + diagnose
+        assert calls == 11  # SAM concepts + classify + diagnose + parallel grounding (Spark box, SAM box)
         await analyze(req, c)
         assert len(seen) == calls
     finally:
@@ -431,7 +433,8 @@ async def test_preview_actual_images_edit_multipart_cache_and_cost(tmp_path, ima
         msg = BytesParser(policy=policy.default).parsebytes(
             ('Content-Type: ' + req.headers['content-type'] + '\r\n\r\n').encode() + req.content)
         parts = {p.get_param('name', header='content-disposition'): p for p in msg.iter_parts()}
-        assert set(parts) == {'image', 'model', 'prompt', 'n', 'response_format'}
+        assert set(parts) == {'image', 'model', 'prompt', 'n', 'response_format', 'reasoning_strength'}
+        assert parts['reasoning_strength'].get_payload(decode=True) == b'low'
         assert parts['model'].get_payload(decode=True) == b'muse-image-1.0'
         assert parts['response_format'].get_payload(decode=True) == b'b64_json'
         assert parts['n'].get_payload(decode=True) == b'1'

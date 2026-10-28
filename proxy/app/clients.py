@@ -313,9 +313,8 @@ class RealMetaClient:
             result = await self.oai.images.edit(
                 model=self.s.image_model, image=("repair.png", png.getvalue(), "image/png"),
                 prompt=prompt, n=1, response_format="b64_json",
-                # Meta extensions (docs/muse-image-notes.md): one pass, no web/image search, no shell.
-                extra_body={"reasoning_strength": "low", "tool_enablement": {
-                    "enable_image_search": False, "enable_web_search": False, "enable_shell": False}},
+                # Meta extension (docs/muse-image-notes.md): single pass for a faster preview.
+                extra_body={"reasoning_strength": "low"},
             )
         except (APITimeoutError, httpx.TimeoutException) as exc:
             raise AppError("timeout", "Die Vorschau hat zu lange gebraucht. Bitte versuche es erneut.", 504) from exc

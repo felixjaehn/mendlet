@@ -29,7 +29,7 @@ def transport_handler(seen, fail=None):
             return httpx.Response(500, json={'error': {'message': 'offline failure'}})
         if path == '/v1/chat/completions':
             data = json.loads(req.content)
-            assert data['max_completion_tokens'] == 256
+            assert data['max_completion_tokens'] == 2048
             assert data['response_format']['type'] == 'json_schema'
             assert len(data['messages'][1]['content']) == 1  # no speculative image billing
             return chat_response({'category':'unsupported', 'risk_level':'warn_only', 'reason':'Kein Foto'})

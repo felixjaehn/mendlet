@@ -35,7 +35,7 @@ from app.prompts import inline_schema, load_prompt  # noqa: E402
 
 CAP_USD = 0.10  # fixed; not configurable through flags or environment
 SPARK_INPUT_CEILING = 65_536  # intentionally very conservative for <=8 KiB of text/schema
-SPARK_OUTPUT_LIMIT = 256
+SPARK_OUTPUT_LIMIT = 2048  # live 2026-10-28: ~820 reasoning tokens before JSON; 256 returned empty output
 MAX_AUDIO_SECONDS = 5
 RESERVATIONS = {
     'muse-spark-1.3': muse_cost(SPARK_INPUT_CEILING, SPARK_OUTPUT_LIMIT),

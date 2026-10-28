@@ -82,12 +82,18 @@ async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress =
         return blocked_response(cls, pre)
 
     await progress("segment")
+    # Live probe 2026-10-28 (docs/benchmark.md): SAM text prompts find parts but rarely damage
+    # ("tear" = 0 matches on an obvious tear), so Spark grounding runs in parallel instead of after.
+    # It always runs to completion so its result is cached; cancelling would re-spend credits on replay.
+    ground_task = asyncio.create_task(client.ground(req, cls.category))
     try:
         segments = await client.segment(req, cls.category, SEGMENT_PROMPTS.get(cls.category, []))
-        if not any(s.kind == "damage" for s in segments):
+        if any(s.kind == "damage" for s in segments):
+            await asyncio.gather(ground_task, return_exceptions=True)
+        else:
             await grounding()
             try:
-                grounded = await client.ground(req, cls.category)
+                grounded = await ground_task
                 for segment in grounded:
                     index = len(segments) + 1
                     while f"seg_{index}" in {s.id for s in segments}:
@@ -98,8 +104,10 @@ async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress =
             except AppError as exc:
                 log.warning("grounding unavailable: %s", exc.code)
     except BudgetExceeded:
+        await asyncio.gather(ground_task, return_exceptions=True)
         raise
     except AppError as exc:
+        await asyncio.gather(ground_task, return_exceptions=True)
         # PRD §6: continue with text guidance when segmentation is unavailable.
         log.warning("segmentation unavailable: %s", exc.code)
         segments = []
