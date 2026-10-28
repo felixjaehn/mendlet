@@ -112,17 +112,40 @@ enum StitchType: String, TolerantEnum {
 
 // MARK: - Segments
 
-struct SegmentMask: Codable, Sendable, Hashable {
+struct MaskRing: Codable, Sendable, Hashable {
     var points: [[Double]]
+    var hole: Bool
     var cgPoints: [CGPoint] {
         points.compactMap { $0.count >= 2 && $0[0].isFinite && $0[1].isFinite ? CGPoint(x: $0[0], y: $0[1]) : nil }
     }
-    private enum CodingKeys: String, CodingKey { case points }
-    init(points: [[Double]]) { self.points = points }
+    private enum CodingKeys: String, CodingKey { case points, hole }
+    init(points: [[Double]], hole: Bool = false) { self.points = points; self.hole = hole }
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         points = (try? c.decode([[Double]].self, forKey: .points)) ?? []
+        hole = (try? c.decode(Bool.self, forKey: .hole)) ?? false
     }
+}
+
+struct SegmentMask: Codable, Sendable, Hashable {
+    var points: [[Double]]
+    /// Optional multi-ring mask (outer rings and holes, drawn even-odd). `points` keeps working on its own.
+    var rings: [MaskRing]
+    var cgPoints: [CGPoint] {
+        points.compactMap { $0.count >= 2 && $0[0].isFinite && $0[1].isFinite ? CGPoint(x: $0[0], y: $0[1]) : nil }
+    }
+    private enum CodingKeys: String, CodingKey { case points, rings }
+    init(points: [[Double]], rings: [MaskRing] = []) { self.points = points; self.rings = rings }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        points = (try? c.decode([[Double]].self, forKey: .points)) ?? []
+        rings = (try? c.decode([MaskRing].self, forKey: .rings)) ?? []
+    }
+}
+
+enum SegmentSource: String, Codable, Sendable, Hashable {
+    case text, grounding, tap
+    var badge: String { self == .grounding ? "Spark → SAM" : "SAM 3.1" }
 }
 
 struct Segment: Codable, Sendable, Hashable, Identifiable {
@@ -133,12 +156,13 @@ struct Segment: Codable, Sendable, Hashable, Identifiable {
     var box: [Double]?
     var mask: SegmentMask?
     var score: Double
+    var source: SegmentSource?
 
-    private enum CodingKeys: String, CodingKey { case id, label, kind, prompt, box, mask, score }
+    private enum CodingKeys: String, CodingKey { case id, label, kind, prompt, box, mask, score, source }
 
-    init(id: String, label: String, kind: SegmentKind, prompt: String = "", box: [Double]? = nil, mask: SegmentMask? = nil, score: Double = 0) {
+    init(id: String, label: String, kind: SegmentKind, prompt: String = "", box: [Double]? = nil, mask: SegmentMask? = nil, score: Double = 0, source: SegmentSource? = nil) {
         self.id = id; self.label = label; self.kind = kind; self.prompt = prompt
-        self.box = box; self.mask = mask; self.score = score
+        self.box = box; self.mask = mask; self.score = score; self.source = source
     }
 
     init(from decoder: Decoder) throws {
@@ -150,6 +174,7 @@ struct Segment: Codable, Sendable, Hashable, Identifiable {
         box = try? c.decode([Double].self, forKey: .box)
         mask = (try? c.decodeIfPresent(SegmentMask.self, forKey: .mask)) ?? nil
         score = (try? c.decode(Double.self, forKey: .score)) ?? 0
+        source = (try? c.decodeIfPresent(SegmentSource.self, forKey: .source)) ?? nil
     }
 
     /// Normalized box (0..1) or nil.
@@ -161,7 +186,23 @@ struct Segment: Codable, Sendable, Hashable, Identifiable {
     /// Normalized polygon or empty (then use the box).
     var polygon: [CGPoint] {
         let p = mask?.cgPoints ?? []
-        return p.count >= 3 ? p : []
+        if p.count >= 3 { return p }
+        return mask?.rings.first(where: { !$0.hole && $0.cgPoints.count >= 3 })?.cgPoints ?? []
+    }
+
+    /// All drawable rings (normalized): `mask.rings` if present, else the single `mask.points` polygon.
+    var ringPolygons: [(points: [CGPoint], hole: Bool)] {
+        let r = (mask?.rings ?? []).map { (points: $0.cgPoints, hole: $0.hole) }.filter { $0.points.count >= 3 }
+        if !r.isEmpty { return r }
+        let p = polygon
+        return p.count >= 3 ? [(p, false)] : []
+    }
+
+    /// Normalized bounds of the mask (outer rings) or the box.
+    var normalizedBounds: CGRect? {
+        let pts = ringPolygons.filter { !$0.hole }.flatMap(\.points)
+        guard let f = pts.first else { return normalizedBox }
+        return pts.reduce(CGRect(origin: f, size: .zero)) { $0.union(CGRect(origin: $1, size: .zero)) }
     }
 
     var isDamage: Bool { kind == .damage }

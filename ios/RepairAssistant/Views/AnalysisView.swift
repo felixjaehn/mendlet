@@ -15,9 +15,8 @@ struct AnalysisView: View {
             VStack(alignment: .leading, spacing: 22) {
                 if let photo = flow.photo {
                     PhotoStage(image: photo, dim: flow.analysisError == nil ? 0.18 : 0.4) { size in
-                        SegmentOverlayView(segments: flow.earlySegments, size: size, appeared: !flow.earlySegments.isEmpty, showLabels: true)
+                        ScanRevealView(segments: flow.earlySegments, size: size, isScanning: flow.isAnalyzing && flow.analysisError == nil)
                     }
-                    .shimmer(flow.isAnalyzing)
                 }
                 VStack(alignment: .leading, spacing: 6) {
                     Text(flow.analysisError == nil ? "Ich schaue mir das genau an" : "Das hat nicht geklappt")
