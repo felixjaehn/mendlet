@@ -70,3 +70,15 @@ Offen: Latenz über dem Ziel von 30 s.
 | `low` + SAM 1024 px + 6 Konzepte (ohne `tear`) | 3,0 s | 10,5 s | 16,4 s | **29,9 s** |
 
 Parallel gestartete SAM-Aufrufe brauchen einzeln 6 bis 14 s statt 3 bis 5 s. Meta reiht parallele Streams offenbar ein. Qualität mit `low`: Konfidenz 0,78 bis 0,82, 5 Schritte, 1 bis 2 Sicherheitsschritte, also vergleichbar mit dem Standard. Kosten der Messläufe: etwa 0,15 $.
+
+## Weitere Live-Fälle über `/analyze` (28.10.2026)
+
+| Fall | SAM | Spark | Latenz |
+| --- | --- | --- | --- |
+| Strickpulli, 3 Löcher | `hole` ×3 (0,78/0,78/0,77), `garment` 0,97; Fehltreffer `rip` ×2 (0,52) | "Vermutlich Wollstrick", Konfidenz 0,78, Stopfgarn und stumpfe Stopfnadel, **ein Stopf-Schritt pro Loch** | 30 s |
+| Sneaker, Sohle vorne gelöst | `detached sole` 0,84, `shoe sole` 0,91; 4 schwache `seam`-Treffer (0,51–0,63) | Konfidenz 0,85, Reiniger, Handschuhe, flexibler Schuhkleber, Krepp; nur der Kleberschritt sicherheitskritisch | 29 s |
+| Heizjacke mit Akku | – (vorher gesperrt) | `warn_only`, Lithium-Risiko, keine Anleitung | **3 s** |
+
+Muse Image Nachher-Vorschau (`/after-preview`, `reasoning_strength=low`): Jeans 12 s, Pulli 11 s. Bildausschnitt, Licht und Material bleiben gleich, nur der Schaden ist repariert ([Jeans](live-probes/2026-10-28_jeans_muse-image_after.jpg)). Kosten gesamt bis hier: 0,47 $.
+
+Offene Qualitätspunkte: schwache Fehltreffer (Score < 0,6), die einen stärkeren Schaden überlappen oder nur Teile sind, sollten gefiltert werden.
