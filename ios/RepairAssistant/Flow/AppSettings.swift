@@ -8,6 +8,7 @@ final class AppSettings {
 
     var demoMode: Bool { didSet { defaults.set(demoMode, forKey: "demoMode") } }
     var scenarioRaw: String { didSet { defaults.set(scenarioRaw, forKey: "demoScenarioSetting") } }
+    var fastReplay: Bool { didSet { defaults.set(fastReplay, forKey: "fastReplay") } }
     var baseURLString: String { didSet { defaults.set(baseURLString, forKey: "proxyBaseURL") } }
 
     static var configuredBaseURL: String {
@@ -18,6 +19,7 @@ final class AppSettings {
         self.defaults = defaults
         demoMode = (defaults.object(forKey: "demoMode") as? Bool) ?? true
         scenarioRaw = defaults.string(forKey: "demoScenarioSetting") ?? DemoScenario.textileTear.rawValue
+        fastReplay = defaults.bool(forKey: "fastReplay")
         baseURLString = defaults.string(forKey: "proxyBaseURL") ?? Self.configuredBaseURL
     }
 
@@ -29,7 +31,7 @@ final class AppSettings {
     var baseURL: URL? { URL(string: baseURLString.trimmingCharacters(in: .whitespaces)) }
 
     func makeService() -> AnalysisService {
-        if demoMode { return MockAPIClient() }
+        if demoMode { return MockAPIClient(fast: fastReplay) }
         if let url = baseURL { return LiveAPIClient(baseURL: url) }
         return MockAPIClient()
     }

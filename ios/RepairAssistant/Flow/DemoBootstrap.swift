@@ -11,12 +11,13 @@ enum DemoBootstrap {
         let scenario = DemoScenario(rawValue: d.string(forKey: "demoScenario") ?? "") ?? .textileTear
         flow.settings.demoMode = true
         flow.settings.scenario = scenario
-        let image = await DemoImageFactory.imageAsync(for: scenario)
+        let image = await DemoPhotos.imageAsync(for: scenario)
         flow.photo = ImageResizer.resized(image)
         flow.note = scenario.userNote
 
         func loaded(label: Bool) -> AnalyzeResponse? {
-            guard var r = try? Fixtures.response(scenario, labelProvided: label) else { return nil }
+            let rec = LiveRecordings.recording(for: scenario)
+            guard var r = (label ? rec?.labelResponse : nil) ?? rec?.response ?? (try? Fixtures.response(scenario, labelProvided: label)) else { return nil }
             r.caseId = "demo-" + scenario.rawValue
             return FlowGate.sanitized(r)
         }
@@ -30,7 +31,7 @@ enum DemoBootstrap {
             flow.startAnalysis()
         case "diagnosis":
             flow.response = loaded(label: true); flow.followUpUsed = true
-            if scenario == .textileTear { flow.labelImage = DemoImageFactory.labelImage(); flow.newInfoBanner = "Etikett erkannt: 98 % Baumwolle, 2 % Elasthan" }
+            if scenario == .textileTear { flow.labelImage = LiveRecordings.recording(for: scenario)?.labelPhoto ?? DemoImageFactory.labelImage(); flow.newInfoBanner = "Etikett erkannt: 98 % Baumwolle, 2 % Elasthan" }
             flow.path = [.diagnosis]
         case "followup":
             flow.response = loaded(label: false)

@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 struct DiagnosisView: View {
     @Environment(FlowModel.self) private var flow
@@ -6,6 +7,10 @@ struct DiagnosisView: View {
     @State private var pulsing: Set<String> = []
     @State private var selectedCause: Int?
     @State private var appeared = false
+    @State private var changedShown = false
+    @State private var showLabelCamera = false
+    @State private var showLabelGallery = false
+    @State private var labelPicker: PhotosPickerItem?
 
     var body: some View {
         @Bindable var flow = flow
@@ -20,7 +25,9 @@ struct DiagnosisView: View {
                 }
                 if let r {
                     if let banner = flow.newInfoBanner, r.diagnosis.labelInfo != nil { infoBanner(banner) }
+                    if !flow.changedItemIds.isEmpty { changedCard(r) }
                     summaryCard(r)
+                    if flow.labelBusy { labelBusyCard } else if flow.labelOfferAvailable { labelOfferCard }
                     if r.diagnosis.needsMoreInfo { needsInfoCard(r) }
                 }
             }
@@ -37,6 +44,15 @@ struct DiagnosisView: View {
             }
         }
         .sheet(isPresented: $flow.showFollowUp) { FollowUpSheet() }
+        .fullScreenCover(isPresented: $showLabelCamera) { CameraPicker { flow.submitLabelPhoto($0) }.ignoresSafeArea() }
+        .photosPicker(isPresented: $showLabelGallery, selection: $labelPicker, matching: .images)
+        .onChange(of: labelPicker) { _, item in
+            guard let item else { return }
+            Task {
+                if let d = try? await item.loadTransferable(type: Data.self), let img = UIImage(data: d) { flow.submitLabelPhoto(img) }
+                labelPicker = nil
+            }
+        }
         .onAppear {
             withAnimation(.easeInOut(duration: 0.5).delay(0.15)) { appeared = true }
             if let r, r.diagnosis.needsMoreInfo, !flow.followUpUsed, !r.diagnosis.followUpQuestions.isEmpty {
@@ -117,6 +133,80 @@ struct DiagnosisView: View {
             }
         }
         .card()
+    }
+
+    /// Optional, never blocks the way to the decision.
+    private var labelOfferCard: some View {
+        Button {
+            Haptics.tap()
+            if flow.settings.demoMode { flow.applyDemoLabel() }
+            else if CameraPicker.isAvailable { showLabelCamera = true } else { showLabelGallery = true }
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: "tag.fill").font(.system(size: 18, weight: .semibold)).foregroundStyle(Theme.thread)
+                    .frame(width: 44, height: 44).background(Theme.threadSoft, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Etikett fotografieren für genauere Empfehlung (optional)").font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
+                        .multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
+                    Text("Material und Pflegehinweise passen Nadel, Garn und Flicken an.").font(.footnote).foregroundStyle(Theme.inkSecondary)
+                        .multilineTextAlignment(.leading)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "camera.fill").foregroundStyle(Theme.inkSecondary)
+            }
+            .padding(14)
+            .background(Theme.card, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Theme.thread.opacity(0.35), style: StrokeStyle(lineWidth: 1.2, dash: [5, 4])))
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("Optional, du kannst auch direkt weitermachen")
+        .transition(.opacity.combined(with: .scale(scale: 0.97)))
+    }
+
+    private var labelBusyCard: some View {
+        HStack(spacing: 14) {
+            if let img = flow.labelImage {
+                Image(uiImage: img).resizable().scaledToFill().frame(width: 44, height: 44)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Theme.thread.opacity(0.5), lineWidth: 1.5))
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Muse Spark liest das Etikett").font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
+                Text("Material und Pflege fließen in die Empfehlung ein.").font(.footnote).foregroundStyle(Theme.inkSecondary)
+            }
+            Spacer(minLength: 0)
+            ProgressView().tint(Theme.thread)
+        }
+        .padding(14)
+        .background(Theme.threadSoft, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .shimmer()
+        .transition(.opacity)
+    }
+
+    /// What the label changed: shopping items that were swapped or adjusted.
+    private func changedCard(_ r: AnalyzeResponse) -> some View {
+        let items = r.shoppingList.filter { flow.changedItemIds.contains($0.id) }
+        return VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "sparkles").foregroundStyle(Theme.thread)
+                Text("Einkaufsliste angepasst").font(.subheadline.weight(.bold)).foregroundStyle(Theme.ink)
+            }
+            VStack(alignment: .leading, spacing: 6) {
+                ForEach(Array(items.enumerated()), id: \.element.id) { i, it in
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: "arrow.right.circle.fill").font(.footnote).foregroundStyle(Theme.thread).padding(.top, 2)
+                        Text(it.name).font(.subheadline).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
+                    }
+                    .opacity(changedShown ? 1 : 0).offset(x: changedShown ? 0 : -10)
+                    .animation(.spring(response: 0.5, dampingFraction: 0.85).delay(0.25 + 0.12 * Double(i)), value: changedShown)
+                }
+            }
+        }
+        .padding(14).frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.threadSoft, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(Theme.thread.opacity(0.35), lineWidth: 1))
+        .transition(.scale(scale: 0.96).combined(with: .opacity))
+        .onAppear { changedShown = true }
     }
 
     private func needsInfoCard(_ r: AnalyzeResponse) -> some View {

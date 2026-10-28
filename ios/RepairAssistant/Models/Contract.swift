@@ -566,7 +566,11 @@ struct TrackResponse: Codable, Sendable, Hashable {
 struct AfterPreviewRequest: Codable, Sendable {
     var imageBase64: String
     var diagnosisSummary: String
-    var stitchType: StitchType
+    /// Textile: stitch type of the first stitch_path step. Shoes: nil (nil fields are omitted when encoding).
+    var stitchType: StitchType?
+    /// Optional: "shoe" for glued soles.
+    var category: String?
+    var repairHint: String?
 }
 
 struct AfterPreviewResponse: Codable, Sendable, Hashable {
@@ -574,6 +578,40 @@ struct AfterPreviewResponse: Codable, Sendable, Hashable {
     var imageBase64: String
     var model: String
     var imageData: Data? { Data(base64Encoded: imageBase64, options: .ignoreUnknownCharacters) }
+}
+
+// MARK: - Agent trace (SSE `agent_step`)
+
+enum AgentStatus: String, TolerantEnum {
+    case done, failed
+    static var fallback: AgentStatus { .done }
+    init(from decoder: Decoder) throws { self = try Self.decodeTolerant(decoder) }
+    func encode(to encoder: Encoder) throws { try encodeRaw(encoder) }
+}
+
+/// One tool call of the analysis agent: `data: {"n":1,"tool":"classify","label":"…","model":"Muse Spark","status":"done","ms":2800}`.
+struct AgentStep: Codable, Sendable, Hashable, Identifiable {
+    var n: Int
+    var tool: String
+    var label: String
+    var model: String
+    var status: AgentStatus
+    var ms: Int
+    var id: Int { n }
+
+    private enum CodingKeys: String, CodingKey { case n, tool, label, model, status, ms }
+    init(n: Int, tool: String = "", label: String, model: String, status: AgentStatus = .done, ms: Int = 0) {
+        self.n = n; self.tool = tool; self.label = label; self.model = model; self.status = status; self.ms = max(0, ms)
+    }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        n = (try? c.decode(Int.self, forKey: .n)) ?? 0
+        tool = (try? c.decode(String.self, forKey: .tool)) ?? ""
+        label = (try? c.decode(String.self, forKey: .label)) ?? ""
+        model = (try? c.decode(String.self, forKey: .model)) ?? ""
+        status = (try? c.decode(AgentStatus.self, forKey: .status)) ?? .done
+        ms = max(0, (try? c.decode(Int.self, forKey: .ms)) ?? 0)
+    }
 }
 
 enum ContractCoding {

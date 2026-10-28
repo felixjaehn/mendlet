@@ -79,7 +79,7 @@ struct FollowUpSheet: View {
                 }
                 if flow.settings.demoMode {
                     PrimaryButton(title: "Demo-Etikett verwenden", systemImage: "tag.fill", kind: CameraPicker.isAvailable ? .secondary : .primary) {
-                        addPhoto(DemoImageFactory.labelImage())
+                        addPhoto(LiveRecordings.recording(for: .textileTear)?.labelPhoto ?? DemoImageFactory.labelImage())
                     }
                 }
                 PrimaryButton(title: "Aus Galerie", systemImage: "photo.on.rectangle", kind: .secondary) { showGallery = true }

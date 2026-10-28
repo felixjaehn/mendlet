@@ -126,6 +126,14 @@ struct ShoppingListView: View {
             }
         }
         .padding(16)
+        .background(flow.changedItemIds.contains(item.id) ? Theme.threadSoft : .clear)
+        .overlay(alignment: .topTrailing) {
+            if flow.changedItemIds.contains(item.id) {
+                Label("durch Etikett angepasst", systemImage: "sparkles").font(.caption2.weight(.bold)).foregroundStyle(Theme.thread)
+                    .padding(.horizontal, 8).padding(.vertical, 3).background(Theme.card, in: Capsule())
+                    .overlay(Capsule().strokeBorder(Theme.thread.opacity(0.4), lineWidth: 1)).padding(8)
+            }
+        }
         .accessibilityElement(children: .contain)
     }
 

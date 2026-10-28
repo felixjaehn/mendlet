@@ -14,6 +14,7 @@ struct HomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 topBar
+                if flow.settings.demoMode { DemoChip().padding(.top, -12) }
                 headline
                 ThreadHero().frame(height: 132)
                 VStack(spacing: 12) {
@@ -75,9 +76,6 @@ struct HomeView: View {
             }
             .onLongPressGesture(minimumDuration: 0.8) { Haptics.success(); flow.showSettings = true }
             Spacer()
-            if flow.settings.demoMode {
-                Badge(text: "Demo", tint: Theme.caution)
-            }
             Button { flow.showSettings = true } label: {
                 Image(systemName: "gearshape").font(.system(size: 18, weight: .medium)).foregroundStyle(Theme.inkSecondary)
                     .frame(width: 44, height: 44)
@@ -147,7 +145,7 @@ private struct ScenarioCard: View {
     var body: some View {
         Button {
             Task {
-                let img = await DemoImageFactory.imageAsync(for: scenario)
+                let img = await DemoPhotos.imageAsync(for: scenario)
                 flow.choose(img, scenarioHint: scenario, note: scenario.userNote)
             }
         } label: {
@@ -169,7 +167,7 @@ private struct ScenarioCard: View {
         }
         .buttonStyle(.plain)
         .task {
-            image = await DemoImageFactory.imageAsync(for: scenario)
+            image = await DemoPhotos.imageAsync(for: scenario)
         }
     }
 }
@@ -265,15 +263,16 @@ extension HomeView {
         flow.settings.demoMode = true
         if screen == "liveScan" { try? await Task.sleep(for: .milliseconds(400)); showLiveScan = true; return }
         let scenario = DemoScenario(rawValue: d.string(forKey: "uiScenario") ?? "") ?? .textileTear
-        let img = await DemoImageFactory.imageAsync(for: scenario)
+        let img = await DemoPhotos.imageAsync(for: scenario)
         flow.choose(img, scenarioHint: scenario, note: scenario.userNote)
         flow.answers = [AnswerPayload(questionId: "debug", text: "Jeans, Baumwolle")]
         flow.startAnalysis(resetExtras: false)
-        guard screen == "guide" else { return }
+        guard screen == "guide" || screen == "decision" else { return }
         let flow = self.flow
         Task { @MainActor in  // unstructured: survives HomeView's .task cancellation on navigation
         while flow.isAnalyzing || flow.response == nil { try? await Task.sleep(for: .milliseconds(200)) }
         try? await Task.sleep(for: .milliseconds(900))
+        if screen == "decision" { flow.go(.decision); return }
         for i in flow.shoppingItems { flow.statuses[i.id] = .have }
         flow.currentStep = d.integer(forKey: "uiStep")
         flow.startRepair()

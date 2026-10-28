@@ -19,6 +19,7 @@ struct CompletionView: View {
                     Text("Repariert!").font(.largeTitle.bold()).foregroundStyle(Theme.ink)
                     Text("Gut gemacht. Das Teil bleibt im Einsatz.").font(.body).foregroundStyle(Theme.inkSecondary)
                 }
+                BeforeAfterCard()
                 impactCard(est, isShoe: isShoe)
                 stats
                 resultPhotoCard
@@ -44,6 +45,7 @@ struct CompletionView: View {
             Task { if let d = try? await item.loadTransferable(type: Data.self), let i = UIImage(data: d) { flow.resultPhoto = ImageResizer.resized(i) }; pickerItem = nil }
         }
         .onAppear {
+            flow.loadAfterPreview()
             Haptics.success()
             withAnimation(.easeOut(duration: 0.7)) { ring = 1 }
             withAnimation(.easeOut(duration: 0.5).delay(0.55)) { check = 1 }
