@@ -15,7 +15,9 @@ from .models import (
     ClassifyResult,
     Decision,
     Diagnosis,
+    DiagnosePlan,
     Safety,
+    Segment,
     Stage,
 )
 from .sam import SEGMENT_PROMPTS
@@ -32,6 +34,8 @@ STAGE_LABELS: dict[str, str] = {
 
 Progress = Callable[[Stage], Awaitable[None]]
 GroundingProgress = Callable[[], Awaitable[None]]
+SegmentsReady = Callable[[list[Segment]], Awaitable[None]]
+AgentStepEvent = Callable[[dict], Awaitable[None]]
 
 
 async def _noop(_: Stage) -> None:
@@ -39,6 +43,14 @@ async def _noop(_: Stage) -> None:
 
 
 async def _noop_grounding() -> None:
+    return None
+
+
+async def _noop_segments(_: list[Segment]) -> None:
+    return None
+
+
+async def _noop_step(_: dict) -> None:
     return None
 
 
@@ -63,25 +75,8 @@ def blocked_response(cls: ClassifyResult, pre: safety.PreCheck) -> AnalyzeRespon
     return safety.enforce(resp, has_answers=False, precheck=pre)
 
 
-async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress = _noop,
-                  grounding: GroundingProgress = _noop_grounding) -> AnalyzeResponse:
-    """Run the pipeline on an already prepared (downscaled) request."""
-    pre = safety.precheck_note("\n".join([req.note, *(a.text for a in req.answers)]))
-
-    await progress("classify")
-    try:
-        cls = await client.classify(req)
-    except ModelOutputError:
-        log.warning("classify output invalid after retry; falling back to warn_only")
-        cls = ClassifyResult(
-            category="unsupported", risk_level="warn_only",
-            reason="Das Objekt konnte nicht sicher eingeordnet werden. Im Zweifel geben wir keine Anleitung.",
-        )
-    cls = safety.apply_precheck(cls, pre)
-    if safety.is_blocked(cls.category, cls.risk_level):
-        return blocked_response(cls, pre)
-
-    await progress("segment")
+async def _classic_segments(req: AnalyzeRequest, client: ModelClient, cls: ClassifyResult,
+                            grounding: GroundingProgress) -> list[Segment]:
     # Live probe 2026-10-28 (docs/benchmark.md): SAM text prompts find parts but rarely damage
     # ("tear" = 0 matches on an obvious tear), so Spark grounding runs in parallel instead of after.
     # It always runs to completion so its result is cached; cancelling would re-spend credits on replay.
@@ -111,9 +106,46 @@ async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress =
         # PRD §6: continue with text guidance when segmentation is unavailable.
         log.warning("segmentation unavailable: %s", exc.code)
         segments = []
+    return segments
+
+
+async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress = _noop,
+                  grounding: GroundingProgress = _noop_grounding, segments_ready: SegmentsReady = _noop_segments,
+                  agent_step: AgentStepEvent = _noop_step) -> AnalyzeResponse:
+    """Run the pipeline on an already prepared (downscaled) request."""
+    pre = safety.precheck_note("\n".join([req.note, *(a.text for a in req.answers)]))
+
+    await progress("classify")
+    try:
+        cls = await client.classify(req)
+    except ModelOutputError:
+        log.warning("classify output invalid after retry; falling back to warn_only")
+        cls = ClassifyResult(
+            category="unsupported", risk_level="warn_only",
+            reason="Das Objekt konnte nicht sicher eingeordnet werden. Im Zweifel geben wir keine Anleitung.",
+        )
+    cls = safety.apply_precheck(cls, pre)
+    if safety.is_blocked(cls.category, cls.risk_level):
+        return blocked_response(cls, pre)  # safety is decided here, never inside the agent
+
+    await progress("segment")
+    plan: DiagnosePlan | None = None
+    segments: list[Segment] | None = None
+    if getattr(client, "agent_enabled", False):
+        try:
+            segments, plan = await client.agent_run(req, cls, agent_step)
+        except BudgetExceeded:
+            raise
+        except AppError as exc:
+            log.warning("agent failed (%s); falling back to the classic pipeline", exc.code)
+            segments, plan = None, None
+    if segments is None:
+        segments = await _classic_segments(req, client, cls, grounding)
+    await segments_ready(segments)
 
     await progress("diagnose")
-    plan = await client.diagnose(req, cls, segments)
+    if plan is None:
+        plan = await client.diagnose(req, cls, segments)
 
     await progress("plan")
     if client.plan_delay:

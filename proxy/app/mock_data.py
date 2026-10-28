@@ -146,6 +146,21 @@ def segments(scenario: str) -> list[Segment]:
     return []
 
 
+def detection(concept: str) -> list[Segment]:
+    """Deterministic /detect fixture: a central polygon shaped like the concept (the app mock uses a central tear)."""
+    if concept in ("hole",):
+        poly = blob(0.5, 0.5, 0.06)
+    elif concept == "detached sole":
+        poly = ribbon((0.2, 0.7), (0.7, 0.72), 0.05, 0.4)
+    elif concept == "wire":
+        poly = ribbon((0.25, 0.4), (0.75, 0.55), 0.03, 2.2)
+    else:
+        poly = ribbon((0.33, 0.52), (0.66, 0.47), 0.05, 1.3)
+    from .sam import PROMPT_META
+    label = PROMPT_META.get(concept, (concept, "damage"))[0]
+    return [seg("damage_1", label, "damage", concept, 0.94, poly)]
+
+
 def tracking(concept: str) -> TrackResponse:
     from .sam import PROMPT_META
 

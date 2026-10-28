@@ -91,6 +91,13 @@ class RefineRequest(Base):
         return self
 
 
+class DetectRequest(Base):
+    """Live camera frame: one frame, one concept (ios/RepairAssistant/Live/DETECT-CONTRACT.md)."""
+
+    image_base64: Annotated[str, Field(max_length=25_000_000)]
+    concept: Annotated[str, Field(min_length=1, max_length=200, pattern=r"\S")]
+
+
 class TrackRequest(Base):
     video_base64: Annotated[str, Field(max_length=66_666_700)]
     concept: Annotated[str, Field(min_length=1, max_length=200, pattern=r"\S")]
@@ -99,12 +106,27 @@ class TrackRequest(Base):
 class AfterPreviewRequest(Base):
     image_base64: Annotated[str, Field(max_length=25_000_000)]
     diagnosis_summary: Annotated[str, Field(min_length=1, max_length=2000, pattern=r"\S")]
-    stitch_type: StitchType
+    stitch_type: StitchType | None = None  # optional: shoes have no stitches
+    category: Literal["textile", "shoe"] | None = None  # None = textile wording (backwards compatible)
+    repair_hint: Annotated[str, Field(max_length=200)] | None = None
 
 
 class AfterPreviewResponse(Base):
     image_base64: str
     model: str
+
+
+class LocateResult(Base):
+    """Agent tool `locate`: Spark perception grounding box on the 0..1000 grid, null = not visible."""
+
+    box: Annotated[list[Annotated[float, Field(allow_inf_nan=False)]], Field(min_length=4, max_length=4)] | None
+
+
+class VerifyResult(Base):
+    """Agent tool `verify_mask`: does the drawn mask lie on the damage?"""
+
+    on_damage: bool
+    issue: str = ""
 
 
 class GroundingResult(Base):
@@ -263,3 +285,7 @@ class AnalyzeResponse(Base):
     shopping_list: list[ShoppingItem]
     guide: Guide
     instances: dict[str, Annotated[int, Field(ge=0)]] | None = None
+
+
+class DetectResponse(Base):
+    segments: list[Segment]

@@ -26,3 +26,11 @@ Quellen: https://dev.meta.ai/docs/tool-calling und https://dev.meta.ai/docs/mode
 | `finish(plan)` | – | Diagnose, Entscheidung, Liste und Schritte (Vertrag) |
 
 Der Agent darf höchstens 8 Runden drehen. Die Sicherheitsprüfung (Prompt A plus Keyword-Gate) läuft **vorher** und deterministisch, nie durch den Agenten. Jeder Agentenschritt geht als SSE-Ereignis `agent_step` an die App (Live-Trace).
+
+## Umsetzung im Proxy (29.10.2026)
+
+- `AGENT_MODE=wonder` (Standard aus). Code: `proxy/app/agent.py`, Einstieg `RealMetaClient.agent_run`, Mock `MockClient.agent_run`. Tools wie in der Tabelle, ohne `read_label` und `preview_repair` (gibt es als eigene Endpunkte). Rundenlimit 8; Sicherheit läuft vorher in `pipeline.analyze`.
+- Jede Tool-Ausführung sendet `event: agent_step` (`n`, `tool`, `label`, `model`, `status`, `ms`). Vertrag: `proxy/CONTRACT-CHANGES.md`.
+- `finish` wird mit `DiagnosePlan` validiert; ungültig, Rundenlimit oder keine Tool-Antwort ergibt den normalen Diagnoseaufruf. Upstream-Fehler ergeben die klassische Pipeline.
+- **Preise Muse Wonder 1.0 (Standard)**, Primärquelle https://dev.meta.ai/docs/pricing-rate-limits (gelesen 28.10.2026): 4,00 $ Input, 20,00 $ Output, 0,20 $ gecachter Input je 1 Mio. Token; Contributor-Modus nicht verfügbar. Konstanten in `proxy/app/budget.py` (`WONDER_*`).
+- **UNBESTÄTIGT:** Live-Verhalten der Schleife (Latenz, Rundenzahl, ob `previous_response_id` mit unseren Bild-Inputs akzeptiert wird), Token-Zählung inkl. Reasoning, Wirkung von `reasoning`-Parametern (nicht gesendet).

@@ -16,17 +16,21 @@ uv run pytest -q              # alle Tests offline
 - **Mock** (Standard ohne Key oder mit `MOCK_MODE=1`): deterministische deutsche Fixtures mit realistischen Verzögerungen. Szenario über das Request-Feld `mock_scenario` oder Schlüsselwörter in `user_note`: `textile_tear_needs_label` (Standard, fragt nach dem Etikett), `textile_tear`, `textile_hole`, `textile_open_seam`, `textile_button`, `shoe_sole`, `battery_jacket`, `helmet`, `unsupported`.
 - **Real** (Key gesetzt): Muse Spark `muse-spark-1.3` über `/v1/chat/completions` mit `response_format: json_schema`; SAM 3.1 über `/v1/responses`, ein Begriff pro Aufruf, parallel, PNG und SSE bis `response.completed`, mit String-Metadata `include_confidence=true` und `mask_encoding=one_bit`; Muse Voice Transcribe über `/v1/asr/transcribe` (Multipart-Teile `request` als JSON und `audio` als WAV). Mit `CACHE_MODEL_CALLS=1` werden erfolgreiche Spark-, SAM- und Voice-Antworten unter `.cache/` gecacht. SDK-Retries sind aus; nur ungültiges Spark-JSON wird in der normalen Pipeline einmal wiederholt.
 
+- **Agent-Modus** (`AGENT_MODE=wonder`, Standard aus): nach der deterministischen Sicherheitsstufe ersetzt ein Muse-Wonder-Tool-Loop (Responses API, `muse-wonder-1.0`, höchstens 8 Runden) Segmentierung und Diagnose. Tools `segment`, `segment_at`, `locate`, `verify_mask`, `finish`; jeder Schritt geht als SSE `agent_step` an die App. Bei Fehlern greift die klassische Pipeline. Mock: geskripteter Lauf mit sechs Schritten. Preise 4 $/20 $ je 1 Mio. Token (Quelle in `app/budget.py`), Live-Verhalten UNBESTÄTIGT.
+- Schwache Segmente (Score < 0,6, überlappend oder Teile) werden gefiltert, höchstens drei Teile.
+
 ## Endpunkte
 
 | Methode | Pfad | Zweck |
 | --- | --- | --- |
 | GET | `/health` | Modus, heutige Kosten, Tageslimit |
-| POST | `/analyze` | SSE: `progress` (classify, segment, diagnose, plan), dann `result` oder `error`. Mit `?stream=false` reines JSON |
+| POST | `/analyze` | SSE: `progress` (classify, segment, diagnose, plan), dazu `segments` (früh, vor der Diagnose), optional `grounding` und im Agent-Modus `agent_step`, dann `result` oder `error`. Mit `?stream=false` reines JSON |
 | POST | `/step-help` | Hilfe zu genau einem Schritt |
 | POST | `/transcribe` | Multipart `file` (WAV) → `{"text": …}` |
 | POST | `/refine` | Normalisierte Punkte/Box → ein Schadsegment mit `source: "tap"` |
 | POST | `/track` | Base64-MP4 und ein Konzept → Frames mit stabilen SAM-Objekt-IDs |
-| POST | `/after-preview` | Foto, `diagnosis_summary`, `stitch_type` → reparierte Bildvorschau |
+| POST | `/after-preview` | Foto, `diagnosis_summary`, optional `stitch_type`, `category` (`textile`/`shoe`), `repair_hint` → reparierte Bildvorschau |
+| POST | `/detect` | Live-Kamera: ein Frame, ein Konzept → `{segments}` (SAM-Text auf 768 px, kein Grounding, `[]` bei keinem Treffer) |
 
 Die exakten JSON-Erweiterungen für iOS stehen in [CONTRACT-CHANGES.md](CONTRACT-CHANGES.md). `/analyze` ergänzt `instances` (Anzahl ausgegebener Schadsegmente pro Konzept) und `segments[].source`. Bei erfolgreicher SAM-Textsuche ohne Schadtreffer lokalisiert Spark einen Schaden auf dem 0–1000-Raster; dessen Box geht als geometrischer Prompt an SAM. Nur eine erhaltene SAM-Maske wird als `source: "grounding"` ausgegeben. Im SSE erscheint davor optional `grounding`; die vier bestehenden `progress`-Stufen und `result`/`error` bleiben erhalten. SAM-Ausfälle sind keine Nulltreffer.
 

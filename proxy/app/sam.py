@@ -35,10 +35,14 @@ PROMPT_META: dict[str, tuple[str, str]] = {
     "seam": ("Naht", "part"),
     "detached sole": ("Abgelöste Sohle", "damage"),
     "heel": ("Absatz", "part"),
+    "wire": ("Kabelschaden", "damage"),
     "cable": ("Kabel", "part"),
     "connector": ("Stecker", "part"),
     "housing": ("Gehäuse", "part"),
 }
+
+# Concepts the live camera (/detect) searches for; they are damage even when SAM_PROMPTS call them parts.
+DETECT_DAMAGE_CONCEPTS = {"tear", "rip", "hole", "open seam", "frayed edge", "detached sole", "wire"}
 
 MIN_SCORE = 0.25
 DEDUP_IOU = 0.6
@@ -339,3 +343,49 @@ def detections_to_segments(dets: list[SamDetection]) -> list[Segment]:
             )
         )
     return segments
+
+
+# ---- weak-segment filter (live finding, docs/benchmark.md) -------------------
+
+WEAK_SCORE = 0.6
+WEAK_IOU = 0.3
+WEAK_CONTAINMENT = 0.6
+MAX_PARTS = 3
+
+
+def _overlaps(weak: Segment, strong: Segment) -> bool:
+    """IoU > 0.3 or the weak box lies mostly (> 60 %) inside the stronger one. Boxes are [x, y, w, h]."""
+    a = (weak.box[0], weak.box[1], weak.box[0] + weak.box[2], weak.box[1] + weak.box[3])
+    b = (strong.box[0], strong.box[1], strong.box[0] + strong.box[2], strong.box[1] + strong.box[3])
+    inter = max(0.0, min(a[2], b[2]) - max(a[0], b[0])) * max(0.0, min(a[3], b[3]) - max(a[1], b[1]))
+    area = weak.box[2] * weak.box[3]
+    return _iou(a, b) > WEAK_IOU or (area > 0 and inter / area > WEAK_CONTAINMENT)
+
+
+def filter_weak_segments(segments: list[Segment]) -> list[Segment]:
+    """Drop weak overlapping damage duplicates and weak parts, keep at most three parts; ids are renumbered.
+
+    Live pulli: `rip` x2 (0.52) sat on three strong `hole` masks; live sneaker: four weak `seam` parts.
+    """
+    damage = [s for s in segments if s.kind == "damage"]
+    kept = []
+    for s in segments:
+        if s.score < WEAK_SCORE:
+            if s.kind == "part":
+                continue
+            if any(o.score > s.score and _overlaps(s, o) for o in damage if o is not s):
+                continue
+        kept.append(s)
+    parts = sorted((s for s in kept if s.kind == "part"), key=lambda s: s.score, reverse=True)[MAX_PARTS:]
+    drop = {id(s) for s in parts}
+    kept = [s for s in kept if id(s) not in drop]
+    return [s.model_copy(update={"id": f"seg_{i}"}) for i, s in enumerate(kept, start=1)]
+
+
+def detect_segments(concept: str, segments: list[Segment]) -> list[Segment]:
+    """/detect result: damage concepts always yield damage segments, ids `damage_<n>`, weak duplicates dropped."""
+    is_damage = concept in DETECT_DAMAGE_CONCEPTS
+    if is_damage:
+        segments = [s.model_copy(update={"kind": "damage"}) for s in segments]
+    out = filter_weak_segments(segments)
+    return [s.model_copy(update={"id": f"{s.kind}_{i}"}) for i, s in enumerate(out, start=1)]

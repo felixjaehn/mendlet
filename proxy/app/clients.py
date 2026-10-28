@@ -6,6 +6,7 @@ import hashlib
 import io
 import json
 import logging
+from collections.abc import Awaitable, Callable
 from typing import Protocol, TypeVar
 
 import httpx
@@ -24,6 +25,7 @@ from .models import (
     AfterPreviewResponse,
     AnalyzeRequest,
     ClassifyResult,
+    DetectRequest,
     DiagnosePlan,
     GroundingResult,
     RefineRequest,
@@ -35,7 +37,9 @@ from .models import (
 )
 from .parsing import call_validated, parse_model_json
 from .prompts import inline_schema, load_prompt, prompt_version
-from .sam import SamDetection, detections_to_segments, geometric_prompt, parse_sam_output, parse_sam_video
+from .sam import (
+    SamDetection, detect_segments, detections_to_segments, filter_weak_segments, geometric_prompt, parse_sam_output, parse_sam_video,
+)
 from .video import prepare_video
 
 log = logging.getLogger("proxy.client")
@@ -44,6 +48,7 @@ T = TypeVar("T", bound=BaseModel)
 
 class ModelClient(Protocol):
     plan_delay: float  # seconds the pipeline waits in the "plan" stage (mock only)
+    agent_enabled: bool  # AGENT_MODE=wonder: pipeline calls agent_run instead of segment + diagnose
 
     async def classify(self, req: AnalyzeRequest) -> ClassifyResult: ...
     async def segment(self, req: AnalyzeRequest, category: str, prompts: list[str]) -> list[Segment]: ...
@@ -54,6 +59,9 @@ class ModelClient(Protocol):
     async def ground(self, req: AnalyzeRequest, category: str) -> list[Segment]: ...
     async def track(self, req: TrackRequest) -> TrackResponse: ...
     async def after_preview(self, req: AfterPreviewRequest) -> AfterPreviewResponse: ...
+    async def detect(self, req: DetectRequest) -> list[Segment]: ...
+    async def agent_run(self, req: AnalyzeRequest, cls: ClassifyResult,
+                        emit: Callable[[dict], Awaitable[None]]) -> tuple[list[Segment], DiagnosePlan]: ...
 
 
 def _data_url(b64: str) -> str:
@@ -61,14 +69,22 @@ def _data_url(b64: str) -> str:
 
 
 def preview_prompt(req: AfterPreviewRequest) -> str:
-    stitch = {"ladder_stitch": "ladder stitch", "running_stitch": "running stitch",
-              "darning": "darning", "whip_stitch": "whip stitch"}[req.stitch_type]
-    return (f"Same photo, show the repaired state of this damage: {req.diagnosis_summary}. "
-            f"Neatly close or mend it with {stitch} in matching thread. "
-            "Keep the same object, material, lighting, perspective and background; nothing else changed.")
+    prompt = f"Same photo, show the repaired state of this damage: {req.diagnosis_summary}. "
+    if req.category == "shoe":
+        prompt += ("The sole is cleanly re-glued and sits flat and tight against the upper: "
+                   "no stitches, no visible glue, no residue. ")
+    else:
+        stitch = {"ladder_stitch": "ladder stitch", "running_stitch": "running stitch",
+                  "darning": "darning", "whip_stitch": "whip stitch"}.get(req.stitch_type or "")
+        prompt += f"Neatly close or mend it with {stitch} in matching thread. " if stitch else \
+            "Neatly close or mend it in matching thread. "
+    if req.repair_hint:
+        prompt += f"Repair detail: {req.repair_hint.strip()}. "
+    return prompt + "Keep the same object, material, lighting, perspective and background; nothing else changed."
 
 
 SAM_TEXT_MAX_EDGE = 1024
+DETECT_MAX_EDGE = 768  # live frames: smaller is faster, the contract already caps the client at 768
 
 
 class RealMetaClient:
@@ -76,6 +92,7 @@ class RealMetaClient:
 
     def __init__(self, settings: Settings, budget: Budget, http_client: httpx.AsyncClient | None = None) -> None:
         self.s = settings
+        self.agent_enabled = settings.agent_mode == "wonder"
         self.budget = budget
         self.cache = ModelCache(settings.cache_dir, settings.cache_model_calls)
         # SDK defaults retry billable requests. Application validation owns its one retry.
@@ -187,7 +204,7 @@ class RealMetaClient:
                 dets += r
         if errors and len(errors) == len(results):
             raise errors[0]
-        return detections_to_segments(dets)
+        return filter_weak_segments(detections_to_segments(dets))
 
     async def _sam_stream(self, prompt: str, media: dict) -> str:
         self.budget.check()
@@ -293,6 +310,20 @@ class RealMetaClient:
         return [s.model_copy(update={"source": "grounding"}) for s in detections_to_segments(
             [d for d in dets if d.object_id == "1"]) if s.mask is not None]
 
+    async def detect(self, req: DetectRequest) -> list[Segment]:
+        """Live camera: one SAM text prompt, never Spark grounding (too slow for the live loop)."""
+        image = downscale_b64(req.image_base64, DETECT_MAX_EDGE)
+        with Image.open(io.BytesIO(base64.b64decode(image))) as photo:
+            width, height = photo.size
+        dets = await self._sam_one(image, req.concept, width, height)
+        return detect_segments(req.concept, detections_to_segments(dets))
+
+    async def agent_run(self, req: AnalyzeRequest, cls: ClassifyResult,
+                        emit: Callable[[dict], Awaitable[None]]) -> tuple[list[Segment], DiagnosePlan]:
+        from .agent import WonderAgent  # lazy: only needed in agent mode
+
+        return await WonderAgent(self).run(req, cls, emit)
+
     async def track(self, req: TrackRequest) -> TrackResponse:
         video = prepare_video(req.video_base64)
         key = ModelCache.key("sam-video-v1", self.s.sam_model, req.concept, ModelCache.key(video))
@@ -390,7 +421,7 @@ def build_client(settings: Settings, budget: Budget) -> ModelClient:
     if settings.mock_mode:
         from .mock_client import MockClient
 
-        return MockClient(settings.mock_delay_scale)
+        return MockClient(settings.mock_delay_scale, agent=settings.agent_mode == "wonder")
     if not settings.meta_api_key:
         raise RuntimeError("MOCK_MODE=0 requires META_API_KEY")
     return RealMetaClient(settings, budget)

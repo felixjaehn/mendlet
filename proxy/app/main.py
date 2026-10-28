@@ -17,7 +17,7 @@ from .config import PROXY_DIR, Settings, load_dotenv
 from .errors import AppError
 from .images import downscale_b64, prepare_request
 from .models import (
-    AfterPreviewRequest, AfterPreviewResponse, AnalyzeRequest, AnalyzeResponse, RefineRequest,
+    AfterPreviewRequest, AfterPreviewResponse, AnalyzeRequest, AnalyzeResponse, DetectRequest, DetectResponse, RefineRequest,
     Segment, Stage, StepHelpRequest, StepHelpResponse, TrackRequest, TrackResponse,
 )
 from .pipeline import STAGE_LABELS, analyze
@@ -42,9 +42,16 @@ async def _event_stream(req: AnalyzeRequest, client: ModelClient) -> AsyncIterat
     async def grounding() -> None:
         await queue.put(("grounding", {"label": "Schadstelle genauer lokalisieren"}))
 
+    async def segments_ready(segments: list[Segment]) -> None:
+        # Same Segment JSON (and ids) as the final result, so the app can draw masks during diagnose.
+        await queue.put(("segments", {"segments": [s.model_dump(mode="json") for s in segments]}))
+
+    async def agent_step(step: dict) -> None:
+        await queue.put(("agent_step", step))
+
     async def runner() -> None:
         try:
-            resp = await analyze(req, client, progress, grounding)
+            resp = await analyze(req, client, progress, grounding, segments_ready, agent_step)
             await queue.put(("result", resp.model_dump(mode="json")))
         except AppError as exc:
             await queue.put(("error", _error_payload(exc)))
@@ -86,6 +93,7 @@ def create_app(settings: Settings | None = None, client: ModelClient | None = No
         return {
             "status": "ok",
             "mode": "mock" if settings.mock_mode else "real",
+            "agent_mode": settings.agent_mode,
             "spent_today_usd": round(budget.spent_today(), 4),
             "daily_budget_usd": budget.limit_usd,
         }
@@ -127,6 +135,12 @@ def create_app(settings: Settings | None = None, client: ModelClient | None = No
     async def refine(body: RefineRequest) -> Segment:
         budget.check()
         return await client.refine(body)
+
+    @app.post("/detect")
+    async def detect(body: DetectRequest) -> DetectResponse:
+        budget.check()
+        body = body.model_copy(update={"image_base64": downscale_b64(body.image_base64, 768)})
+        return DetectResponse(segments=await client.detect(body))
 
     @app.post("/track", response_model_exclude_none=True)
     async def track(body: TrackRequest) -> TrackResponse:

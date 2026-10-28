@@ -49,10 +49,11 @@ def test_grounding_sse_preserves_every_existing_stage(client, image_b64):
     body = {'image_base64': image_b64, 'mock_scenario': 'textile_grounding'}
     response = client.post('/analyze', json=body)
     events = parse_sse(response.text)
-    assert [name for name, _ in events] == ['progress', 'progress', 'grounding', 'progress', 'progress', 'result']
+    assert [name for name, _ in events] == ['progress', 'progress', 'grounding', 'segments', 'progress', 'progress', 'result']
     assert [data['stage'] for name, data in events if name == 'progress'] == ['classify', 'segment', 'diagnose', 'plan']
     assert events[2][1] == {'label': 'Schadstelle genauer lokalisieren'}
     result = events[-1][1]
+    assert events[3][1] == {'segments': result['segments']}
     assert [s['source'] for s in result['segments']] == ['text', 'grounding']
     assert [s['id'] for s in result['segments']] == ['seg_1', 'seg_2']
     assert result['instances'] == {'tear': 1}

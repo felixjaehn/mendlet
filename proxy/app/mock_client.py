@@ -16,6 +16,7 @@ from .models import (
     AfterPreviewResponse,
     AnalyzeRequest,
     ClassifyResult,
+    DetectRequest,
     DiagnosePlan,
     RefineRequest,
     Segment,
@@ -70,7 +71,8 @@ def _stretch_from_answers(req: AnalyzeRequest) -> bool:
 
 
 class MockClient:
-    def __init__(self, delay_scale: float = 1.0) -> None:
+    def __init__(self, delay_scale: float = 1.0, agent: bool = False) -> None:
+        self.agent_enabled = agent
         self.scale = delay_scale
         self.plan_delay = 0.8 * delay_scale
 
@@ -163,6 +165,33 @@ class MockClient:
         result.mask.rings = rings
         result.source = "tap"
         return result
+
+    async def agent_run(self, req: AnalyzeRequest, cls: ClassifyResult, emit) -> tuple[list[Segment], DiagnosePlan]:
+        """Scripted Wonder run (six steps) so the iOS trace can be demoed without a key."""
+        found = md.segments(pick_scenario(req))
+        damage = next((s for s in found if s.kind == "damage"), None)
+        concept = damage.prompt if damage else "rip"
+        target = damage.id if damage else "seg_2"
+        script = [
+            ("segment", f"SAM sucht „garment“", "sam-3.1", 0.9),
+            ("segment", f"SAM sucht „{concept}“", "sam-3.1", 1.0),
+            ("locate", f"Spark lokalisiert „{concept}“", "muse-spark-1.3", 0.6),
+            ("segment_at", "SAM segmentiert die Auswahl", "sam-3.1", 0.9),
+            ("verify_mask", f"Spark prüft Maske {target}", "muse-spark-1.3", 0.7),
+        ]
+        for n, (tool, label, model, delay) in enumerate(script, start=1):
+            await self._sleep(delay)
+            await emit({"n": n, "tool": tool, "label": label, "model": model, "status": "done",
+                        "ms": round(delay * self.scale * 1000)})
+        plan = await self.diagnose(req, cls, found)
+        await emit({"n": 6, "tool": "finish", "label": "Plan zusammenstellen", "model": "muse-wonder-1.0",
+                    "status": "done", "ms": round(1.2 * self.scale * 1000)})
+        return found, plan
+
+    async def detect(self, req: DetectRequest) -> list[Segment]:
+        downscale_b64(req.image_base64, 768)  # same validation as the real path
+        await self._sleep(0.5)
+        return md.detection(req.concept)
 
     async def track(self, req: TrackRequest) -> TrackResponse:
         prepare_video(req.video_base64)

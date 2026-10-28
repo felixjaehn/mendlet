@@ -30,8 +30,10 @@ def test_analyze_stream_stages_in_order_then_result(client, image_b64):
         body = "".join(r.iter_text())
     events = parse_sse(body)
     names = [e for e, _ in events]
-    assert names == ["progress"] * 4 + ["result"]
+    assert names == ["progress", "progress", "segments", "progress", "progress", "result"]
     assert [d["stage"] for e, d in events if e == "progress"] == ["classify", "segment", "diagnose", "plan"]
+    # early segments event carries exactly the final result's segments (same ids and JSON)
+    assert events[2][1] == {"segments": events[-1][1]["segments"]}
     assert all(d["label"] for e, d in events if e == "progress")
     result = events[-1][1]
     assert result["category"] == "textile" and result["guide"]["steps"]

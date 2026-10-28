@@ -113,3 +113,38 @@ Erfolgreiche HTTP-Antworten buchen lokal $0,01 pro Bild, auch wenn der zurückge
 ## Fehler
 
 Bestehender AppError-Envelope: `{"error":{"code":"...","message":"..."}}`, deutsche Meldung. Bild-/Video-Dekodierungsfehler HTTP 422 (`invalid_image`/`invalid_video`), zu große dekodierte Videos 413, Tageslimit 429 (`budget_exceeded`), Modellfehler 502 (`model_output_invalid`/`upstream_error`), Timeout 504 (`timeout`). Pydantic-Requestvalidierung liefert weiterhin FastAPI-422 mit `detail`. Die Endpunkte prüfen das vorhandene Tagesbudget vor dem Modellaufruf; es bleibt eine nachträgliche Kostenbilanz und kann bei parallelen Aufrufen überschritten werden.
+
+# Vertragserweiterungen vom 29.10.2026 (Live-Kamera, früher Segment-Event, Agent)
+
+Alles additiv; Live-Verhalten **UNBESTÄTIGT**, Tests offline.
+
+## POST /detect
+
+Genau nach `ios/RepairAssistant/Live/DETECT-CONTRACT.md`. Request `{"image_base64": "...", "concept": "tear"}` (`concept` nichtleer, höchstens 200 Zeichen). Antwort `{"segments": [Segment, ...]}`, leer bei keinem Treffer. Der Proxy verkleinert auf höchstens 768 px und schickt genau einen SAM-Textprompt (gecacht wie jeder SAM-Aufruf). Bei null Treffern wird **nicht** per Spark lokalisiert (zu langsam fürs Live-Bild), die Antwort ist `[]`. Schadenskonzepte (`tear`, `rip`, `hole`, `open seam`, `frayed edge`, `detached sole`, `wire`) liefern `kind: "damage"`, IDs `damage_1`, `damage_2`, ... (Teile `part_<n>`), `source: "text"`. Der Weak-Filter (siehe unten) gilt auch hier. Fehler wie bei den anderen Endpunkten (`{"error": {...}}`, 4xx/5xx). Mock: deterministisches Polygon je Konzept (Riss, Loch, Sohle, Draht), Score 0,94, ca. 0,5 s.
+
+## SSE-Ereignis `segments` in /analyze
+
+`event: segments`, `data: {"segments": [Segment, ...]}` direkt nach der Segmentierung (und optionalem `grounding`), vor `progress(diagnose)`. Die Segmente (JSON und IDs) sind identisch mit `result.segments`; so kann die App Masken zeichnen, während die Diagnose läuft. Reihenfolge: `progress(classify)`, `progress(segment)`, [`grounding`], `segments`, `progress(diagnose)`, `progress(plan)`, `result`. Gesperrte Fälle senden kein `segments`. Ältere Clients ignorieren unbekannte Ereignisse.
+
+## Weak-Segment-Filter
+
+Schadenssegmente mit Score < 0,6 entfallen, wenn ihre Box ein stärkeres Schadenssegment überlappt (IoU > 0,3 oder mehr als 60 % der schwachen Box liegen darin). Teilesegmente mit Score < 0,6 entfallen. Höchstens drei Teile (die besten). IDs werden danach neu als `seg_1` ... vergeben, `instances` zählt die verbleibenden Schadenssegmente. Grundlage: Live-Fälle Pulli (`rip` ×2 bei 0,52 auf drei `hole`) und Sneaker (vier schwache `seam`), docs/benchmark.md.
+
+## POST /after-preview
+
+Zusatzfelder, alle optional: `category: "textile" | "shoe"` und `repair_hint` (String, höchstens 200 Zeichen). `stitch_type` ist jetzt optional. Ohne `category` gilt Textil (alter Prompt unverändert). Bei `shoe` beschreibt der Prompt eine sauber wieder verklebte Sohle ohne Stiche und ohne sichtbaren Kleber; `repair_hint` wird als Detail angehängt.
+
+## Agent-Modus (`AGENT_MODE=wonder`, Standard aus)
+
+Nach der deterministischen Sicherheits-/Klassifikationsstufe (nie im Agenten; gesperrte Fälle starten ihn nie) ersetzt ein Muse-Wonder-Tool-Loop auf der Responses API die Schritte Segmentieren und Diagnose. Tools: `segment(concept)`, `segment_at(box_0_1000, points?, concept?)`, `locate(description)`, `verify_mask(segment_id)`, `finish(...)` (Plan nach `DiagnosePlan`). Höchstens 8 Runden. Ungültiges `finish`, Rundenlimit, Antwort ohne Tool-Aufruf oder Upstream-Fehler fallen auf den normalen Diagnoseaufruf bzw. die klassische Pipeline zurück (Budget-Fehler nicht).
+
+Neues SSE-Ereignis pro ausgeführtem Tool:
+
+```json
+event: agent_step
+data: {"n": 1, "tool": "segment", "label": "SAM sucht „rip“", "model": "sam-3.1", "status": "done", "ms": 5200}
+```
+
+`model`: `sam-3.1`, `muse-spark-1.3` (locate, verify_mask) oder `muse-wonder-1.0` (finish); `status`: `done` oder `failed`; `n` zählt in Aufrufreihenfolge, bei parallelen Aufrufen kommen die Ereignisse in Abschlussreihenfolge. Ablauf: `progress(classify)`, `progress(segment)`, `agent_step`*, `segments`, `progress(diagnose)`, `progress(plan)`, `result`. `segments` kommt einmal nach dem Agentenlauf; es enthält nur nicht verworfene Segmente (von `verify_mask` abgelehnte Schadensmasken fallen weg), IDs sind laufzeitstabil und stimmen mit dem Ergebnis überein. `source`: `text` (segment), `grounding` (segment_at mit Box), `tap` (segment_at nur mit Punkten). Der Mock-Agent spielt sechs Schritte (segment ×2, locate, segment_at, verify_mask, finish) mit Verzögerungen ab. `/health` meldet zusätzlich `agent_mode`.
+
+Wonder-Kosten (Standard-Modus, https://dev.meta.ai/docs/pricing-rate-limits, gelesen 28.10.2026): 4,00 $ Input, 20,00 $ Output, 0,20 $ gecachter Input je 1 Mio. Token. Tatsächliche Abrechnung, Reasoning-Token im Verbrauch und Live-Verhalten der Tool-Schleife **UNBESTÄTIGT**; `reasoning`-Parameter wird bewusst nicht gesendet.
