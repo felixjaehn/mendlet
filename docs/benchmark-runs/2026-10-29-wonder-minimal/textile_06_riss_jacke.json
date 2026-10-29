@@ -1,0 +1,676 @@
+{
+ "case_id": "dcccca90-388c-46ca-970b-93051cbbbcb3",
+ "category": "textile",
+ "risk_level": "allowed",
+ "safety": {
+  "blocked": false,
+  "reason": null
+ },
+ "segments": [
+  {
+   "id": "seg_1",
+   "label": "Riss",
+   "kind": "damage",
+   "prompt": "rip",
+   "box": [
+    0.3828,
+    0.2715,
+    0.2109,
+    0.1582
+   ],
+   "mask": {
+    "format": "polygon",
+    "points": [
+     [
+      0.557292,
+      0.271484
+     ],
+     [
+      0.563802,
+      0.272461
+     ],
+     [
+      0.572917,
+      0.28125
+     ],
+     [
+      0.575521,
+      0.292969
+     ],
+     [
+      0.572917,
+      0.307617
+     ],
+     [
+      0.566406,
+      0.323242
+     ],
+     [
+      0.565104,
+      0.335937
+     ],
+     [
+      0.5625,
+      0.337891
+     ],
+     [
+      0.561198,
+      0.342773
+     ],
+     [
+      0.559896,
+      0.361328
+     ],
+     [
+      0.570313,
+      0.37793
+     ],
+     [
+      0.578125,
+      0.383789
+     ],
+     [
+      0.580729,
+      0.388672
+     ],
+     [
+      0.59375,
+      0.397461
+     ],
+     [
+      0.592448,
+      0.40332
+     ],
+     [
+      0.576823,
+      0.412109
+     ],
+     [
+      0.571615,
+      0.413086
+     ],
+     [
+      0.56901,
+      0.416016
+     ],
+     [
+      0.554688,
+      0.420898
+     ],
+     [
+      0.553385,
+      0.422852
+     ],
+     [
+      0.540365,
+      0.426758
+     ],
+     [
+      0.532552,
+      0.426758
+     ],
+     [
+      0.526042,
+      0.429688
+     ],
+     [
+      0.513021,
+      0.429688
+     ],
+     [
+      0.501302,
+      0.423828
+     ],
+     [
+      0.475261,
+      0.422852
+     ],
+     [
+      0.46875,
+      0.420898
+     ],
+     [
+      0.442708,
+      0.420898
+     ],
+     [
+      0.417969,
+      0.423828
+     ],
+     [
+      0.39974,
+      0.423828
+     ],
+     [
+      0.391927,
+      0.426758
+     ],
+     [
+      0.382812,
+      0.425781
+     ],
+     [
+      0.385417,
+      0.414063
+     ],
+     [
+      0.394531,
+      0.404297
+     ],
+     [
+      0.414062,
+      0.399414
+     ],
+     [
+      0.423177,
+      0.393555
+     ],
+     [
+      0.427083,
+      0.393555
+     ],
+     [
+      0.428385,
+      0.391602
+     ],
+     [
+      0.432292,
+      0.391602
+     ],
+     [
+      0.438802,
+      0.387695
+     ],
+     [
+      0.446615,
+      0.386719
+     ],
+     [
+      0.46224,
+      0.393555
+     ],
+     [
+      0.472656,
+      0.393555
+     ],
+     [
+      0.519531,
+      0.390625
+     ],
+     [
+      0.529948,
+      0.388672
+     ],
+     [
+      0.532552,
+      0.386719
+     ],
+     [
+      0.536458,
+      0.376953
+     ],
+     [
+      0.539063,
+      0.357422
+     ],
+     [
+      0.546875,
+      0.337891
+     ],
+     [
+      0.553385,
+      0.305664
+     ],
+     [
+      0.559896,
+      0.291016
+     ],
+     [
+      0.559896,
+      0.279297
+     ],
+     [
+      0.557292,
+      0.277344
+     ]
+    ],
+    "rings": [
+     {
+      "points": [
+       [
+        0.557292,
+        0.271484
+       ],
+       [
+        0.563802,
+        0.272461
+       ],
+       [
+        0.572917,
+        0.28125
+       ],
+       [
+        0.575521,
+        0.292969
+       ],
+       [
+        0.572917,
+        0.307617
+       ],
+       [
+        0.566406,
+        0.323242
+       ],
+       [
+        0.565104,
+        0.335937
+       ],
+       [
+        0.5625,
+        0.337891
+       ],
+       [
+        0.561198,
+        0.342773
+       ],
+       [
+        0.559896,
+        0.361328
+       ],
+       [
+        0.570313,
+        0.37793
+       ],
+       [
+        0.578125,
+        0.383789
+       ],
+       [
+        0.580729,
+        0.388672
+       ],
+       [
+        0.59375,
+        0.397461
+       ],
+       [
+        0.592448,
+        0.40332
+       ],
+       [
+        0.576823,
+        0.412109
+       ],
+       [
+        0.571615,
+        0.413086
+       ],
+       [
+        0.56901,
+        0.416016
+       ],
+       [
+        0.554688,
+        0.420898
+       ],
+       [
+        0.553385,
+        0.422852
+       ],
+       [
+        0.540365,
+        0.426758
+       ],
+       [
+        0.532552,
+        0.426758
+       ],
+       [
+        0.526042,
+        0.429688
+       ],
+       [
+        0.513021,
+        0.429688
+       ],
+       [
+        0.501302,
+        0.423828
+       ],
+       [
+        0.475261,
+        0.422852
+       ],
+       [
+        0.46875,
+        0.420898
+       ],
+       [
+        0.442708,
+        0.420898
+       ],
+       [
+        0.417969,
+        0.423828
+       ],
+       [
+        0.39974,
+        0.423828
+       ],
+       [
+        0.391927,
+        0.426758
+       ],
+       [
+        0.382812,
+        0.425781
+       ],
+       [
+        0.385417,
+        0.414063
+       ],
+       [
+        0.394531,
+        0.404297
+       ],
+       [
+        0.414062,
+        0.399414
+       ],
+       [
+        0.423177,
+        0.393555
+       ],
+       [
+        0.427083,
+        0.393555
+       ],
+       [
+        0.428385,
+        0.391602
+       ],
+       [
+        0.432292,
+        0.391602
+       ],
+       [
+        0.438802,
+        0.387695
+       ],
+       [
+        0.446615,
+        0.386719
+       ],
+       [
+        0.46224,
+        0.393555
+       ],
+       [
+        0.472656,
+        0.393555
+       ],
+       [
+        0.519531,
+        0.390625
+       ],
+       [
+        0.529948,
+        0.388672
+       ],
+       [
+        0.532552,
+        0.386719
+       ],
+       [
+        0.536458,
+        0.376953
+       ],
+       [
+        0.539063,
+        0.357422
+       ],
+       [
+        0.546875,
+        0.337891
+       ],
+       [
+        0.553385,
+        0.305664
+       ],
+       [
+        0.559896,
+        0.291016
+       ],
+       [
+        0.559896,
+        0.279297
+       ],
+       [
+        0.557292,
+        0.277344
+       ]
+      ],
+      "hole": false
+     }
+    ]
+   },
+   "score": 0.918,
+   "source": "text",
+   "polarity": null
+  }
+ ],
+ "diagnosis": {
+  "summary": "L-förmiger Riss im Ärmel, vermutlich feste Baumwoll-Webware. Gewebefäden sind gerissen, kein Loch mit großem Materialverlust und keine offene Naht.",
+  "likely_causes": [
+   "Hängenbleiben an scharfer Kante",
+   "Zugbelastung am Ärmel beim Anziehen oder Arbeiten"
+  ],
+  "confidence": 0.78,
+  "evidence_segment_ids": [
+   "seg_1"
+  ],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_self",
+  "reasoning": "L-förmiger Riss mit gerissenen Gewebefäden, kein Nahtschaden. Kanten können spannungsfrei auf einem passenden Unterlegflicken fixiert werden, ohne Stoff zusammenzuziehen. Für sorgfältiges Handnähen zu Hause machbar.",
+  "effort": "medium",
+  "time_minutes": [
+   40,
+   70
+  ],
+  "cost_eur": [
+   4.0,
+   12.0
+  ],
+  "estimate_note": "Schätzung"
+ },
+ "shopping_list": [
+  {
+   "id": "flicken",
+   "name": "Baumwollstoff als Unterlegflicken beige",
+   "kind": "material",
+   "quantity": "10 x 10 cm",
+   "required": true,
+   "search_term": "Baumwollstoff beige Meterware",
+   "household_alternative": "sauberes festes Baumwollreststück in ähnlichem Beige"
+  },
+  {
+   "id": "garn",
+   "name": "Polyester Nähgarn beige",
+   "kind": "material",
+   "quantity": "1 Rolle",
+   "required": true,
+   "search_term": "Polyester Nähgarn beige",
+   "household_alternative": "passendes beige Nähgarn aus dem Nähkästchen"
+  },
+  {
+   "id": "nadel",
+   "name": "Feine scharfe Handnadel für Webware",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "scharfe Handnadel fein Webware",
+   "household_alternative": null
+  },
+  {
+   "id": "stecknadeln",
+   "name": "Stecknadeln",
+   "kind": "tool",
+   "quantity": "1 Packung",
+   "required": true,
+   "search_term": "Stecknadeln zum Nähen",
+   "household_alternative": null
+  },
+  {
+   "id": "schere",
+   "name": "Kleine Stoffschere",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "kleine Stoffschere",
+   "household_alternative": null
+  }
+ ],
+ "guide": {
+  "steps": [
+   {
+    "n": 1,
+    "title": "Ärmel wenden und Riss prüfen",
+    "text": "Jacke auf links wenden und Ärmel so hinlegen, dass du die Innenseite am Riss siehst. Riss von außen und innen ansehen: zwei gerade gerissene Kanten in L-Form mit etwas fransigen Fasern. Fertig, wenn beide Risskanten vollständig sichtbar und flach ausgebreitet sind.",
+    "common_mistake": "Riss zum Fotografieren oder Nähen auseinanderziehen – franst die Kanten weiter aus, stattdessen flach liegen lassen.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 2,
+    "title": "Lose Fasern behutsam kürzen",
+    "text": "Mit der kleinen Stoffschere nur lang abstehende Fusseln am Riss auf etwa 2 mm kürzen, die feste Risskante selbst nicht einschneiden. Finger von der Schnittlinie fernhalten und Schere nach dem Schnitt schließen und weglegen. Fertig, wenn keine langen Fäden mehr abstehen, die Kanten aber noch vollständig vorhanden sind.",
+    "common_mistake": "Fransen bündig am Gewebe abschneiden – schwächt die Kante, nur deutlich abstehende Fusseln kürzen.",
+    "safety_critical": true,
+    "requires_confirmation": true,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "schere"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 3,
+    "title": "Unterlegflicken zuschneiden und feststecken",
+    "text": "Aus dem beigen Baumwollstoff einen rechteckigen Unterlegflicken schneiden, der den L-Riss auf der Innenseite ringsum mindestens 2 cm überragt. Flicken auf der Innenseite glatt unter den Riss legen, Risskanten von außen Stoß an Stoß zusammenschieben ohne zu ziehen, dann mit 4-6 Stecknadeln rundum feststecken. Fertig, wenn der Riss von außen geschlossen flach liegt und der Flicken faltenfrei darunter liegt.",
+    "common_mistake": "Zu kleiner oder dehnbarer Flicken – deckt die Enden nicht ab und wellt sich, lieber mindestens 2 cm Überstand aus fester Baumwolle.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "schere",
+     "flicken",
+     "stecknadeln"
+    ],
+    "overlay": null
+   },
+   {
+    "n": 4,
+    "title": "Erste Risskante auf dem Flicken festnähen",
+    "text": "Etwa 40 cm beiges Polyestergarn einfädeln, Anfang mit 2 kleinen Stichen im tragfähigen Stoff neben dem Riss sichern. Von der Außenseite mit der scharfen Handnadel im Abstand von 2-3 mm entlang der ersten Risskante kleine Stiche durch Oberstoff und Flicken setzen, immer abwechselnd einstechen und 2-3 mm weiter austreten. Fertig, wenn eine Längsseite des L lückenlos flach auf dem Flicken liegt.",
+    "common_mistake": "Faden zu straff anziehen – zieht Kräusel und neue Löcher, Faden nur locker an das Gewebe anlegen.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "nadel",
+     "garn",
+     "flicken"
+    ],
+    "overlay": {
+     "type": "stitch_path",
+     "stitch_type": "running_stitch",
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 5,
+    "title": "Zweite Risskante und Ecke sichern",
+    "text": "Mit neuem etwa 40 cm langem Faden die zweite Risskante genauso in 2-3 mm Abständen auf den Flicken nähen, an der L-Ecke mit einem extra kleinen Stich beginnen und die Ecke flach festhalten. Stiche locker lassen, Stoff entspannt liegen lassen. Am Ende den Faden auf der Innenseite mit 3 kleinen übereinanderliegenden Sicherungsstichen im Flicken vernähen, dann knapp abschneiden. Fertig, wenn beide Kanten geschlossen auf dem Flicken liegen.",
+    "common_mistake": "Ecke offen lassen oder über die Ecke hinweg ziehen – Ecke sorgfältig einzeln sichern, sonst reißt sie wieder auf.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "nadel",
+     "garn",
+     "flicken"
+    ],
+    "overlay": {
+     "type": "stitch_path",
+     "stitch_type": "running_stitch",
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 6,
+    "title": "Nadeln entfernen und Reparatur prüfen",
+    "text": "Alle Stecknadeln entfernen, Ärmel auf rechts wenden und Naht von außen glatt streichen. Riss bei sanftem Zug seitlich leicht belasten: Ränder müssen geschlossen bleiben, keine Kräusel und keine ausreißenden Stiche. Wenn sich die Kante wieder öffnet oder das Gewebe um die Stiche einreißt, aufhören und Fachhilfe prüfen.",
+    "common_mistake": "Stecknadeln vergessen und Jacke so anziehen – alle Nadeln zählen und entfernen, erst dann Zugprobe.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "stecknadeln"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   }
+  ]
+ },
+ "instances": {
+  "rip": 1
+ }
+}

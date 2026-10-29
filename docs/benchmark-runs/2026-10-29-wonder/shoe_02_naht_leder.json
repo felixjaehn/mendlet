@@ -1,0 +1,1563 @@
+{
+ "case_id": "82271518-4438-49a1-b54d-1e8de3ea4829",
+ "category": "shoe",
+ "risk_level": "allowed",
+ "safety": {
+  "blocked": false,
+  "reason": null
+ },
+ "segments": [
+  {
+   "id": "seg_1",
+   "label": "Schadstelle",
+   "kind": "damage",
+   "prompt": "open seam at heel",
+   "box": [
+    0.4336,
+    0.2148,
+    0.2109,
+    0.501
+   ],
+   "mask": {
+    "format": "polygon",
+    "points": [
+     [
+      0.455729,
+      0.214844
+     ],
+     [
+      0.458333,
+      0.222656
+     ],
+     [
+      0.467448,
+      0.219727
+     ],
+     [
+      0.481771,
+      0.232422
+     ],
+     [
+      0.480469,
+      0.268554
+     ],
+     [
+      0.484375,
+      0.27832
+     ],
+     [
+      0.489583,
+      0.274414
+     ],
+     [
+      0.489583,
+      0.283203
+     ],
+     [
+      0.515625,
+      0.28711
+     ],
+     [
+      0.53776,
+      0.28125
+     ],
+     [
+      0.545573,
+      0.286133
+     ],
+     [
+      0.544271,
+      0.293945
+     ],
+     [
+      0.518229,
+      0.296875
+     ],
+     [
+      0.516927,
+      0.302735
+     ],
+     [
+      0.510417,
+      0.292969
+     ],
+     [
+      0.498698,
+      0.292969
+     ],
+     [
+      0.501302,
+      0.297852
+     ],
+     [
+      0.486979,
+      0.311523
+     ],
+     [
+      0.503906,
+      0.348633
+     ],
+     [
+      0.503906,
+      0.374024
+     ],
+     [
+      0.510417,
+      0.37207
+     ],
+     [
+      0.503906,
+      0.388672
+     ],
+     [
+      0.510417,
+      0.384765
+     ],
+     [
+      0.513021,
+      0.392578
+     ],
+     [
+      0.510417,
+      0.388672
+     ],
+     [
+      0.50651,
+      0.391602
+     ],
+     [
+      0.518229,
+      0.397461
+     ],
+     [
+      0.505208,
+      0.40918
+     ],
+     [
+      0.510417,
+      0.415039
+     ],
+     [
+      0.511719,
+      0.411133
+     ],
+     [
+      0.518229,
+      0.413086
+     ],
+     [
+      0.532552,
+      0.427734
+     ],
+     [
+      0.529948,
+      0.436523
+     ],
+     [
+      0.541667,
+      0.441406
+     ],
+     [
+      0.522135,
+      0.446289
+     ],
+     [
+      0.52474,
+      0.458984
+     ],
+     [
+      0.53125,
+      0.458984
+     ],
+     [
+      0.535156,
+      0.493164
+     ],
+     [
+      0.539062,
+      0.5
+     ],
+     [
+      0.544271,
+      0.49707
+     ],
+     [
+      0.546875,
+      0.511719
+     ],
+     [
+      0.552083,
+      0.520508
+     ],
+     [
+      0.558594,
+      0.518555
+     ],
+     [
+      0.563802,
+      0.524414
+     ],
+     [
+      0.566406,
+      0.536133
+     ],
+     [
+      0.572917,
+      0.53418
+     ],
+     [
+      0.570312,
+      0.564453
+     ],
+     [
+      0.580729,
+      0.595703
+     ],
+     [
+      0.588542,
+      0.598633
+     ],
+     [
+      0.592448,
+      0.617188
+     ],
+     [
+      0.598958,
+      0.616211
+     ],
+     [
+      0.605469,
+      0.623047
+     ],
+     [
+      0.606771,
+      0.644531
+     ],
+     [
+      0.611979,
+      0.644531
+     ],
+     [
+      0.613281,
+      0.632813
+     ],
+     [
+      0.615886,
+      0.651367
+     ],
+     [
+      0.622396,
+      0.65918
+     ],
+     [
+      0.627604,
+      0.65625
+     ],
+     [
+      0.634115,
+      0.681641
+     ],
+     [
+      0.641927,
+      0.68457
+     ],
+     [
+      0.641927,
+      0.707031
+     ],
+     [
+      0.619792,
+      0.707031
+     ],
+     [
+      0.606771,
+      0.71582
+     ],
+     [
+      0.585937,
+      0.712891
+     ],
+     [
+      0.544271,
+      0.623047
+     ],
+     [
+      0.528646,
+      0.625
+     ],
+     [
+      0.523438,
+      0.621094
+     ],
+     [
+      0.529948,
+      0.599609
+     ],
+     [
+      0.523438,
+      0.576172
+     ],
+     [
+      0.454427,
+      0.463867
+     ],
+     [
+      0.44401,
+      0.432617
+     ],
+     [
+      0.434896,
+      0.348633
+     ],
+     [
+      0.441406,
+      0.344726
+     ],
+     [
+      0.445313,
+      0.353516
+     ],
+     [
+      0.454427,
+      0.354492
+     ],
+     [
+      0.464844,
+      0.339844
+     ],
+     [
+      0.451823,
+      0.269531
+     ]
+    ],
+    "rings": [
+     {
+      "points": [
+       [
+        0.455729,
+        0.214844
+       ],
+       [
+        0.458333,
+        0.222656
+       ],
+       [
+        0.467448,
+        0.219727
+       ],
+       [
+        0.481771,
+        0.232422
+       ],
+       [
+        0.480469,
+        0.268554
+       ],
+       [
+        0.484375,
+        0.27832
+       ],
+       [
+        0.489583,
+        0.274414
+       ],
+       [
+        0.489583,
+        0.283203
+       ],
+       [
+        0.515625,
+        0.28711
+       ],
+       [
+        0.53776,
+        0.28125
+       ],
+       [
+        0.545573,
+        0.286133
+       ],
+       [
+        0.544271,
+        0.293945
+       ],
+       [
+        0.518229,
+        0.296875
+       ],
+       [
+        0.516927,
+        0.302735
+       ],
+       [
+        0.510417,
+        0.292969
+       ],
+       [
+        0.498698,
+        0.292969
+       ],
+       [
+        0.501302,
+        0.297852
+       ],
+       [
+        0.486979,
+        0.311523
+       ],
+       [
+        0.503906,
+        0.348633
+       ],
+       [
+        0.503906,
+        0.374024
+       ],
+       [
+        0.510417,
+        0.37207
+       ],
+       [
+        0.503906,
+        0.388672
+       ],
+       [
+        0.510417,
+        0.384765
+       ],
+       [
+        0.513021,
+        0.392578
+       ],
+       [
+        0.510417,
+        0.388672
+       ],
+       [
+        0.50651,
+        0.391602
+       ],
+       [
+        0.518229,
+        0.397461
+       ],
+       [
+        0.505208,
+        0.40918
+       ],
+       [
+        0.510417,
+        0.415039
+       ],
+       [
+        0.511719,
+        0.411133
+       ],
+       [
+        0.518229,
+        0.413086
+       ],
+       [
+        0.532552,
+        0.427734
+       ],
+       [
+        0.529948,
+        0.436523
+       ],
+       [
+        0.541667,
+        0.441406
+       ],
+       [
+        0.522135,
+        0.446289
+       ],
+       [
+        0.52474,
+        0.458984
+       ],
+       [
+        0.53125,
+        0.458984
+       ],
+       [
+        0.535156,
+        0.493164
+       ],
+       [
+        0.539062,
+        0.5
+       ],
+       [
+        0.544271,
+        0.49707
+       ],
+       [
+        0.546875,
+        0.511719
+       ],
+       [
+        0.552083,
+        0.520508
+       ],
+       [
+        0.558594,
+        0.518555
+       ],
+       [
+        0.563802,
+        0.524414
+       ],
+       [
+        0.566406,
+        0.536133
+       ],
+       [
+        0.572917,
+        0.53418
+       ],
+       [
+        0.570312,
+        0.564453
+       ],
+       [
+        0.580729,
+        0.595703
+       ],
+       [
+        0.588542,
+        0.598633
+       ],
+       [
+        0.592448,
+        0.617188
+       ],
+       [
+        0.598958,
+        0.616211
+       ],
+       [
+        0.605469,
+        0.623047
+       ],
+       [
+        0.606771,
+        0.644531
+       ],
+       [
+        0.611979,
+        0.644531
+       ],
+       [
+        0.613281,
+        0.632813
+       ],
+       [
+        0.615886,
+        0.651367
+       ],
+       [
+        0.622396,
+        0.65918
+       ],
+       [
+        0.627604,
+        0.65625
+       ],
+       [
+        0.634115,
+        0.681641
+       ],
+       [
+        0.641927,
+        0.68457
+       ],
+       [
+        0.641927,
+        0.707031
+       ],
+       [
+        0.619792,
+        0.707031
+       ],
+       [
+        0.606771,
+        0.71582
+       ],
+       [
+        0.585937,
+        0.712891
+       ],
+       [
+        0.544271,
+        0.623047
+       ],
+       [
+        0.528646,
+        0.625
+       ],
+       [
+        0.523438,
+        0.621094
+       ],
+       [
+        0.529948,
+        0.599609
+       ],
+       [
+        0.523438,
+        0.576172
+       ],
+       [
+        0.454427,
+        0.463867
+       ],
+       [
+        0.44401,
+        0.432617
+       ],
+       [
+        0.434896,
+        0.348633
+       ],
+       [
+        0.441406,
+        0.344726
+       ],
+       [
+        0.445313,
+        0.353516
+       ],
+       [
+        0.454427,
+        0.354492
+       ],
+       [
+        0.464844,
+        0.339844
+       ],
+       [
+        0.451823,
+        0.269531
+       ]
+      ],
+      "hole": false
+     },
+     {
+      "points": [
+       [
+        0.570312,
+        0.405273
+       ],
+       [
+        0.574219,
+        0.405273
+       ],
+       [
+        0.574219,
+        0.40625
+       ],
+       [
+        0.575521,
+        0.40625
+       ],
+       [
+        0.575521,
+        0.407227
+       ],
+       [
+        0.578125,
+        0.407227
+       ],
+       [
+        0.578125,
+        0.410156
+       ],
+       [
+        0.576823,
+        0.410156
+       ],
+       [
+        0.576823,
+        0.413086
+       ],
+       [
+        0.575521,
+        0.413086
+       ],
+       [
+        0.575521,
+        0.414063
+       ],
+       [
+        0.574219,
+        0.414063
+       ],
+       [
+        0.574219,
+        0.418945
+       ],
+       [
+        0.572917,
+        0.418945
+       ],
+       [
+        0.572917,
+        0.419922
+       ],
+       [
+        0.571615,
+        0.419922
+       ],
+       [
+        0.571615,
+        0.420898
+       ],
+       [
+        0.570312,
+        0.420898
+       ],
+       [
+        0.570312,
+        0.419922
+       ],
+       [
+        0.56901,
+        0.419922
+       ],
+       [
+        0.56901,
+        0.412109
+       ],
+       [
+        0.567708,
+        0.412109
+       ],
+       [
+        0.567708,
+        0.411133
+       ],
+       [
+        0.563802,
+        0.411133
+       ],
+       [
+        0.563802,
+        0.40625
+       ],
+       [
+        0.570312,
+        0.40625
+       ]
+      ],
+      "hole": false
+     },
+     {
+      "points": [
+       [
+        0.481771,
+        0.293945
+       ],
+       [
+        0.483073,
+        0.293945
+       ],
+       [
+        0.483073,
+        0.292969
+       ],
+       [
+        0.477865,
+        0.292969
+       ],
+       [
+        0.477865,
+        0.291992
+       ],
+       [
+        0.473958,
+        0.291992
+       ],
+       [
+        0.473958,
+        0.292969
+       ],
+       [
+        0.472656,
+        0.292969
+       ],
+       [
+        0.472656,
+        0.298828
+       ],
+       [
+        0.473958,
+        0.298828
+       ],
+       [
+        0.473958,
+        0.299805
+       ],
+       [
+        0.47526,
+        0.299805
+       ],
+       [
+        0.47526,
+        0.298828
+       ],
+       [
+        0.477865,
+        0.298828
+       ],
+       [
+        0.477865,
+        0.297852
+       ],
+       [
+        0.480469,
+        0.297852
+       ],
+       [
+        0.480469,
+        0.294922
+       ],
+       [
+        0.481771,
+        0.294922
+       ]
+      ],
+      "hole": true
+     },
+     {
+      "points": [
+       [
+        0.638021,
+        0.6875
+       ],
+       [
+        0.639323,
+        0.6875
+       ],
+       [
+        0.639323,
+        0.683594
+       ],
+       [
+        0.638021,
+        0.683594
+       ],
+       [
+        0.638021,
+        0.682617
+       ],
+       [
+        0.635417,
+        0.682617
+       ],
+       [
+        0.635417,
+        0.685547
+       ],
+       [
+        0.634115,
+        0.685547
+       ],
+       [
+        0.634115,
+        0.688477
+       ],
+       [
+        0.632812,
+        0.688477
+       ],
+       [
+        0.632812,
+        0.689453
+       ],
+       [
+        0.634115,
+        0.689453
+       ],
+       [
+        0.634115,
+        0.69043
+       ],
+       [
+        0.635417,
+        0.69043
+       ],
+       [
+        0.635417,
+        0.69336
+       ],
+       [
+        0.636719,
+        0.69336
+       ],
+       [
+        0.636719,
+        0.694336
+       ],
+       [
+        0.638021,
+        0.694336
+       ],
+       [
+        0.638021,
+        0.69336
+       ],
+       [
+        0.639323,
+        0.69336
+       ],
+       [
+        0.639323,
+        0.691406
+       ],
+       [
+        0.638021,
+        0.691406
+       ],
+       [
+        0.638021,
+        0.69043
+       ],
+       [
+        0.636719,
+        0.69043
+       ],
+       [
+        0.636719,
+        0.689453
+       ],
+       [
+        0.635417,
+        0.689453
+       ],
+       [
+        0.635417,
+        0.688477
+       ],
+       [
+        0.638021,
+        0.688477
+       ]
+      ],
+      "hole": true
+     },
+     {
+      "points": [
+       [
+        0.484375,
+        0.293945
+       ],
+       [
+        0.485677,
+        0.293945
+       ],
+       [
+        0.485677,
+        0.294922
+       ],
+       [
+        0.486979,
+        0.294922
+       ],
+       [
+        0.486979,
+        0.295898
+       ],
+       [
+        0.489583,
+        0.295898
+       ],
+       [
+        0.489583,
+        0.297852
+       ],
+       [
+        0.494792,
+        0.297852
+       ],
+       [
+        0.494792,
+        0.295898
+       ],
+       [
+        0.496094,
+        0.295898
+       ],
+       [
+        0.496094,
+        0.293945
+       ],
+       [
+        0.497396,
+        0.293945
+       ],
+       [
+        0.497396,
+        0.292969
+       ],
+       [
+        0.49349,
+        0.292969
+       ],
+       [
+        0.49349,
+        0.293945
+       ],
+       [
+        0.492188,
+        0.293945
+       ],
+       [
+        0.492188,
+        0.294922
+       ],
+       [
+        0.489583,
+        0.294922
+       ],
+       [
+        0.489583,
+        0.292969
+       ],
+       [
+        0.484375,
+        0.292969
+       ]
+      ],
+      "hole": true
+     },
+     {
+      "points": [
+       [
+        0.520833,
+        0.466797
+       ],
+       [
+        0.522135,
+        0.466797
+       ],
+       [
+        0.522135,
+        0.467773
+       ],
+       [
+        0.523438,
+        0.467773
+       ],
+       [
+        0.523438,
+        0.46875
+       ],
+       [
+        0.52474,
+        0.46875
+       ],
+       [
+        0.52474,
+        0.470703
+       ],
+       [
+        0.527344,
+        0.470703
+       ],
+       [
+        0.527344,
+        0.467773
+       ],
+       [
+        0.526042,
+        0.467773
+       ],
+       [
+        0.526042,
+        0.466797
+       ],
+       [
+        0.527344,
+        0.466797
+       ],
+       [
+        0.527344,
+        0.462891
+       ],
+       [
+        0.526042,
+        0.462891
+       ],
+       [
+        0.526042,
+        0.461914
+       ],
+       [
+        0.52474,
+        0.461914
+       ],
+       [
+        0.52474,
+        0.462891
+       ],
+       [
+        0.523438,
+        0.462891
+       ],
+       [
+        0.523438,
+        0.463867
+       ],
+       [
+        0.522135,
+        0.463867
+       ],
+       [
+        0.522135,
+        0.464844
+       ],
+       [
+        0.520833,
+        0.464844
+       ]
+      ],
+      "hole": true
+     },
+     {
+      "points": [
+       [
+        0.559896,
+        0.412109
+       ],
+       [
+        0.563802,
+        0.412109
+       ],
+       [
+        0.563802,
+        0.415039
+       ],
+       [
+        0.5625,
+        0.415039
+       ],
+       [
+        0.5625,
+        0.416015
+       ],
+       [
+        0.561198,
+        0.416015
+       ],
+       [
+        0.561198,
+        0.416992
+       ],
+       [
+        0.559896,
+        0.416992
+       ],
+       [
+        0.559896,
+        0.416015
+       ],
+       [
+        0.558594,
+        0.416015
+       ],
+       [
+        0.558594,
+        0.414063
+       ],
+       [
+        0.559896,
+        0.414063
+       ]
+      ],
+      "hole": false
+     },
+     {
+      "points": [
+       [
+        0.566406,
+        0.551758
+       ],
+       [
+        0.567708,
+        0.551758
+       ],
+       [
+        0.567708,
+        0.552734
+       ],
+       [
+        0.56901,
+        0.552734
+       ],
+       [
+        0.56901,
+        0.549805
+       ],
+       [
+        0.566406,
+        0.549805
+       ]
+      ],
+      "hole": true
+     },
+     {
+      "points": [
+       [
+        0.63151,
+        0.670898
+       ],
+       [
+        0.630208,
+        0.670898
+       ],
+       [
+        0.630208,
+        0.672852
+       ],
+       [
+        0.63151,
+        0.672852
+       ]
+      ],
+      "hole": true
+     },
+     {
+      "points": [
+       [
+        0.501302,
+        0.299805
+       ],
+       [
+        0.502604,
+        0.299805
+       ],
+       [
+        0.502604,
+        0.300781
+       ],
+       [
+        0.501302,
+        0.300781
+       ]
+      ],
+      "hole": false
+     },
+     {
+      "points": [
+       [
+        0.476563,
+        0.311523
+       ],
+       [
+        0.477865,
+        0.311523
+       ],
+       [
+        0.477865,
+        0.310547
+       ],
+       [
+        0.476563,
+        0.310547
+       ]
+      ],
+      "hole": true
+     },
+     {
+      "points": [
+       [
+        0.496094,
+        0.334961
+       ],
+       [
+        0.494792,
+        0.334961
+       ],
+       [
+        0.494792,
+        0.335937
+       ],
+       [
+        0.496094,
+        0.335937
+       ]
+      ],
+      "hole": true
+     },
+     {
+      "points": [
+       [
+        0.459635,
+        0.37207
+       ],
+       [
+        0.460938,
+        0.37207
+       ],
+       [
+        0.460938,
+        0.371094
+       ],
+       [
+        0.459635,
+        0.371094
+       ]
+      ],
+      "hole": true
+     },
+     {
+      "points": [
+       [
+        0.459635,
+        0.375
+       ],
+       [
+        0.460938,
+        0.375
+       ],
+       [
+        0.460938,
+        0.374024
+       ],
+       [
+        0.459635,
+        0.374024
+       ]
+      ],
+      "hole": true
+     },
+     {
+      "points": [
+       [
+        0.507813,
+        0.397461
+       ],
+       [
+        0.509115,
+        0.397461
+       ],
+       [
+        0.509115,
+        0.396484
+       ],
+       [
+        0.507813,
+        0.396484
+       ]
+      ],
+      "hole": true
+     },
+     {
+      "points": [
+       [
+        0.445313,
+        0.425781
+       ],
+       [
+        0.446614,
+        0.425781
+       ],
+       [
+        0.446614,
+        0.424805
+       ],
+       [
+        0.445313,
+        0.424805
+       ]
+      ],
+      "hole": true
+     }
+    ]
+   },
+   "score": 0.789,
+   "source": "grounding",
+   "polarity": null
+  }
+ ],
+ "diagnosis": {
+  "summary": "Offene Fersennaht an braunem Schuh aus vermutlich Leder. Die Nahtfäden sind gerissen, die Stichlöcher und Lederränder wirken erhalten.",
+  "likely_causes": [
+   "Aufgeriebene oder gerissene Nahtfäden durch Zugbelastung an der Ferse",
+   "Abnutzung der Originalnaht"
+  ],
+  "confidence": 0.8,
+  "evidence_segment_ids": [
+   "seg_1"
+  ],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_self",
+  "reasoning": "Offene Fersennaht am vermutlich Lederschuh mit erhaltenen Stichlöchern und tragfähigen Lederrändern. Kein Lederabriss und kein Materialverlust sichtbar, daher von Hand mit vorhanden Löchern belastbar wieder schließbar.",
+  "effort": "medium",
+  "time_minutes": [
+   30,
+   45
+  ],
+  "cost_eur": [
+   5.0,
+   12.0
+  ],
+  "estimate_note": "Schätzung"
+ },
+ "shopping_list": [
+  {
+   "id": "w1",
+   "name": "Starkes Nähgarn für Leder, beige-braun",
+   "kind": "material",
+   "quantity": "1 Rolle",
+   "required": true,
+   "search_term": "Starkes Nähgarn Leder reissfest braun",
+   "household_alternative": null
+  },
+  {
+   "id": "w2",
+   "name": "Ledernadeln Handnähen",
+   "kind": "tool",
+   "quantity": "2 Stück",
+   "required": true,
+   "search_term": "Ledernadel Handnähen",
+   "household_alternative": null
+  },
+  {
+   "id": "w3",
+   "name": "Fingerhut",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "Fingerhut Metall",
+   "household_alternative": "Dicker Löffelstiel als Drückhilfe, vorsichtig nutzen"
+  },
+  {
+   "id": "w4",
+   "name": "Kleine spitze Schere",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": false,
+   "search_term": "Kleine Nähschere spitz",
+   "household_alternative": "Nagelknipser für einzelne Fransen"
+  }
+ ],
+ "guide": {
+  "steps": [
+   {
+    "n": 1,
+    "title": "Vorbereiten und Kanten prüfen",
+    "text": "Schuh von außen an der Ferse trocken abwischen und innen mit Papier locker ausstopfen, damit die Fersenform stabil steht. Prüfe von außen: beide Lederränder lassen sich ohne Kraft lückenlos zusammenführen und die alten Stichlöcher sind auf beiden Seiten sichtbar. Ziel erreicht, wenn die Kanten glatt aneinanderliegen.",
+    "common_mistake": "Fehler: Schuh ungereinigt nähen, dann hält die Naht schlechter – erst trocken abwischen und trocknen lassen.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "w3"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 2,
+    "title": "Lose Fadenreste kürzen",
+    "text": "Abstehende gerissene Fadenfransen an der offenen Stelle mit der kleinen Schere bündig kürzen, Schere flach führen und Leder nicht einschneiden. Feste Originalstiche ober- und unterhalb der Öffnung lassen. Ziel erreicht, wenn keine losen Fransen mehr aus dem Spalt stehen. Schere danach weglegen.",
+    "common_mistake": "Fehler: intakte Restfäden abschneiden – nur abstehende Franse kürzen, tragfähige Nahtreste lassen.",
+    "safety_critical": true,
+    "requires_confirmation": true,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "w4"
+    ],
+    "overlay": null
+   },
+   {
+    "n": 3,
+    "title": "Ausrichten und Faden sichern",
+    "text": "Fersennaht von außen mit den Fingern spannungsfrei zusammenführen, sodass Loch gegen Loch liegt. Fädle ca. 60 cm starkes Garn in die Ledernadel ein und sichere den Anfang mit 2 kleinen Rückstichen im festen Nahtbereich unterhalb der Öffnung im Falz. Ziel erreicht, wenn der Faden fest sitzt und die Kanten geschlossen anliegen.",
+    "common_mistake": "Fehler: Kanten unter Spannung zusammenziehen – das kräuselt das Leder; entspannt ausrichten.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "w1",
+     "w2",
+     "w3"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 4,
+    "title": "Naht durch vorhandene Löcher schließen",
+    "text": "Von unten nach oben nähen: steche mit Fingerhut von außen durch das erste freie Loch einer Seite und gegenüber wieder heraus, dann jeweils ins nächste freie Lochpaar. Faden locker-gleichmäßig anziehen, ohne das Leder zu wellen. Nutze nur die vorhandenen Stichlöcher bis über das obere Ende der Öffnung hinaus in die feste Naht. Ziel erreicht, wenn der Spalt geschlossen ist und alle Stiche gleichmäßig sitzen.",
+    "common_mistake": "Fehler: neue Löcher neben die alten stechen – das schwächt das Leder; immer nur vorhandene Löcher nutzen.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "w1",
+     "w2",
+     "w3"
+    ],
+    "overlay": {
+     "type": "stitch_path",
+     "stitch_type": "running_stitch",
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 5,
+    "title": "Vernähen und Halt prüfen",
+    "text": "Ende im festen Nahtbereich mit 2-3 kleinen Überwendstichen im Falz vernähen, Faden stramm ziehen und bündig abschneiden. Papierfüllung entfernen und Naht von außen prüfen: bei sanftem Zusammendrücken der Ferse bleibt die Naht geschlossen, keine Kräusel, keine lockeren Schlingen. Bei Aufgehen oder Ausreißen nicht weiter nähen, sondern Schuhmacher prüfen lassen.",
+    "common_mistake": "Fehler: Faden einfach abschneiden – er zieht sich dann auf; immer erst im Falz sichern.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "w1",
+     "w2",
+     "w4"
+    ],
+    "overlay": null
+   }
+  ]
+ },
+ "instances": {
+  "open seam at heel": 1
+ }
+}

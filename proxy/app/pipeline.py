@@ -189,7 +189,8 @@ async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress =
     await progress("segment")
     plan: DiagnosePlan | None = None
     segments: list[Segment] | None = None
-    if getattr(client, "agent_enabled", False) and cls.category != "low_voltage_electronics":
+    use_agent = req.agent if req.agent is not None else getattr(client, "agent_enabled", False)
+    if use_agent and cls.category != "low_voltage_electronics":
         try:
             segments, plan = await client.agent_run(req, cls, agent_step)
         except BudgetExceeded:

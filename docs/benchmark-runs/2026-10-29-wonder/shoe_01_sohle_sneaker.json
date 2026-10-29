@@ -1,0 +1,1024 @@
+{
+ "case_id": "af459918-96ae-4592-bfde-e123ba01f874",
+ "category": "shoe",
+ "risk_level": "allowed",
+ "safety": {
+  "blocked": false,
+  "reason": null
+ },
+ "segments": [
+  {
+   "id": "seg_1",
+   "label": "Abgelöste Sohle",
+   "kind": "damage",
+   "prompt": "detached sole",
+   "box": [
+    0.1615,
+    0.4287,
+    0.8385,
+    0.2627
+   ],
+   "mask": {
+    "format": "polygon",
+    "points": [
+     [
+      0.223958,
+      0.428711
+     ],
+     [
+      0.230469,
+      0.428711
+     ],
+     [
+      0.21875,
+      0.456055
+     ],
+     [
+      0.223958,
+      0.46875
+     ],
+     [
+      0.235677,
+      0.481445
+     ],
+     [
+      0.253906,
+      0.495117
+     ],
+     [
+      0.28125,
+      0.509766
+     ],
+     [
+      0.282552,
+      0.512695
+     ],
+     [
+      0.322917,
+      0.530273
+     ],
+     [
+      0.363281,
+      0.540039
+     ],
+     [
+      0.368489,
+      0.544922
+     ],
+     [
+      0.382812,
+      0.546875
+     ],
+     [
+      0.416667,
+      0.558594
+     ],
+     [
+      0.479167,
+      0.56836
+     ],
+     [
+      0.486979,
+      0.572266
+     ],
+     [
+      0.588542,
+      0.580078
+     ],
+     [
+      0.707031,
+      0.577149
+     ],
+     [
+      0.78776,
+      0.569336
+     ],
+     [
+      0.850261,
+      0.566406
+     ],
+     [
+      0.873698,
+      0.560547
+     ],
+     [
+      0.925782,
+      0.554688
+     ],
+     [
+      0.990885,
+      0.540039
+     ],
+     [
+      1.0,
+      0.540039
+     ],
+     [
+      1.0,
+      0.62793
+     ],
+     [
+      0.936198,
+      0.651367
+     ],
+     [
+      0.865885,
+      0.668945
+     ],
+     [
+      0.751302,
+      0.686524
+     ],
+     [
+      0.692708,
+      0.69043
+     ],
+     [
+      0.60026,
+      0.691406
+     ],
+     [
+      0.506511,
+      0.686524
+     ],
+     [
+      0.449219,
+      0.679687
+     ],
+     [
+      0.355468,
+      0.663086
+     ],
+     [
+      0.266927,
+      0.633789
+     ],
+     [
+      0.246094,
+      0.621094
+     ],
+     [
+      0.236979,
+      0.618164
+     ],
+     [
+      0.197916,
+      0.59082
+     ],
+     [
+      0.169271,
+      0.557617
+     ],
+     [
+      0.161458,
+      0.535156
+     ],
+     [
+      0.164063,
+      0.484375
+     ],
+     [
+      0.170573,
+      0.469727
+     ],
+     [
+      0.184896,
+      0.451172
+     ],
+     [
+      0.203125,
+      0.4375
+     ]
+    ],
+    "rings": [
+     {
+      "points": [
+       [
+        0.223958,
+        0.428711
+       ],
+       [
+        0.230469,
+        0.428711
+       ],
+       [
+        0.21875,
+        0.456055
+       ],
+       [
+        0.223958,
+        0.46875
+       ],
+       [
+        0.235677,
+        0.481445
+       ],
+       [
+        0.253906,
+        0.495117
+       ],
+       [
+        0.28125,
+        0.509766
+       ],
+       [
+        0.282552,
+        0.512695
+       ],
+       [
+        0.322917,
+        0.530273
+       ],
+       [
+        0.363281,
+        0.540039
+       ],
+       [
+        0.368489,
+        0.544922
+       ],
+       [
+        0.382812,
+        0.546875
+       ],
+       [
+        0.416667,
+        0.558594
+       ],
+       [
+        0.479167,
+        0.56836
+       ],
+       [
+        0.486979,
+        0.572266
+       ],
+       [
+        0.588542,
+        0.580078
+       ],
+       [
+        0.707031,
+        0.577149
+       ],
+       [
+        0.78776,
+        0.569336
+       ],
+       [
+        0.850261,
+        0.566406
+       ],
+       [
+        0.873698,
+        0.560547
+       ],
+       [
+        0.925782,
+        0.554688
+       ],
+       [
+        0.990885,
+        0.540039
+       ],
+       [
+        1.0,
+        0.540039
+       ],
+       [
+        1.0,
+        0.62793
+       ],
+       [
+        0.936198,
+        0.651367
+       ],
+       [
+        0.865885,
+        0.668945
+       ],
+       [
+        0.751302,
+        0.686524
+       ],
+       [
+        0.692708,
+        0.69043
+       ],
+       [
+        0.60026,
+        0.691406
+       ],
+       [
+        0.506511,
+        0.686524
+       ],
+       [
+        0.449219,
+        0.679687
+       ],
+       [
+        0.355468,
+        0.663086
+       ],
+       [
+        0.266927,
+        0.633789
+       ],
+       [
+        0.246094,
+        0.621094
+       ],
+       [
+        0.236979,
+        0.618164
+       ],
+       [
+        0.197916,
+        0.59082
+       ],
+       [
+        0.169271,
+        0.557617
+       ],
+       [
+        0.161458,
+        0.535156
+       ],
+       [
+        0.164063,
+        0.484375
+       ],
+       [
+        0.170573,
+        0.469727
+       ],
+       [
+        0.184896,
+        0.451172
+       ],
+       [
+        0.203125,
+        0.4375
+       ]
+      ],
+      "hole": false
+     }
+    ]
+   },
+   "score": 0.84,
+   "source": "text",
+   "polarity": null
+  },
+  {
+   "id": "seg_2",
+   "label": "Schadstelle",
+   "kind": "damage",
+   "prompt": "detached sole gap",
+   "box": [
+    0.2201,
+    0.4648,
+    0.4427,
+    0.1143
+   ],
+   "mask": {
+    "format": "polygon",
+    "points": [
+     [
+      0.222656,
+      0.464844
+     ],
+     [
+      0.235677,
+      0.466797
+     ],
+     [
+      0.247396,
+      0.478516
+     ],
+     [
+      0.261719,
+      0.483398
+     ],
+     [
+      0.265625,
+      0.490234
+     ],
+     [
+      0.273437,
+      0.490234
+     ],
+     [
+      0.292969,
+      0.501953
+     ],
+     [
+      0.351563,
+      0.513672
+     ],
+     [
+      0.367188,
+      0.523438
+     ],
+     [
+      0.384114,
+      0.526367
+     ],
+     [
+      0.389323,
+      0.53125
+     ],
+     [
+      0.399739,
+      0.53125
+     ],
+     [
+      0.40625,
+      0.536133
+     ],
+     [
+      0.425781,
+      0.53125
+     ],
+     [
+      0.432292,
+      0.539063
+     ],
+     [
+      0.450521,
+      0.541016
+     ],
+     [
+      0.459635,
+      0.546875
+     ],
+     [
+      0.467448,
+      0.544922
+     ],
+     [
+      0.476563,
+      0.550781
+     ],
+     [
+      0.484375,
+      0.548828
+     ],
+     [
+      0.486979,
+      0.554688
+     ],
+     [
+      0.498698,
+      0.550781
+     ],
+     [
+      0.514323,
+      0.558594
+     ],
+     [
+      0.519531,
+      0.555664
+     ],
+     [
+      0.540364,
+      0.556641
+     ],
+     [
+      0.545573,
+      0.563477
+     ],
+     [
+      0.554687,
+      0.5625
+     ],
+     [
+      0.557292,
+      0.56543
+     ],
+     [
+      0.565104,
+      0.560547
+     ],
+     [
+      0.580729,
+      0.568359
+     ],
+     [
+      0.606771,
+      0.566406
+     ],
+     [
+      0.644531,
+      0.573242
+     ],
+     [
+      0.658854,
+      0.571289
+     ],
+     [
+      0.66276,
+      0.576172
+     ],
+     [
+      0.654948,
+      0.579102
+     ],
+     [
+      0.572917,
+      0.579102
+     ],
+     [
+      0.496094,
+      0.573242
+     ],
+     [
+      0.483073,
+      0.571289
+     ],
+     [
+      0.485677,
+      0.567383
+     ],
+     [
+      0.466146,
+      0.567383
+     ],
+     [
+      0.408854,
+      0.557617
+     ],
+     [
+      0.397135,
+      0.550781
+     ],
+     [
+      0.380208,
+      0.549805
+     ],
+     [
+      0.365886,
+      0.541992
+     ],
+     [
+      0.359375,
+      0.542969
+     ],
+     [
+      0.348958,
+      0.537109
+     ],
+     [
+      0.326823,
+      0.533203
+     ],
+     [
+      0.28776,
+      0.517578
+     ],
+     [
+      0.253906,
+      0.495117
+     ],
+     [
+      0.247396,
+      0.495117
+     ],
+     [
+      0.234375,
+      0.487305
+     ],
+     [
+      0.231771,
+      0.480469
+     ],
+     [
+      0.222656,
+      0.474609
+     ]
+    ],
+    "rings": [
+     {
+      "points": [
+       [
+        0.222656,
+        0.464844
+       ],
+       [
+        0.235677,
+        0.466797
+       ],
+       [
+        0.247396,
+        0.478516
+       ],
+       [
+        0.261719,
+        0.483398
+       ],
+       [
+        0.265625,
+        0.490234
+       ],
+       [
+        0.273437,
+        0.490234
+       ],
+       [
+        0.292969,
+        0.501953
+       ],
+       [
+        0.351563,
+        0.513672
+       ],
+       [
+        0.367188,
+        0.523438
+       ],
+       [
+        0.384114,
+        0.526367
+       ],
+       [
+        0.389323,
+        0.53125
+       ],
+       [
+        0.399739,
+        0.53125
+       ],
+       [
+        0.40625,
+        0.536133
+       ],
+       [
+        0.425781,
+        0.53125
+       ],
+       [
+        0.432292,
+        0.539063
+       ],
+       [
+        0.450521,
+        0.541016
+       ],
+       [
+        0.459635,
+        0.546875
+       ],
+       [
+        0.467448,
+        0.544922
+       ],
+       [
+        0.476563,
+        0.550781
+       ],
+       [
+        0.484375,
+        0.548828
+       ],
+       [
+        0.486979,
+        0.554688
+       ],
+       [
+        0.498698,
+        0.550781
+       ],
+       [
+        0.514323,
+        0.558594
+       ],
+       [
+        0.519531,
+        0.555664
+       ],
+       [
+        0.540364,
+        0.556641
+       ],
+       [
+        0.545573,
+        0.563477
+       ],
+       [
+        0.554687,
+        0.5625
+       ],
+       [
+        0.557292,
+        0.56543
+       ],
+       [
+        0.565104,
+        0.560547
+       ],
+       [
+        0.580729,
+        0.568359
+       ],
+       [
+        0.606771,
+        0.566406
+       ],
+       [
+        0.644531,
+        0.573242
+       ],
+       [
+        0.658854,
+        0.571289
+       ],
+       [
+        0.66276,
+        0.576172
+       ],
+       [
+        0.654948,
+        0.579102
+       ],
+       [
+        0.572917,
+        0.579102
+       ],
+       [
+        0.496094,
+        0.573242
+       ],
+       [
+        0.483073,
+        0.571289
+       ],
+       [
+        0.485677,
+        0.567383
+       ],
+       [
+        0.466146,
+        0.567383
+       ],
+       [
+        0.408854,
+        0.557617
+       ],
+       [
+        0.397135,
+        0.550781
+       ],
+       [
+        0.380208,
+        0.549805
+       ],
+       [
+        0.365886,
+        0.541992
+       ],
+       [
+        0.359375,
+        0.542969
+       ],
+       [
+        0.348958,
+        0.537109
+       ],
+       [
+        0.326823,
+        0.533203
+       ],
+       [
+        0.28776,
+        0.517578
+       ],
+       [
+        0.253906,
+        0.495117
+       ],
+       [
+        0.247396,
+        0.495117
+       ],
+       [
+        0.234375,
+        0.487305
+       ],
+       [
+        0.231771,
+        0.480469
+       ],
+       [
+        0.222656,
+        0.474609
+       ]
+      ],
+      "hole": false
+     }
+    ]
+   },
+   "score": 0.707,
+   "source": "grounding",
+   "polarity": null
+  }
+ ],
+ "diagnosis": {
+  "summary": "Weißer Sneaker mit vorne abgelöster Sohle. Der Spalt ist geöffnet, die Klebeflächen sind sichtbar, das Obermaterial wirkt ungerissen.",
+  "likely_causes": [
+   "Alterung und Ermüdung der Originalverklebung im Vorderfußbereich",
+   "Feuchtigkeit, Schmutz oder Biegebelastung beim Gehen"
+  ],
+  "confidence": 0.85,
+  "evidence_segment_ids": [
+   "seg_1",
+   "seg_2"
+  ],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_self",
+  "reasoning": "Die Sohle ist vorne klar abgelöst, Obermaterial und Sohle wirken sonst intakt und sauber verklebbar. Eine flexible Schuhverklebung mit Reinigung, Anrauen und festem Anpressen ist für Laien machbar.",
+  "effort": "medium",
+  "time_minutes": [
+   20,
+   30
+  ],
+  "cost_eur": [
+   8.0,
+   15.0
+  ],
+  "estimate_note": "Schätzung"
+ },
+ "shopping_list": [
+  {
+   "id": "glue",
+   "name": "Flexibler Schuhkleber für Sohle",
+   "kind": "material",
+   "quantity": "1 Tube",
+   "required": true,
+   "search_term": "Schuhkleber Sohle flexibel",
+   "household_alternative": null
+  },
+  {
+   "id": "cleaner",
+   "name": "Isopropanol-Reiniger 70 Prozent",
+   "kind": "material",
+   "quantity": "kleine Menge",
+   "required": true,
+   "search_term": "Isopropanol 70 Reiniger",
+   "household_alternative": null
+  },
+  {
+   "id": "cloth",
+   "name": "Fusselfreies Tuch",
+   "kind": "tool",
+   "quantity": "2 Stück",
+   "required": true,
+   "search_term": "fusselfreies Tuch",
+   "household_alternative": null
+  },
+  {
+   "id": "sand",
+   "name": "Feines Schleifpapier Korn 120",
+   "kind": "tool",
+   "quantity": "1 Blatt",
+   "required": false,
+   "search_term": "Schleifpapier Korn 120 fein",
+   "household_alternative": null
+  },
+  {
+   "id": "tape",
+   "name": "Malerkreppband",
+   "kind": "material",
+   "quantity": "1 Rolle",
+   "required": true,
+   "search_term": "Malerkreppband",
+   "household_alternative": null
+  },
+  {
+   "id": "press",
+   "name": "Breite Gummibänder oder kleine Zwingen mit Tuch",
+   "kind": "tool",
+   "quantity": "2 Stück",
+   "required": true,
+   "search_term": "Gummiband breit stark oder kleine Schraubzwinge",
+   "household_alternative": null
+  }
+ ],
+ "guide": {
+  "steps": [
+   {
+    "n": 1,
+    "title": "Spalt öffnen, reinigen und trocknen",
+    "text": "Schuh auf die Seite legen, Sohle vorne vorsichtig ca. 2 cm aufklappen. Mit fusselfreiem Tuch und wenig Reiniger beide Klebeflächen innen im Spalt abwischen. Danach mindestens 10 Minuten vollständig trocknen lassen. Fertig, wenn beide Flächen trocken, sauber und griffig wirken.",
+    "common_mistake": "Fehler: feuchte oder staubige Klebefläche verkleben – hält nicht. Korrektur: vollständig trocknen und Staub entfernen.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1",
+     "seg_2"
+    ],
+    "uses_items": [
+     "cleaner",
+     "cloth"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_2",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 2,
+    "title": "Klebeflächen anrauen und abkleben",
+    "text": "Obermaterial direkt über dem Spalt mit Malerkreppband schützen. Klebeflächen an Sohle und Oberteil mit feinem Schleifpapier leicht anrauen, Staub mit trockenem Tuch abnehmen. Fertig, wenn die Flächen matt und staubfrei sind.",
+    "common_mistake": "Fehler: stark schleifen oder Oberleder beschädigen. Korrektur: nur leicht anrauen, Obermaterial abkleben.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1",
+     "seg_2"
+    ],
+    "uses_items": [
+     "sand",
+     "tape",
+     "cloth"
+    ],
+    "overlay": null
+   },
+   {
+    "n": 3,
+    "title": "Schuhkleber auftragen und ablüften",
+    "text": "In gut gelüftetem Raum arbeiten, Dämpfe nicht einatmen. Flexiblen Schuhkleber dünn auf beide Seiten im Spalt auftragen, nicht auf das äußere Obermaterial. Nach Herstellerangabe offen ablüften lassen, meist 5-15 Minuten, bis der Kleber leicht anzieht. Fertig, wenn der Kleber gleichmäßig und nicht mehr nass glänzend fließt.",
+    "common_mistake": "Fehler: zu viel Kleber und sofort zusammendrücken. Korrektur: dünn auftragen und offene Ablüftzeit nach Hersteller einhalten.",
+    "safety_critical": true,
+    "requires_confirmation": true,
+    "segment_ids": [
+     "seg_2"
+    ],
+    "uses_items": [
+     "glue"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_2",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 4,
+    "title": "Sohle andrücken und fixieren",
+    "text": "Sohle von der Mitte zur Spitze fest an das Oberteil drücken und exakt ausrichten. Überquellenden Kleber sofort mit Tuch entfernen. Dann Vorderfuß mit Malerkreppband und Gummibändern oder kleinen Zwingen mit Tuch als Druckschutz gleichmäßig fixieren. Fertig, wenn der Spalt geschlossen ohne Versatz anliegt.",
+    "common_mistake": "Fehler: ungleichmäßig drücken, Sohle verrutscht. Korrektur: von hinten nach vorne andrücken und sofort ausrichten.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "tape",
+     "press",
+     "cloth"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 5,
+    "title": "Aushärten lassen und prüfen",
+    "text": "Schuh bei Raumtemperatur nach Herstellerangabe aushärten lassen, meist 24 Stunden, Fixierung dran lassen. Danach Bänder und Klebeband entfernen und Kante vorsichtig mit leichtem Biegen prüfen. Fertig, wenn der Spalt geschlossen bleibt und nichts knirscht oder sich löst. Bei erneutem Aufgehen nicht nachkleben, sondern Fachhilfe prüfen.",
+    "common_mistake": "Fehler: zu früh belasten, Verklebung löst sich wieder. Korrektur: volle Aushärtezeit nach Hersteller abwarten.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "press"
+    ],
+    "overlay": null
+   }
+  ]
+ },
+ "instances": {
+  "detached sole": 1,
+  "detached sole gap": 1
+ }
+}

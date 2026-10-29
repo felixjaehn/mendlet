@@ -5593,6 +5593,40 @@
           }
         }
       }
+    },
+    "Präzisionsmodus (Muse Wonder)": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Präzisionsmodus (Muse Wonder)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Precision mode (Muse Wonder)"
+          }
+        }
+      }
+    },
+    "Ein Muse-Wonder-Agent prüft jede Schadensmaske selbst und segmentiert bei Bedarf neu. Im Test: alle Masken auf dem Schaden, keine Fehltreffer, dafür etwa 60–90 statt 25 Sekunden.": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Muse-Wonder-Agent prüft jede Schadensmaske selbst und segmentiert bei Bedarf neu. Im Test: alle Masken auf dem Schaden, keine Fehltreffer, dafür etwa 60–90 statt 25 Sekunden."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Muse Wonder agent checks every damage mask itself and re-segments when needed. In our tests: every mask on the damage, no false positives, at about 60–90 instead of 25 seconds."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

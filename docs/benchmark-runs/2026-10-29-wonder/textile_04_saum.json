@@ -1,0 +1,776 @@
+{
+ "case_id": "814e2e88-056c-4e8f-985b-f1f0e55a892f",
+ "category": "textile",
+ "risk_level": "allowed",
+ "safety": {
+  "blocked": false,
+  "reason": null
+ },
+ "segments": [
+  {
+   "id": "seg_1",
+   "label": "Schadstelle",
+   "kind": "damage",
+   "prompt": "fallen hanging hem flap",
+   "box": [
+    0.2344,
+    0.5059,
+    0.651,
+    0.2822
+   ],
+   "mask": {
+    "format": "polygon",
+    "points": [
+     [
+      0.25651,
+      0.506836
+     ],
+     [
+      0.279948,
+      0.506836
+     ],
+     [
+      0.365885,
+      0.524414
+     ],
+     [
+      0.516927,
+      0.544922
+     ],
+     [
+      0.528646,
+      0.553711
+     ],
+     [
+      0.528646,
+      0.5625
+     ],
+     [
+      0.518229,
+      0.571289
+     ],
+     [
+      0.52474,
+      0.580078
+     ],
+     [
+      0.523438,
+      0.566406
+     ],
+     [
+      0.533854,
+      0.561523
+     ],
+     [
+      0.535156,
+      0.548828
+     ],
+     [
+      0.523438,
+      0.545899
+     ],
+     [
+      0.535156,
+      0.538086
+     ],
+     [
+      0.549479,
+      0.552734
+     ],
+     [
+      0.589844,
+      0.557617
+     ],
+     [
+      0.589844,
+      0.56543
+     ],
+     [
+      0.601562,
+      0.576172
+     ],
+     [
+      0.632812,
+      0.564453
+     ],
+     [
+      0.664062,
+      0.571289
+     ],
+     [
+      0.671875,
+      0.567383
+     ],
+     [
+      0.690104,
+      0.580078
+     ],
+     [
+      0.696615,
+      0.573242
+     ],
+     [
+      0.697917,
+      0.59082
+     ],
+     [
+      0.701823,
+      0.595703
+     ],
+     [
+      0.71224,
+      0.59375
+     ],
+     [
+      0.705729,
+      0.606445
+     ],
+     [
+      0.716146,
+      0.620117
+     ],
+     [
+      0.723958,
+      0.606445
+     ],
+     [
+      0.721354,
+      0.580078
+     ],
+     [
+      0.730469,
+      0.576172
+     ],
+     [
+      0.752604,
+      0.582031
+     ],
+     [
+      0.760417,
+      0.587891
+     ],
+     [
+      0.755208,
+      0.592773
+     ],
+     [
+      0.77474,
+      0.598633
+     ],
+     [
+      0.785156,
+      0.59375
+     ],
+     [
+      0.815104,
+      0.594727
+     ],
+     [
+      0.832031,
+      0.598633
+     ],
+     [
+      0.830729,
+      0.602539
+     ],
+     [
+      0.84375,
+      0.600586
+     ],
+     [
+      0.84375,
+      0.605469
+     ],
+     [
+      0.859375,
+      0.611328
+     ],
+     [
+      0.884115,
+      0.613281
+     ],
+     [
+      0.846354,
+      0.785156
+     ],
+     [
+      0.830729,
+      0.788086
+     ],
+     [
+      0.768229,
+      0.77832
+     ],
+     [
+      0.575521,
+      0.737305
+     ],
+     [
+      0.440104,
+      0.697266
+     ],
+     [
+      0.325521,
+      0.652344
+     ],
+     [
+      0.279948,
+      0.626953
+     ],
+     [
+      0.235677,
+      0.589844
+     ],
+     [
+      0.240885,
+      0.525391
+     ]
+    ],
+    "rings": [
+     {
+      "points": [
+       [
+        0.25651,
+        0.506836
+       ],
+       [
+        0.279948,
+        0.506836
+       ],
+       [
+        0.365885,
+        0.524414
+       ],
+       [
+        0.516927,
+        0.544922
+       ],
+       [
+        0.528646,
+        0.553711
+       ],
+       [
+        0.528646,
+        0.5625
+       ],
+       [
+        0.518229,
+        0.571289
+       ],
+       [
+        0.52474,
+        0.580078
+       ],
+       [
+        0.523438,
+        0.566406
+       ],
+       [
+        0.533854,
+        0.561523
+       ],
+       [
+        0.535156,
+        0.548828
+       ],
+       [
+        0.523438,
+        0.545899
+       ],
+       [
+        0.535156,
+        0.538086
+       ],
+       [
+        0.549479,
+        0.552734
+       ],
+       [
+        0.589844,
+        0.557617
+       ],
+       [
+        0.589844,
+        0.56543
+       ],
+       [
+        0.601562,
+        0.576172
+       ],
+       [
+        0.632812,
+        0.564453
+       ],
+       [
+        0.664062,
+        0.571289
+       ],
+       [
+        0.671875,
+        0.567383
+       ],
+       [
+        0.690104,
+        0.580078
+       ],
+       [
+        0.696615,
+        0.573242
+       ],
+       [
+        0.697917,
+        0.59082
+       ],
+       [
+        0.701823,
+        0.595703
+       ],
+       [
+        0.71224,
+        0.59375
+       ],
+       [
+        0.705729,
+        0.606445
+       ],
+       [
+        0.716146,
+        0.620117
+       ],
+       [
+        0.723958,
+        0.606445
+       ],
+       [
+        0.721354,
+        0.580078
+       ],
+       [
+        0.730469,
+        0.576172
+       ],
+       [
+        0.752604,
+        0.582031
+       ],
+       [
+        0.760417,
+        0.587891
+       ],
+       [
+        0.755208,
+        0.592773
+       ],
+       [
+        0.77474,
+        0.598633
+       ],
+       [
+        0.785156,
+        0.59375
+       ],
+       [
+        0.815104,
+        0.594727
+       ],
+       [
+        0.832031,
+        0.598633
+       ],
+       [
+        0.830729,
+        0.602539
+       ],
+       [
+        0.84375,
+        0.600586
+       ],
+       [
+        0.84375,
+        0.605469
+       ],
+       [
+        0.859375,
+        0.611328
+       ],
+       [
+        0.884115,
+        0.613281
+       ],
+       [
+        0.846354,
+        0.785156
+       ],
+       [
+        0.830729,
+        0.788086
+       ],
+       [
+        0.768229,
+        0.77832
+       ],
+       [
+        0.575521,
+        0.737305
+       ],
+       [
+        0.440104,
+        0.697266
+       ],
+       [
+        0.325521,
+        0.652344
+       ],
+       [
+        0.279948,
+        0.626953
+       ],
+       [
+        0.235677,
+        0.589844
+       ],
+       [
+        0.240885,
+        0.525391
+       ]
+      ],
+      "hole": false
+     },
+     {
+      "points": [
+       [
+        0.716146,
+        0.585937
+       ],
+       [
+        0.717448,
+        0.585937
+       ],
+       [
+        0.717448,
+        0.586914
+       ],
+       [
+        0.71875,
+        0.586914
+       ],
+       [
+        0.71875,
+        0.59082
+       ],
+       [
+        0.717448,
+        0.59082
+       ],
+       [
+        0.717448,
+        0.592773
+       ],
+       [
+        0.716146,
+        0.592773
+       ],
+       [
+        0.716146,
+        0.59082
+       ],
+       [
+        0.714844,
+        0.59082
+       ],
+       [
+        0.714844,
+        0.586914
+       ],
+       [
+        0.716146,
+        0.586914
+       ]
+      ],
+      "hole": false
+     },
+     {
+      "points": [
+       [
+        0.708333,
+        0.600586
+       ],
+       [
+        0.710938,
+        0.600586
+       ],
+       [
+        0.710938,
+        0.604492
+       ],
+       [
+        0.709635,
+        0.604492
+       ],
+       [
+        0.709635,
+        0.603516
+       ],
+       [
+        0.708333,
+        0.603516
+       ],
+       [
+        0.708333,
+        0.602539
+       ],
+       [
+        0.707031,
+        0.602539
+       ],
+       [
+        0.707031,
+        0.601562
+       ],
+       [
+        0.708333,
+        0.601562
+       ]
+      ],
+      "hole": false
+     },
+     {
+      "points": [
+       [
+        0.535156,
+        0.566406
+       ],
+       [
+        0.536458,
+        0.566406
+       ],
+       [
+        0.536458,
+        0.564453
+       ],
+       [
+        0.535156,
+        0.564453
+       ]
+      ],
+      "hole": true
+     },
+     {
+      "points": [
+       [
+        0.539062,
+        0.557617
+       ],
+       [
+        0.540365,
+        0.557617
+       ],
+       [
+        0.540365,
+        0.556641
+       ],
+       [
+        0.539062,
+        0.556641
+       ]
+      ],
+      "hole": true
+     },
+     {
+      "points": [
+       [
+        0.84375,
+        0.605469
+       ],
+       [
+        0.842448,
+        0.605469
+       ],
+       [
+        0.842448,
+        0.606445
+       ],
+       [
+        0.84375,
+        0.606445
+       ]
+      ],
+      "hole": true
+     }
+    ]
+   },
+   "score": 0.863,
+   "source": "grounding",
+   "polarity": null
+  }
+ ],
+ "diagnosis": {
+  "summary": "Vermutlich Webware-Hose mit gelöstem Saum: die Saumzugabe hängt herunter, Kanten wirken intakt, kein Loch mit Materialverlust sichtbar.",
+  "likely_causes": [
+   "aufgetrennte Saumnaht durch Tragen und Waschen",
+   "einzelne durchgescheuerte Heftstiche am Saum"
+  ],
+  "confidence": 0.82,
+  "evidence_segment_ids": [
+   "seg_1"
+  ],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_self",
+  "reasoning": "Loser Hosen- oder Ärmelsaum mit intakter Saumzugabe, Gewebe wirkt tragfähig und nicht gerissen. Kann von Hand unsichtbar angeheftet werden.",
+  "effort": "low",
+  "time_minutes": [
+   20,
+   35
+  ],
+  "cost_eur": [
+   3.0,
+   9.0
+  ],
+  "estimate_note": "Schätzung"
+ },
+ "shopping_list": [
+  {
+   "id": "nadel",
+   "name": "Feine scharfe Handnähnadel für Webware",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "scharfe Handnähnadel fein Webware",
+   "household_alternative": null
+  },
+  {
+   "id": "garn",
+   "name": "Feines Polyester-Nähgarn dunkelgrau",
+   "kind": "material",
+   "quantity": "1 Rolle",
+   "required": true,
+   "search_term": "Polyester Nähgarn dunkelgrau fein",
+   "household_alternative": null
+  },
+  {
+   "id": "stecknadeln",
+   "name": "Stecknadeln",
+   "kind": "tool",
+   "quantity": "4 Stück",
+   "required": true,
+   "search_term": "Stecknadeln zum Nähen",
+   "household_alternative": "Büroklammern als Ersatz zum Fixieren"
+  },
+  {
+   "id": "schere",
+   "name": "Kleine Stoffschere",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "kleine Stoffschere",
+   "household_alternative": null
+  }
+ ],
+ "guide": {
+  "steps": [
+   {
+    "n": 1,
+    "title": "Wenden und Saumverlauf prüfen",
+    "text": "Teil auf links wenden und auf hellem Tisch flach auslegen. Saumzugabe an der Schadstelle mit der Hand hochklappen und prüfen: eingeschlagene Kante vorhanden und Stoff um die alte Nahtlinie tragfähig. Fertig, wenn Verlauf der alten Saumlinie erkennbar ist.",
+    "common_mistake": "Fehler: Außenseite als Innenseite verwechseln – Korrektur: Saumzugabe liegt innen, schöne Seite bleibt außen.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 2,
+    "title": "Lose Fäden behutsam kürzen",
+    "text": "Lose alte Heftfäden an der Schadstelle mit den Fingern glattstreichen. Schere flach führen und nur abstehende Fadenenden 2-3 mm über dem Stoff abschneiden. Schutz: Finger weg von der Schneide, Schere nach Gebrauch schließen und weglegen. Fertig, wenn keine langen Schlaufen mehr abstehen.",
+    "common_mistake": "Fehler: lange lose Fäden herausziehen – Korrektur: nur überstehende Fadenenden bündig abschneiden, nicht ziehen.",
+    "safety_critical": true,
+    "requires_confirmation": true,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "schere"
+    ],
+    "overlay": null
+   },
+   {
+    "n": 3,
+    "title": "Saum ausrichten und stecken",
+    "text": "Saumzugabe entlang der alten Nahtlinie hochklappen und Kante bündig zur alten Linie ausrichten. Von der Innenseite mit 3-4 Stecknadeln quer zur Kante fixieren, Spitzen von dir weg. Fertig, wenn der Saum außen gerade liegt und nicht zieht.",
+    "common_mistake": "Fehler: Saum wellig feststecken – Korrektur: lösen, entspannt glattziehen und neu stecken.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "stecknadeln"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 4,
+    "title": "Saum mit Leiterstich schließen",
+    "text": "Etwa 40 cm Garn einfädeln, Anfang mit 2 kleinen Sicherungsstichen im Saumstoff sichern. Von der Innenseite abwechselnd 2-3 mm kleine Einstiche in die Saumkante und gegenüber in den Oberstoff setzen, Faden locker mitführen. So entlang der Schadstelle nähen. Fertig, wenn die Kante geschlossen anliegt und außen fast nichts sichtbar ist.",
+    "common_mistake": "Fehler: Faden zu straff anziehen, Stoff kräuselt – Korrektur: Faden locker lassen, Saum bleibt flach.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "nadel",
+     "garn"
+    ],
+    "overlay": {
+     "type": "stitch_path",
+     "stitch_type": "ladder_stitch",
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 5,
+    "title": "Sichern und Sitz prüfen",
+    "text": "Stecknadeln entfernen. Endfaden mit 2 kleinen Sicherungsstichen im tragfähigen Saumstoff vernähen, dann bündig abschneiden. Teil auf rechts wenden und Saum bei leichtem Zug prüfen: geschlossen, flach, keine Kräusel, keine ausreißenden Stiche. Bei Aufklaffen Methode prüfen oder Fachhilfe nutzen.",
+    "common_mistake": "Fehler: Faden direkt an der Naht abschneiden ohne Sichern – Korrektur: erst 2 kleine Stiche im festen Stoff, dann schneiden.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [],
+    "overlay": null
+   }
+  ]
+ },
+ "instances": {
+  "fallen hanging hem flap": 1
+ }
+}

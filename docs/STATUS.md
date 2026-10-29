@@ -9,10 +9,10 @@ Last updated: 2026-10-29 (morning).
 | Electronics outlook runs live | **yes**: USB board, wires and pads with polarity, solder overlays |
 | Safety blocks live | **yes**: 4 of 4 hazard cases blocked in 2–4 s; one over-cautious block (USB socket) |
 | Muse Image after-repair preview live | **yes**: jeans and sweater, 11–12 s |
-| Muse Wonder agent live | **yes** (opt-in `AGENT_MODE=wonder`): verifies masks, recovered from a SAM HTTP 500 |
+| Muse Wonder agent live | **yes**, as precision mode (app toggle / `"agent": true`): 10/10 masks, 0 false positives on 10 cases, ~60–90 s; recovered from a SAM HTTP 500 |
 | Muse Voice live | **yes**: error-free German transcript with keyword biasing, 2.9 s |
 | Full benchmark | 16 cases: 16/16 category, 4/4 blocks, 10/11 overlays on damage, 0 invalid JSON, mean 23.7 s ([benchmark.md](benchmark.md)) |
-| Tests | proxy 250 (offline), iOS 82 |
+| Tests | proxy 251 (offline), iOS 82 |
 | Languages | German and English end to end (UI, model outputs, voice), real English demo recordings |
 | API cost so far | about $2 of $150 (proxy budget: $0.75 on Oct 28, $1.22 on Oct 29; probes outside the proxy a few cents) |
 | Independent judge score | 5.4 (Oct 28 baseline) → 6.3 → 6.5 (Oct 29) |

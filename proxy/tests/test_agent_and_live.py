@@ -272,7 +272,7 @@ async def test_agent_full_loop_wire_steps_budget_and_contract(tmp_path):
             assert [t['name'] for t in data['tools']] == ['segment', 'segment_at', 'locate', 'verify_mask', 'finish']
             assert all(t['type'] == 'function' and 'function' not in t for t in data['tools'])  # flat format
             assert 'previous_response_id' not in data and 'nur die Wahrnehmung' in data['instructions']
-            assert data['reasoning'] == {'effort': 'low'}  # docs/reasoning: nested on the Responses API
+            assert data['reasoning'] == {'effort': 'minimal'}  # docs/reasoning: nested on the Responses API
             assert next(t for t in data['tools'] if t['name'] == 'finish')['parameters']['properties'] == {}
             content = data['input'][0]['content']
             assert content[0]['type'] == 'input_text' and content[1]['image_url'].startswith('data:image/jpeg;base64,')
@@ -453,3 +453,17 @@ def test_agent_mode_default_off(client, image_b64):
     assert client.get('/health').json()['agent_mode'] == 'off'
     assert Settings.from_env({'AGENT_MODE': 'Wonder'}).agent_mode == 'wonder'
     assert Settings.from_env({'AGENT_MODE': 'bogus'}).agent_mode == 'off' and Settings.from_env({}).agent_mode == 'off'
+
+
+async def test_request_flag_turns_precision_mode_on_and_off(image_b64):
+    class Probe(MockClient):
+        ran = 0
+
+        async def agent_run(self, req, cls, emit):
+            Probe.ran += 1
+            return await super().agent_run(req, cls, emit)
+
+    await analyze(make_req(image_b64, agent=True), Probe(0.0))  # server default off, request on
+    assert Probe.ran == 1
+    await analyze(make_req(image_b64, agent=False), Probe(0.0, agent=True))  # server on, request off
+    assert Probe.ran == 1

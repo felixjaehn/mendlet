@@ -1,0 +1,507 @@
+{
+ "case_id": "1ccb98f7-d99b-4980-9d89-63228469f523",
+ "category": "textile",
+ "risk_level": "allowed",
+ "safety": {
+  "blocked": false,
+  "reason": null
+ },
+ "segments": [
+  {
+   "id": "seg_1",
+   "label": "Schadstelle",
+   "kind": "damage",
+   "prompt": "missing button threads",
+   "box": [
+    0.4622,
+    0.4736,
+    0.0755,
+    0.0723
+   ],
+   "mask": {
+    "format": "polygon",
+    "points": [
+     [
+      0.466146,
+      0.473633
+     ],
+     [
+      0.471354,
+      0.473633
+     ],
+     [
+      0.473958,
+      0.475586
+     ],
+     [
+      0.480469,
+      0.492188
+     ],
+     [
+      0.501302,
+      0.492188
+     ],
+     [
+      0.507812,
+      0.493164
+     ],
+     [
+      0.509115,
+      0.495117
+     ],
+     [
+      0.516927,
+      0.494141
+     ],
+     [
+      0.519531,
+      0.490234
+     ],
+     [
+      0.518229,
+      0.479492
+     ],
+     [
+      0.523438,
+      0.473633
+     ],
+     [
+      0.527344,
+      0.473633
+     ],
+     [
+      0.529948,
+      0.477539
+     ],
+     [
+      0.529948,
+      0.487305
+     ],
+     [
+      0.53776,
+      0.512695
+     ],
+     [
+      0.535156,
+      0.543945
+     ],
+     [
+      0.526042,
+      0.543945
+     ],
+     [
+      0.52474,
+      0.537109
+     ],
+     [
+      0.520833,
+      0.533203
+     ],
+     [
+      0.516927,
+      0.524414
+     ],
+     [
+      0.505208,
+      0.524414
+     ],
+     [
+      0.502604,
+      0.525391
+     ],
+     [
+      0.502604,
+      0.527344
+     ],
+     [
+      0.497396,
+      0.525391
+     ],
+     [
+      0.497396,
+      0.527344
+     ],
+     [
+      0.490885,
+      0.532227
+     ],
+     [
+      0.484375,
+      0.532227
+     ],
+     [
+      0.481771,
+      0.541992
+     ],
+     [
+      0.479167,
+      0.544922
+     ],
+     [
+      0.473958,
+      0.545898
+     ],
+     [
+      0.470052,
+      0.542969
+     ],
+     [
+      0.46875,
+      0.53418
+     ],
+     [
+      0.466146,
+      0.533203
+     ],
+     [
+      0.46224,
+      0.524414
+     ],
+     [
+      0.46224,
+      0.514648
+     ],
+     [
+      0.464844,
+      0.506836
+     ],
+     [
+      0.463542,
+      0.476563
+     ]
+    ],
+    "rings": [
+     {
+      "points": [
+       [
+        0.466146,
+        0.473633
+       ],
+       [
+        0.471354,
+        0.473633
+       ],
+       [
+        0.473958,
+        0.475586
+       ],
+       [
+        0.480469,
+        0.492188
+       ],
+       [
+        0.501302,
+        0.492188
+       ],
+       [
+        0.507812,
+        0.493164
+       ],
+       [
+        0.509115,
+        0.495117
+       ],
+       [
+        0.516927,
+        0.494141
+       ],
+       [
+        0.519531,
+        0.490234
+       ],
+       [
+        0.518229,
+        0.479492
+       ],
+       [
+        0.523438,
+        0.473633
+       ],
+       [
+        0.527344,
+        0.473633
+       ],
+       [
+        0.529948,
+        0.477539
+       ],
+       [
+        0.529948,
+        0.487305
+       ],
+       [
+        0.53776,
+        0.512695
+       ],
+       [
+        0.535156,
+        0.543945
+       ],
+       [
+        0.526042,
+        0.543945
+       ],
+       [
+        0.52474,
+        0.537109
+       ],
+       [
+        0.520833,
+        0.533203
+       ],
+       [
+        0.516927,
+        0.524414
+       ],
+       [
+        0.505208,
+        0.524414
+       ],
+       [
+        0.502604,
+        0.525391
+       ],
+       [
+        0.502604,
+        0.527344
+       ],
+       [
+        0.497396,
+        0.525391
+       ],
+       [
+        0.497396,
+        0.527344
+       ],
+       [
+        0.490885,
+        0.532227
+       ],
+       [
+        0.484375,
+        0.532227
+       ],
+       [
+        0.481771,
+        0.541992
+       ],
+       [
+        0.479167,
+        0.544922
+       ],
+       [
+        0.473958,
+        0.545898
+       ],
+       [
+        0.470052,
+        0.542969
+       ],
+       [
+        0.46875,
+        0.53418
+       ],
+       [
+        0.466146,
+        0.533203
+       ],
+       [
+        0.46224,
+        0.524414
+       ],
+       [
+        0.46224,
+        0.514648
+       ],
+       [
+        0.464844,
+        0.506836
+       ],
+       [
+        0.463542,
+        0.476563
+       ]
+      ],
+      "hole": false
+     }
+    ]
+   },
+   "score": 0.895,
+   "source": "grounding",
+   "polarity": null
+  }
+ ],
+ "diagnosis": {
+  "summary": "An einem vermutlich weißen Baumwoll-Hemd in Webware ist ein 4-Loch-Knopf abgerissen. An der Schadstelle sind weiße Fadenreste sichtbar, der Stoff und die Nachbarknöpfe sind intakt.",
+  "likely_causes": [
+   "Zugbelastung beim Öffnen oder Schließen des Hemdes",
+   "Allmählicher Verschleiß des Knopf-Nähgarns durch Waschen und Tragen"
+  ],
+  "confidence": 0.85,
+  "evidence_segment_ids": [
+   "seg_1"
+  ],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_self",
+  "reasoning": "Der Stoff an der Knopfstelle ist intakt, nur der Knopf fehlt und alte Fadenreste sind sichtbar. Ein passender Ersatzknopf kann von Hand angenäht werden, mit Stiel für die Knopfleiste.",
+  "effort": "low",
+  "time_minutes": [
+   15,
+   25
+  ],
+  "cost_eur": [
+   2.0,
+   6.0
+  ],
+  "estimate_note": "Schätzung"
+ },
+ "shopping_list": [
+  {
+   "id": "button",
+   "name": "Weißer 4-Loch Hemdknopf in passender Größe",
+   "kind": "material",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "weißer Hemdknopf 4-Loch",
+   "household_alternative": null
+  },
+  {
+   "id": "thread",
+   "name": "Weißes Nähgarn Polyester oder Baumwolle",
+   "kind": "material",
+   "quantity": "1 Rolle",
+   "required": true,
+   "search_term": "weißes Nähgarn Polyester",
+   "household_alternative": null
+  },
+  {
+   "id": "needle",
+   "name": "Feine scharfe Handnadel für dünne Webware",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "scharfe Handnadel fein Baumwollstoff",
+   "household_alternative": null
+  },
+  {
+   "id": "scissors",
+   "name": "Kleine Schneiderschere",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "kleine Schneiderschere",
+   "household_alternative": "kleine Haushaltsschere"
+  }
+ ],
+ "guide": {
+  "steps": [
+   {
+    "n": 1,
+    "title": "Schadstelle und Stoff prüfen",
+    "text": "Hemd mit der Vorderseite zu dir auf den Tisch legen. Stelle mit Fadenresten in die Mitte nehmen. Von vorn und von der Rückseite der Knopfleiste prüfen: Stoff fest anfassen und leicht ziehen. Fertig, wenn der Stoff um die vier kleinen Einstichpunkte geschlossen und nicht eingerissen ist.",
+    "common_mistake": "Nicht auf beschädigtem Stoff weiterarbeiten – bei eingerissenem Loch aufhören und Fachhilfe prüfen.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 2,
+    "title": "Alte Fadenreste vorsichtig entfernen",
+    "text": "Hemd mit der Schadstelle nach oben halten. Mit der kleinen Schneiderschere nur die losen weißen Fadenknötchen bündig abschneiden, ohne in den Hemdstoff zu schneiden. Schere immer vom Stoff weg führen und Fussel mit den Fingern abnehmen. Fertig, wenn die Stelle flach ist und nur die vier alten Einstichpunkte sichtbar bleiben.",
+    "common_mistake": "Nicht am Faden reißen – das zieht den Stoff aus und vergrößert das Loch.",
+    "safety_critical": true,
+    "requires_confirmation": true,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "scissors"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 3,
+    "title": "Nadel einfädeln und Anfang sichern",
+    "text": "Etwa 50 cm weißes Nähgarn abschneiden und in die feine scharfe Handnadel einfädeln. Faden doppelt legen und die beiden Enden mit 2-3 kleinen Knoten übereinander sichern. An einem Saumrest kurz ziehen: Knoten muss halten. Fertig, wenn der Knoten fest sitzt und der Faden nicht aus der Nadel rutscht.",
+    "common_mistake": "Zu langer Faden verknotet sich – lieber etwa 50 cm einfach nehmen und neu anfangen.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [],
+    "uses_items": [
+     "needle",
+     "thread"
+    ],
+    "overlay": null
+   },
+   {
+    "n": 4,
+    "title": "Ersatzknopf in Kreuzform annähen",
+    "text": "Neuen weißen 4-Loch-Knopf mittig auf die alten Einstichpunkte legen, Ausrichtung wie die Nachbarknöpfe. Von der Rückseite der Leiste durch einen alten Einstichpunkt nach vorn stechen, durch ein Knopfloch führen, dann diagonal zum gegenüberliegenden Knopfloch und wieder nach hinten stechen. Beide Diagonalen 4-5 Mal wiederholen, Faden locker lassen, sodass etwa 2-3 mm Abstand zwischen Knopf und Stoff bleibt. Fertig, wenn der Knopf in allen 4 Löchern fest, aber beweglich sitzt.",
+    "common_mistake": "Knopf ohne Abstand flach anpressen – dann lässt sich das Hemd nicht schließen. Streichholz oder 2-3 mm Luft lassen.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "needle",
+     "thread",
+     "button"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 5,
+    "title": "Stiel wickeln, sichern und prüfen",
+    "text": "Faden auf die Rückseite der Knopfleiste führen. Nadel 5-6 Mal fest um die Fäden zwischen Knopf und Stoff wickeln, um einen etwa 2-3 mm hohen Stiel zu bilden. Dann 3 kleine Stiche dicht nebeneinander in den tragfähigen Stoff setzen, Faden anziehen und bündig abschneiden. Knopfprobe: Knopf durch das gegenüberliegende Knopfloch knöpfen und leicht ziehen – er muss halten, nicht kräuseln und nicht ausreißen.",
+    "common_mistake": "Faden direkt am Knopf abschneiden – das löst sich. Erst 3 kleine Sicherungsstiche auf der Rückseite nähen.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "needle",
+     "thread",
+     "scissors"
+    ],
+    "overlay": null
+   }
+  ]
+ },
+ "instances": {
+  "missing button threads": 1
+ }
+}

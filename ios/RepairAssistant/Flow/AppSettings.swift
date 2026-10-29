@@ -10,6 +10,7 @@ final class AppSettings {
     var scenarioRaw: String { didSet { defaults.set(scenarioRaw, forKey: "demoScenarioSetting") } }
     var fastReplay: Bool { didSet { defaults.set(fastReplay, forKey: "fastReplay") } }
     var recoveryTrace: Bool { didSet { defaults.set(recoveryTrace, forKey: "recoveryTrace") } }
+    var precisionMode: Bool { didSet { defaults.set(precisionMode, forKey: "precisionMode") } }
     /// "system", "de" or "en" (Settings > Sprache / Language); shared with `Lang`, which also feeds the proxy `locale`.
     var language: String {
         get { Lang.shared.choice }
@@ -27,6 +28,7 @@ final class AppSettings {
         scenarioRaw = defaults.string(forKey: "demoScenarioSetting") ?? DemoScenario.textileTear.rawValue
         fastReplay = defaults.bool(forKey: "fastReplay")
         recoveryTrace = defaults.bool(forKey: "recoveryTrace")
+        precisionMode = defaults.bool(forKey: "precisionMode")
         baseURLString = defaults.string(forKey: "proxyBaseURL") ?? Self.configuredBaseURL
     }
 

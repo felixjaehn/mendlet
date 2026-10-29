@@ -38,6 +38,9 @@ class AnalyzeRequest(Base):
     answers: list[Answer] = []
     locale: str = "de"
     mock_scenario: str | None = None  # ignored in real mode
+    # Per-request precision mode (Muse Wonder agent). None = server default (AGENT_MODE).
+    # Benchmark 2026-10-29: 10/10 masks on damage, 0 false positives, ~60–90 s vs ~25 s classic.
+    agent: bool | None = None
 
     @property
     def note(self) -> str:

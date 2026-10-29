@@ -484,6 +484,8 @@ struct AnalyzeRequest: Codable, Sendable {
     var answers: [AnswerPayload] = []
     var locale: String = "de"
     var mockScenario: String?
+    /// Precision mode: Muse Wonder agent verifies every damage mask (nil = server default).
+    var agent: Bool?
 }
 
 struct StepRef: Codable, Sendable, Hashable {

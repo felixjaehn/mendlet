@@ -23,6 +23,13 @@ struct SettingsSheet: View {
                         Text("Spielt die echten Modellantworten in etwa 6 statt 25 Sekunden ab. Der Agenten-Lauf mit Fehlerbehebung (Jeans) zeigt einen echten Lauf, in dem SAM einen Serverfehler meldete und der Agent ausgewichen ist.")
                     }
                 }
+                if !settings.demoMode {
+                    Section {
+                        Toggle("Präzisionsmodus (Muse Wonder)", isOn: $settings.precisionMode).tint(Theme.thread)
+                    } footer: {
+                        Text("Ein Muse-Wonder-Agent prüft jede Schadensmaske selbst und segmentiert bei Bedarf neu. Im Test: alle Masken auf dem Schaden, keine Fehltreffer, dafür etwa 60–90 statt 25 Sekunden.")
+                    }
+                }
                 Section {
                     Picker(selection: $settings.language) {
                         Text("System").tag("system")

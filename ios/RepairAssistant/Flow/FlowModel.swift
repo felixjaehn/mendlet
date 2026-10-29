@@ -89,7 +89,8 @@ final class FlowModel {
         let request = AnalyzeRequest(
             imageBase64: ImageResizer.base64(photo), userNote: note,
             extraImages: extraImages, answers: answers, locale: Lang.apiCode,
-            mockScenario: settings.demoMode ? settings.scenario.rawValue : (settings.scenarioRaw.isEmpty ? nil : settings.scenario.rawValue))
+            mockScenario: settings.demoMode ? settings.scenario.rawValue : (settings.scenarioRaw.isEmpty ? nil : settings.scenario.rawValue),
+            agent: settings.demoMode ? nil : settings.precisionMode)
         let svc = service
         analysisTask?.cancel()
         analysisTask = Task { [weak self] in

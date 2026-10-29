@@ -203,3 +203,16 @@ Synthetische Stimme, keine echte Sprecherin. Echte Sprache mit Nebengeräuschen 
 | Jacke, L-Riss | Stopfen | Riss gestopft, Stopffläche sichtbar | 10,6 s |
 
 Vergleichsbild: [live-probes/2026-10-29_muse-image_sneaker_shirt_jacket.jpg](live-probes/2026-10-29_muse-image_sneaker_shirt_jacket.jpg). Damit 5 von 5 getesteten Fällen mit glaubwürdiger Vorschau. Die Sneaker-Vorschau liegt jetzt auch im Demo-Modus (`sneaker_after.jpg`).
+
+## Präzisionsmodus: Muse Wonder gegen klassischen Pfad (29.10.2026, live, ohne Cache)
+
+Gleiche 10 Textil- und Schuhfälle. Kontaktbögen: [klassisch](benchmark-runs/2026-10-29-v2-overlays.jpg), [Wonder](benchmark-runs/2026-10-29-wonder-overlays.jpg).
+
+| Pfad | Masken auf dem Schaden | Fälle mit Fehltreffern | Latenz Mittel / Max |
+| --- | --- | --- | --- |
+| Klassisch (SAM-Text + Spark-Grounding) | 10/10 | 3 (Knopflöcher, Jackennähte, Schuhsohle) | 24,7 s / 32,0 s |
+| **Wonder-Agent** (`reasoning.effort=low`) | **10/10** | **0** | 90,0 s / 176,2 s |
+| Wonder, vorbelegt mit den klassischen Kandidaten (Experiment) | 10/10 | mehr als ohne Vorbelegung (Knopf: 9 Segmente) | 89,5 s / 134,7 s |
+| Wonder, `reasoning.effort=minimal` (3 Fälle: Jeans, Knopf, Jacke) | 3/3 | 0 | 57,5 s (gleiche Fälle mit `low`: 62,9 s) |
+
+**Befund:** Der Agent ist deutlich präziser, aber bauartbedingt langsamer. Die Zeit steckt in seinen Reasoning-Runden, nicht in der Suche. Die Vorbelegung mit klassischen Kandidaten hat weder Zeit gespart noch die Präzision gehalten und wurde verworfen. **Konsequenz:** Der klassische Pfad bleibt Standard. Wonder ist als **Präzisionsmodus** pro Anfrage schaltbar (App: Einstellungen → Präzisionsmodus, API: `"agent": true`), Standard-Reasoning `minimal`. Kosten der Vergleichsläufe: etwa 2,50 $.

@@ -1,0 +1,606 @@
+{
+ "case_id": "19faa6fb-067a-4b20-a58e-563501a567cd",
+ "category": "textile",
+ "risk_level": "allowed",
+ "safety": {
+  "blocked": false,
+  "reason": null
+ },
+ "segments": [
+  {
+   "id": "seg_1",
+   "label": "Schadstelle",
+   "kind": "damage",
+   "prompt": "missing button thread remnants",
+   "box": [
+    0.4622,
+    0.4736,
+    0.0755,
+    0.0752
+   ],
+   "mask": {
+    "format": "polygon",
+    "points": [
+     [
+      0.467448,
+      0.473633
+     ],
+     [
+      0.471354,
+      0.473633
+     ],
+     [
+      0.471354,
+      0.475586
+     ],
+     [
+      0.473958,
+      0.476562
+     ],
+     [
+      0.480469,
+      0.492187
+     ],
+     [
+      0.485677,
+      0.492187
+     ],
+     [
+      0.486979,
+      0.490234
+     ],
+     [
+      0.489583,
+      0.490234
+     ],
+     [
+      0.490885,
+      0.492187
+     ],
+     [
+      0.510417,
+      0.493164
+     ],
+     [
+      0.511719,
+      0.495117
+     ],
+     [
+      0.515625,
+      0.495117
+     ],
+     [
+      0.519531,
+      0.491211
+     ],
+     [
+      0.518229,
+      0.480469
+     ],
+     [
+      0.520833,
+      0.478516
+     ],
+     [
+      0.520833,
+      0.475586
+     ],
+     [
+      0.52474,
+      0.473633
+     ],
+     [
+      0.527344,
+      0.474609
+     ],
+     [
+      0.527344,
+      0.476562
+     ],
+     [
+      0.529948,
+      0.477539
+     ],
+     [
+      0.529948,
+      0.487305
+     ],
+     [
+      0.53776,
+      0.509766
+     ],
+     [
+      0.53776,
+      0.532227
+     ],
+     [
+      0.536458,
+      0.543945
+     ],
+     [
+      0.533854,
+      0.546875
+     ],
+     [
+      0.528646,
+      0.547852
+     ],
+     [
+      0.52474,
+      0.545898
+     ],
+     [
+      0.522135,
+      0.536133
+     ],
+     [
+      0.519531,
+      0.536133
+     ],
+     [
+      0.516927,
+      0.532227
+     ],
+     [
+      0.513021,
+      0.533203
+     ],
+     [
+      0.513021,
+      0.538086
+     ],
+     [
+      0.510417,
+      0.538086
+     ],
+     [
+      0.510417,
+      0.535156
+     ],
+     [
+      0.507812,
+      0.535156
+     ],
+     [
+      0.503906,
+      0.541016
+     ],
+     [
+      0.5,
+      0.541016
+     ],
+     [
+      0.5,
+      0.539063
+     ],
+     [
+      0.496094,
+      0.538086
+     ],
+     [
+      0.496094,
+      0.535156
+     ],
+     [
+      0.49349,
+      0.535156
+     ],
+     [
+      0.49349,
+      0.538086
+     ],
+     [
+      0.496094,
+      0.540039
+     ],
+     [
+      0.492188,
+      0.541016
+     ],
+     [
+      0.489583,
+      0.543945
+     ],
+     [
+      0.484375,
+      0.543945
+     ],
+     [
+      0.477865,
+      0.548828
+     ],
+     [
+      0.470052,
+      0.546875
+     ],
+     [
+      0.46875,
+      0.536133
+     ],
+     [
+      0.46224,
+      0.526367
+     ],
+     [
+      0.463542,
+      0.477539
+     ]
+    ],
+    "rings": [
+     {
+      "points": [
+       [
+        0.467448,
+        0.473633
+       ],
+       [
+        0.471354,
+        0.473633
+       ],
+       [
+        0.471354,
+        0.475586
+       ],
+       [
+        0.473958,
+        0.476562
+       ],
+       [
+        0.480469,
+        0.492187
+       ],
+       [
+        0.485677,
+        0.492187
+       ],
+       [
+        0.486979,
+        0.490234
+       ],
+       [
+        0.489583,
+        0.490234
+       ],
+       [
+        0.490885,
+        0.492187
+       ],
+       [
+        0.510417,
+        0.493164
+       ],
+       [
+        0.511719,
+        0.495117
+       ],
+       [
+        0.515625,
+        0.495117
+       ],
+       [
+        0.519531,
+        0.491211
+       ],
+       [
+        0.518229,
+        0.480469
+       ],
+       [
+        0.520833,
+        0.478516
+       ],
+       [
+        0.520833,
+        0.475586
+       ],
+       [
+        0.52474,
+        0.473633
+       ],
+       [
+        0.527344,
+        0.474609
+       ],
+       [
+        0.527344,
+        0.476562
+       ],
+       [
+        0.529948,
+        0.477539
+       ],
+       [
+        0.529948,
+        0.487305
+       ],
+       [
+        0.53776,
+        0.509766
+       ],
+       [
+        0.53776,
+        0.532227
+       ],
+       [
+        0.536458,
+        0.543945
+       ],
+       [
+        0.533854,
+        0.546875
+       ],
+       [
+        0.528646,
+        0.547852
+       ],
+       [
+        0.52474,
+        0.545898
+       ],
+       [
+        0.522135,
+        0.536133
+       ],
+       [
+        0.519531,
+        0.536133
+       ],
+       [
+        0.516927,
+        0.532227
+       ],
+       [
+        0.513021,
+        0.533203
+       ],
+       [
+        0.513021,
+        0.538086
+       ],
+       [
+        0.510417,
+        0.538086
+       ],
+       [
+        0.510417,
+        0.535156
+       ],
+       [
+        0.507812,
+        0.535156
+       ],
+       [
+        0.503906,
+        0.541016
+       ],
+       [
+        0.5,
+        0.541016
+       ],
+       [
+        0.5,
+        0.539063
+       ],
+       [
+        0.496094,
+        0.538086
+       ],
+       [
+        0.496094,
+        0.535156
+       ],
+       [
+        0.49349,
+        0.535156
+       ],
+       [
+        0.49349,
+        0.538086
+       ],
+       [
+        0.496094,
+        0.540039
+       ],
+       [
+        0.492188,
+        0.541016
+       ],
+       [
+        0.489583,
+        0.543945
+       ],
+       [
+        0.484375,
+        0.543945
+       ],
+       [
+        0.477865,
+        0.548828
+       ],
+       [
+        0.470052,
+        0.546875
+       ],
+       [
+        0.46875,
+        0.536133
+       ],
+       [
+        0.46224,
+        0.526367
+       ],
+       [
+        0.463542,
+        0.477539
+       ]
+      ],
+      "hole": false
+     }
+    ]
+   },
+   "score": 0.883,
+   "source": "grounding",
+   "polarity": null
+  }
+ ],
+ "diagnosis": {
+  "summary": "An weißer Hemdknopfleiste, vermutlich Baumwoll-Webware, fehlt ein 4-Loch-Knopf. An der Stelle sind noch weiße Fadenreste und vier Einstichpunkte sichtbar, der Stoff wirkt tragfähig.",
+  "likely_causes": [
+   "Faden durch Zug und Tragen durchgescheuert und gerissen",
+   "Knopf an Knopfloch hängen geblieben und abgerissen"
+  ],
+  "confidence": 0.88,
+  "evidence_segment_ids": [
+   "seg_1"
+  ],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_self",
+  "reasoning": "Knopf fehlt, Stoff und Einstichstellen an der Knopfleiste sind intakt. Ersatzknopf kann mit Stiel neu angenäht werden, passend zu den vorhandenen Nachbarknöpfen.",
+  "effort": "low",
+  "time_minutes": [
+   15,
+   25
+  ],
+  "cost_eur": [
+   2.0,
+   5.0
+  ],
+  "estimate_note": "Schätzung"
+ },
+ "shopping_list": [
+  {
+   "id": "nadel",
+   "name": "Feine scharfe Handnähnadel für Baumwoll-Webware",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "feine Handnähnadel Baumwolle",
+   "household_alternative": null
+  },
+  {
+   "id": "garn",
+   "name": "Weißes Polyester-Nähgarn für Hemdstoff",
+   "kind": "material",
+   "quantity": "1 Rolle",
+   "required": true,
+   "search_term": "weißes Polyester Nähgarn",
+   "household_alternative": null
+  },
+  {
+   "id": "knopf",
+   "name": "Weißer Hemdknopf 4-Loch passend zu Nachbarknöpfen",
+   "kind": "material",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "weißer Hemdknopf 4 Loch klein",
+   "household_alternative": null
+  },
+  {
+   "id": "schere",
+   "name": "Kleine spitze Stoffschere",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "kleine spitze Stoffschere",
+   "household_alternative": "kleine Nagelschere"
+  }
+ ],
+ "guide": {
+  "steps": [
+   {
+    "n": 1,
+    "title": "Schadstelle prüfen und ausrichten",
+    "text": "Hemd mit der Außenseite nach oben flach hinlegen. Schadstelle in der Mitte zwischen den zwei noch vorhandenen Knöpfen suchen: weiße Fadenreste und 4 kleine Löcher. Stoff um die Stelle leicht glatt streichen. Ziel erreicht, wenn die vier alten Einstichlöcher frei liegen.",
+    "common_mistake": "Alte harte Knoten drin lassen – der neue Knopf sitzt dann schief und wackelt.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 2,
+    "title": "Alte Fadenreste entfernen",
+    "text": "Mit der kleinen Schere nur die losen weißen Fadenreste bündig abschneiden. Schere flach halten, Spitze vom Stoff weg, keine Gewebefäden durchtrennen. Alte Knotenreste vorsichtig herauszupfen. Schutz: Finger weg von der Schneide, Schere nach Gebrauch sofort schließen und weglegen. Ziel erreicht, wenn die Stelle flach ist und keine dicken Knoten mehr fühlbar sind.",
+    "common_mistake": "Mit Gewalt ziehen – dabei wird das feine Hemdgewebe aufgerissen.",
+    "safety_critical": true,
+    "requires_confirmation": true,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "schere"
+    ],
+    "overlay": null
+   },
+   {
+    "n": 3,
+    "title": "Garn und Ersatzknopf vorbereiten",
+    "text": "Etwa 50 cm weißes Garn abschneiden, doppelt in die feine Handnadel einfädeln und die beiden Enden mit kleinem Knoten verbinden. Ersatzknopf in Größe und Farbe mit den Nachbarknöpfen vergleichen und mittig auf die vier alten Einstichpunkte legen. Ziel erreicht, wenn Nadel startbereit ist und der Knopf mittig auf der Leiste liegt.",
+    "common_mistake": "Zu langer Faden – verknotet sich ständig und wird fusselig.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [],
+    "uses_items": [
+     "nadel",
+     "garn",
+     "knopf"
+    ],
+    "overlay": null
+   },
+   {
+    "n": 4,
+    "title": "Knopf mit Stiel annähen",
+    "text": "Von der Rückseite der Knopfleiste in ein altes Einstichloch einstechen und vorne durch ein Knopfloch austreten, dann kreuzweise durch die gegenüberliegenden Knopflöcher und Stofflöcher nähen, wie bei den Nachbarknöpfen als Kreuz. Faden locker lassen, etwa 2-3 mm Abstand zwischen Knopf und Stoff als Stiel lassen, z. B. mit einem Streichholz unter dem Knopf. 6-8 Durchgänge machen. Ziel erreicht, wenn der Knopf im Kreuzmuster fest, aber beweglich mit Stiel sitzt.",
+    "common_mistake": "Knopf platt ohne Abstand annähen – dann lässt er sich kaum knöpfen und spannt.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "nadel",
+     "garn",
+     "knopf"
+    ],
+    "overlay": null
+   },
+   {
+    "n": 5,
+    "title": "Wickeln, sichern und prüfen",
+    "text": "Faden 4-5-mal fest um den entstandenen Stiel zwischen Knopf und Stoff wickeln, dann auf der Rückseite mit 2-3 kleinen Stichen im festen Stoff vernähen und erst dann mit der kleinen Schere bündig abschneiden. Schutz: beim Schneiden Stoff weghalten, Schere sicher ablegen. Zum Schluss Knopfprobe durch das gegenüberliegende Knopfloch: schließt glatt, kein Kräuseln, kein Ausreißen. Bei Lockerheit nicht weiter benutzen, sondern neu sichern.",
+    "common_mistake": "Faden direkt am Knoten abschneiden – die Sicherung geht wieder auf.",
+    "safety_critical": true,
+    "requires_confirmation": true,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "nadel",
+     "garn",
+     "schere"
+    ],
+    "overlay": null
+   }
+  ]
+ },
+ "instances": {
+  "missing button thread remnants": 1
+ }
+}
