@@ -96,3 +96,12 @@ Foto `electronics/01_kabel_platine.jpg` (Muse Image generiert).
 | `solder pad` | 0 | – | 1,8 s |
 
 Folgerung für das Löt-Overlay: Kabel und blanke Enden liefert SAM per Text. Die Ziel-Pads mit Polarität (+/− im Siebdruck) lokalisiert Spark, SAM segmentiert sie per Box, wie beim Riss.
+
+## Muse-Wonder-Agent live (29.10.2026, Jeans)
+
+| Lauf | Aufbau | Agentenschritte | Ergebnis | Latenz |
+| --- | --- | --- | --- | --- |
+| 1 | Wonder schreibt den Plan selbst (`finish` mit Plan), Reasoning Standard | SAM `rip` → **Serverfehler 500**, SAM `hole`, SAM `tear in jeans` (kein Schaden), Spark lokalisiert, SAM segmentiert Box (0,94), Spark prüft Maske ✓, finish | Selbst von SAM-Fehler erholt, Maske geprüft. Plan ignorierte aber Prompt B v3 (fragte wieder nach Etikett, Konfidenz 0,88) | 94 s |
+| 2 | Wonder nur Wahrnehmung, Plan per Prompt B v3, `reasoning.effort=low` | SAM `rip` (gefunden), Spark prüft Maske ✓, finish | Annahme Denim, keine Rückfrage, 5 Schritte, 2 Sicherheitsschritte (Schere) | 50 s |
+
+Der klassische Pfad (etwa 30 s) bleibt Standard. Der Agent-Modus (`AGENT_MODE=wonder`) ist langsamer, prüft dafür jede Schadensmaske selbst und segmentiert bei Fehlschlag nach. Kosten Wonder-Lauf 1: etwa 0,16 $.
