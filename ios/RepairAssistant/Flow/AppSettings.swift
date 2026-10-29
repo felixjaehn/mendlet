@@ -10,6 +10,11 @@ final class AppSettings {
     var scenarioRaw: String { didSet { defaults.set(scenarioRaw, forKey: "demoScenarioSetting") } }
     var fastReplay: Bool { didSet { defaults.set(fastReplay, forKey: "fastReplay") } }
     var recoveryTrace: Bool { didSet { defaults.set(recoveryTrace, forKey: "recoveryTrace") } }
+    /// "system", "de" or "en" (Settings > Sprache / Language); shared with `Lang`, which also feeds the proxy `locale`.
+    var language: String {
+        get { Lang.shared.choice }
+        set { Lang.shared.choice = newValue }
+    }
     var baseURLString: String { didSet { defaults.set(baseURLString, forKey: "proxyBaseURL") } }
 
     static var configuredBaseURL: String {

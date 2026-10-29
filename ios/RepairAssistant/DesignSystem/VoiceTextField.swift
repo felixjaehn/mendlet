@@ -27,7 +27,7 @@ struct VoiceTextField: View {
                         }
                         .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                     default:
-                        TextField(placeholder, text: $text, axis: .vertical)
+                        TextField(tr(placeholder), text: $text, axis: .vertical)
                             .lineLimit(lines)
                             .focused($focused)
                             .font(.body)
@@ -65,7 +65,7 @@ struct VoiceTextField: View {
             .frame(width: 56, height: 56)
         }
         .disabled(mode == .transcribing)
-        .accessibilityLabel(mode == .recording ? "Aufnahme beenden" : "Spracheingabe starten")
+        .accessibilityLabel(mode == .recording ? tr("Aufnahme beenden") : tr("Spracheingabe starten"))
     }
 
     private var recordingBar: some View {
@@ -105,7 +105,7 @@ struct VoiceTextField: View {
             mode = .idle
             focused = true
         } catch {
-            mode = .failed("Das hat nicht geklappt. Tippe den Text einfach ein.")
+            mode = .failed(tr("Das hat nicht geklappt. Tippe den Text einfach ein."))
         }
     }
 }

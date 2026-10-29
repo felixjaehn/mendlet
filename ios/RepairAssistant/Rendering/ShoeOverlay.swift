@@ -9,15 +9,15 @@ struct ShoeStepKind: Equatable {
 
     init(step: GuideStep) {
         let t = (step.title + " " + step.text).lowercased()
-        glue = ["kleber", "auftrag", "bestreich", "aufstreich"].contains { t.contains($0) }
-        press = ["andrück", "andruck", "drück", "pressen", "fixier", "beschwer"].contains { t.contains($0) }
-        cure = ["aushärt", "andrück", "abbind", "ablüft", "trockn"].contains { t.contains($0) }
+        glue = ["kleber", "auftrag", "bestreich", "aufstreich", "glue", "adhesive", "brush", "spread"].contains { t.contains($0) }
+        press = ["andrück", "andruck", "drück", "pressen", "fixier", "beschwer", "press", "clamp", "weigh"].contains { t.contains($0) }
+        cure = ["aushärt", "andrück", "abbind", "ablüft", "trockn", "cure", "curing", "dry", "harden", "tacky", "press"].contains { t.contains($0) }
         minutes = Self.minutes(in: step.text) ?? Self.minutes(in: step.title)
     }
 
     /// First duration in the text, in minutes ("10 Minuten", "20–30 Min.", "2 Stunden"); a range yields its upper bound.
     static func minutes(in text: String) -> Int? {
-        let pattern = #"(\d+)(?:\s*(?:–|-|bis)\s*(\d+))?\s*(Minuten|Min\.?|Stunden|Std\.?|h)\b"#
+        let pattern = #"(\d+)(?:\s*(?:–|-|bis|to)\s*(\d+))?\s*(Minuten|Minutes?|Mins?\.?|Min\.?|Stunden|Hours?|Hrs?\.?|Std\.?|h)\b"#
         guard let re = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]),
               let m = re.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
               let r1 = Range(m.range(at: 1), in: text), let a = Int(text[r1]),
@@ -55,7 +55,7 @@ struct ShoeOverlay: View {
                 .allowsHitTesting(false)
             }
             if kind.cure {
-                CureRing(minutes: kind.minutes, label: kind.press && !kind.glue ? "Andrücken" : "Aushärten")
+                CureRing(minutes: kind.minutes, label: kind.press && !kind.glue ? tr("Andrücken") : tr("Aushärten"))
                     .padding(12).frame(width: size.width, height: size.height, alignment: .bottomTrailing)
             }
         }
@@ -191,8 +191,8 @@ struct CureRing: View {
                     Circle().trim(from: 0, to: frac).stroke(done ? Theme.safe : Theme.caution, style: StrokeStyle(lineWidth: 6, lineCap: .round))
                         .rotationEffect(.degrees(-90)).animation(reduceMotion ? nil : .linear(duration: 0.5), value: frac)
                     VStack(spacing: 0) {
-                        Text(done ? "Fertig" : Self.format(remaining)).font(.system(size: 17, weight: .bold, design: .rounded)).monospacedDigit().foregroundStyle(.white)
-                        Text(startedAt == nil && pausedRemaining == nil ? "Start" : label).font(.system(size: 10, weight: .semibold)).foregroundStyle(.white.opacity(0.75))
+                        Text(done ? tr("Fertig") : Self.format(remaining)).font(.system(size: 17, weight: .bold, design: .rounded)).monospacedDigit().foregroundStyle(.white)
+                        Text(startedAt == nil && pausedRemaining == nil ? tr("Start") : label).font(.system(size: 10, weight: .semibold)).foregroundStyle(.white.opacity(0.75))
                     }
                 }
                 .frame(width: 84, height: 84)

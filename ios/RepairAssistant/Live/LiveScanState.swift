@@ -4,6 +4,7 @@ import CoreGraphics
 enum LiveCategory: String, CaseIterable, Identifiable, Sendable {
     case clothing = "Kleidung", shoe = "Schuh", electronics = "Elektronik"
     var id: String { rawValue }
+    var title: String { tr(rawValue) }
     var concepts: [String] {
         switch self { case .clothing: ["tear", "hole"]; case .shoe: ["detached sole"]; case .electronics: ["wire"] }
     }

@@ -96,10 +96,10 @@ struct LabelPinsLayer: View {
 
     static func plural(_ label: String, _ n: Int) -> String {
         switch label {
-        case "Loch": return "\(n) Löcher"
-        case "Riss": return "\(n) Risse"
-        case "Fleck": return "\(n) Flecken"
-        default: return "\(n)× \(label)"
+        case "Loch", "Hole": return tr("%lld Löcher", n)
+        case "Riss", "Tear": return tr("%lld Risse", n)
+        case "Fleck", "Stain": return tr("%lld Flecken", n)
+        default: return "\(n)× \(tr(label))"
         }
     }
 
@@ -133,7 +133,7 @@ struct LabelPinsLayer: View {
             guard let first = infos.first, let s0 = g.first else { continue }
             let top = g.map(\.score).max() ?? 0
             let score = top > 0 ? "\(Int((top * 100).rounded())) %" : nil
-            let text = g.count > 1 ? Self.plural(s0.label, g.count) : s0.label
+            let text = g.count > 1 ? Self.plural(s0.label, g.count) : tr(s0.label)
             let b = infos.dropFirst().reduce(first.bounds) { $0.union($1.bounds) }
             let anchor = g.count > 1 ? CGPoint(x: infos.map(\.anchor.x).reduce(0, +) / CGFloat(infos.count), y: infos.map(\.anchor.y).reduce(0, +) / CGFloat(infos.count)) : first.anchor
             let badge = s0.source?.badge
@@ -150,7 +150,7 @@ struct LabelPinsLayer: View {
             let b = i.bounds
             let corners = [b.origin, CGPoint(x: b.maxX, y: b.minY), CGPoint(x: b.minX, y: b.maxY), CGPoint(x: b.maxX, y: b.maxY)].map { i.pts.isEmpty ? $0 : nearest($0) }
             // "Lötpad +" -> disc "+" and text "Lötpad": the sign is not shown twice
-            let text = s.polarity == nil ? s.label : Self.stripPolarity(s.label)
+            let text = tr(s.polarity == nil ? s.label : Self.stripPolarity(s.label))
             out.append(LabelPlacer.Item(id: s.id, text: text, score: score, badge: badge, polarity: s.polarity, anchor: i.anchor, bounds: b,
                                         width: LabelPlacer.width(text: text, score: score, badge: badge, polarity: s.polarity), large: large, corners: corners))
         }

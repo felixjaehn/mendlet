@@ -56,17 +56,17 @@ enum ShoppingGate {
         items.filter { statuses[$0.id] == .buy }
     }
     static func shareText(title: String, items: [ShoppingItem], statuses: [String: ItemStatus]) -> String {
-        var lines = ["\(title) – Einkaufsliste", ""]
+        var lines = [tr("%@ – Einkaufsliste", title), ""]
         for kind in [ItemKind.material, .tool] {
             let group = items.filter { $0.kind == kind }
             guard !group.isEmpty else { continue }
-            lines.append(kind == .material ? "Material" : "Werkzeug")
+            lines.append(kind == .material ? tr("Material") : tr("Werkzeug"))
             for i in group {
                 let mark = statuses[i.id] == .have ? "[x]" : "[ ]"
                 var l = "\(mark) \(i.name)"
                 if !i.quantity.isEmpty { l += " (\(i.quantity))" }
-                if !i.required { l += " – optional" }
-                if statuses[i.id] == .buy, !i.searchTerm.isEmpty { l += " – Suche: \(i.searchTerm)" }
+                if !i.required { l += " – " + tr("optional") }
+                if statuses[i.id] == .buy, !i.searchTerm.isEmpty { l += " – " + tr("Suche: %@", i.searchTerm) }
                 lines.append(l)
             }
             lines.append("")
@@ -83,13 +83,13 @@ enum ImpactEstimator {
     }
 
     private static let table: [(keys: [String], name: String, kg: Double)] = [
-        (["sneaker", "schuh", "turnschuh", "stiefel", "sohle"], "Sneaker (Paar)", 0.8),
+        (["sneaker", "schuh", "turnschuh", "stiefel", "sohle", "shoe", "boot", "sole", "trainer"], "Sneaker (Paar)", 0.8),
         (["t-shirt", "tshirt", "shirt-", "tee"], "T-Shirt", 0.2),
         (["jeans", "denim", "jeanshose"], "Jeans", 0.6),
-        (["pullover", "strick", "sweater", "hoodie", "wolle"], "Pullover", 0.5),
-        (["jacke", "mantel", "parka", "weste"], "Jacke", 1.0),
-        (["kleid", "rock"], "Kleid", 0.35),
-        (["hemd", "bluse"], "Hemd/Bluse", 0.25),
+        (["pullover", "strick", "sweater", "hoodie", "wolle", "jumper", "knit", "wool"], "Pullover", 0.5),
+        (["jacke", "mantel", "parka", "weste", "jacket", "coat", "vest"], "Jacke", 1.0),
+        (["kleid", "rock", "dress", "skirt"], "Kleid", 0.35),
+        (["hemd", "bluse", "blouse", "dress shirt"], "Hemd/Bluse", 0.25),
     ]
 
     static func estimate(summary: String, segmentLabels: [String], category: Category = .textile) -> Estimate {
@@ -103,7 +103,7 @@ enum ImpactEstimator {
 
     static func format(kg: Double) -> String {
         let f = NumberFormatter()
-        f.locale = Locale(identifier: "de_DE")
+        f.locale = Lang.shared.locale
         f.minimumFractionDigits = 1
         f.maximumFractionDigits = 1
         return f.string(from: NSNumber(value: kg)) ?? String(format: "%.1f", kg)
@@ -112,7 +112,7 @@ enum ImpactEstimator {
 
 enum ImpactFacts {
     struct Fact: Sendable { let text: String; let source: String }
-    static let headline = Fact(text: "Jede Sekunde landet weltweit eine Lkw-Ladung Kleidung auf der Deponie oder in der Verbrennung.", source: "Ellen MacArthur Foundation")
-    static let secondary = Fact(text: "In der EU fallen pro Kopf 16 kg Textilabfall im Jahr an – nur 4,6 kg davon werden getrennt gesammelt.", source: "EEA, 2022")
-    static let lifetime = Fact(text: "9 Monate länger tragen senkt den CO₂-, Wasser- und Abfall-Fußabdruck um bis zu 20 %.", source: "WRAP")
+    static var headline: Fact { Fact(text: tr("Jede Sekunde landet weltweit eine Lkw-Ladung Kleidung auf der Deponie oder in der Verbrennung."), source: "Ellen MacArthur Foundation") }
+    static var secondary: Fact { Fact(text: tr("In der EU fallen pro Kopf 16 kg Textilabfall im Jahr an – nur 4,6 kg davon werden getrennt gesammelt."), source: "EEA, 2022") }
+    static var lifetime: Fact { Fact(text: tr("9 Monate länger tragen senkt den CO₂-, Wasser- und Abfall-Fußabdruck um bis zu 20 %."), source: "WRAP") }
 }

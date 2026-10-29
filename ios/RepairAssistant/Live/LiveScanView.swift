@@ -16,7 +16,7 @@ struct LiveScanView: View {
         }
         .ignoresSafeArea()
         .safeAreaInset(edge: .top) {
-            LiveCameraHeader(title: "Live-Scan", synthetic: model.feed.isSynthetic, latency: model.latencyMilliseconds) { dismiss() }
+            LiveCameraHeader(title: tr("Live-Scan"), synthetic: model.feed.isSynthetic, latency: model.latencyMilliseconds) { dismiss() }
         }
         .safeAreaInset(edge: .bottom) { controls }
         .task(id: "\(model.category.id)-\(scenePhase)-\(reduceMotion)") {
@@ -48,7 +48,7 @@ struct LiveScanView: View {
             HStack(spacing: 8) {
                 ForEach(LiveCategory.allCases) { category in
                     Button { model.category = category; Haptics.selection() } label: {
-                        Label(category.rawValue, systemImage: category.symbol)
+                        Label(category.title, systemImage: category.symbol)
                             .font(.caption.weight(.semibold)).padding(.horizontal, 12).frame(minHeight: 44)
                             .background(model.category == category ? Theme.threadSoft : Theme.card, in: Capsule())
                             .overlay(Capsule().strokeBorder(model.category == category ? Theme.thread : Theme.hairline, lineWidth: 1))
@@ -64,10 +64,10 @@ struct LiveScanView: View {
 
     private var status: String {
         switch model.state {
-        case .searching: "Suche Schaden…"
-        case .detected: model.category == .clothing ? "Riss erkannt – halt still" : "Schaden erkannt – halt still"
-        case .stable: "Still halten · Foto wird aufgenommen…"
-        case .captured: "Foto aufgenommen"
+        case .searching: tr("Suche Schaden…")
+        case .detected: model.category == .clothing ? tr("Riss erkannt – halt still") : tr("Schaden erkannt – halt still")
+        case .stable: tr("Still halten · Foto wird aufgenommen…")
+        case .captured: tr("Foto aufgenommen")
         }
     }
 }

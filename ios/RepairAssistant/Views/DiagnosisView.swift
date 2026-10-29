@@ -78,7 +78,7 @@ struct DiagnosisView: View {
                     } label: {
                         Chip(title: s.label, systemImage: hidden.contains(s.id) ? "eye.slash" : "eye", tint: segmentColor(s, in: r.segments), isOn: !hidden.contains(s.id))
                     }
-                    .accessibilityLabel("\(s.label) \(hidden.contains(s.id) ? "einblenden" : "ausblenden")")
+                    .accessibilityLabel(tr(hidden.contains(s.id) ? "%@ einblenden" : "%@ ausblenden", tr(s.label)))
                 }
             }
             .padding(.horizontal, Theme.margin)
@@ -91,7 +91,7 @@ struct DiagnosisView: View {
             Image(systemName: "tag.fill").foregroundStyle(Theme.safe)
             VStack(alignment: .leading, spacing: 2) {
                 Text(text).font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
-                if flow.response?.diagnosis.labelInfo?.materials.contains(where: { $0.lowercased().contains("elasthan") }) == true {
+                if flow.response?.diagnosis.labelInfo?.materials.contains(where: { $0.lowercased().contains("elasthan") || $0.lowercased().contains("elastane") || $0.lowercased().contains("spandex") }) == true {
                     Text("Elasthan erkannt, also ein dehnbarer Stich").font(.footnote).foregroundStyle(Theme.inkSecondary)
                 }
             }
@@ -212,8 +212,8 @@ struct DiagnosisView: View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "questionmark.bubble.fill").foregroundStyle(Theme.caution).font(.title3)
             VStack(alignment: .leading, spacing: 4) {
-                Text(flow.followUpUsed ? "Es fehlen weiter Angaben" : "Mir fehlt noch eine Angabe").font(.headline)
-                Text(flow.followUpUsed ? "Mach ein neues, schärferes Foto, dann versuche ich es noch einmal." : "Mit einer kurzen Antwort kann ich Nadel, Faden und Stich genau wählen.")
+                Text(flow.followUpUsed ? tr("Es fehlen weiter Angaben") : tr("Mir fehlt noch eine Angabe")).font(.headline)
+                Text(flow.followUpUsed ? tr("Mach ein neues, schärferes Foto, dann versuche ich es noch einmal.") : tr("Mit einer kurzen Antwort kann ich Nadel, Faden und Stich genau wählen."))
                     .font(.subheadline).foregroundStyle(Theme.inkSecondary)
             }
         }

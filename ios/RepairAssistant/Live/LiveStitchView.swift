@@ -84,10 +84,10 @@ struct LiveStitchView: View {
         }
         .ignoresSafeArea()
         .safeAreaInset(edge: .top) {
-            LiveCameraHeader(title: "Live auf dem Stoff", synthetic: model.feed.isSynthetic) { dismiss() }
+            LiveCameraHeader(title: tr("Live auf dem Stoff"), synthetic: model.feed.isSynthetic) { dismiss() }
         }
         .safeAreaInset(edge: .bottom) {
-            Text(model.feed.error ?? (model.registered ? "Folge den nummerierten Stichpunkten" : "Kamera auf die markierte Stelle richten"))
+            Text(model.feed.error ?? (model.registered ? tr("Folge den nummerierten Stichpunkten") : tr("Kamera auf die markierte Stelle richten")))
                 .font(.headline).multilineTextAlignment(.center).foregroundStyle(Theme.ink)
                 .padding(Theme.margin).frame(maxWidth: .infinity).background(.regularMaterial)
         }

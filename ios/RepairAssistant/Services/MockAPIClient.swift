@@ -11,22 +11,22 @@ enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
     var id: String { rawValue }
     var title: String {
         switch self {
-        case .textileTear: "Jeans (Riss)"
-        case .textileHole: "Pulli (3 Löcher)"
-        case .shoeSole: "Sneaker (Sohle)"
-        case .batteryJacket: "Heizjacke (Akku)"
-        case .helmet: "Fahrradhelm"
-        case .platine: "Platine (Lötstelle)"
+        case .textileTear: tr("Jeans (Riss)")
+        case .textileHole: tr("Pulli (3 Löcher)")
+        case .shoeSole: tr("Sneaker (Sohle)")
+        case .batteryJacket: tr("Heizjacke (Akku)")
+        case .helmet: tr("Fahrradhelm")
+        case .platine: tr("Platine (Lötstelle)")
         }
     }
     var subtitle: String {
         switch self {
-        case .textileTear: "Flicken, optional Etikett"
-        case .textileHole: "Drei Stopfstellen"
-        case .shoeSole: "Kleben"
-        case .batteryJacket: "Gesperrt"
-        case .helmet: "Profi empfohlen"
-        case .platine: "Anlöten, + und −"
+        case .textileTear: tr("Flicken, optional Etikett")
+        case .textileHole: tr("Drei Stopfstellen")
+        case .shoeSole: tr("Kleben")
+        case .batteryJacket: tr("Gesperrt")
+        case .helmet: tr("Profi empfohlen")
+        case .platine: tr("Anlöten, + und −")
         }
     }
     var systemImage: String {
@@ -41,12 +41,12 @@ enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
     }
     var userNote: String {
         switch self {
-        case .textileTear: "Riss am Knie meiner Jeans"
-        case .textileHole: "Loch am Ellbogen"
-        case .shoeSole: "Sohle löst sich vorne"
-        case .batteryJacket: "Reißverschluss kaputt"
-        case .helmet: "Riss in der Schale"
-        case .platine: "USB-Lampe ohne Funktion, Kabel abgerissen"
+        case .textileTear: tr("Riss am Knie meiner Jeans")
+        case .textileHole: tr("Loch am Ellbogen")
+        case .shoeSole: tr("Sohle löst sich vorne")
+        case .batteryJacket: tr("Reißverschluss kaputt")
+        case .helmet: tr("Riss in der Schale")
+        case .platine: tr("USB-Lampe ohne Funktion, Kabel abgerissen")
         }
     }
 }
@@ -102,25 +102,25 @@ struct MockAPIClient: AnalysisService {
                     if !request.userNote.isEmpty { /* note is only sent along; fixtures stay fixed */ }
 
                     func pause(_ s: Double) async throws { try await Task.sleep(for: .milliseconds(Int(s * 1000 / speed))) }
-                    continuation.yield(.progress(stage: .classify, label: "Objekt und Sicherheit prüfen", segments: nil))
+                    continuation.yield(.progress(stage: .classify, label: tr("Objekt und Sicherheit prüfen"), segments: nil))
                     try await pause(1.0)
                     if FlowGate.isBlocked(resp) {
-                        continuation.yield(.progress(stage: .segment, label: "Schaden markieren", segments: resp.segments))
+                        continuation.yield(.progress(stage: .segment, label: tr("Schaden markieren"), segments: resp.segments))
                         try await pause(0.7)
                         continuation.yield(.result(resp)); continuation.finish(); return
                     }
                     if scenario == .textileHole {
-                        continuation.yield(.grounding(label: "Schadstelle genauer lokalisieren"))
+                        continuation.yield(.grounding(label: tr("Schadstelle genauer lokalisieren")))
                         try await pause(1.0)
                     }
-                    continuation.yield(.progress(stage: .segment, label: "Schaden markieren", segments: resp.segments))
+                    continuation.yield(.progress(stage: .segment, label: tr("Schaden markieren"), segments: resp.segments))
                     try await pause(1.5)
-                    continuation.yield(.progress(stage: .diagnose, label: "Diagnose stellen", segments: nil))
+                    continuation.yield(.progress(stage: .diagnose, label: tr("Diagnose stellen"), segments: nil))
                     try await pause(1.5)
                     if resp.diagnosis.needsMoreInfo {
                         continuation.yield(.result(resp)); continuation.finish(); return
                     }
-                    continuation.yield(.progress(stage: .plan, label: "Reparatur planen", segments: nil))
+                    continuation.yield(.progress(stage: .plan, label: tr("Reparatur planen"), segments: nil))
                     try await pause(1.2)
                     continuation.yield(.result(resp))
                     continuation.finish()
@@ -136,17 +136,17 @@ struct MockAPIClient: AnalysisService {
         try await Task.sleep(for: .milliseconds(Int(900 / speed)))
         let t = request.issueText.lowercased()
         if ["rauch", "heiß", "heiss", "brennt", "qualm", "warm"].contains(where: { t.contains($0) }) {
-            return StepHelpResponse(answer: "Das klingt nach einem Sicherheitsproblem. Höre sofort auf und arbeite nicht weiter.", retryHint: nil, escalate: true)
+            return StepHelpResponse(answer: tr("Das klingt nach einem Sicherheitsproblem. Höre sofort auf und arbeite nicht weiter."), retryHint: nil, escalate: true)
         }
         return StepHelpResponse(
-            answer: "Das passiert oft bei diesem Schritt. Prüfe, ob der Faden zu straff sitzt, und löse die letzten zwei Stiche etwas.",
-            retryHint: "Versuche es mit weniger Zug am Faden und achte auf gleichmäßige Abstände.",
+            answer: tr("Das passiert oft bei diesem Schritt. Prüfe, ob der Faden zu straff sitzt, und löse die letzten zwei Stiche etwas."),
+            retryHint: tr("Versuche es mit weniger Zug am Faden und achte auf gleichmäßige Abstände."),
             escalate: false)
     }
 
     func transcribe(fileURL: URL) async throws -> String {
         try await Task.sleep(for: .milliseconds(700))
-        return "Der Riss ist etwa sechs Zentimeter lang und geht quer über das Knie."
+        return tr("Der Riss ist etwa sechs Zentimeter lang und geht quer über das Knie.")
     }
 
     func refine(_ request: RefineRequest) async throws -> Segment {

@@ -2,7 +2,7 @@ import SwiftUI
 
 enum Fmt {
     static func number(_ v: Double) -> String {
-        v.rounded() == v ? String(Int(v)) : String(format: "%.1f", v).replacingOccurrences(of: ".", with: ",")
+        v.rounded() == v ? String(Int(v)) : String(format: "%.1f", v).replacingOccurrences(of: ".", with: Lang.shared.isEnglish ? "." : ",")
     }
     static func range(_ a: [Double], unit: String) -> String {
         switch a.count {
@@ -11,16 +11,16 @@ enum Fmt {
         default: return "\(number(a[0]))–\(number(a[1])) \(unit)"
         }
     }
-    static func minutes(_ a: [Int]) -> String { range(a.map(Double.init), unit: "Min.") }
+    static func minutes(_ a: [Int]) -> String { range(a.map(Double.init), unit: tr("Min.")) }
     static func euro(_ a: [Double]) -> String { range(a, unit: "€") }
 }
 
 extension Recommendation {
     var title: String {
         switch self {
-        case .repairSelf: "Selbst reparieren"
-        case .repairPro: "Zum Profi"
-        case .replace: "Ersetzen"
+        case .repairSelf: tr("Selbst reparieren")
+        case .repairPro: tr("Zum Profi")
+        case .replace: tr("Ersetzen")
         }
     }
     var icon: String {
@@ -39,9 +39,9 @@ extension Recommendation {
     }
     var tagline: String {
         switch self {
-        case .repairSelf: "Günstig, lehrreich, nachhaltig"
-        case .repairPro: "Sicher, kostet mehr"
-        case .replace: "Schnell, aber mehr Abfall"
+        case .repairSelf: tr("Günstig, lehrreich, nachhaltig")
+        case .repairPro: tr("Sicher, kostet mehr")
+        case .replace: tr("Schnell, aber mehr Abfall")
         }
     }
 }
@@ -103,7 +103,7 @@ struct DecisionView: View {
     }
 
     private func effortText(_ e: Effort) -> String {
-        switch e { case .low: "Gering"; case .medium: "Mittel"; case .high: "Hoch" }
+        switch e { case .low: tr("Gering"); case .medium: tr("Mittel"); case .high: tr("Hoch") }
     }
 
     private func optionRow(_ o: Recommendation, selected: Bool) -> some View {

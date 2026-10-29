@@ -4,7 +4,7 @@ import SwiftUI
 enum DamageDimension {
     /// Typical real-world width (cm) of the part's box, matched by keyword in its label.
     static let typicalWidthsCM: [(keys: [String], cm: Double)] = [
-        (["jeans", "hose"], 20), (["shirt"], 50), (["sohle", "schuh"], 28),
+        (["jeans", "hose", "trouser", "pants"], 20), (["shirt"], 50), (["sohle", "schuh", "sole", "shoe"], 28),
     ]
 
     struct Layout { let a: CGPoint, b: CGPoint, offset: CGVector, cm: Double, chipRect: CGRect }
@@ -53,7 +53,7 @@ struct DimensionLineView: View {
         let a = CGPoint(x: l.a.x + l.offset.dx, y: l.a.y + l.offset.dy), b = CGPoint(x: l.b.x + l.offset.dx, y: l.b.y + l.offset.dy)
         let d = CGVector(dx: b.x - a.x, dy: b.y - a.y), len = max(hypot(d.dx, d.dy), 1)
         let n = CGVector(dx: -d.dy / len * 4, dy: d.dx / len * 4)
-        let cm = l.cm.truncatingRemainder(dividingBy: 1) == 0 ? String(Int(l.cm)) : String(format: "%.1f", l.cm).replacingOccurrences(of: ".", with: ",")
+        let cm = l.cm.truncatingRemainder(dividingBy: 1) == 0 ? String(Int(l.cm)) : String(format: "%.1f", l.cm).replacingOccurrences(of: ".", with: Lang.shared.isEnglish ? "." : ",")
         ZStack(alignment: .topLeading) {
             Path { p in
                 p.move(to: a); p.addLine(to: b)
@@ -62,7 +62,7 @@ struct DimensionLineView: View {
             .stroke(.white.opacity(0.9), style: StrokeStyle(lineWidth: 1, lineCap: .round))
             .shadow(color: .black.opacity(0.5), radius: 1.5)
             HStack(spacing: 5) {
-                Text("ca. \(cm) cm").font(.system(size: 11.5, weight: .semibold, design: .rounded)).monospacedDigit()
+                Text(tr("ca. %@ cm", cm)).font(.system(size: 11.5, weight: .semibold, design: .rounded)).monospacedDigit()
                 Text("geschätzt").font(.system(size: 9, weight: .medium)).opacity(0.65)
             }
             .lineLimit(1).foregroundStyle(.white)

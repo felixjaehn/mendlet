@@ -23,6 +23,15 @@ struct SettingsSheet: View {
                         Text("Spielt die echten Modellantworten in etwa 6 statt 25 Sekunden ab. Der Agenten-Lauf mit Fehlerbehebung (Jeans) zeigt einen echten Lauf, in dem SAM einen Serverfehler meldete und der Agent ausgewichen ist.")
                     }
                 }
+                Section {
+                    Picker(selection: $settings.language) {
+                        Text("System").tag("system")
+                        Text("Deutsch").tag("de")
+                        Text("English").tag("en")
+                    } label: { Label("Sprache / Language", systemImage: "globe") }
+                } footer: {
+                    Text("Die App folgt der Systemsprache. Die Sprache wird auch an den Server gesendet, damit Diagnose und Anleitung passen.")
+                }
                 Section("Demo-Szenario") {
                     Picker("Szenario", selection: $settings.scenarioRaw) {
                         ForEach(DemoScenario.allCases) { Text($0.title).tag($0.rawValue) }
@@ -55,10 +64,10 @@ struct SettingsSheet: View {
     }
 
     private func check() async {
-        guard let url = flow.settings.baseURL else { status = "Ungültige URL"; return }
+        guard let url = flow.settings.baseURL else { status = tr("Ungültige URL"); return }
         checking = true
         let ok = await LiveAPIClient(baseURL: url).health()
         checking = false
-        status = ok ? "OK" : "Keine Antwort"
+        status = ok ? "OK" : tr("Keine Antwort")
     }
 }

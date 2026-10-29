@@ -8,11 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		07C3DC8897DC6EEFFC98C1A0 /* LiveRecordings in Resources */ = {isa = PBXBuildFile; fileRef = 5BAFBA433CC1287D3C6AD5F3 /* LiveRecordings */; };
+		0836EEC8482925E85D216580 /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = C48AA3FD82664905293D4379 /* Localization.swift */; };
 		0871038ADF25DCD290B52A64 /* LiveScanModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91935C61BAD25FD2F7BD1915 /* LiveScanModel.swift */; };
 		09D1F7568691FC02D1E55C55 /* DecisionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D0644FC95BE83C26E5F081 /* DecisionView.swift */; };
 		0B67AEDC671ABF0F6AEE4C6C /* StepHelpSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F840728B0735157F950CDD07 /* StepHelpSheet.swift */; };
 		0CDA4FA873B19D5E14C6027F /* MockAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 240834AF2730B5F09B148429 /* MockAPIClient.swift */; };
 		0CE97CB2362881F1D7E32C4B /* LivePipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C71A8C55A2A249AB2E670C1 /* LivePipelineTests.swift */; };
+		0E998EEE59648845945E6BED /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 5997B796A3944269FDBCC319 /* InfoPlist.xcstrings */; };
 		110503C0F228C6047DB8254A /* AgentTraceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 002004F61A01D2B82C734E23 /* AgentTraceView.swift */; };
 		13A200729FC8727822B81070 /* AnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDC79702C1652A582742CF18 /* AnalysisView.swift */; };
 		158E3B154BA196BDE0288229 /* Gates.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA2B73602D37556FBD1DB80F /* Gates.swift */; };
@@ -49,6 +51,7 @@
 		7DA3FD106676BC8170D58284 /* ContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8561213C59BDD736C2E01A50 /* ContractTests.swift */; };
 		8067C83514AC6410E301A509 /* ShoppingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2897F364C0B84A9ACA1239D5 /* ShoppingListView.swift */; };
 		82A08451E902C19621BE0216 /* BeforeAfterSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1863CE6CE5F4CF490483A253 /* BeforeAfterSlider.swift */; };
+		84CE98C01BE837C84FDC69F7 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 4A6DDF2119D2ACA1AD5F6CC8 /* Localizable.xcstrings */; };
 		8B4A74BD20900DA307F2C9CF /* LiveCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F786C6F9136070262BE453B /* LiveCamera.swift */; };
 		8CA05FAF5C19C376BA7A4D3A /* ServicesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29461B5D6EA0E176CFE12E67 /* ServicesTests.swift */; };
 		8E438585B749AE32922BD55F /* RepairAssistantApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39489FA78FE9DC5D68159888 /* RepairAssistantApp.swift */; };
@@ -75,6 +78,7 @@
 		DE42B1E0D857A1364B0B1C58 /* helmet.json in Resources */ = {isa = PBXBuildFile; fileRef = DAEBBE9A58CD6E61DDEC6818 /* helmet.json */; };
 		E026D4461BB751589522F5B2 /* LiveCameraFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21FCA99D3820E0AB616A4C35 /* LiveCameraFeed.swift */; };
 		E33552F1FF4CA0AF3B2C34C1 /* DiagnosisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6188CDF8368F759CC6EF251C /* DiagnosisView.swift */; };
+		E7D30C695A6F35E90F0EBBA3 /* LocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DC2397AA08F9B9C83566D19 /* LocalizationTests.swift */; };
 		F1CCC2ADF126354725F5548B /* LiveScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B34482E79C2F31720DF519 /* LiveScanView.swift */; };
 /* End PBXBuildFile section */
 
@@ -104,15 +108,18 @@
 		2897F364C0B84A9ACA1239D5 /* ShoppingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingListView.swift; sourceTree = "<group>"; };
 		29461B5D6EA0E176CFE12E67 /* ServicesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicesTests.swift; sourceTree = "<group>"; };
 		2B34A32C7116AFB95E9395CF /* OverlayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayTests.swift; sourceTree = "<group>"; };
+		2DC2397AA08F9B9C83566D19 /* LocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationTests.swift; sourceTree = "<group>"; };
 		35CE3E755F4391CE9F672DC5 /* SolderOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolderOverlay.swift; sourceTree = "<group>"; };
 		38163D88A4049F05C71F254F /* VoiceTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceTextField.swift; sourceTree = "<group>"; };
 		39489FA78FE9DC5D68159888 /* RepairAssistantApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepairAssistantApp.swift; sourceTree = "<group>"; };
 		3F4C11D4A686C55CAFBC17F1 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		4A6DDF2119D2ACA1AD5F6CC8 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		4C9B880956ABA473E2ECC908 /* StitchPathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StitchPathView.swift; sourceTree = "<group>"; };
 		4CCFFB56C0D59D85E436E259 /* LiveDemoCamera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveDemoCamera.swift; sourceTree = "<group>"; };
 		5678AE0EFC35C82D6FA7B41C /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
 		5909F3053F48E59D40B6C556 /* DemoBootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoBootstrap.swift; sourceTree = "<group>"; };
 		5917622903507FBD2BF36E0B /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		5997B796A3944269FDBCC319 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		59BEE4BF3847519869DA264C /* LiveStitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveStitchView.swift; sourceTree = "<group>"; };
 		5BAFBA433CC1287D3C6AD5F3 /* LiveRecordings */ = {isa = PBXFileReference; lastKnownFileType = folder; name = LiveRecordings; path = RepairAssistant/Resources/LiveRecordings; sourceTree = SOURCE_ROOT; };
 		5FC45F4DA89EAFE987711263 /* LiveRecordings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveRecordings.swift; sourceTree = "<group>"; };
@@ -144,6 +151,7 @@
 		B751448E176D74D472880B9E /* RepairAssistant.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = RepairAssistant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEE564BBFFEACF23C3A53EC1 /* textile_tear_needs_label.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = textile_tear_needs_label.json; sourceTree = "<group>"; };
 		BFB5813C50C055C4601E1F1B /* LiveScanState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveScanState.swift; sourceTree = "<group>"; };
+		C48AA3FD82664905293D4379 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		C49DFE75B7D10484AE45BC38 /* textile_tear.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = textile_tear.json; sourceTree = "<group>"; };
 		CA2B73602D37556FBD1DB80F /* Gates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gates.swift; sourceTree = "<group>"; };
 		D0F40BD1321A3D274272E514 /* SettingsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSheet.swift; sourceTree = "<group>"; };
@@ -161,7 +169,7 @@
 		F4F482E47A76CEDA809866E9 /* ShoeOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoeOverlay.swift; sourceTree = "<group>"; };
 		F840728B0735157F950CDD07 /* StepHelpSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepHelpSheet.swift; sourceTree = "<group>"; };
 		FDC79702C1652A582742CF18 /* AnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisView.swift; sourceTree = "<group>"; };
-		"TEMP_220415FD-07D6-40D6-9DF0-B301B28B74CF" /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		"TEMP_9CF90294-3EA7-4C0D-8BA9-7D48A0E0FB57" /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -198,6 +206,7 @@
 				F398BA963F98F706571962B1 /* AppSettings.swift */,
 				5909F3053F48E59D40B6C556 /* DemoBootstrap.swift */,
 				61D022E5ED49F4DD3C2AA194 /* FlowModel.swift */,
+				C48AA3FD82664905293D4379 /* Localization.swift */,
 			);
 			path = Flow;
 			sourceTree = "<group>";
@@ -220,6 +229,7 @@
 				0923FC5BE124D51C897EB1EF /* FlowGateTests.swift */,
 				115C8760627A3D713BC1ADDD /* LiveDetectionTests.swift */,
 				8C71A8C55A2A249AB2E670C1 /* LivePipelineTests.swift */,
+				2DC2397AA08F9B9C83566D19 /* LocalizationTests.swift */,
 				2B34A32C7116AFB95E9395CF /* OverlayTests.swift */,
 				7B4965E6B112978ABDDF1A8A /* RecordingTests.swift */,
 				29461B5D6EA0E176CFE12E67 /* ServicesTests.swift */,
@@ -266,6 +276,8 @@
 			children = (
 				AA2FC8C9F54DBD22CB8A318F /* Assets.xcassets */,
 				D770F4F50765D368DC4152DD /* Info.plist */,
+				5997B796A3944269FDBCC319 /* InfoPlist.xcstrings */,
+				4A6DDF2119D2ACA1AD5F6CC8 /* Localizable.xcstrings */,
 				39489FA78FE9DC5D68159888 /* RepairAssistantApp.swift */,
 				302B863F57856A68542B3B3E /* DesignSystem */,
 				0CDC7B622C15F8F3D1B3DFE1 /* Flow */,
@@ -339,10 +351,10 @@
 			path = Fixtures;
 			sourceTree = "<group>";
 		};
-		"TEMP_8C289FD2-5B3F-47B6-8735-7D89DF5C7598" /* ios */ = {
+		"TEMP_B7A47E60-A39A-4A0D-9795-758C5890F0E4" /* ios */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_220415FD-07D6-40D6-9DF0-B301B28B74CF" /* Config.xcconfig */,
+				"TEMP_9CF90294-3EA7-4C0D-8BA9-7D48A0E0FB57" /* Config.xcconfig */,
 			);
 			path = ios;
 			sourceTree = "<group>";
@@ -409,6 +421,7 @@
 			knownRegions = (
 				Base,
 				de,
+				en,
 			);
 			mainGroup = 444DCE8B2FA2BE513EEF9FAB;
 			minimizedProjectReferenceProxies = 1;
@@ -430,7 +443,9 @@
 			files = (
 				3E54AE295B7B515722BF9B9B /* Assets.xcassets in Resources */,
 				5153B0063263A6278543BC7A /* DETECT-CONTRACT.md in Resources */,
+				0E998EEE59648845945E6BED /* InfoPlist.xcstrings in Resources */,
 				07C3DC8897DC6EEFFC98C1A0 /* LiveRecordings in Resources */,
+				84CE98C01BE837C84FDC69F7 /* Localizable.xcstrings in Resources */,
 				25690BFDBFCB71941BFA07F7 /* battery_jacket.json in Resources */,
 				DE42B1E0D857A1364B0B1C58 /* helmet.json in Resources */,
 				67D1F6B26EAA2A040E2CA4BB /* shoe_sole.json in Resources */,
@@ -482,6 +497,7 @@
 				AE74025A93A06708CE3E844E /* LiveScanState.swift in Sources */,
 				F1CCC2ADF126354725F5548B /* LiveScanView.swift in Sources */,
 				406FACF62238B6B7B06C8885 /* LiveStitchView.swift in Sources */,
+				0836EEC8482925E85D216580 /* Localization.swift in Sources */,
 				0CDA4FA873B19D5E14C6027F /* MockAPIClient.swift in Sources */,
 				2B01B221E7653D8ABB61E8B2 /* OverlayRenderer.swift in Sources */,
 				8E438585B749AE32922BD55F /* RepairAssistantApp.swift in Sources */,
@@ -509,6 +525,7 @@
 				61F40FBCA4FC1879FFE6FE8A /* FlowGateTests.swift in Sources */,
 				4554B094E5BB11AD0819BB1A /* LiveDetectionTests.swift in Sources */,
 				0CE97CB2362881F1D7E32C4B /* LivePipelineTests.swift in Sources */,
+				E7D30C695A6F35E90F0EBBA3 /* LocalizationTests.swift in Sources */,
 				B697EFE92A874184E1A2CE4C /* OverlayTests.swift in Sources */,
 				70E7195F9362FD7DABA9048A /* RecordingTests.swift in Sources */,
 				8CA05FAF5C19C376BA7A4D3A /* ServicesTests.swift in Sources */,
@@ -547,7 +564,7 @@
 		};
 		88DB0C72E15D4B1747846766 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_220415FD-07D6-40D6-9DF0-B301B28B74CF" /* Config.xcconfig */;
+			baseConfigurationReference = "TEMP_9CF90294-3EA7-4C0D-8BA9-7D48A0E0FB57" /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -666,7 +683,7 @@
 		};
 		FD9CD525F142F5622F8FDCCB /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_220415FD-07D6-40D6-9DF0-B301B28B74CF" /* Config.xcconfig */;
+			baseConfigurationReference = "TEMP_9CF90294-3EA7-4C0D-8BA9-7D48A0E0FB57" /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;

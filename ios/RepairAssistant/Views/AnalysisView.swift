@@ -19,7 +19,7 @@ struct AnalysisView: View {
                     }
                 }
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(flow.analysisError == nil ? "Ich schaue mir das genau an" : "Das hat nicht geklappt")
+                    Text(flow.analysisError == nil ? tr("Ich schaue mir das genau an") : tr("Das hat nicht geklappt"))
                         .font(.title3.bold()).foregroundStyle(Theme.ink)
                     if flow.analysisError != nil {
                         Text("Dein Foto bleibt erhalten.").font(.subheadline).foregroundStyle(Theme.inkSecondary)

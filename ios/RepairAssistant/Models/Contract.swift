@@ -103,10 +103,10 @@ enum StitchType: String, TolerantEnum {
 
     var germanName: String {
         switch self {
-        case .ladderStitch: "Leiterstich"
-        case .runningStitch: "Vorstich"
-        case .darning: "Stopfen"
-        case .whipStitch: "Überwendlingstich"
+        case .ladderStitch: tr("Leiterstich")
+        case .runningStitch: tr("Vorstich")
+        case .darning: tr("Stopfen")
+        case .whipStitch: tr("Überwendlingstich")
         }
     }
 }
@@ -180,7 +180,7 @@ struct Segment: Codable, Sendable, Hashable, Identifiable {
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id = (try? c.decode(String.self, forKey: .id)) ?? UUID().uuidString
-        label = (try? c.decode(String.self, forKey: .label)) ?? "Bereich"
+        label = (try? c.decode(String.self, forKey: .label)) ?? tr("Bereich")
         kind = (try? c.decode(SegmentKind.self, forKey: .kind)) ?? .part
         prompt = (try? c.decode(String.self, forKey: .prompt)) ?? ""
         box = try? c.decode([Double].self, forKey: .box)
@@ -334,7 +334,7 @@ struct ShoppingItem: Codable, Sendable, Hashable, Identifiable {
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id = (try? c.decode(String.self, forKey: .id)) ?? UUID().uuidString
-        name = (try? c.decode(String.self, forKey: .name)) ?? "Artikel"
+        name = (try? c.decode(String.self, forKey: .name)) ?? tr("Artikel")
         kind = (try? c.decode(ItemKind.self, forKey: .kind)) ?? .material
         quantity = (try? c.decode(String.self, forKey: .quantity)) ?? ""
         required = (try? c.decode(Bool.self, forKey: .required)) ?? true
@@ -498,6 +498,7 @@ struct StepHelpRequest: Codable, Sendable {
     var riskLevel: RiskLevel
     var issueText: String
     var imageBase64: String?
+    var locale: String = Lang.apiCode
 }
 
 struct StepHelpResponse: Codable, Sendable, Hashable {
@@ -531,11 +532,13 @@ struct RefineRequest: Codable, Sendable {
     /// [x, y, w, h] normalized to the EXIF-oriented photo.
     var box: [Double]?
     var label: String
+    var locale: String = Lang.apiCode
 }
 
 struct TrackRequest: Codable, Sendable {
     var videoBase64: String
     var concept: String
+    var locale: String = Lang.apiCode
 }
 
 /// A segment inside a tracked frame; carries SAM's decimal `object_id` as string.
@@ -592,6 +595,7 @@ struct AfterPreviewRequest: Codable, Sendable {
     /// Optional: "shoe" for glued soles.
     var category: String?
     var repairHint: String?
+    var locale: String = Lang.apiCode
 }
 
 struct AfterPreviewResponse: Codable, Sendable, Hashable {

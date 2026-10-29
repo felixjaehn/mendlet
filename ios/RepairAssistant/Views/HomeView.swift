@@ -100,7 +100,7 @@ struct HomeView: View {
             Image(systemName: "leaf.fill").foregroundStyle(Theme.safe)
             VStack(alignment: .leading, spacing: 1) {
                 Text("Deine Bilanz").font(.caption).foregroundStyle(Theme.inkSecondary)
-                Text("\(flow.store.rescuedCount) \(flow.store.rescuedCount == 1 ? "Teil" : "Teile") gerettet · ≈ \(ImpactEstimator.format(kg: flow.store.rescuedKilograms)) kg")
+                Text(tr(flow.store.rescuedCount == 1 ? "%lld Teil gerettet · ≈ %@ kg" : "%lld Teile gerettet · ≈ %@ kg", flow.store.rescuedCount, ImpactEstimator.format(kg: flow.store.rescuedKilograms)))
                     .font(.rounded(.subheadline, weight: .semibold)).monospacedDigit().foregroundStyle(Theme.ink)
             }
             Spacer()
@@ -184,7 +184,7 @@ private struct HistoryCard: View {
                     } else { Theme.hairline }
                 }
                 .frame(width: 132, height: 96).clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                Text(item.response.diagnosis.summary.isEmpty ? "Analyse" : item.response.diagnosis.summary)
+                Text(item.response.diagnosis.summary.isEmpty ? tr("Analyse") : item.response.diagnosis.summary)
                     .font(.caption.weight(.medium)).foregroundStyle(Theme.ink).lineLimit(2, reservesSpace: true)
                     .multilineTextAlignment(.leading)
             }

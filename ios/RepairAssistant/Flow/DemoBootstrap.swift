@@ -31,7 +31,7 @@ enum DemoBootstrap {
             flow.startAnalysis()
         case "diagnosis":
             flow.response = loaded(label: true); flow.followUpUsed = true
-            if scenario == .textileTear { flow.labelImage = LiveRecordings.recording(for: scenario)?.labelPhoto ?? DemoImageFactory.labelImage(); flow.newInfoBanner = "Etikett erkannt: 98 % Baumwolle, 2 % Elasthan" }
+            if scenario == .textileTear { flow.labelImage = LiveRecordings.recording(for: scenario)?.labelPhoto ?? DemoImageFactory.labelImage(); flow.newInfoBanner = tr("Etikett erkannt: %@", "98 % Baumwolle, 2 % Elasthan") }
             flow.path = [.diagnosis]
         case "followup":
             flow.response = loaded(label: false)
