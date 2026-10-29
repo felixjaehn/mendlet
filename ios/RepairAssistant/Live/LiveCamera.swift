@@ -17,10 +17,10 @@ enum LiveCameraError: LocalizedError {
     case denied, unavailable, capture, interrupted
     var errorDescription: String? {
         switch self {
-        case .denied: "Bitte erlaube den Kamerazugriff in den Einstellungen."
-        case .unavailable: "Die Kamera ist gerade nicht verfügbar."
-        case .capture: "Das Foto konnte nicht aufgenommen werden. Bitte versuche es erneut."
-        case .interrupted: "Die Kamera wurde unterbrochen. Bitte starte den Live-Scan erneut."
+        case .denied: tr("Bitte erlaube den Kamerazugriff in den Einstellungen.")
+        case .unavailable: tr("Die Kamera ist gerade nicht verfügbar.")
+        case .capture: tr("Das Foto konnte nicht aufgenommen werden. Bitte versuche es erneut.")
+        case .interrupted: tr("Die Kamera wurde unterbrochen. Bitte starte den Live-Scan erneut.")
         }
     }
 }

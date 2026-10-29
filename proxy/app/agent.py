@@ -25,6 +25,7 @@ from .errors import AppError, BudgetExceeded, ModelOutputError
 from .images import downscale_b64
 from .models import AnalyzeRequest, ClassifyResult, DiagnosePlan, LocateResult, RefinePoint, Segment, VerifyResult
 from .parsing import call_validated, parse_model_json
+from . import i18n
 from .prompts import inline_schema, load_prompt
 from .sam import MAX_PARTS, PROMPT_META, _iou, detections_to_segments, geometric_prompt
 
@@ -52,6 +53,7 @@ Schaden, negative daneben) und prüfe erneut. Verworfene Segmente zählen nicht 
 5. Rufe `finish` auf, sobald jede verbleibende Schadensmaske geprüft ist. Verworfene Segmente zählen nicht.
 
 Koordinaten in Tool-Argumenten und -Ergebnissen liegen auf dem Raster 0..1000, Ursprung oben links.
+Schreibe deine kurzen Zwischenüberlegungen auf {language}; Tool-Begriffe bleiben englisch.
 """
 
 VERIFY_PROMPT = (
@@ -259,23 +261,24 @@ class WonderAgent:
     # ---- loop --------------------------------------------------------------------
 
     @staticmethod
-    def _describe(name: str, raw: str, model: str) -> tuple[str, str]:
-        """(German label, model name) for the live trace; tolerant of broken arguments."""
+    def _describe(name: str, raw: str, model: str, locale: str | None = None) -> tuple[str, str]:
+        """(label in the request locale, model name) for the live trace; tolerant of broken arguments."""
         try:
             args = json.loads(raw)
         except ValueError:
             args = {}
         if not isinstance(args, dict):
             args = {}
+        text = lambda key: i18n.pick(i18n.AGENT_LABELS[key], locale)  # noqa: E731
         if name == "segment":
-            return f"SAM sucht „{_short(str(args.get('concept', '?')))}“", "sam-3.1"
+            return text("segment").format(_short(str(args.get("concept", "?")))), "sam-3.1"
         if name == "segment_at":
-            return "SAM segmentiert die Auswahl", "sam-3.1"
+            return text("segment_at"), "sam-3.1"
         if name == "locate":
-            return f"Spark lokalisiert „{_short(str(args.get('description', '?')))}“", model
+            return text("locate").format(_short(str(args.get("description", "?")))), model
         if name == "verify_mask":
-            return f"Spark prüft Maske {_short(str(args.get('segment_id', '?')), 20)}", model
-        return "Masken geprüft · Übergabe an den Plan", "muse-wonder-1.0"
+            return text("verify_mask").format(_short(str(args.get("segment_id", "?")), 20)), model
+        return text("finish"), "muse-wonder-1.0"
 
     async def _execute(self, name: str, raw: str) -> dict:
         try:
@@ -292,7 +295,7 @@ class WonderAgent:
 
     async def _step(self, n: int, call, emit: StepEmit) -> tuple[str, dict]:
         """Run one tool call, emit its agent_step, and return (call_id, output for the model)."""
-        label, model = self._describe(call.name, call.arguments, self.c.s.muse_model)
+        label, model = self._describe(call.name, call.arguments, self.c.s.muse_model, i18n.current())
         started = time.perf_counter()
         status, output = "done", {}
         try:
@@ -316,10 +319,10 @@ class WonderAgent:
                 # docs/reasoning: Responses API nests the effort; "low" keeps the perception loop fast.
                 reasoning={"effort": c.s.wonder_reasoning_effort}, **kw)
         except APITimeoutError as exc:
-            raise AppError("timeout", "Der Agent hat zu lange gebraucht. Bitte versuche es erneut.", 504) from exc
+            raise AppError("timeout", "Der Agent hat zu lange gebraucht. Bitte versuche es erneut.", 504, en="The agent took too long. Please try again.") from exc
         except (APIConnectionError, APIStatusError) as exc:
             log.warning("wonder call failed: %s", type(exc).__name__)
-            raise AppError("upstream_error", "Der Modelldienst ist gerade nicht erreichbar.", 502) from exc
+            raise AppError("upstream_error", "Der Modelldienst ist gerade nicht erreichbar.", 502, en="The model service is currently unreachable.") from exc
         usage = getattr(resp, "usage", None)
         tokens_in = getattr(usage, "input_tokens", None) or 3000
         tokens_out = getattr(usage, "output_tokens", None) or 800
@@ -336,13 +339,14 @@ class WonderAgent:
             self.size = photo.size
         payload = {
             "category": cls.category, "risk_level": cls.risk_level, "user_note": req.note,
+            "locale": i18n.norm(req.locale),
             "answers": [a.model_dump() for a in req.answers],
             "image_order": ["main"] + [e.purpose for e in req.extra_images],
             "followup_round_already_done": req.is_followup_round,
         }
         content = [{"type": "input_text", "text": json.dumps(payload, ensure_ascii=False)}]
         content += [{"type": "input_image", "image_url": f"data:image/jpeg;base64,{b}"} for b in c._images(req)]
-        kw: dict = {"instructions": AGENT_PROMPT,
+        kw: dict = {"instructions": AGENT_PROMPT.replace("{language}", i18n.language_name(req.locale)),
                     "input": [{"type": "message", "role": "user", "content": content}]}
         n = 0
         for _ in range(MAX_ROUNDS):

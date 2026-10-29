@@ -44,7 +44,7 @@ struct PrimaryButton: View {
         Button(action: action) {
             HStack(spacing: 10) {
                 if let systemImage { Image(systemName: systemImage) }
-                Text(title)
+                Text(tr(title))
             }
         }
         .buttonStyle(PrimaryButtonStyle(kind: kind))
@@ -64,7 +64,7 @@ struct CircleIconButton: View {
                 .background(Theme.card, in: Circle())
                 .overlay(Circle().strokeBorder(Theme.hairline, lineWidth: 1.5))
         }
-        .accessibilityLabel(label)
+        .accessibilityLabel(tr(label))
     }
 }
 
@@ -80,7 +80,7 @@ struct Chip: View {
     var body: some View {
         HStack(spacing: 6) {
             if let systemImage { Image(systemName: systemImage).font(.caption.weight(.semibold)) }
-            Text(title).font(.subheadline.weight(.semibold))
+            Text(tr(title)).font(.subheadline.weight(.semibold))
         }
         .padding(.horizontal, 14)
         .frame(minHeight: 36)
@@ -98,7 +98,7 @@ struct EstimatePill: View {
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: "info.circle")
-            Text(text)
+            Text(tr(text))
         }
         .font(.footnote.weight(.semibold))
         .foregroundStyle(Theme.caution)
@@ -111,7 +111,7 @@ struct Badge: View {
     var text: String
     var tint: Color
     var body: some View {
-        Text(text).font(.caption2.weight(.bold)).textCase(.uppercase)
+        Text(tr(text)).font(.caption2.weight(.bold)).textCase(.uppercase)
             .foregroundStyle(tint)
             .padding(.horizontal, 8).padding(.vertical, 3)
             .background(tint.opacity(0.14), in: Capsule())
@@ -124,13 +124,13 @@ struct DemoChip: View {
     var body: some View {
         HStack(spacing: 6) {
             Circle().fill(Theme.caution).frame(width: 6, height: 6)
-            Text(text).font(.caption.weight(.semibold))
+            Text(tr(text)).font(.caption.weight(.semibold))
         }
         .foregroundStyle(Theme.inkSecondary)
         .padding(.horizontal, 10).frame(minHeight: 26)
         .background(Theme.card, in: Capsule())
         .overlay(Capsule().strokeBorder(Theme.hairline, lineWidth: 1))
-        .accessibilityLabel("Demo-Modus mit echten Modellantworten vom 28. Oktober")
+        .accessibilityLabel(Text("Demo-Modus mit echten Modellantworten vom 28. Oktober"))
     }
 }
 
@@ -141,9 +141,9 @@ struct ConfidenceMeter: View {
     @State private var shown = 0.0
 
     static func level(_ c: Double) -> (text: String, color: Color) {
-        if c >= 0.75 { return ("ziemlich sicher", Theme.safe) }
-        if c >= 0.6 { return ("eher sicher", Theme.caution) }
-        return ("unsicher", Theme.stop)
+        if c >= 0.75 { return (tr("ziemlich sicher"), Theme.safe) }
+        if c >= 0.6 { return (tr("eher sicher"), Theme.caution) }
+        return (tr("unsicher"), Theme.stop)
     }
 
     var body: some View {
@@ -165,7 +165,7 @@ struct ConfidenceMeter: View {
             Spacer(minLength: 0)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Konfidenz \(Int((confidence * 100).rounded())) Prozent, \(lv.text)")
+        .accessibilityLabel(tr("Konfidenz %lld Prozent, %@", Int((confidence * 100).rounded()), lv.text))
         .onAppear { withAnimation(.easeOut(duration: 0.9)) { shown = confidence } }
         .onChange(of: confidence) { _, v in withAnimation(.easeOut(duration: 0.6)) { shown = v } }
     }
@@ -216,9 +216,9 @@ struct StageRow: View {
                 }
             }
             VStack(alignment: .leading, spacing: 1) {
-                Text(title).font(.body.weight(.semibold))
+                Text(tr(title)).font(.body.weight(.semibold))
                     .foregroundStyle(state == .pending ? Theme.inkSecondary : Theme.ink)
-                Text(subtitle).font(.caption).foregroundStyle(Theme.inkSecondary)
+                Text(tr(subtitle)).font(.caption).foregroundStyle(Theme.inkSecondary)
             }
             Spacer(minLength: 0)
         }
@@ -244,7 +244,7 @@ struct ErrorCard: View {
                 Text(message).font(.body).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
             }
             if let retry {
-                PrimaryButton(title: retryTitle, systemImage: "arrow.clockwise", action: retry)
+                PrimaryButton(title: tr(retryTitle), systemImage: "arrow.clockwise", action: retry)
             }
             if let secondaryTitle, let secondary {
                 PrimaryButton(title: secondaryTitle, kind: .secondary, action: secondary)
@@ -267,8 +267,8 @@ struct MetricTile: View {
             Text(value).font(.rounded(.title3)).monospacedDigit().foregroundStyle(Theme.ink)
                 .minimumScaleFactor(0.7).lineLimit(1)
             VStack(alignment: .leading, spacing: 0) {
-                Text(title).font(.caption).foregroundStyle(Theme.inkSecondary)
-                if let detail { Text(detail).font(.caption2).foregroundStyle(Theme.inkSecondary) }
+                Text(tr(title)).font(.caption).foregroundStyle(Theme.inkSecondary)
+                if let detail { Text(tr(detail)).font(.caption2).foregroundStyle(Theme.inkSecondary) }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -311,7 +311,7 @@ extension View {
 struct SectionLabel: View {
     var text: String
     var body: some View {
-        Text(text).font(.footnote.weight(.semibold)).textCase(.uppercase)
+        Text(tr(text)).font(.footnote.weight(.semibold)).textCase(.uppercase)
             .foregroundStyle(Theme.inkSecondary).tracking(0.6)
     }
 }

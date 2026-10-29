@@ -60,6 +60,7 @@ class StepHelpRequest(Base):
     risk_level: RiskLevel
     issue_text: str
     image_base64: str | None = None
+    locale: str = "de"
 
 
 class StepHelpResponse(Base):
@@ -79,6 +80,7 @@ class RefineRequest(Base):
     points: list[RefinePoint] = Field(default_factory=list, max_length=256)
     box: Annotated[list[Normalized], Field(min_length=4, max_length=4)] | None = None
     label: Annotated[str, Field(min_length=1, max_length=200, pattern=r"\S")]
+    locale: str = "de"
 
     @model_validator(mode="after")
     def valid_geometry(self):
@@ -96,11 +98,13 @@ class DetectRequest(Base):
 
     image_base64: Annotated[str, Field(max_length=25_000_000)]
     concept: Annotated[str, Field(min_length=1, max_length=200, pattern=r"\S")]
+    locale: str = "de"
 
 
 class TrackRequest(Base):
     video_base64: Annotated[str, Field(max_length=66_666_700)]
     concept: Annotated[str, Field(min_length=1, max_length=200, pattern=r"\S")]
+    locale: str = "de"
 
 
 class AfterPreviewRequest(Base):
@@ -109,6 +113,7 @@ class AfterPreviewRequest(Base):
     stitch_type: StitchType | None = None  # optional: shoes have no stitches
     category: Literal["textile", "shoe"] | None = None  # None = textile wording (backwards compatible)
     repair_hint: Annotated[str, Field(max_length=200)] | None = None
+    locale: str = "de"  # accepted for symmetry; the image prompt is English either way
 
 
 class AfterPreviewResponse(Base):

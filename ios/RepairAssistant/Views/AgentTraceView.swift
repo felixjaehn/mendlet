@@ -83,8 +83,8 @@ struct AgentTraceView: View {
         return HStack(spacing: 10) {
             tile(s.model, ok: ok)
             Group {
-                if ok { Text(s.label).foregroundStyle(Theme.ink) }
-                else { Text(s.label).foregroundStyle(Theme.ink) + Text("\nServerfehler – Agent weicht aus").font(.caption.weight(.semibold)).foregroundStyle(Theme.stop) }
+                if ok { Text(AgentLabel.localized(s.label)).foregroundStyle(Theme.ink) }
+                else { Text(AgentLabel.localized(s.label)).foregroundStyle(Theme.ink) + Text("\nServerfehler – Agent weicht aus").font(.caption.weight(.semibold)).foregroundStyle(Theme.stop) }
             }
             .font(.subheadline.weight(.semibold)).lineLimit(3).fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 6)
@@ -98,13 +98,13 @@ struct AgentTraceView: View {
         }
         .padding(.vertical, 3)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(s.label), \(ModelStyle.display(s.model)), \(ModelStyle.seconds(s.ms)), \(ok ? "fertig" : "fehlgeschlagen, Serverfehler, Agent weicht aus")")
+        .accessibilityLabel("\(AgentLabel.localized(s.label)), \(ModelStyle.display(s.model)), \(ModelStyle.seconds(s.ms)), \(ok ? tr("fertig") : tr("fehlgeschlagen, Serverfehler, Agent weicht aus"))")
     }
 
     private func activeRow(_ a: (label: String, model: String)) -> some View {
         HStack(spacing: 10) {
             tile(a.model)
-            Text(a.label).font(.subheadline.weight(.semibold)).foregroundStyle(Theme.inkSecondary).lineLimit(2)
+            Text(AgentLabel.localized(a.label)).font(.subheadline.weight(.semibold)).foregroundStyle(Theme.inkSecondary).lineLimit(2)
             Spacer(minLength: 6)
             VStack(alignment: .trailing, spacing: 2) {
                 badge(a.model)
@@ -113,7 +113,7 @@ struct AgentTraceView: View {
         }
         .padding(.vertical, 3)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(a.label), läuft")
+        .accessibilityLabel(tr("%@, läuft", AgentLabel.localized(a.label)))
     }
 }
 
@@ -124,7 +124,7 @@ private struct LiveDot: View {
     var body: some View {
         HStack(spacing: 5) {
             Circle().fill(Theme.thread).frame(width: 7, height: 7).opacity(on ? 1 : 0.35)
-            Text(replay ? "Aufzeichnung" : "live").font(.caption2.weight(.bold)).textCase(.uppercase).foregroundStyle(Theme.thread)
+            Text(replay ? tr("Aufzeichnung") : tr("live")).font(.caption2.weight(.bold)).textCase(.uppercase).foregroundStyle(Theme.thread)
         }
         .onAppear { if !reduceMotion { withAnimation(.easeInOut(duration: 0.8).repeatForever()) { on = true } } else { on = true } }
         .accessibilityHidden(true)
@@ -148,7 +148,7 @@ struct StageStrip: View {
             }
             .animation(Theme.spring, value: states)
             if let i = states.firstIndex(of: .active) ?? (states.allSatisfy { $0 == .done } ? states.count - 1 : nil) {
-                Text(states.allSatisfy { $0 == .done } ? "Fertig" : "\(i + 1) von \(states.count) · \(titles[i])")
+                Text(states.allSatisfy { $0 == .done } ? tr("Fertig") : tr("%lld von %lld · %@", i + 1, states.count, tr(titles[i])))
                     .font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkSecondary)
             }
         }
@@ -157,5 +157,26 @@ struct StageStrip: View {
 
     private func color(_ s: StageState) -> Color {
         switch s { case .done: Theme.safe; case .active: Theme.threadSoft; case .pending: Theme.hairline }
+    }
+}
+
+/// Agent step labels come from the proxy (already in the request locale) or from German recordings.
+/// In English mode the structural German phrases of recorded runs are translated; unknown labels stay unchanged.
+enum AgentLabel {
+    private static let patterns: [(prefix: String, suffix: String, key: String)] = [
+        ("SAM sucht „", "“", "SAM sucht „%@“"),
+        ("Spark lokalisiert „", "“", "Spark lokalisiert „%@“"),
+        ("Spark prüft Maske ", "", "Spark prüft Maske %@"),
+    ]
+
+    static func localized(_ label: String, english: Bool = Lang.shared.isEnglish) -> String {
+        guard english else { return label }
+        let direct = tr(label)
+        if direct != label { return direct }
+        for p in patterns where label.hasPrefix(p.prefix) && label.hasSuffix(p.suffix) && label.count >= p.prefix.count + p.suffix.count {
+            let inner = String(label.dropFirst(p.prefix.count).dropLast(p.suffix.count))
+            return tr(p.key, inner)
+        }
+        return label
     }
 }

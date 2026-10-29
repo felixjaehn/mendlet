@@ -8,6 +8,7 @@ struct RepairAssistantApp: App {
         WindowGroup {
             RootView()
                 .environment(flow)
+                .environment(\.locale, Lang.shared.locale)
                 .preferredColorScheme(Self.forcedScheme)
         }
     }

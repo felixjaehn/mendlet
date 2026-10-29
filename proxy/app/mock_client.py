@@ -8,6 +8,7 @@ import re
 import numpy as np
 from PIL import Image
 
+from . import i18n
 from . import mock_data as md
 from . import mock_electronics
 from .errors import AppError
@@ -29,6 +30,7 @@ from .models import (
 from .sam import bitmap_to_rings
 from .video import prepare_video
 
+PLAN_LABEL = {"de": "Plan zusammenstellen", "en": "Assembling the plan"}
 SCENARIOS = {
     "textile_tear_needs_label", "textile_tear", "textile_hole", "textile_open_seam", "textile_button",
     "shoe_sole", "battery_jacket", "helmet", "unsupported",
@@ -141,8 +143,10 @@ class MockClient:
             answer=f"Zum Schritt \"{title}\": Geh ihn noch einmal langsam durch und vergleiche, was der Schritt verlangt, mit deinem Ergebnis. Die übrigen Schritte bleiben unverändert.",
             retry_hint="Mach ein Foto der Stelle von nahem und schicke es mit, dann sehe ich genauer hin.", escalate=False)
 
-    async def transcribe(self, wav: bytes, duration_s: float) -> str:
+    async def transcribe(self, wav: bytes, duration_s: float, locale: str = "de") -> str:
         await self._sleep(0.6)
+        if locale.lower().startswith("en"):
+            return "There is a tear along the seam on the trouser leg, about six centimetres long."
         return "Am Hosenbein ist ein Riss entlang der Naht, etwa sechs Zentimeter lang."
 
     async def ground(self, req: AnalyzeRequest, category: str) -> list[Segment]:
@@ -169,7 +173,7 @@ class MockClient:
                 mask[region] = label == "positive"
         rings = bitmap_to_rings(mask)
         if not rings:
-            raise AppError("no_segment", "Die markierte Stelle konnte nicht erkannt werden. Bitte markiere sie erneut.", 422)
+            raise AppError("no_segment", "Die markierte Stelle konnte nicht erkannt werden. Bitte markiere sie erneut.", 422, en="The marked area could not be recognized. Please mark it again.")
         result = md.seg("seg_1", req.label, "damage", req.label, 0.9, rings[0].points)
         ys, xs = np.nonzero(mask)
         result.box = [min(xs) / width, min(ys) / height, (max(xs) + 1 - min(xs)) / width, (max(ys) + 1 - min(ys)) / height]
@@ -182,27 +186,28 @@ class MockClient:
         found = md.segments(pick_scenario(req))
         damage = next((s for s in found if s.kind == "damage"), None)
         concept = damage.prompt if damage else "rip"
+        lab = lambda key: i18n.pick(i18n.AGENT_LABELS[key], req.locale)  # noqa: E731
         target = damage.id if damage else "seg_2"
         script = [
-            ("segment", f"SAM sucht „garment“", "sam-3.1", 0.9),
-            ("segment", f"SAM sucht „{concept}“", "sam-3.1", 1.0),
-            ("locate", f"Spark lokalisiert „{concept}“", "muse-spark-1.3", 0.6),
-            ("segment_at", "SAM segmentiert die Auswahl", "sam-3.1", 0.9),
-            ("verify_mask", f"Spark prüft Maske {target}", "muse-spark-1.3", 0.7),
+            ("segment", lab("segment").format("garment"), "sam-3.1", 0.9),
+            ("segment", lab("segment").format(concept), "sam-3.1", 1.0),
+            ("locate", lab("locate").format(concept), "muse-spark-1.3", 0.6),
+            ("segment_at", lab("segment_at"), "sam-3.1", 0.9),
+            ("verify_mask", lab("verify_mask").format(target), "muse-spark-1.3", 0.7),
         ]
         for n, (tool, label, model, delay) in enumerate(script, start=1):
             await self._sleep(delay)
             await emit({"n": n, "tool": tool, "label": label, "model": model, "status": "done",
                         "ms": round(delay * self.scale * 1000)})
         plan = await self.diagnose(req, cls, found)
-        await emit({"n": 6, "tool": "finish", "label": "Plan zusammenstellen", "model": "muse-wonder-1.0",
+        await emit({"n": 6, "tool": "finish", "label": i18n.pick(PLAN_LABEL, req.locale), "model": "muse-wonder-1.0",
                     "status": "done", "ms": round(1.2 * self.scale * 1000)})
         return found, plan
 
     async def detect(self, req: DetectRequest) -> list[Segment]:
         downscale_b64(req.image_base64, 768)  # same validation as the real path
         await self._sleep(0.5)
-        return md.detection(req.concept)
+        return i18n.relabel(md.detection(req.concept), req.locale)
 
     async def track(self, req: TrackRequest) -> TrackResponse:
         prepare_video(req.video_base64)

@@ -14,6 +14,7 @@ from openai import APIConnectionError, APIError, APIStatusError, APITimeoutError
 from PIL import Image
 from pydantic import BaseModel
 
+from . import i18n
 from .audio import ensure_wav
 from .budget import Budget, image_cost, muse_cost, sam_cost, sam_video_cost, transcribe_cost
 from .cache import ModelCache
@@ -55,7 +56,7 @@ class ModelClient(Protocol):
     async def segment(self, req: AnalyzeRequest, category: str, prompts: list[str]) -> list[Segment]: ...
     async def diagnose(self, req: AnalyzeRequest, cls: ClassifyResult, segments: list[Segment]) -> DiagnosePlan: ...
     async def step_help(self, req: StepHelpRequest) -> StepHelpResponse: ...
-    async def transcribe(self, wav: bytes, duration_s: float) -> str: ...
+    async def transcribe(self, wav: bytes, duration_s: float, locale: str = "de") -> str: ...
     async def refine(self, req: RefineRequest) -> Segment: ...
     async def ground(self, req: AnalyzeRequest, category: str) -> list[Segment]: ...
     async def track(self, req: TrackRequest) -> TrackResponse: ...
@@ -85,6 +86,8 @@ def preview_prompt(req: AfterPreviewRequest) -> str:
 
 
 SAM_TEXT_MAX_EDGE = 1024
+REPAIR_KEYWORDS_EN = ["jeans", "seam", "side seam", "hem", "tear", "hole", "label", "darning", "patch", "sole",
+                      "heel", "sneaker", "sweater", "elastane", "cable", "solder pad", "circuit board"]
 REPAIR_KEYWORDS = ["Jeans", "Naht", "Seitennaht", "Saum", "Riss", "Loch", "Etikett", "Stopfen", "Flicken",
                    "Sohle", "Absatz", "Sneaker", "Pullover", "Elasthan", "Kabel", "Lötpad", "Platine"]
 DETECT_MAX_EDGE = 768  # live frames: smaller is faster, the contract already caps the client at 768
@@ -127,10 +130,10 @@ class RealMetaClient:
                 **({"reasoning_effort": self.s.muse_reasoning_effort} if self.s.muse_reasoning_effort else {}),
             )
         except APITimeoutError as exc:
-            raise AppError("timeout", "Das Modell hat zu lange gebraucht. Bitte versuche es erneut.", 504) from exc
+            raise AppError("timeout", "Das Modell hat zu lange gebraucht. Bitte versuche es erneut.", 504, en="The model took too long. Please try again.") from exc
         except (APIConnectionError, APIStatusError) as exc:
             log.warning("muse call failed: %s", type(exc).__name__)
-            raise AppError("upstream_error", "Der Modelldienst ist gerade nicht erreichbar.", 502) from exc
+            raise AppError("upstream_error", "Der Modelldienst ist gerade nicht erreichbar.", 502, en="The model service is currently unreachable.") from exc
         usage = resp.usage
         tokens_in = usage.prompt_tokens if usage else (len(system) + len(text)) // 4 + 800 * len(images)
         tokens_out = usage.completion_tokens if usage else 800
@@ -142,8 +145,8 @@ class RealMetaClient:
             raise ModelOutputError("Muse returned no complete choice")
         return resp.choices[0].message.content or ""
 
-    async def _json_call(self, key: str, text: str, images: list[str], cls: type[T]) -> T:
-        system = load_prompt(key, self.s.prompts_dir)
+    async def _json_call(self, key: str, text: str, images: list[str], cls: type[T], locale: str = "de") -> T:
+        system = load_prompt(key, self.s.prompts_dir, locale)
         cache_key = ModelCache.key(
             prompt_version(key), self.s.muse_model, system, text, [ModelCache.key(i) for i in images]
         )
@@ -163,12 +166,13 @@ class RealMetaClient:
 
     async def classify(self, req: AnalyzeRequest) -> ClassifyResult:
         text = json.dumps({"user_note": req.note, "locale": req.locale}, ensure_ascii=False)
-        return await self._json_call("classify", text, [req.image_base64], ClassifyResult)
+        return await self._json_call("classify", text, [req.image_base64], ClassifyResult, req.locale)
 
     async def diagnose(self, req: AnalyzeRequest, cls: ClassifyResult, segments: list[Segment]) -> DiagnosePlan:
         payload = {
             "category": cls.category,
             "risk_level": cls.risk_level,
+            "locale": i18n.norm(req.locale),
             "user_note": req.note,
             "answers": [a.model_dump() for a in req.answers],
             "image_order": ["main"] + [e.purpose for e in req.extra_images],
@@ -180,13 +184,13 @@ class RealMetaClient:
             ],
         }
         return await self._json_call(
-            "diagnose", json.dumps(payload, ensure_ascii=False), self._images(req), DiagnosePlan
+            "diagnose", json.dumps(payload, ensure_ascii=False), self._images(req), DiagnosePlan, req.locale
         )
 
     async def step_help(self, req: StepHelpRequest) -> StepHelpResponse:
         payload = req.model_dump(exclude={"image_base64"})
         images = [req.image_base64] if req.image_base64 else []
-        return await self._json_call("step_help", json.dumps(payload, ensure_ascii=False), images, StepHelpResponse)
+        return await self._json_call("step_help", json.dumps(payload, ensure_ascii=False), images, StepHelpResponse, req.locale)
 
     # ---- SAM 3.1 (responses API, one concept per request) -----------------------
 
@@ -244,10 +248,10 @@ class RealMetaClient:
             if not completed:
                 raise ModelOutputError("SAM stream ended without response.completed")
         except (APITimeoutError, httpx.TimeoutException) as exc:
-            raise AppError("timeout", "Die Segmentierung hat zu lange gebraucht.", 504) from exc
+            raise AppError("timeout", "Die Segmentierung hat zu lange gebraucht.", 504, en="Segmentation took too long.") from exc
         except (APIError, httpx.HTTPError) as exc:
             log.warning("sam call failed: %s", type(exc).__name__)
-            raise AppError("upstream_error", "Der Segmentierungsdienst ist gerade nicht erreichbar.", 502) from exc
+            raise AppError("upstream_error", "Der Segmentierungsdienst ist gerade nicht erreichbar.", 502, en="The segmentation service is currently unreachable.") from exc
         return "".join(parts)
 
     async def _sam_one(self, image_b64: str, prompt: str, width: int, height: int) -> list[SamDetection]:
@@ -277,7 +281,7 @@ class RealMetaClient:
         # One prompted object (id 1), never silently select another object.
         matches = detections_to_segments([d for d in dets if d.object_id == "1"])
         if not matches:
-            raise AppError("no_segment", "Die markierte Stelle konnte nicht erkannt werden. Bitte markiere sie erneut.", 422)
+            raise AppError("no_segment", "Die markierte Stelle konnte nicht erkannt werden. Bitte markiere sie erneut.", 422, en="The marked area could not be recognized. Please mark it again.")
         return matches[0].model_copy(update={"label": req.label, "kind": "damage", "prompt": req.label, "source": "tap"})
 
     async def ground(self, req: AnalyzeRequest, category: str) -> list[Segment]:
@@ -345,14 +349,14 @@ class RealMetaClient:
         with Image.open(io.BytesIO(base64.b64decode(req.image_base64))) as photo:
             width, height = photo.size
 
-        async def segment_pad(pad):
+        async def segment_pad(pad):  # noqa: E301
             x1, y1, x2, y2 = [v / 1000 for v in pad.box_0_1000]
             prompt = geometric_prompt(width, height, [], [x1, y1, x2 - x1, y2 - y1])
             dets = await self._sam_one(req.image_base64, prompt, width, height)
             matches = detections_to_segments([d for d in dets if d.object_id == "1"])
             # Spark boxes and SAM boxes alone are not mask evidence.
             return next((s.model_copy(update={
-                "label": {"+": "Lötpad +", "-": "Lötpad −", "other": "Lötpad"}[pad.label],
+                "label": i18n.label({"+": "Lötpad +", "-": "Lötpad −", "other": "Lötpad"}[pad.label], req.locale),
                 "kind": "part", "prompt": "solder pad", "source": "grounding",
                 "polarity": pad.label if pad.label in {"+", "-"} else None,
             }) for s in matches if s.mask is not None), None)
@@ -376,7 +380,7 @@ class RealMetaClient:
         with Image.open(io.BytesIO(base64.b64decode(image))) as photo:
             width, height = photo.size
         dets = await self._sam_one(image, req.concept, width, height)
-        return detect_segments(req.concept, detections_to_segments(dets))
+        return i18n.relabel(detect_segments(req.concept, detections_to_segments(dets)), req.locale)
 
     async def agent_run(self, req: AnalyzeRequest, cls: ClassifyResult,
                         emit: Callable[[dict], Awaitable[None]]) -> tuple[list[Segment], DiagnosePlan]:
@@ -418,10 +422,10 @@ class RealMetaClient:
                 extra_body={"reasoning_strength": "low"},
             )
         except (APITimeoutError, httpx.TimeoutException) as exc:
-            raise AppError("timeout", "Die Vorschau hat zu lange gebraucht. Bitte versuche es erneut.", 504) from exc
+            raise AppError("timeout", "Die Vorschau hat zu lange gebraucht. Bitte versuche es erneut.", 504, en="The preview took too long. Please try again.") from exc
         except (APIError, httpx.HTTPError) as exc:
             log.warning("image edit failed: %s", type(exc).__name__)
-            raise AppError("upstream_error", "Die Bildvorschau ist gerade nicht erreichbar.", 502) from exc
+            raise AppError("upstream_error", "Die Bildvorschau ist gerade nicht erreichbar.", 502, en="The image preview is currently unreachable.") from exc
         self.budget.add(image_cost())
         try:
             output = result.data[0].b64_json if result.data else None
@@ -436,17 +440,17 @@ class RealMetaClient:
 
     # ---- Muse Voice Transcribe ----------------------------------------------------
 
-    async def transcribe(self, wav: bytes, duration_s: float) -> str:
+    async def transcribe(self, wav: bytes, duration_s: float, locale: str = "de") -> str:
         # Revalidate at this boundary too: callers must not bypass the wire contract.
         wav, duration_s = ensure_wav(wav)
         request = {
             "model": self.s.transcribe_model,
             "audioEncoding": "WAV",
             "mode": "PUSH_TO_TALK",
-            "languageBias": ["German"],
+            "languageBias": ["English" if i18n.norm(locale) == "en" else "German"],
             # Live 2026-10-29: "Jeans" came back as "Teams"; keyword biasing (docs: contextual/keyword
             # biasing) covers the repair vocabulary users dictate.
-            "keywords": REPAIR_KEYWORDS,
+            "keywords": REPAIR_KEYWORDS_EN if i18n.norm(locale) == "en" else REPAIR_KEYWORDS,
         }
         key = ModelCache.key("transcribe-v1", self.s.transcribe_model, request, hashlib.sha256(wav).hexdigest())
         cached = self.cache.get(key)
@@ -464,10 +468,10 @@ class RealMetaClient:
             )
             r.raise_for_status()
         except httpx.TimeoutException as exc:
-            raise AppError("timeout", "Die Transkription hat zu lange gebraucht.", 504) from exc
+            raise AppError("timeout", "Die Transkription hat zu lange gebraucht.", 504, en="Transcription took too long.") from exc
         except httpx.HTTPError as exc:
             log.warning("transcribe failed: %s", type(exc).__name__)
-            raise AppError("upstream_error", "Die Transkription ist gerade nicht erreichbar.", 502) from exc
+            raise AppError("upstream_error", "Die Transkription ist gerade nicht erreichbar.", 502, en="Transcription is currently unreachable.") from exc
         self.budget.add(transcribe_cost(duration_s))
         try:
             data = r.json()

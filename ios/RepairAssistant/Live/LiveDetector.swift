@@ -12,7 +12,7 @@ struct ProxyLiveDetector: LiveDetector {
     var session: URLSession = .shared
 
     func detect(frame: CGImage, concept: String) async throws -> [Segment] {
-        struct Body: Encodable { let imageBase64: String; let concept: String }
+        struct Body: Encodable { let imageBase64: String; let concept: String; let locale: String }
         struct Response: Decodable { let segments: [Segment] }
         guard ["http", "https"].contains(baseURL.scheme?.lowercased() ?? ""), baseURL.host != nil else { throw APIError.invalidURL }
         let image = LiveImage.scaled(frame, longestSide: 768)
@@ -24,7 +24,7 @@ struct ProxyLiveDetector: LiveDetector {
         request.httpMethod = "POST"
         request.timeoutInterval = 12
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try ContractCoding.encoder().encode(Body(imageBase64: (data as Data).base64EncodedString(), concept: concept))
+        request.httpBody = try ContractCoding.encoder().encode(Body(imageBase64: (data as Data).base64EncodedString(), concept: concept, locale: Lang.apiCode))
         do {
             let (body, response) = try await session.data(for: request)
             guard let http = response as? HTTPURLResponse else { throw APIError.unreachable }
@@ -48,7 +48,7 @@ struct MockLiveDetector: LiveDetector {
 
     func detect(frame: CGImage, concept: String) async throws -> [Segment] {
         try await Task.sleep(for: .milliseconds(700))
-        var result = segment ?? Segment(id: "live-damage", label: "Riss", kind: .damage, prompt: concept,
+        var result = segment ?? Segment(id: "live-damage", label: tr("Riss"), kind: .damage, prompt: concept,
                                        mask: SegmentMask(points: [[0.33, 0.47], [0.47, 0.44], [0.66, 0.48], [0.62, 0.53], [0.46, 0.51], [0.34, 0.54]]), score: 0.94)
         if let reference, let transform = await registrar.register(reference: reference, current: frame),
            let polygon = transform.warp(result.polygon) {

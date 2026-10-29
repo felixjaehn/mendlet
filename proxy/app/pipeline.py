@@ -6,7 +6,7 @@ import uuid
 from collections import Counter
 from collections.abc import Awaitable, Callable
 
-from . import safety
+from . import i18n, safety
 from .clients import ModelClient
 from .errors import AppError, BudgetExceeded, ModelOutputError
 from .models import (
@@ -25,17 +25,20 @@ from .sam import SEGMENT_PROMPTS
 log = logging.getLogger("proxy.pipeline")
 
 STAGES: tuple[Stage, ...] = ("classify", "segment", "diagnose", "plan")
-STAGE_LABELS: dict[str, str] = {
-    "classify": "Objekt und Risiko prüfen",
-    "segment": "Schadstelle markieren",
-    "diagnose": "Schaden diagnostizieren",
-    "plan": "Einkaufsliste und Anleitung erstellen",
-}
+STAGE_LABELS: dict[str, str] = i18n.STAGE_LABELS["de"]  # German default; use stage_label() for a locale
+
+
+def stage_label(stage: str, locale: str | None = None) -> str:
+    return i18n.pick(i18n.STAGE_LABELS, locale)[stage]
 
 Progress = Callable[[Stage], Awaitable[None]]
 GroundingProgress = Callable[[], Awaitable[None]]
 SegmentsReady = Callable[[list[Segment]], Awaitable[None]]
 AgentStepEvent = Callable[[dict], Awaitable[None]]
+CLASSIFY_FALLBACK_REASON = {
+    "de": "Das Objekt konnte nicht sicher eingeordnet werden. Im Zweifel geben wir keine Anleitung.",
+    "en": "The object could not be classified reliably. When in doubt, we do not give a guide.",
+}
 
 
 async def _noop(_: Stage) -> None:
@@ -54,7 +57,7 @@ async def _noop_step(_: dict) -> None:
     return None
 
 
-def blocked_response(cls: ClassifyResult, pre: safety.PreCheck) -> AnalyzeResponse:
+def blocked_response(cls: ClassifyResult, pre: safety.PreCheck, locale: str | None = None) -> AnalyzeResponse:
     """Response without segments/guide. diagnosis/decision are filled placeholders so the contract stays complete."""
     reason = cls.reason
     resp = AnalyzeResponse(
@@ -72,7 +75,7 @@ def blocked_response(cls: ClassifyResult, pre: safety.PreCheck) -> AnalyzeRespon
         shopping_list=[],
         guide={"steps": []},  # type: ignore[arg-type]
     )
-    return safety.enforce(resp, has_answers=False, precheck=pre)
+    return safety.enforce(resp, has_answers=False, precheck=pre, locale=locale)
 
 
 def _xyxy(seg: Segment) -> tuple[float, float, float, float] | None:
@@ -168,7 +171,7 @@ async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress =
                   grounding: GroundingProgress = _noop_grounding, segments_ready: SegmentsReady = _noop_segments,
                   agent_step: AgentStepEvent = _noop_step) -> AnalyzeResponse:
     """Run the pipeline on an already prepared (downscaled) request."""
-    pre = safety.precheck_note("\n".join([req.note, *(a.text for a in req.answers)]))
+    pre = safety.precheck_note("\n".join([req.note, *(a.text for a in req.answers)]), req.locale)
 
     await progress("classify")
     try:
@@ -177,11 +180,11 @@ async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress =
         log.warning("classify output invalid after retry; falling back to warn_only")
         cls = ClassifyResult(
             category="unsupported", risk_level="warn_only",
-            reason="Das Objekt konnte nicht sicher eingeordnet werden. Im Zweifel geben wir keine Anleitung.",
+            reason=i18n.pick(CLASSIFY_FALLBACK_REASON, req.locale),
         )
     cls = safety.apply_precheck(cls, pre)
     if safety.is_blocked(cls.category, cls.risk_level):
-        return blocked_response(cls, pre)  # safety is decided here, never inside the agent
+        return blocked_response(cls, pre, req.locale)  # safety is decided here, never inside the agent
 
     await progress("segment")
     plan: DiagnosePlan | None = None
@@ -196,6 +199,7 @@ async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress =
             segments, plan = None, None
     if segments is None:
         segments = await _classic_segments(req, client, cls, grounding)
+    segments = i18n.relabel(segments, req.locale)
     await segments_ready(segments)
 
     await progress("diagnose")
@@ -217,6 +221,6 @@ async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress =
         shopping_list=plan.shopping_list,
         guide=plan.guide,
     )
-    resp = safety.enforce(resp, has_answers=req.is_followup_round, precheck=pre)
+    resp = safety.enforce(resp, has_answers=req.is_followup_round, precheck=pre, locale=req.locale)
     resp.instances = dict(Counter(s.prompt for s in resp.segments if s.kind == "damage"))
     return resp

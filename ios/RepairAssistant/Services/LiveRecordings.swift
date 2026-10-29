@@ -22,7 +22,7 @@ struct AgentEnvelope: Decodable {
 }
 
 enum LiveRecordings {
-    static let chipText = "Demo · echte Modellantworten vom 28.10."
+    static var chipText: String { tr("Demo · echte Modellantworten vom 28.10.") }
 
     static func name(for s: DemoScenario) -> String? {
         switch s {
@@ -42,8 +42,15 @@ enum LiveRecordings {
         Bundle.main.url(forResource: file, withExtension: ext, subdirectory: "LiveRecordings") ?? Bundle.main.url(forResource: file, withExtension: ext)
     }
 
+    /// Optional English recordings sit next to the German ones as `<case>.en.json` (e.g. `jeans.en.json`).
+    /// In English mode an existing `.en` file wins; otherwise the German recording is used. `exists` is injectable for tests.
+    static func localizedJSONName(_ file: String, language: String = Lang.shared.code, exists: (String) -> Bool = { url($0, "json") != nil }) -> String {
+        guard language == "en", !file.hasSuffix(".en") else { return file }
+        return exists(file + ".en") ? file + ".en" : file
+    }
+
     static func response(file: String) -> AnalyzeResponse? {
-        guard let u = url(file, "json"), let d = try? Data(contentsOf: u) else { return nil }
+        guard let u = url(localizedJSONName(file), "json"), let d = try? Data(contentsOf: u) else { return nil }
         return try? ContractCoding.decoder().decode(AnalyzeResponse.self, from: d)
     }
 
@@ -56,7 +63,7 @@ enum LiveRecordings {
     }
 
     static func envelope(file: String) -> AgentEnvelope? {
-        guard let u = url(file, "json"), let d = try? Data(contentsOf: u) else { return nil }
+        guard let u = url(localizedJSONName(file), "json"), let d = try? Data(contentsOf: u) else { return nil }
         return try? ContractCoding.decoder().decode(AgentEnvelope.self, from: d)
     }
 
@@ -64,7 +71,9 @@ enum LiveRecordings {
         guard let n = name(for: s), var r = response(file: n) else { return nil }
         let isJeans = n == "jeans"
         let agent = isJeans ? envelope(file: "jeans_agent") : nil
-        if let res = agent?.result { r = res }
+        // The agent run carries its own (German) result; it must not replace an English `<case>.en.json`.
+        let englishBase = localizedJSONName(n) != n, englishAgent = localizedJSONName("jeans_agent") != "jeans_agent"
+        if let res = agent?.result, englishAgent || !englishBase { r = res }
         return LiveRecording(name: n, response: r, photo: image(file: n), after: image(file: n + "_after"),
                              labelResponse: isJeans ? response(file: "jeans_label") : nil,
                              labelPhoto: isJeans ? image(file: "jeans_label_photo") : nil,
@@ -93,13 +102,13 @@ enum DemoReplay {
     /// (seconds from start, event). Blocked cases end after the safety check.
     static func timeline(name: String, response r: AnalyzeResponse, steps: [AgentStep] = []) -> [(at: Double, event: AnalyzeEvent)] {
         var t: [(at: Double, event: AnalyzeEvent)] = []
-        t.append((0, .progress(stage: .classify, label: "Objekt und Sicherheit prüfen", segments: nil)))
-        t.append((2.8, .agentStep(AgentStep(n: 1, tool: "classify", label: "Muse Spark prüft Objekt und Sicherheit", model: "muse-spark-1.3", ms: 2800))))
+        t.append((0, .progress(stage: .classify, label: tr("Objekt und Sicherheit prüfen"), segments: nil)))
+        t.append((2.8, .agentStep(AgentStep(n: 1, tool: "classify", label: tr("Muse Spark prüft Objekt und Sicherheit"), model: "muse-spark-1.3", ms: 2800))))
         if FlowGate.isBlocked(r) {
             t.append((3.0, .result(r)))
             return t
         }
-        t.append((3.0, .progress(stage: .segment, label: "Schaden markieren", segments: nil)))
+        t.append((3.0, .progress(stage: .segment, label: tr("Schaden markieren"), segments: nil)))
         var clock = 3.0
         var n = 1
         for s in steps where s.tool != "finish" {
@@ -114,8 +123,8 @@ enum DemoReplay {
             t.append((segEnd, .agentStep(c)))
         }
         t.append((segEnd + 0.4, .segments(r.segments)))
-        t.append((segEnd + 0.4, .progress(stage: .diagnose, label: "Diagnose stellen", segments: nil)))
-        t.append((segEnd + 7.5, .progress(stage: .plan, label: "Reparatur planen", segments: nil)))
+        t.append((segEnd + 0.4, .progress(stage: .diagnose, label: tr("Diagnose stellen"), segments: nil)))
+        t.append((segEnd + 7.5, .progress(stage: .plan, label: tr("Reparatur planen"), segments: nil)))
         t.append((segEnd + 15, .result(r)))
         return t
     }

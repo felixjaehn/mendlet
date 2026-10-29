@@ -88,7 +88,7 @@ final class FlowModel {
 
         let request = AnalyzeRequest(
             imageBase64: ImageResizer.base64(photo), userNote: note,
-            extraImages: extraImages, answers: answers, locale: "de",
+            extraImages: extraImages, answers: answers, locale: Lang.apiCode,
             mockScenario: settings.demoMode ? settings.scenario.rawValue : (settings.scenarioRaw.isEmpty ? nil : settings.scenario.rawValue))
         let svc = service
         analysisTask?.cancel()
@@ -134,7 +134,7 @@ final class FlowModel {
         response = r
         isAnalyzing = false
         let hadLabel = (labelImage != nil) && r.diagnosis.labelInfo != nil
-        newInfoBanner = hadLabel ? r.diagnosis.labelInfo.map { "Etikett erkannt: " + $0.materials.joined(separator: ", ") } : nil
+        newInfoBanner = hadLabel ? r.diagnosis.labelInfo.map { tr("Etikett erkannt: %@", $0.materials.joined(separator: ", ")) } : nil
         if hadLabel, let base = labelBaseline { markChanged(from: base, to: r) }
         labelBaseline = nil
         persist()
@@ -172,7 +172,7 @@ final class FlowModel {
 
     func skipFollowUp() {
         let qs = response?.diagnosis.followUpQuestions ?? []
-        submitFollowUp(answers: qs.map { AnswerPayload(questionId: $0.id, text: "Keine Angabe") }, images: [])
+        submitFollowUp(answers: qs.map { AnswerPayload(questionId: $0.id, text: tr("Keine Angabe")) }, images: [])
     }
 
     // MARK: Optional label photo (jeans)
@@ -202,7 +202,7 @@ final class FlowModel {
             guard let self, self.response?.caseId == old.caseId else { return }
             let sane = FlowGate.sanitized(new)
             self.markChanged(from: old, to: sane)
-            self.newInfoBanner = sane.diagnosis.labelInfo.map { "Etikett erkannt: " + $0.materials.joined(separator: ", ") }
+            self.newInfoBanner = sane.diagnosis.labelInfo.map { tr("Etikett erkannt: %@", $0.materials.joined(separator: ", ")) }
             self.labelBusy = false
             withAnimation(Theme.spring) { self.response = sane }
             self.currentStep = 0; self.completedSteps = []

@@ -36,7 +36,7 @@ struct ShoppingListView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                ShareLink(item: ShoppingGate.shareText(title: flow.response?.diagnosis.summary.components(separatedBy: ".").first ?? "Reparatur", items: items, statuses: flow.statuses)) {
+                ShareLink(item: ShoppingGate.shareText(title: flow.response?.diagnosis.summary.components(separatedBy: ".").first ?? tr("Reparatur"), items: items, statuses: flow.statuses)) {
                     Image(systemName: "square.and.arrow.up")
                 }
                 .accessibilityLabel("Liste teilen")
@@ -45,7 +45,7 @@ struct ShoppingListView: View {
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 8) {
                 if !open.isEmpty {
-                    Text("Noch \(open.count) \(open.count == 1 ? "Pflichtteil" : "Pflichtteile") offen")
+                    Text(tr(open.count == 1 ? "Noch %lld Pflichtteil offen" : "Noch %lld Pflichtteile offen", open.count))
                         .font(.footnote.weight(.medium)).foregroundStyle(Theme.inkSecondary)
                 }
                 PrimaryButton(title: "Reparatur starten", systemImage: "play.fill") { flow.startRepair() }
@@ -60,7 +60,7 @@ struct ShoppingListView: View {
             Image(systemName: "cart.fill").foregroundStyle(Theme.thread)
                 .frame(width: 44, height: 44).background(Theme.threadSoft, in: Circle())
             VStack(alignment: .leading, spacing: 2) {
-                Text(buyCount == 0 ? "Noch nichts zu kaufen" : "\(buyCount) \(buyCount == 1 ? "Ding" : "Dinge") kaufen")
+                Text(buyCount == 0 ? tr("Noch nichts zu kaufen") : tr(buyCount == 1 ? "%lld Ding kaufen" : "%lld Dinge kaufen", buyCount))
                     .font(.headline).foregroundStyle(Theme.ink)
                 if let d = decision, !d.costEur.isEmpty {
                     Text("Gesamtkosten laut Schätzung \(Fmt.euro(d.costEur))").font(.footnote).foregroundStyle(Theme.inkSecondary)
@@ -117,7 +117,7 @@ struct ShoppingListView: View {
                         copied = item.id; Haptics.selection()
                         Task { try? await Task.sleep(for: .seconds(1.5)); if copied == item.id { copied = nil } }
                     } label: {
-                        Label(copied == item.id ? "Kopiert" : "Kopieren", systemImage: copied == item.id ? "checkmark" : "doc.on.doc")
+                        Label(copied == item.id ? tr("Kopiert") : tr("Kopieren"), systemImage: copied == item.id ? "checkmark" : "doc.on.doc")
                             .font(.footnote.weight(.semibold)).foregroundStyle(Theme.thread)
                     }
                 }
@@ -141,7 +141,7 @@ struct ShoppingListView: View {
         Button(action: action) {
             HStack(spacing: 6) {
                 Image(systemName: icon).font(.caption.weight(.bold))
-                Text(title).font(.subheadline.weight(.semibold))
+                Text(tr(title)).font(.subheadline.weight(.semibold))
             }
             .padding(.horizontal, 14).frame(minHeight: 40)
             .foregroundStyle(active ? .white : Theme.inkSecondary)

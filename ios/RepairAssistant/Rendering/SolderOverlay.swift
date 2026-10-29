@@ -124,7 +124,7 @@ struct SolderOverlay: View {
     }
 
     private var holdControl: some View {
-        let label = finished ? "Zinn zugeführt" : (holdStart == nil ? "\(Int(hold)) s erhitzen · Zinn zuführen" : "Halten …")
+        let label = finished ? tr("Zinn zugeführt") : (holdStart == nil ? tr("%lld s erhitzen · Zinn zuführen", Int(hold)) : tr("Halten …"))
         return ZStack {
             if let p = padPoint {
                 Circle().fill(.clear).frame(width: 64, height: 64).contentShape(Circle())

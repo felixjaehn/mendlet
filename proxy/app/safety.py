@@ -7,6 +7,7 @@ import math
 import re
 from dataclasses import dataclass
 
+from . import i18n
 from .models import (
     ESTIMATE_NOTE,
     AnalyzeResponse,
@@ -21,19 +22,41 @@ MAX_QUESTIONS = 3
 
 RISK_ORDER: dict[str, int] = {"allowed": 0, "warn_only": 1, "professional": 2}
 
-_REASON_WARN = (
-    "Dieser Gegenstand kann gefährlich sein (zum Beispiel Akku, Netzanschluss oder Gas). "
-    "Dafür gibt es hier keine Reparaturanleitung. Bitte wende dich an den Hersteller oder einen Fachbetrieb."
-)
-_REASON_PRO = (
-    "Dieser Gegenstand ist sicherheitsrelevant. Bitte lass ihn von einem Fachbetrieb prüfen oder ersetzen."
-)
-_REASON_UNSUPPORTED = "Dieses Objekt wird nicht unterstützt. Die App hilft nur bei Textilien und Schuhen."
+_REASON_WARN = {
+    "de": "Dieser Gegenstand kann gefährlich sein (zum Beispiel Akku, Netzanschluss oder Gas). "
+          "Dafür gibt es hier keine Reparaturanleitung. Bitte wende dich an den Hersteller oder einen Fachbetrieb.",
+    "en": "This item can be dangerous (for example a battery, mains connection or gas). "
+          "There is no repair guide for it here. Please contact the manufacturer or a professional.",
+}
+_REASON_PRO = {
+    "de": "Dieser Gegenstand ist sicherheitsrelevant. Bitte lass ihn von einem Fachbetrieb prüfen oder ersetzen.",
+    "en": "This item is safety-critical. Please have a professional inspect or replace it.",
+}
+_REASON_UNSUPPORTED = {
+    "de": "Dieses Objekt wird nicht unterstützt. Die App hilft nur bei Textilien und Schuhen.",
+    "en": "This object is not supported. The app only helps with textiles and shoes.",
+}
+_NOTE_HINT = {"de": "Hinweis aus deiner Beschreibung", "en": "Hint from your description"}
+_FOLLOW_UP_CLOSEUP = {
+    "de": "Mach bitte eine scharfe Nahaufnahme der Schadstelle aus einem anderen Winkel.",
+    "en": "Please take a sharp close-up of the damage from a different angle.",
+}
 
-# (pattern, risk, short German label)
+# (pattern, risk, short label) as {"de": ..., "en": ...}; German and English notes are always both checked
 _KEYWORDS: list[tuple[re.Pattern[str], RiskLevel, str]] = [
     (re.compile(p, re.IGNORECASE), risk, label)
     for p, risk, label in [
+        (r"batter(?:y|ies)|accumulator", "warn_only", "Akku"),
+        (r"power\s?(?:supply|adapter|cord|cable|plug)|\bmains\b|wall\s?(?:outlet|socket)|charger", "warn_only", "Netzanschluss"),
+        (r"\b(?:230|240|110)\s?v\b|\bmains\s?voltage", "warn_only", "Netzspannung"),
+        (r"capacitor|flash\s?unit|strobe", "warn_only", "Kondensator"),
+        (r"heated\s|heating\s?(?:pad|element|jacket|vest|insole)|heated$", "warn_only", "Heizelement"),
+        (r"\bgas\b|gas\s?(?:stove|cartridge|cylinder|appliance)", "warn_only", "Gas"),
+        (r"light-?up\s?(?:shoe|sneaker)|led\s?(?:shoe|sneaker)|blinking\s?shoe", "warn_only", "Elektronik im Schuh"),
+        (r"\bhelmets?\b", "professional", "Helm"),
+        (r"child\s?(?:car\s?)?seat|car\s?seat|baby\s?(?:seat|carrier shell)", "professional", "Kindersitz"),
+        (r"\bbrakes?\b|brake\s?(?:pad|disc|disk)", "professional", "Bremse"),
+        (r"air\s?bag|seat\s?belt|climbing\s?(?:harness|rope)|parachute|harness", "professional", "Sicherheitsausrüstung"),
         (r"akku", "warn_only", "Akku"),
         (r"lithium|li-?ion|lipo\b", "warn_only", "Lithium"),
         (r"netzteil|ladeger[aä]t|netzbetrieb|steckdose|netzkabel|netzstecker", "warn_only", "Netzanschluss"),
@@ -65,10 +88,18 @@ def stricter(a: RiskLevel, b: RiskLevel) -> RiskLevel:
 # ("kein/keine/ohne … Akku/Lithium") is ignored; Prompt A still checks the photo for batteries, and every
 # other hazard keyword stays conservative even when negated.
 _NEGATED_BATTERY = re.compile(
-    r"\b(?:kein(?:e|en|em|er)?|ohne)\s+(?:\w+\s+){0,2}?(?:akku[\w-]*|lithium[\w-]*|li-?ion[\w-]*|lipo)\b", re.IGNORECASE)
+    r"\b(?:kein(?:e|en|em|er)?|ohne)\s+(?:\w+\s+){0,2}?(?:akku[\w-]*|lithium[\w-]*|li-?ion[\w-]*|lipo)\b"
+    r"|\b(?:no|without)\s+(?:\w+\s+){0,2}?(?:batter(?:y|ies)|lithium[\w-]*|li-?ion[\w-]*|lipo)\b", re.IGNORECASE)
 
 
-def precheck_note(note: str | None) -> PreCheck:
+LABELS_EN = {
+    "Akku": "Battery", "Lithium": "Lithium", "Netzanschluss": "Mains connection", "Netzspannung": "Mains voltage",
+    "Kondensator": "Capacitor", "Heizelement": "Heating element", "Gas": "Gas", "Elektronik im Schuh": "Electronics in the shoe",
+    "Helm": "Helmet", "Kindersitz": "Child seat", "Bremse": "Brake", "Sicherheitsausrüstung": "Safety equipment",
+}
+
+
+def precheck_note(note: str | None, locale: str | None = None) -> PreCheck:
     """Keyword pre-check on the user's free text."""
     risk: RiskLevel = "allowed"
     matches: list[str] = []
@@ -79,8 +110,9 @@ def precheck_note(note: str | None) -> PreCheck:
             risk = stricter(risk, level)
     if risk == "allowed":
         return PreCheck("allowed", None, ())
-    reason = _REASON_PRO if risk == "professional" else _REASON_WARN
-    return PreCheck(risk, f"{reason} (Hinweis aus deiner Beschreibung: {', '.join(matches)})", tuple(matches))
+    reason = i18n.pick(_REASON_PRO if risk == "professional" else _REASON_WARN, locale)
+    shown = [LABELS_EN.get(m, m) for m in matches] if i18n.norm(locale) == "en" else matches
+    return PreCheck(risk, f"{reason} ({i18n.pick(_NOTE_HINT, locale)}: {', '.join(shown)})", tuple(matches))
 
 
 def apply_precheck(cls: ClassifyResult, pre: PreCheck) -> ClassifyResult:
@@ -93,14 +125,14 @@ def is_blocked(category: str, risk_level: str) -> bool:
     return risk_level != "allowed" or category == "unsupported"
 
 
-def blocked_reason(category: str, risk_level: str, given: str | None) -> str:
+def blocked_reason(category: str, risk_level: str, given: str | None, locale: str | None = None) -> str:
     if given and given.strip():
         return given
     if risk_level == "professional":
-        return _REASON_PRO
+        return i18n.pick(_REASON_PRO, locale)
     if risk_level == "warn_only":
-        return _REASON_WARN
-    return _REASON_UNSUPPORTED
+        return i18n.pick(_REASON_WARN, locale)
+    return i18n.pick(_REASON_UNSUPPORTED, locale)
 
 
 def _clamp01(value: float) -> float:
@@ -109,7 +141,8 @@ def _clamp01(value: float) -> float:
     return max(0.0, min(1.0, value))
 
 
-def enforce(resp: AnalyzeResponse, *, has_answers: bool, precheck: PreCheck | None = None) -> AnalyzeResponse:
+def enforce(resp: AnalyzeResponse, *, has_answers: bool, precheck: PreCheck | None = None,
+            locale: str | None = None) -> AnalyzeResponse:
     """Apply all contract/safety rules to a response; returns a corrected copy."""
     r = resp.model_copy(deep=True)
 
@@ -119,7 +152,7 @@ def enforce(resp: AnalyzeResponse, *, has_answers: bool, precheck: PreCheck | No
         r.safety.reason = precheck.reason
     blocked = is_blocked(r.category, r.risk_level)
     r.safety.blocked = blocked
-    r.safety.reason = blocked_reason(r.category, r.risk_level, r.safety.reason) if blocked else None
+    r.safety.reason = blocked_reason(r.category, r.risk_level, r.safety.reason, locale) if blocked else None
 
     # --- diagnosis ---
     d, dec = r.diagnosis, r.decision
@@ -142,11 +175,11 @@ def enforce(resp: AnalyzeResponse, *, has_answers: bool, precheck: PreCheck | No
                 FollowUpQuestion(
                     id="q1",
                     type="photo",
-                    prompt="Mach bitte eine scharfe Nahaufnahme der Schadstelle aus einem anderen Winkel.",
+                    prompt=i18n.pick(_FOLLOW_UP_CLOSEUP, locale),
                     purpose="closeup",
                 )
             ]
-    dec.estimate_note = ESTIMATE_NOTE
+    dec.estimate_note = i18n.pick(i18n.ESTIMATE_NOTE, locale) if i18n.norm(locale) == "en" else ESTIMATE_NOTE
     dec.time_minutes = sorted(max(0, t) for t in dec.time_minutes)
     dec.cost_eur = sorted(max(0.0, c) for c in dec.cost_eur)
 
@@ -191,7 +224,7 @@ def enforce(resp: AnalyzeResponse, *, has_answers: bool, precheck: PreCheck | No
 
 # ---- /step-help -------------------------------------------------------------
 
-_ESCALATE = re.compile(r"rauch|hei(ß|ss)|akku|brenn|brand|funken|qualm|schmor|verbrenn|verätz", re.IGNORECASE)
+_ESCALATE = re.compile(r"smok|burn|fire|spark|fume|scorch|melt|overheat|hot\b|battery|rauch|hei(ß|ss)|akku|brenn|brand|funken|qualm|schmor|verbrenn|verätz", re.IGNORECASE)
 
 
 def step_help_escalation(issue_text: str, risk_level: str) -> bool:

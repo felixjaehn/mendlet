@@ -48,8 +48,8 @@ struct BeforeAfterSlider: View {
                     .scaleEffect(dragging ? 1.1 : 1)
                     .position(x: x, y: h / 2)
                 // side chips
-                tag("Vorher").opacity(frac > 0.2 ? 1 : 0).padding(12).frame(width: w, height: h, alignment: .topLeading)
-                tag("Nachher").opacity(frac < 0.8 ? 1 : 0).padding(12).frame(width: w, height: h, alignment: .topTrailing)
+                tag(tr("Vorher")).opacity(frac > 0.2 ? 1 : 0).padding(12).frame(width: w, height: h, alignment: .topLeading)
+                tag(tr("Nachher")).opacity(frac < 0.8 ? 1 : 0).padding(12).frame(width: w, height: h, alignment: .topTrailing)
                 HStack(spacing: 6) {
                     Image(systemName: "sparkles").font(.caption.weight(.bold))
                     Text("Vorschau · Muse Image").font(.caption.weight(.semibold))

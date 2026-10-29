@@ -85,7 +85,7 @@ struct FollowUpSheet: View {
                 PrimaryButton(title: "Aus Galerie", systemImage: "photo.on.rectangle", kind: .secondary) { showGallery = true }
             }
         case .choice:
-            let opts = q.options.isEmpty ? ["Baumwolle", "Wolle", "Polyester", "Weiß ich nicht"] : q.options
+            let opts = q.options.isEmpty ? [tr("Baumwolle"), tr("Wolle"), tr("Polyester"), tr("Weiß ich nicht")] : q.options
             FlowLayout(spacing: 8) {
                 ForEach(opts, id: \.self) { o in
                     Button { answer(text: o) } label: { Chip(title: o, tint: Theme.thread, isOn: true) }
@@ -103,16 +103,16 @@ struct FollowUpSheet: View {
 
     private func photoTitle(_ q: FollowUpQuestion) -> String {
         switch q.purpose {
-        case .label: "Etikett fotografieren"
-        case .closeup: "Nahaufnahme machen"
-        case .other: "Foto aufnehmen"
+        case .label: tr("Etikett fotografieren")
+        case .closeup: tr("Nahaufnahme machen")
+        case .other: tr("Foto aufnehmen")
         }
     }
 
     private func addPhoto(_ img: UIImage) {
         guard let q = current else { return }
         images.append((q.purpose, ImageResizer.resized(img)))
-        transcript.append((q.prompt, q.purpose == .label ? "Etikett-Foto gesendet" : "Foto gesendet", img))
+        transcript.append((q.prompt, q.purpose == .label ? tr("Etikett-Foto gesendet") : tr("Foto gesendet"), img))
         Haptics.success()
         advance()
     }
@@ -129,7 +129,7 @@ struct FollowUpSheet: View {
 
     private func skip() {
         guard let q = current else { return }
-        answers.append(AnswerPayload(questionId: q.id, text: "Keine Angabe"))
+        answers.append(AnswerPayload(questionId: q.id, text: tr("Keine Angabe")))
         advance(skipped: true)
     }
 

@@ -26,13 +26,13 @@ enum APIError: LocalizedError, Sendable, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .invalidURL: "Die Server-Adresse ist ungültig. Prüfe die Einstellungen."
-        case .http(let c): "Der Server meldet einen Fehler (\(c)). Bitte versuche es erneut."
-        case .server(let m): m.isEmpty ? "Die Analyse ist fehlgeschlagen." : m
-        case .timeout: "Die Analyse dauert zu lange. Bitte versuche es erneut."
-        case .unreachable: "Der Server antwortet nicht. Läuft der Proxy?"
-        case .emptyResult: "Ich finde die Stelle nicht sicher. Mach ein schärferes Foto oder versuche es noch einmal."
-        case .decoding: "Die Antwort des Servers war unlesbar. Bitte versuche es erneut."
+        case .invalidURL: tr("Die Server-Adresse ist ungültig. Prüfe die Einstellungen.")
+        case .http(let c): tr("Der Server meldet einen Fehler (%lld). Bitte versuche es erneut.", c)
+        case .server(let m): m.isEmpty ? tr("Die Analyse ist fehlgeschlagen.") : m
+        case .timeout: tr("Die Analyse dauert zu lange. Bitte versuche es erneut.")
+        case .unreachable: tr("Der Server antwortet nicht. Läuft der Proxy?")
+        case .emptyResult: tr("Ich finde die Stelle nicht sicher. Mach ein schärferes Foto oder versuche es noch einmal.")
+        case .decoding: tr("Die Antwort des Servers war unlesbar. Bitte versuche es erneut.")
         }
     }
 
@@ -127,7 +127,7 @@ enum SSEDecoder {
             catch { throw APIError.decoding }
         case "grounding":
             let g = try? decoder.decode(GroundingPayload.self, from: data)
-            return .grounding(label: g?.label ?? "Schadstelle genauer lokalisieren")
+            return .grounding(label: g?.label ?? tr("Schadstelle genauer lokalisieren"))
         case "segments":
             guard let p = try? decoder.decode(SegmentsPayload.self, from: data), let segs = p.segments, !segs.isEmpty else { return nil }
             return .segments(segs)
@@ -259,7 +259,9 @@ struct LiveAPIClient: AnalysisService {
 
     func transcribe(fileURL: URL) async throws -> String {
         let boundary = "Boundary-\(UUID().uuidString)"
-        var req = URLRequest(url: url("transcribe"))
+        var transcribeURL = URLComponents(url: url("transcribe"), resolvingAgainstBaseURL: false) ?? URLComponents()
+        transcribeURL.queryItems = [URLQueryItem(name: "locale", value: Lang.apiCode)]
+        var req = URLRequest(url: transcribeURL.url ?? url("transcribe"))
         req.httpMethod = "POST"
         req.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         let audio = try Data(contentsOf: fileURL)

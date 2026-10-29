@@ -35,7 +35,7 @@ struct StepHelpSheet: View {
                         HStack {
                             let attached = extraPhoto != nil
                             PhotosPicker(selection: $pickerItem, matching: .images) {
-                                Label(attached ? "Foto angehängt" : "Foto anhängen", systemImage: attached ? "checkmark.circle.fill" : "paperclip")
+                                Label(attached ? tr("Foto angehängt") : tr("Foto anhängen"), systemImage: attached ? "checkmark.circle.fill" : "paperclip")
                                     .font(.subheadline.weight(.semibold)).foregroundStyle(attached ? Theme.safe : Theme.thread)
                             }
                             Spacer()
@@ -108,6 +108,6 @@ struct StepHelpSheet: View {
             riskLevel: flow.response?.riskLevel ?? .allowed,
             issueText: issue, imageBase64: extraPhoto.map { ImageResizer.base64($0) })
         do { result = try await flow.service.stepHelp(req) }
-        catch { self.error = (error as? APIError)?.errorDescription ?? "Das hat nicht geklappt." }
+        catch { self.error = (error as? APIError)?.errorDescription ?? tr("Das hat nicht geklappt.") }
     }
 }

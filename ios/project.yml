@@ -30,6 +30,7 @@ targets:
       properties:
         CFBundleDisplayName: Reparatur-Assistent
         CFBundleDevelopmentRegion: de
+        CFBundleLocalizations: [de, en]
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         NSCameraUsageDescription: "Die Kamera erkennt Schäden im Live-Bild, nimmt ein Foto auf und zeigt Stichpunkte auf dem Stoff."
@@ -50,6 +51,12 @@ targets:
     platform: iOS
     sources:
       - path: RepairAssistantTests
+      - path: ../ios/RepairAssistant/Localizable.xcstrings
+        buildPhase:
+          copyFiles: {destination: resources, subpath: catalogs}
+      - path: ../ios/RepairAssistant/InfoPlist.xcstrings
+        buildPhase:
+          copyFiles: {destination: resources, subpath: catalogs}
     dependencies:
       - target: RepairAssistant
     settings:

@@ -10,6 +10,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from . import i18n
 from .config import REPO_DIR
 from .models import ClassifyResult, DiagnosePlan, StepHelpResponse
 
@@ -17,9 +18,9 @@ MARKER = "\n\nJSON-Schema der Antwort (strikt einhalten, keine zusätzlichen Fel
 
 PROMPTS: dict[str, tuple[str, str, type[BaseModel]]] = {
     # key: (version, file name, answer model)
-    "classify": ("v1", "prompt_a_classify.v1.txt", ClassifyResult),
-    "diagnose": ("v4", "prompt_b_diagnose.v4.txt", DiagnosePlan),
-    "step_help": ("v1", "prompt_c_step_help.v1.txt", StepHelpResponse),
+    "classify": ("v2", "prompt_a_classify.v2.txt", ClassifyResult),
+    "diagnose": ("v5", "prompt_b_diagnose.v5.txt", DiagnosePlan),
+    "step_help": ("v2", "prompt_c_step_help.v2.txt", StepHelpResponse),
 }
 
 
@@ -51,9 +52,15 @@ def prompt_version(key: str) -> str:
     return PROMPTS[key][0]
 
 
-def load_prompt(key: str, prompts_dir: Path | None = None) -> str:
+def load_prompt(key: str, prompts_dir: Path | None = None, locale: str | None = None) -> str:
+    """Prompt text with the output language of `locale` filled in (`{language}`, `{estimate_note}`).
+
+    Only these two placeholders are replaced; the JSON schema block contains braces and stays untouched.
+    """
     _, name, _ = PROMPTS[key]
-    return ((prompts_dir or REPO_DIR / "prompts") / name).read_text(encoding="utf-8").strip()
+    text = ((prompts_dir or REPO_DIR / "prompts") / name).read_text(encoding="utf-8").strip()
+    return text.replace("{language}", i18n.language_name(locale)).replace(
+        "{estimate_note}", i18n.pick(i18n.ESTIMATE_NOTE, locale))
 
 
 def write_schemas(prompts_dir: Path | None = None) -> None:

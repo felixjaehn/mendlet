@@ -21,16 +21,16 @@ struct BlockView: View {
     }
     private var title: String {
         switch variant {
-        case .warn: "Hier reparieren wir lieber nicht selbst"
-        case .professional: "Das gehört in Profi-Hände"
-        case .unsupported: "Dafür bin ich nicht gemacht"
+        case .warn: tr("Hier reparieren wir lieber nicht selbst")
+        case .professional: tr("Das gehört in Profi-Hände")
+        case .unsupported: tr("Dafür bin ich nicht gemacht")
         }
     }
     private var tips: [String] {
         switch variant {
-        case .warn: ["Lass das Teil vom Hersteller oder einem Fachbetrieb prüfen.", "Akkus getrennt an einer Sammelstelle abgeben, nie in den Hausmüll.", "Frag in einem Reparaturcafé, ob dort Elektrofachleute helfen."]
-        case .professional: ["Frag den Hersteller oder einen Fachbetrieb nach Prüfung oder Ersatz.", "Benutze das Teil bis dahin nicht.", "Ein Reparaturcafé kann dir sagen, wer in deiner Nähe helfen kann."]
-        case .unsupported: ["Ich helfe bei Kleidung und Schuhen.", "Mach ein neues Foto von dem Teil, das du reparieren willst.", "Für andere Dinge hilft ein Reparaturcafé in deiner Nähe."]
+        case .warn: [tr("Lass das Teil vom Hersteller oder einem Fachbetrieb prüfen."), tr("Akkus getrennt an einer Sammelstelle abgeben, nie in den Hausmüll."), tr("Frag in einem Reparaturcafé, ob dort Elektrofachleute helfen.")]
+        case .professional: [tr("Frag den Hersteller oder einen Fachbetrieb nach Prüfung oder Ersatz."), tr("Benutze das Teil bis dahin nicht."), tr("Ein Reparaturcafé kann dir sagen, wer in deiner Nähe helfen kann.")]
+        case .unsupported: [tr("Ich helfe bei Kleidung und Schuhen."), tr("Mach ein neues Foto von dem Teil, das du reparieren willst."), tr("Für andere Dinge hilft ein Reparaturcafé in deiner Nähe.")]
         }
     }
 

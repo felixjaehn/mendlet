@@ -73,9 +73,9 @@ struct CompletionView: View {
                     .font(.system(size: 52, weight: .bold, design: .rounded)).monospacedDigit().foregroundStyle(Theme.ink)
                     .minimumScaleFactor(0.6).lineLimit(1)
             }
-            Text("\(isShoe ? "Schuhe" : "Textil") vor Deponie oder Verbrennung bewahrt")
+            Text(isShoe ? tr("Schuhe vor Deponie oder Verbrennung bewahrt") : tr("Textil vor Deponie oder Verbrennung bewahrt"))
                 .font(.headline).foregroundStyle(Theme.ink)
-            Text("Grobe Schätzung nach Durchschnittsgewicht (\(est.garment), ca.).").font(.footnote).foregroundStyle(Theme.inkSecondary)
+            Text(tr("Grobe Schätzung nach Durchschnittsgewicht (%@, ca.).", tr(est.garment))).font(.footnote).foregroundStyle(Theme.inkSecondary)
             Divider().overlay(Theme.hairline)
             fact(ImpactFacts.headline)
             fact(ImpactFacts.lifetime)
@@ -88,7 +88,7 @@ struct CompletionView: View {
     private func fact(_ f: ImpactFacts.Fact) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(f.text).font(.subheadline).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
-            Text("Quelle: \(f.source)").font(.caption2).foregroundStyle(Theme.inkSecondary)
+            Text(tr("Quelle: %@", f.source)).font(.caption2).foregroundStyle(Theme.inkSecondary)
         }
     }
 
@@ -96,14 +96,14 @@ struct CompletionView: View {
         HStack(spacing: 10) {
             MetricTile(icon: "clock", title: "Zeit", value: elapsedText)
             MetricTile(icon: "eurosign.circle", title: "Kosten ca.", value: Fmt.euro(flow.response?.decision?.costEur ?? []))
-            MetricTile(icon: "checkmark.seal", title: "gerettet", value: flow.response?.category == .shoe ? "1 Paar" : "1 Teil")
+            MetricTile(icon: "checkmark.seal", title: "gerettet", value: flow.response?.category == .shoe ? tr("1 Paar") : tr("1 Teil"))
         }
     }
 
     private var elapsedText: String {
         guard let s = flow.guideStartedAt else { return "–" }
         let m = max(1, Int(Date().timeIntervalSince(s) / 60))
-        return "\(m) Min."
+        return tr("%lld Min.", m)
     }
 
     private var resultPhotoCard: some View {
@@ -111,8 +111,8 @@ struct CompletionView: View {
             SectionLabel(text: "Ergebnisfoto")
             if let after = flow.resultPhoto {
                 HStack(spacing: 10) {
-                    if let before = flow.photo { compare(before, "Vorher") }
-                    compare(after, "Nachher")
+                    if let before = flow.photo { compare(before, tr("Vorher")) }
+                    compare(after, tr("Nachher"))
                 }
             } else {
                 HStack(spacing: 10) {
@@ -136,7 +136,7 @@ struct CompletionView: View {
     }
 
     private func shareText(_ est: ImpactEstimator.Estimate) -> String {
-        "Ich habe gerade etwas repariert statt weggeworfen: ca. \(ImpactEstimator.format(kg: est.kilograms)) kg vor Deponie oder Verbrennung bewahrt (Schätzung). #Reparieren"
+        tr("Ich habe gerade etwas repariert statt weggeworfen: ca. %@ kg vor Deponie oder Verbrennung bewahrt (Schätzung). #Reparieren", ImpactEstimator.format(kg: est.kilograms))
     }
 }
 
