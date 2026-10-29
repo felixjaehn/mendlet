@@ -188,3 +188,15 @@ def test_negated_battery_is_not_a_hazard_but_other_negations_stay_conservative()
     assert precheck_note("Der Akku ist aufgebläht").risk_level == "warn_only"
     assert precheck_note("Kein Akku, aber am Netzteil").risk_level == "warn_only"
     assert precheck_note("kein Helm").risk_level == "professional"
+
+
+def test_second_life_only_for_replace_and_capped_at_three():
+    from app.models import SecondLife
+    ideas = [SecondLife(kind="upcycle", title=f"Idea {i}", text="Cut it into cleaning rags.") for i in range(5)]
+    plan = textile_tear()
+    plan.decision.recommendation = "replace"
+    plan.decision.second_life = ideas
+    assert len(safety.enforce(resp(plan=plan), has_answers=True).decision.second_life) == 3
+    plan = textile_tear()
+    plan.decision.second_life = ideas  # repair_self: ideas are dropped
+    assert safety.enforce(resp(plan=plan), has_answers=True).decision.second_life == []

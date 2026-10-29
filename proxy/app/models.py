@@ -246,6 +246,13 @@ class Diagnosis(Base):
     label_info: LabelInfo = LabelInfo()
 
 
+class SecondLife(Base):
+    """Replace only: what to do with the old item instead of the bin."""
+    kind: Literal["upcycle", "recycle", "donate"]
+    title: Annotated[str, Field(max_length=80)]
+    text: Annotated[str, Field(max_length=300)]
+
+
 class Decision(Base):
     recommendation: Literal["repair_self", "repair_pro", "replace"]
     reasoning: str
@@ -253,6 +260,7 @@ class Decision(Base):
     time_minutes: Annotated[list[int], Field(min_length=2, max_length=2)]
     cost_eur: Annotated[list[float], Field(min_length=2, max_length=2)]
     estimate_note: str = ESTIMATE_NOTE
+    second_life: list[SecondLife] = Field(default_factory=list)
 
 
 class ShoppingItem(Base):

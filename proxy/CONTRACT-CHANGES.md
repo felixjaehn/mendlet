@@ -148,3 +148,7 @@ data: {"n": 1, "tool": "segment", "label": "SAM sucht „rip“", "model": "sam-
 `model`: `sam-3.1`, `muse-spark-1.3` (locate, verify_mask) oder `muse-wonder-1.0` (finish); `status`: `done` oder `failed`; `n` zählt in Aufrufreihenfolge, bei parallelen Aufrufen kommen die Ereignisse in Abschlussreihenfolge. Ablauf: `progress(classify)`, `progress(segment)`, `agent_step`*, `segments`, `progress(diagnose)`, `progress(plan)`, `result`. `segments` kommt einmal nach dem Agentenlauf; es enthält nur nicht verworfene Segmente (von `verify_mask` abgelehnte Schadensmasken fallen weg), IDs sind laufzeitstabil und stimmen mit dem Ergebnis überein. `source`: `text` (segment), `grounding` (segment_at mit Box), `tap` (segment_at nur mit Punkten). Der Mock-Agent spielt sechs Schritte (segment ×2, locate, segment_at, verify_mask, finish) mit Verzögerungen ab. `/health` meldet zusätzlich `agent_mode`.
 
 Wonder-Kosten (Standard-Modus, https://dev.meta.ai/docs/pricing-rate-limits, gelesen 28.10.2026): 4,00 $ Input, 20,00 $ Output, 0,20 $ gecachter Input je 1 Mio. Token. Tatsächliche Abrechnung, Reasoning-Token im Verbrauch und Live-Verhalten der Tool-Schleife **UNBESTÄTIGT**; `reasoning`-Parameter wird bewusst nicht gesendet.
+
+## `decision.second_life` (29.10.2026, additiv)
+
+Nur bei `recommendation: "replace"`: bis zu drei Ideen für das alte Stück, `[{kind: "upcycle"|"recycle"|"donate", title, text}]`. Bei allen anderen Empfehlungen und bei gesperrten Fällen erzwingt der Proxy `[]`. Diagnose-Prompt v6. Alte Clients ignorieren das Feld.

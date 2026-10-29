@@ -19,7 +19,7 @@ MARKER = "\n\nJSON-Schema der Antwort (strikt einhalten, keine zusätzlichen Fel
 PROMPTS: dict[str, tuple[str, str, type[BaseModel]]] = {
     # key: (version, file name, answer model)
     "classify": ("v2", "prompt_a_classify.v2.txt", ClassifyResult),
-    "diagnose": ("v5", "prompt_b_diagnose.v5.txt", DiagnosePlan),
+    "diagnose": ("v6", "prompt_b_diagnose.v6.txt", DiagnosePlan),
     "step_help": ("v2", "prompt_c_step_help.v2.txt", StepHelpResponse),
 }
 

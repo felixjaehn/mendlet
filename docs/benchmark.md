@@ -239,3 +239,16 @@ Ergebnis: 8 Fehltreffer weniger, kein echter Schaden verloren. Damit erreicht de
 | "USB-Leselampe ohne Akku: die Micro-USB-Buchse für die Stromversorgung hat sich gelöst" | – | `allowed`, Konfidenz 0,5, Rückfrage nach Nahaufnahme von unten und von der Seite, keine geratene Lötanleitung |
 
 Einordnung: Ein Gerät, das "nicht mehr lädt", lädt in der Regel einen Akku. Die Sperre ist vorsichtig und vertretbar. Die ursprüngliche Testfall-Notiz war unglücklich formuliert. SAM findet die Buchse selbst mit keinem Begriff (`usb port`, `micro usb connector`, `connector`: 0 Treffer). Das Elektronik-Grounding sucht bisher nur Lötpads.
+
+## Echte Handyfotos (29.10.2026, live)
+
+Zwei echte Fotos (`testdata/real/`, 2048×1536) zusätzlich zu den 16 KI-Fotos. Lauf: `docs/benchmark-runs/2026-10-29-real/`, Kontaktbogen `2026-10-29-real-overlays.jpg`.
+
+| Fall | Empfehlung | Konf. | Schadensmaske | Befund |
+| --- | --- | --- | --- | --- |
+| Ledersohle, bis zum Loch durchgelaufen | `repair_pro` (neu besohlen, 35–80 €) | 0,88 | erst falsch: SAM `detached sole` 0,57 über die ganze Sohle; nach Fix: Loch genau umrandet (Spark → SAM) | richtige Entscheidung |
+| Pulli, kleines Loch | `repair_self` (Stopfen, 20–40 min) | 0,75 | Loch genau umrandet (Spark → SAM, 0,80), 0,7 % der Bildfläche | richtige Entscheidung |
+
+**Fix im Merge (`proxy/app/pipeline.py`):** Liegt eine Grounding-Box innerhalb einer SAM-Schadensbox und ist kleiner als 15 % ihrer Fläche, ersetzt sie diese. Vorher galt die kleine Box als Duplikat und wurde verworfen. Test: `test_small_grounded_hole_replaces_broad_sam_damage_around_it`.
+
+**App:** Beide Fotos sind englische Demo-Aufnahmen (`real_sweater`, `real_sole`, Pulli mit Muse-Image-Vorschau). Kleine Schäden (unter 4 % der Fläche) zoomen Diagnose, Anleitung und PDF automatisch heran (Pinch, Doppeltipp, Taste „Whole photo“). Masken sind kräftiger, kleine Schäden bekommen einen Ring. „Wrong spot marked? Refine“ schickt einen Tipp als SAM-Punkt-Prompt an `/refine`.
