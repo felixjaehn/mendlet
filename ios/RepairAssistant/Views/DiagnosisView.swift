@@ -64,6 +64,15 @@ struct DiagnosisView: View {
         }
     }
 
+    private func chipGroups(_ segments: [Segment]) -> [(label: String, ids: [String], first: Segment)] {
+        var order: [String] = [], groups: [String: [Segment]] = [:]
+        for s in segments {
+            if groups[s.label] == nil { order.append(s.label) }
+            groups[s.label, default: []].append(s)
+        }
+        return order.map { (label: $0, ids: groups[$0]!.map(\.id), first: groups[$0]![0]) }
+    }
+
     private func chipBar(_ r: AnalyzeResponse) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
@@ -71,14 +80,17 @@ struct DiagnosisView: View {
                     withAnimation(Theme.spring) { hidden = hidden.isEmpty ? Set(r.segments.map(\.id)) : [] }
                     Haptics.selection()
                 } label: { Chip(title: "Alle", systemImage: "square.stack.3d.up", tint: Theme.ink, isOn: hidden.isEmpty, filled: hidden.isEmpty) }
-                ForEach(r.segments) { s in
+                // One chip per label ("Loch ×3"), matching the grouped label pins on the photo.
+                ForEach(chipGroups(r.segments), id: \.label) { g in
+                    let off = g.ids.allSatisfy(hidden.contains)
                     Button {
-                        withAnimation(Theme.spring) { if hidden.contains(s.id) { hidden.remove(s.id) } else { hidden.insert(s.id) } }
+                        withAnimation(Theme.spring) { if off { hidden.subtract(g.ids) } else { hidden.formUnion(g.ids) } }
                         Haptics.selection()
                     } label: {
-                        Chip(title: s.label, systemImage: hidden.contains(s.id) ? "eye.slash" : "eye", tint: segmentColor(s, in: r.segments), isOn: !hidden.contains(s.id))
+                        Chip(title: g.ids.count > 1 ? "\(tr(g.label)) ×\(g.ids.count)" : g.label, systemImage: off ? "eye.slash" : "eye",
+                             tint: segmentColor(g.first, in: r.segments), isOn: !off)
                     }
-                    .accessibilityLabel(tr(hidden.contains(s.id) ? "%@ einblenden" : "%@ ausblenden", tr(s.label)))
+                    .accessibilityLabel(tr(off ? "%@ einblenden" : "%@ ausblenden", tr(g.label)))
                 }
             }
             .padding(.horizontal, Theme.margin)

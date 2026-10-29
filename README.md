@@ -6,6 +6,16 @@ Point your phone at a torn shirt, a split seam, a sneaker whose sole is coming o
 
 **Why it matters:** Every second, one garbage truck of clothing is landfilled or burned worldwide (Ellen MacArthur Foundation). Every person in the EU throws away about 16 kg of textiles a year (EEA, 2022). Wearing clothes nine months longer cuts their footprint by up to 20 % (WRAP). Many of those items fail at one tear that could be fixed in 20 minutes. Sources and verification status: [`docs/impact.md`](docs/impact.md).
 
+## Screenshots
+
+Demo mode, English, real recorded Meta API responses (`scripts/screenshots.sh` re-takes them).
+
+| Agent log with recovery | Mask on the real tear | 3 holes, one label | Before / after (Muse Image) |
+| --- | --- | --- | --- |
+| ![](docs/screenshots/v6-en-analysis-agent.png) | ![](docs/screenshots/v6-en-diagnosis-jeans.png) | ![](docs/screenshots/v6-en-diagnosis-sweater.png) | ![](docs/screenshots/v6-en-decision-slider.png) |
+| **Darning path from the mask** | **Wire → pad, with polarity** | **Glue zone, press direction, timer** | **Battery: blocked** |
+| ![](docs/screenshots/v6-en-guide-darning.png) | ![](docs/screenshots/v6-en-guide-solder.png) | ![](docs/screenshots/v6-en-guide-shoe.png) | ![](docs/screenshots/v6-en-blocked-battery.png) |
+
 ## Not an image analyzer: what happens between photo and plan
 
 ```mermaid
