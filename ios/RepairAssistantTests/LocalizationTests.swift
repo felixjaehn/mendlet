@@ -5,7 +5,10 @@ import XCTest
 final class LocalizationTests: XCTestCase {
     private var original = "de"
     override func setUp() { original = Lang.shared.choice }
-    override func tearDown() { Lang.shared.choice = original }
+    override func tearDown() {
+        Lang.shared.choice = original
+        UserDefaults.standard.removeObject(forKey: Lang.defaultsKey)  // tests must not leave a language override behind
+    }
 
     private func catalog(_ name: String) throws -> [String: Any] {
         // The raw catalogs are copied into the test bundle (project.yml), the simulator cannot read the source tree.
