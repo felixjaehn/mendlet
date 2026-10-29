@@ -244,7 +244,9 @@ async def test_agent_full_loop_wire_steps_budget_and_contract(tmp_path):
             assert data['model'] == 'muse-wonder-1.0' and data['tool_choice'] == 'auto'
             assert [t['name'] for t in data['tools']] == ['segment', 'segment_at', 'locate', 'verify_mask', 'finish']
             assert all(t['type'] == 'function' and 'function' not in t for t in data['tools'])  # flat format
-            assert 'previous_response_id' not in data and 'Änderungsschneiderin' in data['instructions']
+            assert 'previous_response_id' not in data and 'nur die Wahrnehmung' in data['instructions']
+            assert data['reasoning'] == {'effort': 'low'}  # docs/reasoning: nested on the Responses API
+            assert next(t for t in data['tools'] if t['name'] == 'finish')['parameters']['properties'] == {}
             content = data['input'][0]['content']
             assert content[0]['type'] == 'input_text' and content[1]['image_url'].startswith('data:image/jpeg;base64,')
             return wonder_response(n, fc('segment', {'concept': 'rip'}, 'call_a'))
@@ -260,7 +262,7 @@ async def test_agent_full_loop_wire_steps_budget_and_contract(tmp_path):
             assert data['previous_response_id'] == 'resp_2'
             outs = {o['call_id']: json.loads(o['output']) for o in data['input']}
             assert outs['call_b']['on_damage'] is True and 'error' in outs['call_c']
-            return wonder_response(n, fc('finish', plan_args(), 'call_d'))
+            return wonder_response(n, fc('finish', {}, 'call_d'))
         raise AssertionError('unexpected round')
     script = Script(rounds)
     c = agent_client(tmp_path, script)
@@ -273,7 +275,8 @@ async def test_agent_full_loop_wire_steps_budget_and_contract(tmp_path):
         assert [s.id for s in result.segments] == ['seg_1'] and result.segments[0].source == 'text'
         assert seen == [['seg_1']] and progress == ['classify', 'segment', 'diagnose', 'plan']
         assert result.instances == {'rip': 1} and result.guide.steps
-        assert result.diagnosis.evidence_segment_ids == ['seg_1']
+        assert set(result.diagnosis.evidence_segment_ids) <= {'seg_1'}  # plan from prompt B, only kept segments
+        assert ('/v1/chat/completions', 'muse-spark-1.3') in script.paths
         # three Wonder rounds at $4/$20 per 1M tokens (UNBESTÄTIGT only for live billing, price from the docs)
         assert len(script.wonder) == 3 and c.budget.spent_today() >= 3 * wonder_cost(1000, 200)
         assert wonder_cost(1_000_000, 1_000_000) == pytest.approx(24.0)
@@ -308,16 +311,17 @@ async def test_agent_refines_after_failed_verify_and_drops_rejected_mask(tmp_pat
         await c.aclose()
 
 
-async def test_agent_invalid_finish_falls_back_to_normal_diagnose(tmp_path):
+async def test_agent_finish_hands_off_to_prompt_b_diagnose(tmp_path):
+    # Live 2026-10-29: plans written inside the loop ignored prompt B v3; Wonder now only perceives.
     def rounds(n, data):
         if n == 1:
-            return wonder_response(n, fc('finish', {'diagnosis': 'kaputt'}, 'c1'))
+            return wonder_response(n, fc('finish', {'diagnosis': 'ignored'}, 'c1'))
         raise AssertionError('no second round expected')
     script = Script(rounds)
     c = agent_client(tmp_path, script)
     try:
         result, steps, _, _ = await run_agent(c)
-        assert [(s['tool'], s['status']) for s in steps] == [('finish', 'failed')]
+        assert [(s['tool'], s['status']) for s in steps] == [('finish', 'done')]
         assert ('/v1/chat/completions', 'muse-spark-1.3') in script.paths and result.guide.steps
     finally:
         await c.aclose()

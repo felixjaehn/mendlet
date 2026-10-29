@@ -36,6 +36,7 @@ class Settings:
     image_model: str = "muse-image-1.0"
     transcribe_model: str = "muse-voice-transcribe-1.0"
     wonder_model: str = "muse-wonder-1.0"
+    wonder_reasoning_effort: str = "low"
     # "wonder" = Muse Wonder tool-calling agent after the deterministic safety step; "off" = classic pipeline.
     agent_mode: str = "off"
     daily_budget_usd: float = 5.0
@@ -61,6 +62,7 @@ class Settings:
             image_model=e.get("IMAGE_MODEL") or "muse-image-1.0",
             transcribe_model=e.get("TRANSCRIBE_MODEL") or "muse-voice-transcribe-1.0",
             wonder_model=e.get("WONDER_MODEL") or "muse-wonder-1.0",
+            wonder_reasoning_effort=(e.get("WONDER_REASONING_EFFORT") or "low").strip(),
             agent_mode="wonder" if (e.get("AGENT_MODE") or "").strip().lower() == "wonder" else "off",
             daily_budget_usd=float(e.get("DAILY_BUDGET_USD") or 5.0),
             mock_mode=explicit if explicit is not None else not key,
