@@ -16,6 +16,9 @@ struct StitchPlan: Equatable, Sendable {
     var gridLines: [[CGPoint]] = []
     /// Number of lines in the first (principal axis) direction.
     var firstDirectionCount: Int = 0
+    /// Darning needle routes (lines plus U-turn arcs), warp first, then weft.
+    var warpStrokes: [StitchPathPlanner.DarnStroke] = []
+    var weftStrokes: [StitchPathPlanner.DarnStroke] = []
     var isFallback = false
     static let empty = StitchPlan()
 }
@@ -156,60 +159,139 @@ enum StitchPathPlanner {
 
     // MARK: Darning grid
 
+    /// One needle stroke of the darn. `isTurn` strokes are the U-turn arcs outside the hole.
+    /// `coreFrom`/`coreTo` (0...1 along a line) mark the part lying on the mask; the rest is intact fabric.
+    struct DarnStroke: Equatable, Sendable {
+        var points: [CGPoint]
+        var isTurn = false
+        var coreFrom: CGFloat = 0
+        var coreTo: CGFloat = 1
+    }
+
     private static func darning(_ poly: [CGPoint], _ a: CGFloat) -> StitchPlan {
         guard abs(area(poly)) > 1e-9 else { return .empty }
-        let cx = poly.map(\.x).reduce(0, +) / CGFloat(poly.count)
-        let cy = poly.map(\.y).reduce(0, +) / CGFloat(poly.count)
+        // Centroid + principal axis from the rasterised mask (robust against uneven vertex spacing).
+        let bb = bounds(poly)
+        let n = 90
+        var cnt: CGFloat = 0, mx: CGFloat = 0, my: CGFloat = 0
+        var cells: [CGPoint] = []
+        for iy in 0..<n { for ix in 0..<n {
+            let p = CGPoint(x: bb.minX + bb.width * (CGFloat(ix) + 0.5) / CGFloat(n), y: bb.minY + bb.height * (CGFloat(iy) + 0.5) / CGFloat(n))
+            if pointInPolygon(p, poly) { cells.append(p); mx += p.x; my += p.y; cnt += 1 }
+        } }
+        guard cnt > 4 else { return .empty }
+        let cx = mx / cnt, cy = my / cnt
         var sxx: CGFloat = 0, syy: CGFloat = 0, sxy: CGFloat = 0
-        for p in poly { let dx = p.x - cx, dy = p.y - cy; sxx += dx * dx; syy += dy * dy; sxy += dx * dy }
+        for p in cells { let dx = p.x - cx, dy = p.y - cy; sxx += dx * dx; syy += dy * dy; sxy += dx * dy }
         let theta = 0.5 * atan2(2 * sxy, sxx - syy)
-        let u = CGPoint(x: cos(theta), y: sin(theta)), v = CGPoint(x: -sin(theta), y: cos(theta))
-        let q = poly.map { CGPoint(x: $0.x * u.x + $0.y * u.y, y: $0.x * v.x + $0.y * v.y) }
+        var u = CGPoint(x: cos(theta), y: sin(theta))
+        if u.y < -1e-6 || (abs(u.y) <= 1e-6 && u.x < 0) { u = CGPoint(x: -u.x, y: -u.y) }   // travel downwards first
+        var v = CGPoint(x: -u.y, y: u.x)
+        if v.x > 0 { v = CGPoint(x: -v.x, y: -v.y) }                                        // start on the right side
+        func toQ(_ p: CGPoint) -> CGPoint { CGPoint(x: (p.x - cx) * u.x + (p.y - cy) * u.y, y: (p.x - cx) * v.x + (p.y - cy) * v.y) }
+        func fromQ(_ q: CGPoint) -> CGPoint { CGPoint(x: cx + q.x * u.x + q.y * v.x, y: cy + q.x * u.y + q.y * v.y) }
+        func out(_ q: CGPoint) -> CGPoint { let p = fromQ(q); return CGPoint(x: p.x / a, y: p.y) }
+        let q = poly.map(toQ)
         let b = bounds(q)
-        func back(_ p: CGPoint) -> CGPoint {
-            let x = p.x * u.x + p.y * v.x, y = p.x * u.y + p.y * v.y
-            return CGPoint(x: x / a, y: y)
-        }
-        let margin: CGFloat = 0.0015
-        func scan(vertical: Bool, count: Int) -> [[CGPoint]] {
-            var lines: [[CGPoint]] = []
-            let lo = vertical ? b.minX : b.minY, hi = vertical ? b.maxX : b.maxY
-            for k in 1...count {
-                let val = lo + (hi - lo) * CGFloat(k) / CGFloat(count + 1)
-                var xs: [CGFloat] = []
-                for i in 0..<q.count {
-                    let p0 = q[i], p1 = q[(i + 1) % q.count]
-                    let a0 = vertical ? p0.x : p0.y, a1 = vertical ? p1.x : p1.y
-                    guard (a0 <= val) != (a1 <= val) else { continue }
-                    let t = (val - a0) / (a1 - a0)
-                    xs.append(vertical ? p0.y + (p1.y - p0.y) * t : p0.x + (p1.x - p0.x) * t)
-                }
-                xs.sort()
-                var runs: [[CGPoint]] = []
-                var j = 0
-                while j + 1 < xs.count {
-                    let s = xs[j] + margin, e = xs[j + 1] - margin
-                    if e > s {
-                        runs.append(vertical ? [CGPoint(x: val, y: s), CGPoint(x: val, y: e)] : [CGPoint(x: s, y: val), CGPoint(x: e, y: val)])
-                    }
-                    j += 2
-                }
-                lines.append(contentsOf: runs.enumerated().map { $0.offset % 2 == 0 ? $0.element : $0.element })
+        guard b.width > 1e-5, b.height > 1e-5 else { return .empty }
+
+        /// Hull [lo, hi] of the mask along one scan line (vertical: s = const, runs along t; else t = const).
+        func span(_ val: CGFloat, alongS: Bool) -> (CGFloat, CGFloat)? {
+            var xs: [CGFloat] = []
+            for i in 0..<q.count {
+                let p0 = q[i], p1 = q[(i + 1) % q.count]
+                let a0 = alongS ? p0.y : p0.x, a1 = alongS ? p1.y : p1.x
+                guard (a0 <= val) != (a1 <= val) else { continue }
+                let t = (val - a0) / (a1 - a0)
+                xs.append(alongS ? p0.x + (p1.x - p0.x) * t : p0.y + (p1.y - p0.y) * t)
             }
-            // serpentine
-            for i in lines.indices where i % 2 == 1 { lines[i].reverse() }
-            return lines
+            guard let lo = xs.min(), let hi = xs.max(), hi > lo else { return nil }
+            return (lo, hi)
         }
-        let ext1 = b.height, ext2 = b.width
-        let c1 = min(10, max(4, Int((ext1 / 0.028).rounded())))
-        let c2 = min(10, max(4, Int((ext2 / 0.028).rounded())))
-        let first = scan(vertical: false, count: c1)
-        let second = scan(vertical: true, count: c2)
+        func insideMask(_ qp: CGPoint) -> Bool { pointInPolygon(fromQ(qp), poly) }
+
+        // Warp: lines along the principal axis (s), evenly spaced across the width (t).
+        let extentT = b.height
+        let warpCount = min(9, max(6, Int((extentT / 0.011).rounded()) + 1))
+        let tInset = extentT * 0.02
+        let tLo = b.minY + tInset, tHi = b.maxY - tInset
+        struct Line { var s0: CGFloat; var s1: CGFloat; var t0: CGFloat; var t1: CGFloat; var coreFrom: CGFloat; var coreTo: CGFloat }
+        var warp: [Line] = []
+        for k in 0..<warpCount {
+            let t = tLo + (tHi - tLo) * CGFloat(k) / CGFloat(warpCount - 1)
+            guard let (lo, hi) = span(t, alongS: true) else { continue }
+            let ext = max(0.012, (hi - lo) * 0.15)
+            let s0 = lo - ext, s1 = hi + ext
+            warp.append(Line(s0: s0, s1: s1, t0: t, t1: t, coreFrom: ext / (s1 - s0), coreTo: 1 - ext / (s1 - s0)))
+        }
+        if let longest = warp.map({ $0.s1 - $0.s0 }).max() { warp = warp.filter { $0.s1 - $0.s0 > longest * 0.12 } }
+        guard warp.count >= 2 else { return .empty }
+        let warpSpacing = (tHi - tLo) / CGFloat(max(warpCount - 1, 1))
+
+        // Weft: perpendicular lines, spaced at least like the warp, at most 12.
+        let sLo = warp.map(\.s0).min()!, sHi = warp.map(\.s1).max()!
+        let coreLo = warp.map { $0.s0 + $0.coreFrom * ($0.s1 - $0.s0) }.min()!
+        let coreHi = warp.map { $0.s0 + $0.coreTo * ($0.s1 - $0.s0) }.max()!
+        _ = (sLo, sHi)
+        let weftCount = min(12, max(5, Int(((coreHi - coreLo) / max(warpSpacing * 2.2, 0.018)).rounded()) + 1))
+        var weft: [Line] = []
+        for k in 0..<weftCount {
+            let s = coreLo + (coreHi - coreLo) * CGFloat(k) / CGFloat(weftCount - 1)
+            let sv = min(max(s, b.minX + 1e-4), b.maxX - 1e-4)
+            guard let (lo, hi) = span(sv, alongS: false) else { continue }
+            let ext = max(0.010, (hi - lo) * 0.15)
+            let t0 = lo - ext, t1 = hi + ext
+            weft.append(Line(s0: s, s1: s, t0: t0, t1: t1, coreFrom: ext / (t1 - t0), coreTo: 1 - ext / (t1 - t0)))
+        }
+
+        // Route: serpentine; U-turn arcs bulge away from the hole and stay outside the mask.
+        func route(_ lines: [Line], warpDir: Bool) -> (strokes: [DarnStroke], segs: [[CGPoint]]) {
+            var strokes: [DarnStroke] = [], segs: [[CGPoint]] = []
+            var prevEnd: CGPoint?
+            var prevDir: CGFloat = 1
+            for (i, l) in lines.enumerated() {
+                let forward = i % 2 == 0
+                let aQ = warpDir ? CGPoint(x: l.s0, y: l.t0) : CGPoint(x: l.s0, y: l.t0)
+                let bQ = warpDir ? CGPoint(x: l.s1, y: l.t1) : CGPoint(x: l.s1, y: l.t1)
+                let start = forward ? aQ : bQ, end = forward ? bQ : aQ
+                if let pe = prevEnd {
+                    // outward direction in q space: along the travel axis of the previous line
+                    let dirQ: CGPoint = warpDir ? CGPoint(x: prevDir, y: 0) : CGPoint(x: 0, y: prevDir)
+                    var bulge = max(abs(warpDir ? start.y - pe.y : start.x - pe.x) * 0.6, 0.006)
+                    var pts: [CGPoint] = []
+                    for _ in 0..<8 {
+                        let c1 = CGPoint(x: pe.x + dirQ.x * bulge, y: pe.y + dirQ.y * bulge)
+                        let c2 = CGPoint(x: start.x + dirQ.x * bulge, y: start.y + dirQ.y * bulge)
+                        pts = (0...10).map { j -> CGPoint in
+                            let t = CGFloat(j) / 10, m = 1 - t
+                            return CGPoint(x: m*m*m*pe.x + 3*m*m*t*c1.x + 3*m*t*t*c2.x + t*t*t*start.x,
+                                           y: m*m*m*pe.y + 3*m*m*t*c1.y + 3*m*t*t*c2.y + t*t*t*start.y)
+                        }
+                        // straight chord and curve must stay outside the mask
+                        if pts.allSatisfy({ !insideMask($0) }) { break }
+                        bulge *= 1.7
+                    }
+                    strokes.append(DarnStroke(points: pts.map(out), isTurn: true))
+                }
+                var dir: CGFloat = 1
+                if warpDir { dir = end.x >= start.x ? 1 : -1 } else { dir = end.y >= start.y ? 1 : -1 }
+                prevDir = dir
+                prevEnd = end
+                let cf = forward ? l.coreFrom : 1 - l.coreTo, ct = forward ? l.coreTo : 1 - l.coreFrom
+                strokes.append(DarnStroke(points: [out(start), out(end)], coreFrom: cf, coreTo: ct))
+                segs.append([out(start), out(end)])
+            }
+            return (strokes, segs)
+        }
+        let w = route(warp, warpDir: true)
+        let wf = route(weft, warpDir: false)
         var plan = StitchPlan()
         plan.kind = .darning
-        plan.gridLines = (first + second).map { $0.map(back) }
-        plan.firstDirectionCount = first.count
-        return plan.gridLines.isEmpty ? .empty : plan
+        plan.gridLines = w.segs + wf.segs
+        plan.firstDirectionCount = w.segs.count
+        plan.warpStrokes = w.strokes
+        plan.weftStrokes = wf.strokes
+        return plan.gridLines.isEmpty || wf.segs.isEmpty ? .empty : plan
     }
 
     // MARK: Raster helpers
