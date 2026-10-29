@@ -257,7 +257,7 @@ final class FlowModel {
         if r.category == .shoe {
             let hint = r.guide.steps.prefix(3).map(\.title).joined(separator: "; ")
             return AfterPreviewRequest(imageBase64: b64, diagnosisSummary: r.diagnosis.summary, stitchType: nil, category: "shoe",
-                                       repairHint: hint.isEmpty ? nil : String(hint.prefix(300)))
+                                       repairHint: hint.isEmpty ? nil : String(hint.prefix(200)))
         }
         let stitch = r.guide.steps.first { $0.overlay?.type == .stitchPath }?.overlay?.stitchType ?? .runningStitch
         return AfterPreviewRequest(imageBase64: b64, diagnosisSummary: r.diagnosis.summary, stitchType: stitch)

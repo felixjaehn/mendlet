@@ -12,6 +12,7 @@ enum LabelPlacer {
         let width: CGFloat
         let large: Bool              // mask fills much of the photo: chip goes inside a corner
         var corners: [CGPoint] = []  // for large masks: candidate dot positions on the contour
+        var dots: [CGPoint] = []     // grouped instances: one leader line (fan-out) and dot per instance
     }
     struct Placed: Identifiable { let item: Item; let dot: CGPoint; let rect: CGRect; var id: String { item.id } }
 
@@ -92,22 +93,58 @@ struct LabelPinsLayer: View {
         .allowsHitTesting(false)
     }
 
+    static func plural(_ label: String, _ n: Int) -> String {
+        switch label {
+        case "Loch": return "\(n) Löcher"
+        case "Riss": return "\(n) Risse"
+        case "Fleck": return "\(n) Flecken"
+        default: return "\(n)× \(label)"
+        }
+    }
+
+    private func info(_ s: Segment) -> (anchor: CGPoint, bounds: CGRect, pts: [CGPoint])? {
+        guard let nb = s.normalizedBounds else { return nil }
+        let b = CGRect(x: nb.minX * size.width, y: nb.minY * size.height, width: nb.width * size.width, height: nb.height * size.height)
+        let pts = s.ringPolygons.filter { !$0.hole }.flatMap(\.points).map { CGPoint(x: $0.x * size.width, y: $0.y * size.height) }
+        func nearest(_ t: CGPoint) -> CGPoint { pts.min { hypot($0.x - t.x, $0.y - t.y) < hypot($1.x - t.x, $1.y - t.y) } ?? t }
+        let centroid = pts.isEmpty ? CGPoint(x: b.midX, y: b.midY) : CGPoint(x: pts.map(\.x).reduce(0, +) / CGFloat(pts.count), y: pts.map(\.y).reduce(0, +) / CGFloat(pts.count))
+        return (pts.isEmpty ? CGPoint(x: b.midX, y: b.minY) : nearest(centroid), b, pts)
+    }
+
     func items() -> [LabelPlacer.Item] {
-        // damage first so it gets the best spot
-        segments.filter { !$0.label.isEmpty }.sorted { $0.isDamage && !$1.isDamage }.compactMap { s -> LabelPlacer.Item? in
-            guard let nb = s.normalizedBounds else { return nil }
-            let b = CGRect(x: nb.minX * size.width, y: nb.minY * size.height, width: nb.width * size.width, height: nb.height * size.height)
-            let pts = s.ringPolygons.filter { !$0.hole }.flatMap(\.points).map { CGPoint(x: $0.x * size.width, y: $0.y * size.height) }
-            func nearest(_ t: CGPoint) -> CGPoint { pts.min { hypot($0.x - t.x, $0.y - t.y) < hypot($1.x - t.x, $1.y - t.y) } ?? t }
-            let centroid = pts.isEmpty ? CGPoint(x: b.midX, y: b.midY) : CGPoint(x: pts.map(\.x).reduce(0, +) / CGFloat(pts.count), y: pts.map(\.y).reduce(0, +) / CGFloat(pts.count))
-            let anchor = pts.isEmpty ? CGPoint(x: b.midX, y: b.minY) : nearest(centroid)
+        let labelled = segments.filter { !$0.label.isEmpty }
+        // damage instances with the same label collapse into one chip ("3 Löcher · 78 %")
+        let damage = labelled.filter(\.isDamage)
+        var groups: [[Segment]] = []
+        for s in damage {
+            if let i = groups.firstIndex(where: { $0[0].label == s.label }) { groups[i].append(s) } else { groups.append([s]) }
+        }
+        var out: [LabelPlacer.Item] = []
+        for g in groups {
+            let infos = g.compactMap { info($0) }
+            guard let first = infos.first, let s0 = g.first else { continue }
+            let top = g.map(\.score).max() ?? 0
+            let score = top > 0 ? "\(Int((top * 100).rounded())) %" : nil
+            let text = g.count > 1 ? Self.plural(s0.label, g.count) : s0.label
+            let b = infos.dropFirst().reduce(first.bounds) { $0.union($1.bounds) }
+            let anchor = g.count > 1 ? CGPoint(x: infos.map(\.anchor.x).reduce(0, +) / CGFloat(infos.count), y: infos.map(\.anchor.y).reduce(0, +) / CGFloat(infos.count)) : first.anchor
+            let badge = s0.source?.badge
+            out.append(LabelPlacer.Item(id: s0.id, text: text, score: score, badge: badge, anchor: anchor, bounds: b,
+                                        width: LabelPlacer.width(text: text, score: score, badge: badge), large: false,
+                                        dots: g.count > 1 ? infos.map(\.anchor) : []))
+        }
+        for s in labelled where !s.isDamage {
+            guard let i = info(s) else { continue }
             let score = s.score > 0 ? "\(Int((s.score * 100).rounded())) %" : nil
             let badge = s.source?.badge
-            let large = !s.isDamage && b.width * b.height > 0.3 * size.width * size.height
-            let corners = [b.origin, CGPoint(x: b.maxX, y: b.minY), CGPoint(x: b.minX, y: b.maxY), CGPoint(x: b.maxX, y: b.maxY)].map { pts.isEmpty ? $0 : nearest($0) }
-            return LabelPlacer.Item(id: s.id, text: s.label, score: score, badge: badge, anchor: anchor, bounds: b,
-                                    width: LabelPlacer.width(text: s.label, score: score, badge: badge), large: large, corners: corners)
+            let large = i.bounds.width * i.bounds.height > 0.3 * size.width * size.height
+            func nearest(_ t: CGPoint) -> CGPoint { i.pts.min { hypot($0.x - t.x, $0.y - t.y) < hypot($1.x - t.x, $1.y - t.y) } ?? t }
+            let b = i.bounds
+            let corners = [b.origin, CGPoint(x: b.maxX, y: b.minY), CGPoint(x: b.minX, y: b.maxY), CGPoint(x: b.maxX, y: b.maxY)].map { i.pts.isEmpty ? $0 : nearest($0) }
+            out.append(LabelPlacer.Item(id: s.id, text: s.label, score: score, badge: badge, anchor: i.anchor, bounds: b,
+                                        width: LabelPlacer.width(text: s.label, score: score, badge: badge), large: large, corners: corners))
         }
+        return out
     }
 }
 
@@ -122,13 +159,16 @@ private struct PinView: View {
         let tail = beside ? CGPoint(x: placed.dot.x < r.midX ? r.minX : r.maxX, y: r.midY)
                           : CGPoint(x: min(max(placed.dot.x, r.minX + 12), r.maxX - 12), y: placed.dot.y < r.midY ? r.minY : r.maxY)
         ZStack(alignment: .topLeading) {
-            Path { p in p.move(to: placed.dot); p.addLine(to: tail) }
+            let dots = it.dots.isEmpty ? [placed.dot] : it.dots
+            Path { p in for d in dots { p.move(to: d); p.addLine(to: tail) } }
                 .stroke(.white.opacity(0.9), style: StrokeStyle(lineWidth: 1, lineCap: .round))
                 .shadow(color: .black.opacity(0.5), radius: 1.5)
-            Circle().fill(color).frame(width: 8, height: 8)
-                .overlay(Circle().strokeBorder(.white, lineWidth: 1.5))
-                .shadow(color: .black.opacity(0.45), radius: 2)
-                .position(placed.dot)
+            ForEach(Array(dots.enumerated()), id: \.offset) { _, d in
+                Circle().fill(color).frame(width: 8, height: 8)
+                    .overlay(Circle().strokeBorder(.white, lineWidth: 1.5))
+                    .shadow(color: .black.opacity(0.45), radius: 2)
+                    .position(d)
+            }
             HStack(spacing: 5) {
                 Text(it.text).font(.system(size: 11.5, weight: .semibold))
                 if let s = it.score { Text(s).font(.system(size: 11, weight: .medium, design: .rounded)).monospacedDigit().opacity(0.7) }

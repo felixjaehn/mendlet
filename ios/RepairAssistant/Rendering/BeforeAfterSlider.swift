@@ -1,6 +1,8 @@
 import SwiftUI
 
 enum SliderMath {
+    /// Both layers are drawn into exactly this rect so features line up at the divider.
+    static func layerFrame(container: CGSize) -> CGRect { CGRect(origin: .zero, size: container) }
     /// The handle never reaches the very edge so it stays grabbable.
     static let range: ClosedRange<Double> = 0.03...0.97
     static func clamp(_ f: Double) -> Double {
@@ -33,9 +35,10 @@ struct BeforeAfterSlider: View {
         GeometryReader { geo in
             let w = geo.size.width, h = geo.size.height, x = w * frac
             ZStack(alignment: .topLeading) {
-                Image(uiImage: after).resizable().scaledToFill().frame(width: w, height: h).clipped()
-                Image(uiImage: before).resizable().scaledToFill().frame(width: w, height: h).clipped()
-                    .mask(alignment: .leading) { Rectangle().frame(width: x) }
+                // both layers: same content aspect (the photo's), same frame, same fill mode -> pixel-aligned
+                let lf = SliderMath.layerFrame(container: geo.size)
+                layer(after, lf)
+                layer(before, lf).mask(alignment: .leading) { Rectangle().frame(width: x) }
                 // divider + knob
                 Rectangle().fill(.white).frame(width: 2, height: h)
                     .shadow(color: .black.opacity(0.35), radius: 3).offset(x: x - 1)
@@ -88,6 +91,12 @@ struct BeforeAfterSlider: View {
             try? await Task.sleep(for: .milliseconds(850))
             withAnimation(.easeInOut(duration: 0.6)) { frac = SliderMath.clamp(initial) }
         }
+    }
+
+    private func layer(_ img: UIImage, _ f: CGRect) -> some View {
+        Image(uiImage: img).resizable()
+            .aspectRatio(before.size.width / max(before.size.height, 1), contentMode: .fill)
+            .frame(width: f.width, height: f.height).clipped()
     }
 
     private func tag(_ text: String) -> some View {

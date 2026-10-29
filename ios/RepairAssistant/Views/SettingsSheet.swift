@@ -18,8 +18,9 @@ struct SettingsSheet: View {
                 if settings.demoMode {
                     Section {
                         Toggle("Schnell (für Videoaufnahmen)", isOn: $settings.fastReplay).tint(Theme.thread)
+                        Toggle("Agenten-Lauf mit Fehlerbehebung zeigen", isOn: $settings.recoveryTrace).tint(Theme.thread)
                     } footer: {
-                        Text("Spielt die echten Modellantworten in etwa 6 statt 28 Sekunden ab.")
+                        Text("Spielt die echten Modellantworten in etwa 6 statt 25 Sekunden ab. Der Agenten-Lauf mit Fehlerbehebung (Jeans) zeigt einen echten Lauf, in dem SAM einen Serverfehler meldete und der Agent ausgewichen ist.")
                     }
                 }
                 Section("Demo-Szenario") {

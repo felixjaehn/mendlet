@@ -28,8 +28,46 @@ final class RecordingTests: XCTestCase {
             case .grounding: break
             }
         }
-        XCTAssertEqual(steps, 6)
+        XCTAssertEqual(steps, 4)   // classify + 2 real agent steps + finish
         XCTAssertEqual(order, ["classify", "segment", "segments", "diagnose", "plan", "result"])
+    }
+
+    func testRecoveryTraceHasFailedStepAndPlaysIt() async throws {
+        let rec = try XCTUnwrap(LiveRecordings.recording(for: .textileTear))
+        XCTAssertEqual(rec.agentSteps.count, 3)
+        XCTAssertEqual(rec.recoverySteps.count, 7)
+        XCTAssertEqual(rec.recoverySteps.first?.status, .failed)
+        var failed = 0, steps = 0
+        for try await e in MockAPIClient(speed: 300, recovery: true).analyze(AnalyzeRequest(imageBase64: "", userNote: "", mockScenario: "textile_tear")) {
+            if case .agentStep(let a) = e { steps += 1; if a.status == .failed { failed += 1 } }
+        }
+        XCTAssertEqual(steps, 8)
+        XCTAssertEqual(failed, 1)
+        XCTAssertEqual(ModelStyle.display("sam-3.1"), "SAM 3.1")
+        XCTAssertEqual(ModelStyle.display("muse-spark-1.3"), "Muse Spark")
+    }
+
+    func testSliderLayersShareOneFrame() {
+        let size = CGSize(width: 361, height: 361)
+        let f = SliderMath.layerFrame(container: size)
+        XCTAssertEqual(f, CGRect(origin: .zero, size: size))
+    }
+
+    func testRepairHintClampedTo200() throws {
+        var r = try XCTUnwrap(LiveRecordings.response(file: "sneaker"))
+        r.guide.steps = (1...5).map { GuideStep(n: $0, title: String(repeating: "x", count: 120), text: "") }
+        let photo = UIGraphicsImageRenderer(size: CGSize(width: 8, height: 8)).image { _ in }
+        XCTAssertLessThanOrEqual(FlowModel.afterPreviewRequest(for: r, photo: photo).repairHint?.count ?? 0, 200)
+    }
+
+    func testGroupedLabelChip() throws {
+        let r = try XCTUnwrap(LiveRecordings.response(file: "pulli"))
+        let layer = LabelPinsLayer(segments: r.segments, all: r.segments, size: CGSize(width: 300, height: 400))
+        let items = layer.items()
+        let holes = items.filter { $0.text.contains("Löcher") }
+        XCTAssertEqual(holes.count, 1)
+        XCTAssertEqual(holes.first?.dots.count, 3)
+        XCTAssertEqual(items.filter { $0.text == "Loch" }.count, 0)
     }
 
     func testBlockedReplayEndsEarly() async throws {

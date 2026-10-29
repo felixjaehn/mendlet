@@ -17,6 +17,18 @@ enum ModelStyle {
         if m.contains("image") { return "photo.artframe" }
         return "sparkle"
     }
+    /// "sam-3.1" -> "SAM 3.1", "muse-spark-1.3" -> "Muse Spark" ...
+    static func display(_ model: String) -> String {
+        let l = model.lowercased()
+        if l.contains("sam") {
+            let ver = l.split(whereSeparator: { $0 == "-" || $0 == " " }).last.map(String.init) ?? ""
+            return "SAM " + (ver.first?.isNumber == true ? ver : "3.1")
+        }
+        if l.contains("spark") { return "Muse Spark" }
+        if l.contains("wonder") { return "Muse Wonder" }
+        if l.contains("image") { return "Muse Image" }
+        return model
+    }
     static func seconds(_ ms: Int) -> String {
         ms < 100 ? "\(ms) ms" : String(format: "%.1f s", Double(ms) / 1000).replacingOccurrences(of: ".", with: ",")
     }
@@ -58,7 +70,7 @@ struct AgentTraceView: View {
     }
 
     private func badge(_ model: String, ok: Bool = true) -> some View {
-        Text(model).font(.system(size: 10.5, weight: .bold)).textCase(.uppercase).tracking(0.3)
+        Text(ModelStyle.display(model)).font(.system(size: 10.5, weight: .bold)).textCase(.uppercase).tracking(0.3)
             .foregroundStyle(ok ? ModelStyle.tint(model) : Theme.stop)
             .padding(.horizontal, 7).padding(.vertical, 2)
             .background((ok ? ModelStyle.tint(model) : Theme.stop).opacity(0.12), in: Capsule())
@@ -68,7 +80,11 @@ struct AgentTraceView: View {
         let ok = s.status == .done
         return HStack(spacing: 10) {
             tile(s.model, ok: ok)
-            Text(s.label).font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink).lineLimit(2).fixedSize(horizontal: false, vertical: true)
+            Group {
+                if ok { Text(s.label).foregroundStyle(Theme.ink) }
+                else { Text(s.label).foregroundStyle(Theme.ink) + Text("\nServerfehler – Agent weicht aus").font(.caption.weight(.semibold)).foregroundStyle(Theme.stop) }
+            }
+            .font(.subheadline.weight(.semibold)).lineLimit(3).fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 6)
             VStack(alignment: .trailing, spacing: 2) {
                 badge(s.model, ok: ok)
@@ -80,7 +96,7 @@ struct AgentTraceView: View {
         }
         .padding(.vertical, 3)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(s.label), \(s.model), \(ModelStyle.seconds(s.ms)), \(ok ? "fertig" : "fehlgeschlagen")")
+        .accessibilityLabel("\(s.label), \(ModelStyle.display(s.model)), \(ModelStyle.seconds(s.ms)), \(ok ? "fertig" : "fehlgeschlagen, Serverfehler, Agent weicht aus")")
     }
 
     private func activeRow(_ a: (label: String, model: String)) -> some View {

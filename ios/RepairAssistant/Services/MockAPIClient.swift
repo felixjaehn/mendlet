@@ -70,6 +70,8 @@ struct MockAPIClient: AnalysisService {
     var fast = false
     /// Replay the real recordings (LiveRecordings); false = old hand-written fixtures.
     var useRecordings = true
+    /// Jeans: replay the real run with the SAM server error and the agent's recovery.
+    var recovery = false
 
     func analyze(_ request: AnalyzeRequest) -> AsyncThrowingStream<AnalyzeEvent, Error> {
         AsyncThrowingStream { continuation in
@@ -81,7 +83,7 @@ struct MockAPIClient: AnalysisService {
                         resp.caseId = UUID().uuidString
                         let scale = (fast ? DemoReplay.fastScale : 1) / speed
                         var clock = 0.0
-                        for item in DemoReplay.timeline(name: rec.name, response: resp) {
+                        for item in DemoReplay.timeline(name: rec.name, response: resp, steps: recovery && !rec.recoverySteps.isEmpty ? rec.recoverySteps : rec.agentSteps) {
                             let wait = (item.at - clock) * scale
                             if wait > 0 { try await Task.sleep(for: .milliseconds(Int(wait * 1000))) }
                             clock = item.at
