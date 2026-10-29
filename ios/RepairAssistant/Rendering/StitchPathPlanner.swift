@@ -228,12 +228,13 @@ enum StitchPathPlanner {
         guard warp.count >= 2 else { return .empty }
         let warpSpacing = (tHi - tLo) / CGFloat(max(warpCount - 1, 1))
 
-        // Weft: perpendicular lines, spaced at least like the warp, at most 12.
+        // Weft: perpendicular lines about as dense as the warp (a real darn is a square weave); a wide spacing
+        // made the U-turns into large loops sticking out of the darn.
         let sLo = warp.map(\.s0).min()!, sHi = warp.map(\.s1).max()!
         let coreLo = warp.map { $0.s0 + $0.coreFrom * ($0.s1 - $0.s0) }.min()!
         let coreHi = warp.map { $0.s0 + $0.coreTo * ($0.s1 - $0.s0) }.max()!
         _ = (sLo, sHi)
-        let weftCount = min(12, max(5, Int(((coreHi - coreLo) / max(warpSpacing * 2.2, 0.018)).rounded()) + 1))
+        let weftCount = min(28, max(5, Int(((coreHi - coreLo) / max(warpSpacing * 1.2, 0.012)).rounded()) + 1))
         var weft: [Line] = []
         for k in 0..<weftCount {
             let s = coreLo + (coreHi - coreLo) * CGFloat(k) / CGFloat(weftCount - 1)
