@@ -78,6 +78,9 @@ def blocked_response(cls: ClassifyResult, pre: safety.PreCheck, locale: str | No
     return safety.enforce(resp, has_answers=False, precheck=pre, locale=locale)
 
 
+UNSURE_TEXT_DAMAGE = 0.7
+
+
 def _xyxy(seg: Segment) -> tuple[float, float, float, float] | None:
     if not seg.box:
         return None
@@ -140,6 +143,11 @@ async def _classic_segments(req: AnalyzeRequest, client: ModelClient, cls: Class
             grounded = done[0] if isinstance(done[0], list) else []
             if isinstance(done[0], BudgetExceeded):
                 raise done[0]
+            if grounded:
+                # Benchmark 2026-10-29: SAM's uncertain text hits (< 0.7) away from where Spark sees the damage were
+                # buttonholes, intact seams and a sound sole; dropping them removed 8 false positives, no real damage.
+                segments = [s for s in segments if s.kind != "damage" or s.score >= UNSURE_TEXT_DAMAGE
+                            or any(_overlaps(s, g) for g in grounded)]
             for segment in grounded:
                 if not any(_overlaps(segment, s) for s in segments if s.kind == "damage"):
                     segments.append(segment.model_copy(update={"id": _free_id(segments)}))

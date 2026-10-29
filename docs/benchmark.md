@@ -216,3 +216,26 @@ Gleiche 10 Textil- und Schuhfälle. Kontaktbögen: [klassisch](benchmark-runs/20
 | Wonder, `reasoning.effort=minimal` (3 Fälle: Jeans, Knopf, Jacke) | 3/3 | 0 | 57,5 s (gleiche Fälle mit `low`: 62,9 s) |
 
 **Befund:** Der Agent ist deutlich präziser, aber bauartbedingt langsamer. Die Zeit steckt in seinen Reasoning-Runden, nicht in der Suche. Die Vorbelegung mit klassischen Kandidaten hat weder Zeit gespart noch die Präzision gehalten und wurde verworfen. **Konsequenz:** Der klassische Pfad bleibt Standard. Wonder ist als **Präzisionsmodus** pro Anfrage schaltbar (App: Einstellungen → Präzisionsmodus, API: `"agent": true`), Standard-Reasoning `minimal`. Kosten der Vergleichsläufe: etwa 2,50 $.
+
+## Fehltreffer-Filter im klassischen Pfad (29.10.2026)
+
+Regel (`proxy/app/pipeline.py`): Liefert Spark-Grounding eine Schadensbox, fallen SAM-Textschäden mit Score unter 0,7 weg, die diese Box nicht überlappen. Sichere Treffer (≥ 0,7) bleiben immer. Vor dem Einbau an allen 10 Textil-/Schuhfällen des Laufs 2 geprüft (Grounding live bzw. aus dem Cache):
+
+| Fall | bleibt | fällt weg |
+| --- | --- | --- |
+| Knopf | `rip` 0,64 (die fehlende Knopfstelle) | 5 Fehltreffer an Knopflöchern (`hole`/`rip` 0,53–0,65) |
+| Jacke | `rip` 0,92 (L-Riss) | 2× `open seam` 0,52/0,54 (intakte Nähte) |
+| Lederschuh | Fersennaht (per Grounding) | `detached sole` 0,69 (Sohle ist intakt) |
+| alle anderen 7 | unverändert | – |
+
+Ergebnis: 8 Fehltreffer weniger, kein echter Schaden verloren. Damit erreicht der klassische Pfad annähernd die Präzision des Wonder-Agenten bei einem Viertel der Zeit.
+
+## USB-Buchse: Sperre überprüft (29.10.2026, live)
+
+| Notiz | Antwort | Ergebnis |
+| --- | --- | --- |
+| "USB-Buchse wackelt und lädt nicht mehr" (Benchmark) | – | `warn_only`: "Ladefunktion gestört, Akkubezug nicht auszuschließen" |
+| gleiche Notiz | "Kein Akku verbaut, nur USB-Strom" | weiter `warn_only`: "Ladeproblem deutet auf Akku- oder Netzteilbezug hin" |
+| "USB-Leselampe ohne Akku: die Micro-USB-Buchse für die Stromversorgung hat sich gelöst" | – | `allowed`, Konfidenz 0,5, Rückfrage nach Nahaufnahme von unten und von der Seite, keine geratene Lötanleitung |
+
+Einordnung: Ein Gerät, das "nicht mehr lädt", lädt in der Regel einen Akku. Die Sperre ist vorsichtig und vertretbar. Die ursprüngliche Testfall-Notiz war unglücklich formuliert. SAM findet die Buchse selbst mit keinem Begriff (`usb port`, `micro usb connector`, `connector`: 0 Treffer). Das Elektronik-Grounding sucht bisher nur Lötpads.

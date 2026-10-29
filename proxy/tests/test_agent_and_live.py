@@ -467,3 +467,22 @@ async def test_request_flag_turns_precision_mode_on_and_off(image_b64):
     assert Probe.ran == 1
     await analyze(make_req(image_b64, agent=False), Probe(0.0, agent=True))  # server on, request off
     assert Probe.ran == 1
+
+
+async def test_unsure_text_damage_away_from_grounding_is_dropped(image_b64):
+    # Benchmark 2026-10-29 shirt with a missing button: SAM also flagged buttonholes (0.6-0.65).
+    real = box_seg('r', 'damage', 'rip', 0.64, (0.46, 0.47, 0.07, 0.07))
+    buttonhole = box_seg('b', 'damage', 'hole', 0.65, (0.74, 0.47, 0.03, 0.08))
+    sure = box_seg('s', 'damage', 'hole', 0.9, (0.1, 0.1, 0.05, 0.05))
+    spot = box_seg('g', 'damage', 'tear', 0.8, (0.45, 0.46, 0.09, 0.09)).model_copy(update={'source': 'grounding'})
+
+    class Shirt(MockClient):
+        async def segment(self, req, category, prompts):
+            return [real, buttonhole, sure]
+
+        async def ground(self, req, category):
+            return [spot]
+
+    result = await analyze(make_req(image_b64, user_note='Knopf ist abgerissen'), Shirt(0.0))
+    kept = sorted((s.prompt, s.score) for s in result.segments if s.kind == 'damage')
+    assert kept == [('hole', 0.9), ('rip', 0.64)]  # buttonhole dropped; grounding overlaps the kept rip
