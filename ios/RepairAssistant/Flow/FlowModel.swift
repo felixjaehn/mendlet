@@ -4,7 +4,7 @@ import Observation
 @MainActor
 @Observable
 final class FlowModel {
-    enum Route: Hashable { case analysis, diagnosis, decision, shopping, guide, block, completion }
+    enum Route: Hashable { case analysis, diagnosis, decision, shopping, guide, block, completion, project(String) }
 
     let settings: AppSettings
     let store: CaseStore
@@ -19,6 +19,8 @@ final class FlowModel {
     // Analysis
     var stageStates: [AnalysisStage: StageState] = [:]
     var earlySegments: [Segment] = []
+    /// When the first marks arrived: the reveal animation on Analysis runs from here and is never cut short.
+    var marksArrivedAt: Date?
     /// Live agent trace (SSE `agent_step`), newest last.
     var agentSteps: [AgentStep] = []
     /// true once the proxy announced the Spark grounding fallback (extra live step).
@@ -56,6 +58,10 @@ final class FlowModel {
     var guideStartedAt: Date?
     var resultPhoto: UIImage?
     var showSettings = false
+    /// Home presents Scan as a cover; Analysis pushes underneath.
+    var showScan = false
+    var projectStarted = false
+    var projectParked = false
 
     init(settings: AppSettings = AppSettings(), store: CaseStore = CaseStore()) {
         self.settings = settings
@@ -73,11 +79,20 @@ final class FlowModel {
         showReview = true
     }
 
+    /// Scan -> Analysis: the captured photo goes straight into the analysis (no review step).
+    func scan(_ image: UIImage, scenarioHint: DemoScenario? = nil, note: String? = nil) {
+        choose(image, scenarioHint: scenarioHint, note: note)
+        showReview = false
+        showScan = false
+        startAnalysis()
+    }
+
     // MARK: Analysis
 
     func startAnalysis(resetExtras: Bool = true) {
         guard let photo else { return }
         if resetExtras {
+            projectStarted = false; projectParked = false
             extraImages = []; answers = []; followUpUsed = false; labelImage = nil; newInfoBanner = nil
             statuses = [:]; currentStep = 0; completedSteps = []; guideStartedAt = nil
         }
@@ -87,6 +102,7 @@ final class FlowModel {
         response = resetExtras ? nil : response
         stageStates = [:]; groundingSeen = false; agentSteps = []
         earlySegments = resetExtras ? [] : (response?.segments ?? earlySegments)
+        marksArrivedAt = earlySegments.isEmpty ? nil : Date()
         isAnalyzing = true
         path = [.analysis]
 
@@ -118,11 +134,11 @@ final class FlowModel {
             let order = AnalysisStage.allCases
             let idx = order.firstIndex(of: stage) ?? 0
             for (i, s) in order.enumerated() { stageStates[s] = i < idx ? .done : (i == idx ? .active : .pending) }
-            if let segments, !segments.isEmpty { earlySegments = segments }
+            if let segments, !segments.isEmpty { setEarly(segments) }
         case .grounding:
             groundingSeen = true
         case .segments(let segments):
-            if !segments.isEmpty { earlySegments = segments }
+            if !segments.isEmpty { setEarly(segments) }
         case .agentStep(let step):
             if let i = agentSteps.firstIndex(where: { $0.n == step.n }) { agentSteps[i] = step } else { agentSteps.append(step) }
             agentSteps.sort { $0.n < $1.n }
@@ -131,12 +147,18 @@ final class FlowModel {
         }
     }
 
+    private func setEarly(_ segments: [Segment]) {
+        earlySegments = segments
+        if marksArrivedAt == nil { marksArrivedAt = Date() }
+    }
+
     private func finish(with r: AnalyzeResponse) {
         if r.segments.isEmpty && r.diagnosis.summary.isEmpty && !FlowGate.isBlocked(r) {
             fail(APIError.emptyResult); return
         }
         for s in AnalysisStage.allCases { stageStates[s] = .done }
         response = r
+        if earlySegments.isEmpty, !r.segments.isEmpty { setEarly(r.segments) }
         isAnalyzing = false
         let hadLabel = (labelImage != nil) && r.diagnosis.labelInfo != nil
         newInfoBanner = hadLabel ? r.diagnosis.labelInfo.map { tr("Etikett erkannt: %@", $0.materials.joined(separator: ", ")) } : nil
@@ -146,6 +168,11 @@ final class FlowModel {
         // let the last checkmark land before navigating
         Task { [weak self] in
             try? await Task.sleep(for: .milliseconds(600))
+            // the mark reveal (2.5 s) always runs to its end before the screen changes
+            if let t = self?.marksArrivedAt {
+                let left = t.timeIntervalSinceNow + 2.9
+                if left > 0 { try? await Task.sleep(for: .seconds(left)) }
+            }
             guard let self, self.response?.caseId == r.caseId else { return }
             switch FlowGate.destination(for: r) {
             case .block: self.path = [.block]; Haptics.warning()
@@ -317,6 +344,7 @@ final class FlowModel {
         case .guide: .guide
         case .block: .block
         case .completion: .completion
+        case .project: .guide
         }
         guard route == .analysis || FlowGate.canNavigate(to: gateRoute, response: response) else { Haptics.warning(); return }
         path.append(route)
@@ -346,6 +374,7 @@ final class FlowModel {
 
     func finishRepair() {
         guard FlowGate.canNavigate(to: .completion, response: response) else { return }
+        projectStarted = true
         if let r = response {
             let est = impact()
             store.recordRescue(caseId: r.caseId, garment: est.garment, kilograms: est.kilograms)
@@ -366,8 +395,8 @@ final class FlowModel {
         refineMode = false; refineBusy = false; refineError = nil
         extraImages = []; answers = []; followUpUsed = false; labelImage = nil; resultPhoto = nil
         statuses = [:]; currentStep = 0; completedSteps = []; guideStartedAt = nil
-        earlySegments = []; analysisError = nil; isAnalyzing = false; stageStates = [:]; groundingSeen = false
-        newInfoBanner = nil
+        earlySegments = []; marksArrivedAt = nil; analysisError = nil; isAnalyzing = false; stageStates = [:]; groundingSeen = false
+        newInfoBanner = nil; projectStarted = false; projectParked = false
         agentSteps = []; labelBusy = false; changedItemIds = []; labelBaseline = nil
         afterTask?.cancel(); afterState = .idle; afterImage = nil; afterCaseId = nil
     }
@@ -376,19 +405,59 @@ final class FlowModel {
 
     func persist(finished: Bool = false) {
         guard let r = response else { return }
-        let c = SavedCase(id: r.caseId, createdAt: store.savedCase(r.caseId)?.createdAt ?? Date(), userNote: note, response: r,
+        let old = store.savedCase(r.caseId)
+        let nowFinished = finished || (old?.finished ?? false)
+        let c = SavedCase(id: r.caseId, createdAt: old?.createdAt ?? Date(), userNote: note, response: r,
                           shoppingStatus: statuses, currentStep: currentStep, completedSteps: completedSteps.sorted(),
-                          finished: finished || (store.savedCase(r.caseId)?.finished ?? false))
+                          finished: nowFinished, started: projectStarted || (old?.started ?? false), parked: projectParked || (old?.parked ?? false),
+                          finishedAt: nowFinished ? (old?.finishedAt ?? Date()) : nil)
         store.upsert(c, image: photo)
     }
 
-    func open(_ c: SavedCase) {
+    /// "Start repair" (or "Save for later"): the case becomes a project on Home.
+    func startProject(parked: Bool = false) {
+        projectStarted = true
+        projectParked = parked
+        persist()
+    }
+
+    var projects: [SavedCase] { store.cases.filter { $0.started == true || $0.finished } }
+    var inProgress: [SavedCase] { projects.filter { !$0.finished } }
+    var doneProjects: [SavedCase] { projects.filter(\.finished).sorted { ($0.finishedAt ?? $0.createdAt) > ($1.finishedAt ?? $1.createdAt) } }
+
+    /// Items (required first) the user does not have yet.
+    func missingItems(_ c: SavedCase) -> [ShoppingItem] {
+        c.response.shoppingList.filter { $0.required && c.shoppingStatus[$0.id] != .have }
+    }
+
+    /// Home -> Project detail.
+    func openProject(_ c: SavedCase) {
+        guard store.image(for: c.id) != nil else { return }
+        loadCase(c)
+        path = [.project(c.id)]
+    }
+
+    /// From the project: back into the guide (or the checklist when nothing is gathered yet).
+    func continueProject() {
+        if !missingItems(currentCase).isEmpty && currentStep == 0 && completedSteps.isEmpty { go(.shopping) } else { startRepair() }
+    }
+
+    private var currentCase: SavedCase {
+        store.savedCase(response?.caseId ?? "") ?? SavedCase(id: "", createdAt: Date(), userNote: "", response: response!, shoppingStatus: statuses, currentStep: currentStep, completedSteps: [], finished: false)
+    }
+
+    private func loadCase(_ c: SavedCase) {
         guard let img = store.image(for: c.id) else { return }
         reset()
         photo = img; note = c.userNote
         response = FlowGate.sanitized(c.response)
         statuses = c.shoppingStatus; currentStep = c.currentStep; completedSteps = Set(c.completedSteps)
+        projectStarted = c.started == true; projectParked = c.parked == true
         followUpUsed = true
+    }
+
+    func open(_ c: SavedCase) {
+        loadCase(c)
         if let r = response {
             switch FlowGate.destination(for: r) {
             case .block: path = [.block]

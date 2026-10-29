@@ -10,6 +10,11 @@ struct SavedCase: Codable, Sendable, Identifiable, Hashable {
     var currentStep: Int
     var completedSteps: [Int]
     var finished: Bool
+    /// Set when the user taps "Start repair" (or "Save for later"): only started cases are projects on Home.
+    var started: Bool? = nil
+    /// "Save for later" on a pro verdict: the project waits for a professional.
+    var parked: Bool? = nil
+    var finishedAt: Date? = nil
 }
 
 struct RescueEntry: Codable, Sendable, Hashable {
@@ -66,6 +71,12 @@ final class CaseStore {
 
     func image(for id: String) -> UIImage? { UIImage(contentsOfFile: imageURL(id).path) }
     func savedCase(_ id: String) -> SavedCase? { cases.first { $0.id == id } }
+
+    func delete(_ id: String) {
+        try? FileManager.default.removeItem(at: imageURL(id))
+        cases.removeAll { $0.id == id }
+        persist()
+    }
 
     func clearHistory() {
         for c in cases { try? FileManager.default.removeItem(at: imageURL(c.id)) }

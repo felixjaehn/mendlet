@@ -136,7 +136,7 @@ struct SolderOverlay: View {
             Button { start() } label: {
                 HStack(spacing: 8) {
                     Image(systemName: finished ? "checkmark.circle.fill" : "flame.fill")
-                        .foregroundStyle(finished ? Theme.safe : Theme.caution)
+                        .foregroundStyle(finished ? Theme.highlight : Theme.caution)
                     Text(label).font(.system(size: 13, weight: .semibold)).monospacedDigit()
                 }
                 .foregroundStyle(.white)
@@ -259,7 +259,7 @@ struct SolderOverlay: View {
         if hold > 0 {
             var arc = Path()
             arc.addArc(center: b, radius: R, startAngle: .degrees(-90), endAngle: .degrees(-90 + 360 * hold), clockwise: false)
-            ctx.stroke(arc, with: .color(hold >= 1 ? Theme.safe : Theme.caution), style: StrokeStyle(lineWidth: 4, lineCap: .round))
+            ctx.stroke(arc, with: .color(hold >= 1 ? Theme.highlight : Theme.caution), style: StrokeStyle(lineWidth: 4, lineCap: .round))
         }
         drawIron(&ctx, at: b, time: t, animated: animated, active: hold > 0 && hold < 1)
     }

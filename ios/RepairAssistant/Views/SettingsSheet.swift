@@ -5,44 +5,60 @@ struct SettingsSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var status: String?
     @State private var checking = false
+    @State private var taps = 0
+    @State private var confirmClear = false
+    @State private var dev = UserDefaults.standard.bool(forKey: "showDev")
+
+    private var version: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0" }
 
     var body: some View {
         @Bindable var settings = flow.settings
         NavigationStack {
-            Form {
+            List {
                 Section {
-                    Toggle("Use server", isOn: Binding(get: { !settings.demoMode }, set: { settings.demoMode = !$0 })).tint(Theme.thread)
+                    Button("Delete all repairs", role: .destructive) { confirmClear = true }
+                } footer: {
+                    Text("Photos are sent to the analysis server only to assess the repair.")
                 }
-                if !settings.demoMode {
-                    Section("Server") {
-                        TextField("http://localhost:8787", text: $settings.baseURLString)
-                            .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
-                        Button {
-                            Task { await check() }
-                        } label: {
-                            HStack { Text("Verbindung testen"); Spacer(); if checking { ProgressView() } else if let status { Text(status).foregroundStyle(status.hasPrefix("OK") ? Theme.safe : Theme.stop) } }
+                Section("About") {
+                    HStack { Text("Mendlet"); Spacer(); Text(version).foregroundStyle(Theme.inkSecondary) }
+                        .contentShape(Rectangle())
+                        .onTapGesture { taps += 1; if taps >= 5 { dev = true } }
+                }
+                if dev {
+                    Section("Developer") {
+                        Toggle("Use server", isOn: Binding(get: { !settings.demoMode }, set: { settings.demoMode = !$0 }))
+                        if !settings.demoMode {
+                            TextField("http://localhost:8787", text: $settings.baseURLString)
+                                .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
+                            Button {
+                                Task { await check() }
+                            } label: {
+                                HStack { Text("Test connection"); Spacer(); if checking { ProgressView() } else if let status { Text(status).foregroundStyle(Theme.inkSecondary) } }
+                            }
+                            Toggle("Precision mode", isOn: $settings.precisionMode)
                         }
-                        Toggle("Präzisionsmodus (Muse Wonder)", isOn: $settings.precisionMode).tint(Theme.thread)
                     }
-                }
-                Section {
-                    Button("Verlauf löschen", role: .destructive) { flow.store.clearHistory() }
                 }
             }
             .scrollContentBackground(.hidden)
             .background(Theme.paper)
-            .navigationTitle("Einstellungen")
+            .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Fertig") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } } }
+            .confirmationDialog("Delete all repairs? Photos and progress will be removed.", isPresented: $confirmClear, titleVisibility: .visible) {
+                Button("Delete all repairs", role: .destructive) { flow.store.clearHistory() }
+                Button("Cancel", role: .cancel) {}
+            }
         }
         .presentationDetents([.medium, .large])
     }
 
     private func check() async {
-        guard let url = flow.settings.baseURL else { status = tr("Ungültige URL"); return }
+        guard let url = flow.settings.baseURL else { status = "Invalid URL"; return }
         checking = true
         let ok = await LiveAPIClient(baseURL: url).health()
         checking = false
-        status = ok ? "OK" : tr("Keine Antwort")
+        status = ok ? "OK" : "No response"
     }
 }

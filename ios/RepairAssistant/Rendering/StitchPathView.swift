@@ -175,12 +175,11 @@ struct StitchPathView: View {
             if amt < len { break }
         }
         let thread = Theme.highlight
-        let shadowT = CGAffineTransform(translationX: 0.9, y: 1.0), hiT = CGAffineTransform(translationX: -0.5, y: -0.6)
-        let dash: [CGFloat] = [5, 4]
+        let shadowT = CGAffineTransform(translationX: 0.6, y: 0.8)
+        let dash: [CGFloat] = [6, 6]
         for (path, d) in [(solid, [CGFloat]()), (dashed, dash)] {
-            ctx.stroke(path.applying(shadowT), with: .color(.black.opacity(0.32)), style: StrokeStyle(lineWidth: 3.2, lineCap: .round, lineJoin: .round, dash: d))
-            ctx.stroke(path, with: .color(thread), style: StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round, dash: d))
-            ctx.stroke(path.applying(hiT), with: .color(.white.opacity(0.32)), style: StrokeStyle(lineWidth: 0.8, lineCap: .round, lineJoin: .round, dash: d))
+            ctx.stroke(path.applying(shadowT), with: .color(.black.opacity(0.28)), style: StrokeStyle(lineWidth: 2.8, lineCap: .round, lineJoin: .round, dash: d))
+            ctx.stroke(path, with: .color(thread), style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round, dash: d))
         }
         return head
     }
@@ -194,7 +193,7 @@ struct StitchPathView: View {
             tr = stitchTrace(size: size)
             if plan.centerline.count >= 2 {
                 var c = Path(); c.addLines(plan.centerline.map { px($0, size) })
-                ctx.stroke(c, with: .color(.white.opacity(0.6)), style: StrokeStyle(lineWidth: 1.4, lineCap: .round, dash: [1.5, 6]))
+                ctx.stroke(c, with: .color(.white.opacity(0.45)), style: StrokeStyle(lineWidth: 1, lineCap: .round, dash: [1.5, 6]))
             }
         case .darning:
             if phase == .second {
@@ -215,8 +214,7 @@ struct StitchPathView: View {
             for s in plan.stitches {
                 let c = px(s.position, size)
                 idx += 1
-                ctx.fill(Path(ellipseIn: CGRect(x: c.x - 2.6, y: c.y - 2.6, width: 5.2, height: 5.2)), with: .color(.white.opacity(0.9)))
-                ctx.fill(Path(ellipseIn: CGRect(x: c.x - 1.5, y: c.y - 1.5, width: 3, height: 3)), with: .color(thread))
+                ctx.fill(Path(ellipseIn: CGRect(x: c.x - 2, y: c.y - 2, width: 4, height: 4)), with: .color(.white.opacity(0.9)))
             }
         }
 
@@ -225,15 +223,12 @@ struct StitchPathView: View {
             guard drawn + 0.5 >= m.at else { continue }
             let sinceSec = progress >= 1 ? 1.0 : Double((drawn - m.at) / tr.total) * drawDuration
             let s = pop(min(1, max(0, sinceSec / 0.35)))
-            let r: CGFloat = (m.small ? 5 : 8) * CGFloat(s)
+            let r: CGFloat = (m.small ? 5 : 7) * CGFloat(s)
             let rect = CGRect(x: m.point.x - r, y: m.point.y - r, width: r * 2, height: r * 2)
             ctx.fill(Path(ellipseIn: rect.insetBy(dx: -1.5, dy: -1.5)), with: .color(.black.opacity(0.25)))
-            ctx.fill(Path(ellipseIn: rect), with: .color(m.filled ? thread : .white))
-            ctx.stroke(Path(ellipseIn: rect), with: .color(m.filled ? .white : thread), lineWidth: 1.8)
-            if s > 0.6 && !m.small {
-                let label = Text("\(m.number)").font(.system(size: 9.5, weight: .bold, design: .rounded)).foregroundColor(m.filled ? .white : thread)
-                ctx.draw(label, at: m.point)
-            }
+            let dot = rect.insetBy(dx: r * 0.35, dy: r * 0.35)
+            ctx.fill(Path(ellipseIn: dot), with: .color(.white))
+            ctx.stroke(Path(ellipseIn: rect), with: .color(.white), lineWidth: 1)
         }
 
         // needle

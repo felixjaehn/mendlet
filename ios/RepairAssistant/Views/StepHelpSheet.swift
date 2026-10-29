@@ -15,32 +15,30 @@ struct StepHelpSheet: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
+            HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Hilfe zu diesem Schritt").font(.title2.bold()).foregroundStyle(Theme.ink)
-                    Text("Schritt \(step.n): \(step.title)").font(.subheadline).foregroundStyle(Theme.inkSecondary).lineLimit(1)
+                    Text("Not working?").font(.serif(.title2)).foregroundStyle(Theme.ink)
+                    Text("Step \(step.n): \(step.title)").font(.subheadline).foregroundStyle(Theme.inkSecondary).lineLimit(1)
                 }
                 Spacer()
-                Button("Schließen") { dismiss() }.font(.body.weight(.medium)).foregroundStyle(Theme.inkSecondary)
+                Button("Close") { dismiss() }.font(.body.weight(.medium))
             }
             .padding(.horizontal, Theme.margin).padding(.top, 24).padding(.bottom, 12)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     if let r = result {
-                        if r.escalate { escalateCard(r) } else { answerCards(r) }
+                        if r.escalate { escalateBlock(r) } else { answerBlock(r) }
                     } else {
-                        SectionLabel(text: "Was klappt nicht?")
-                        VoiceTextField(placeholder: "z. B. Der Faden zieht den Stoff zusammen", text: $issue, lines: 2...4)
-                        HStack {
-                            let attached = extraPhoto != nil
-                            PhotosPicker(selection: $pickerItem, matching: .images) {
-                                Label(attached ? tr("Foto angehängt") : tr("Foto anhängen"), systemImage: attached ? "checkmark.circle.fill" : "paperclip")
-                                    .font(.subheadline.weight(.semibold)).foregroundStyle(attached ? Theme.safe : Theme.thread)
-                            }
-                            Spacer()
+                        Text("What's happening?").overline()
+                        VoiceTextField(placeholder: "e.g. The thread pulls the fabric together", text: $issue, lines: 2...4)
+                        let attached = extraPhoto != nil
+                        PhotosPicker(selection: $pickerItem, matching: .images) {
+                            Text(attached ? "Photo attached" : "Add a photo").font(.body.weight(.medium)).foregroundStyle(Theme.thread)
+                                .frame(minHeight: 44, alignment: .leading)
                         }
-                        if let error { ErrorCard(message: error, retry: { Task { await send() } }) }
+                        if loading { HStack(spacing: 10) { ProgressView(); Text("Checking this step").font(.subheadline).foregroundStyle(Theme.inkSecondary) } }
+                        if error != nil { ErrorCard(message: "Couldn't load help. Try again.", retry: { Task { await send() } }) }
                     }
                 }
                 .padding(.horizontal, Theme.margin).padding(.bottom, 16)
@@ -48,54 +46,46 @@ struct StepHelpSheet: View {
             .scrollDismissesKeyboard(.interactively)
 
             if result == nil {
-                PrimaryButton(title: loading ? "Ich überlege …" : "Frage senden", systemImage: "arrow.up") { Task { await send() } }
+                PrimaryButton(title: "Get help") { Task { await send() } }
                     .disabled(loading || issue.trimmingCharacters(in: .whitespaces).isEmpty)
                     .padding(.horizontal, Theme.margin).padding(.vertical, 12)
             } else if result?.escalate != true {
-                PrimaryButton(title: "Weiter versuchen") { dismiss() }
+                PrimaryButton(title: "Keep going") { dismiss() }
                     .padding(.horizontal, Theme.margin).padding(.vertical, 12)
             }
         }
         .screenBackground()
         .presentationDetents([.large])
+        .presentationDragIndicator(.visible)
         .onChange(of: pickerItem) { _, item in
             guard let item else { return }
             Task { if let d = try? await item.loadTransferable(type: Data.self) { extraPhoto = UIImage(data: d) } }
         }
     }
 
-    private func answerCards(_ r: StepHelpResponse) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            VStack(alignment: .leading, spacing: 8) {
-                Label("Antwort", systemImage: "text.bubble.fill").font(.subheadline.weight(.bold)).foregroundStyle(Theme.thread)
-                Text(r.answer).font(.body).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading).card()
+    private func answerBlock(_ r: StepHelpResponse) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(r.answer).font(.body).foregroundStyle(Theme.ink).lineSpacing(4).fixedSize(horizontal: false, vertical: true)
             if let hint = r.retryHint, !hint.isEmpty {
-                HStack(alignment: .top, spacing: 10) {
-                    Image(systemName: "lightbulb.fill").foregroundStyle(Theme.caution)
-                    Text(hint).font(.subheadline).foregroundStyle(Theme.ink)
+                HStack(alignment: .top, spacing: 12) {
+                    Rectangle().fill(Theme.thread).frame(width: 2)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Try this").overline()
+                        Text(hint).font(.subheadline).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
+                    }
                 }
-                .padding(14).frame(maxWidth: .infinity, alignment: .leading)
-                .background(Theme.cautionSoft, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .fixedSize(horizontal: false, vertical: true)
             }
-            Text("Die übrigen Schritte bleiben unverändert.").font(.footnote).foregroundStyle(Theme.inkSecondary)
+            Text("The other steps stay the same.").font(.footnote).foregroundStyle(Theme.inkTertiary)
         }
     }
 
-    private func escalateCard(_ r: StepHelpResponse) -> some View {
+    private func escalateBlock(_ r: StepHelpResponse) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: "hand.raised.fill").font(.title2).foregroundStyle(Theme.stop)
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Bitte hier aufhören").font(.title3.bold()).foregroundStyle(Theme.stop)
-                    Text(r.answer).font(.body).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
-                }
-            }
-            PrimaryButton(title: "Reparatur abbrechen", kind: .destructive) { dismiss(); flow.reset() }
+            Text("Please stop here.").font(.serif(.title2)).foregroundStyle(Theme.ink)
+            Text(r.answer).font(.body).foregroundStyle(Theme.ink).lineSpacing(4).fixedSize(horizontal: false, vertical: true)
+            PrimaryButton(title: "Stop the repair", kind: .destructive) { dismiss(); flow.reset() }
         }
-        .padding(16)
-        .background(Theme.stopSoft, in: RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
         .onAppear { Haptics.warning() }
     }
 
@@ -108,6 +98,6 @@ struct StepHelpSheet: View {
             riskLevel: flow.response?.riskLevel ?? .allowed,
             issueText: issue, imageBase64: extraPhoto.map { ImageResizer.base64($0) })
         do { result = try await flow.service.stepHelp(req) }
-        catch { self.error = (error as? APIError)?.errorDescription ?? tr("Das hat nicht geklappt.") }
+        catch { self.error = (error as? APIError)?.errorDescription ?? "error" }
     }
 }

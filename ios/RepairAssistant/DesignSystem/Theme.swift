@@ -12,33 +12,42 @@ extension Color {
     }
 }
 
-/// Apple system palette (grouped backgrounds, labels, system tints) with one brand accent: the thread orange.
-/// References: Apple Health / Fitness / Journal on Mobbin (docs/design-notes.md, "Apple-Qualität").
+/// Mendlet design tokens (docs/design/REDESIGN-SPEC.md 1.1): neutral ink and paper, one accent (system blue, state only),
+/// white for everything drawn on photos. Serif (New York) only for editorial moments.
 enum Theme {
     static let paper = Color(uiColor: .systemGroupedBackground)
+    static let surface = Color(uiColor: .systemBackground)
     static let card = Color(uiColor: .secondarySystemGroupedBackground)
     static let fill = Color(uiColor: .tertiarySystemFill)
     static let ink = Color(uiColor: .label)
     static let inkSecondary = Color(uiColor: .secondaryLabel)
+    static let inkTertiary = Color(uiColor: .tertiaryLabel)
     static let hairline = Color(uiColor: .separator)
-    /// UI accent = the system accent colour (Assets: AccentColor, system blue). No orange UI.
+    /// UI accent = the system accent colour (Assets: AccentColor, system blue). No orange anywhere.
     static let thread = Color.accentColor
     static let threadSoft = Color.accentColor.opacity(0.14)
-    /// Annotations on photos (masks, stitch path, routes): white glow like Visual Intelligence.
+    /// Everything drawn on a photo (masks, stitch path, routes) is white.
     static let highlight = Color.white
-    static let safe = Color(uiColor: .systemGreen)
-    static let safeSoft = Color(uiColor: .systemGreen).opacity(0.14)
-    static let caution = Color(light: 0xB27C00, dark: 0xFFD60A)
-    static let cautionSoft = Color(uiColor: .systemYellow).opacity(0.18)
+    static let scrim = Color.black.opacity(0.30)
+    /// Legacy names kept for the trace drawer and overlays: no extra hues, white on photos, red only for destructive.
+    static let safe = Color.accentColor
+    static let safeSoft = Color.accentColor.opacity(0.14)
+    static let caution = Color.white
+    static let cautionSoft = Color(uiColor: .tertiarySystemFill)
     static let stop = Color(uiColor: .systemRed)
     static let stopSoft = Color(uiColor: .systemRed).opacity(0.12)
 
     static let partColors: [Color] = [.white, .white, .white]
 
     static let margin: CGFloat = 20
-    static let cardRadius: CGFloat = 24
+    static let heroRadius: CGFloat = 28
+    static let cardRadius: CGFloat = 20
+    static let thumbRadius: CGFloat = 12
+    static let controlHeight: CGFloat = 54
 
-    static let spring = Animation.spring(response: 0.45, dampingFraction: 0.85)
+    /// `ui` spring (state change) and `press` spring.
+    static let spring = Animation.spring(response: 0.42, dampingFraction: 0.86)
+    static let press = Animation.spring(response: 0.25, dampingFraction: 0.7)
 }
 
 extension Color {
@@ -48,8 +57,14 @@ extension Color {
 }
 
 extension Font {
-    static func rounded(_ style: Font.TextStyle, weight: Font.Weight = .bold) -> Font {
-        .system(style, design: .rounded, weight: weight)
+    static func serif(_ style: Font.TextStyle, weight: Font.Weight = .semibold) -> Font { .system(style, design: .serif, weight: weight) }
+    static let overline = Font.caption.weight(.semibold)
+}
+
+extension View {
+    /// Small caps label above a block of content ("What we found").
+    func overline() -> some View {
+        self.font(.overline).tracking(0.8).textCase(.uppercase).foregroundStyle(Theme.inkSecondary)
     }
 }
 
@@ -59,6 +74,7 @@ enum Haptics {
     static func warning() { UINotificationFeedbackGenerator().notificationOccurred(.warning) }
     static func selection() { UISelectionFeedbackGenerator().selectionChanged() }
     static func tap() { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
+    static func soft() { UIImpactFeedbackGenerator(style: .soft).impactOccurred() }
 }
 
 extension View {

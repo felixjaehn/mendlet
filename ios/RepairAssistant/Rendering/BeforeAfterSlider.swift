@@ -15,15 +15,19 @@ enum SliderMath {
     }
 }
 
-/// Draggable before/after comparison: original photo on the left, Muse Image preview on the right.
+/// Draggable before/after comparison (Photoroom): the original on one side, the preview on the other, a hairline divider
+/// with a white thumb and tiny caps labels. Fills its container when `aspect` is nil.
 struct BeforeAfterSlider: View {
     let before: UIImage
     let after: UIImage
-    var aspect: CGFloat = 1.0
+    var aspect: CGFloat? = 1.0
+    var cornerRadius: CGFloat = Theme.heroRadius
     var initial: Double = 0.5
-    /// true = divider runs left-right (before on top). Used for tall damage such as a tear along a seam,
-    /// so the same tear visibly continues across the divider (demo review 2026-10-29).
+    /// true = divider runs left-right (before on top).
     var horizontalSplit = false
+    var labels = true
+    /// Sweep the divider once when the slider appears.
+    var sweepOnAppear = true
     @State private var frac: Double
     @State private var dragging = false
     @State private var hinted = false
@@ -31,41 +35,38 @@ struct BeforeAfterSlider: View {
     @Environment(\.staticRendering) private var staticRendering
     private var reduceMotion: Bool { systemReduceMotion || staticRendering }
 
-    init(before: UIImage, after: UIImage, aspect: CGFloat = 1.0, initial: Double = 0.5, horizontalSplit: Bool = false) {
-        self.before = before; self.after = after; self.aspect = aspect; self.initial = initial; self.horizontalSplit = horizontalSplit
+    init(before: UIImage, after: UIImage, aspect: CGFloat? = 1.0, cornerRadius: CGFloat = Theme.heroRadius, initial: Double = 0.5,
+         horizontalSplit: Bool = false, labels: Bool = true, sweepOnAppear: Bool = true) {
+        self.before = before; self.after = after; self.aspect = aspect; self.cornerRadius = cornerRadius; self.initial = initial
+        self.horizontalSplit = horizontalSplit; self.labels = labels; self.sweepOnAppear = sweepOnAppear
         _frac = State(initialValue: SliderMath.clamp(initial))
     }
 
     var body: some View {
-        GeometryReader { geo in
+        let core = GeometryReader { geo in
             let w = geo.size.width, h = geo.size.height
             let pos = (horizontalSplit ? h : w) * frac
             ZStack(alignment: .topLeading) {
-                // both layers: same content aspect (the photo's), same frame, same fill mode -> pixel-aligned
                 let lf = SliderMath.layerFrame(container: geo.size)
                 layer(after, lf)
                 if horizontalSplit {
                     layer(before, lf).mask(alignment: .top) { Rectangle().frame(height: pos) }
-                    Rectangle().fill(.white).frame(width: w, height: 2)
-                        .shadow(color: .black.opacity(0.35), radius: 3).offset(y: pos - 1)
+                    Rectangle().fill(.white).frame(width: w, height: 1.5).shadow(color: .black.opacity(0.3), radius: 2).offset(y: pos - 0.75)
                 } else {
                     layer(before, lf).mask(alignment: .leading) { Rectangle().frame(width: pos) }
-                    Rectangle().fill(.white).frame(width: 2, height: h)
-                        .shadow(color: .black.opacity(0.35), radius: 3).offset(x: pos - 1)
+                    Rectangle().fill(.white).frame(width: 1.5, height: h).shadow(color: .black.opacity(0.3), radius: 2).offset(x: pos - 0.75)
                 }
-                Circle().fill(.white).frame(width: 44, height: 44)
-                    .shadow(color: .black.opacity(0.3), radius: 8, y: 2)
-                    .overlay(Image(systemName: horizontalSplit ? "arrow.up.and.down" : "arrow.left.and.right")
-                        .font(.system(size: 16, weight: .bold)).foregroundStyle(Theme.thread))
+                Circle().fill(.white).frame(width: 32, height: 32)
+                    .shadow(color: .black.opacity(0.25), radius: 6, y: 1)
+                    .overlay(Image(systemName: horizontalSplit ? "chevron.up.chevron.down" : "chevron.left.chevron.right")
+                        .font(.system(size: 12, weight: .bold)).foregroundStyle(.black))
                     .scaleEffect(dragging ? 1.1 : 1)
                     .position(x: horizontalSplit ? w / 2 : pos, y: horizontalSplit ? pos : h / 2)
-                // side chips
-                tag(tr("Vorher")).opacity(frac > 0.2 ? 1 : 0).padding(12).frame(width: w, height: h, alignment: .topLeading)
-                tag(tr("Nachher")).opacity(frac < 0.8 ? 1 : 0).padding(12)
-                    .frame(width: w, height: h, alignment: horizontalSplit ? .bottomTrailing : .topTrailing)
-                Image(systemName: "sparkles").font(.caption.weight(.bold)).foregroundStyle(.white)
-                    .frame(width: 30, height: 30).background(.black.opacity(0.55), in: Circle())
-                    .padding(12).frame(width: w, height: h, alignment: .bottomLeading)
+                if labels {
+                    tag("Before").opacity(frac > 0.2 ? 1 : 0).padding(12).frame(width: w, height: h, alignment: .topLeading)
+                    tag("After").opacity(frac < 0.8 ? 1 : 0).padding(12)
+                        .frame(width: w, height: h, alignment: horizontalSplit ? .bottomTrailing : .topTrailing)
+                }
             }
             .frame(width: w, height: h)
             .contentShape(Rectangle())
@@ -77,12 +78,13 @@ struct BeforeAfterSlider: View {
                 .onEnded { _ in withAnimation(Theme.spring) { dragging = false } })
             .animation(.interactiveSpring(response: 0.18, dampingFraction: 0.9), value: dragging)
         }
-        .aspectRatio(aspect, contentMode: .fit)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
+        Group {
+            if let aspect { core.aspectRatio(aspect, contentMode: .fit) } else { core }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Vorher-Nachher-Vergleich")
-        .accessibilityValue("\(Int((frac * 100).rounded())) Prozent Nachher")
+        .accessibilityLabel(tr("Before and after"))
+        .accessibilityValue(tr("%lld percent after", Int((frac * 100).rounded())))
         .accessibilityAdjustableAction { dir in
             switch dir {
             case .increment: frac = SliderMath.clamp(frac + 0.1)
@@ -91,14 +93,12 @@ struct BeforeAfterSlider: View {
             }
         }
         .task {
-            guard !hinted, !reduceMotion else { return }
+            guard !hinted, sweepOnAppear, !reduceMotion else { return }
             hinted = true
-            try? await Task.sleep(for: .milliseconds(500))
-            withAnimation(.easeInOut(duration: 0.7)) { frac = SliderMath.clamp(initial + 0.18) }
-            try? await Task.sleep(for: .milliseconds(750))
-            withAnimation(.easeInOut(duration: 0.8)) { frac = SliderMath.clamp(initial - 0.18) }
-            try? await Task.sleep(for: .milliseconds(850))
-            withAnimation(.easeInOut(duration: 0.6)) { frac = SliderMath.clamp(initial) }
+            try? await Task.sleep(for: .milliseconds(450))
+            withAnimation(.easeInOut(duration: 0.45)) { frac = SliderMath.clamp(initial - 0.4) }
+            try? await Task.sleep(for: .milliseconds(480))
+            withAnimation(.easeInOut(duration: 0.45)) { frac = SliderMath.clamp(initial) }
         }
     }
 
@@ -109,67 +109,9 @@ struct BeforeAfterSlider: View {
     }
 
     private func tag(_ text: String) -> some View {
-        Text(text).font(.caption.weight(.semibold))
+        Text(text).font(.caption2.weight(.semibold)).tracking(0.8).textCase(.uppercase)
             .foregroundStyle(.white).padding(.horizontal, 10).padding(.vertical, 5)
-            .background(.black.opacity(0.45), in: Capsule())
+            .background(.black.opacity(0.25), in: Capsule())
             .animation(.easeInOut(duration: 0.2), value: frac > 0.2)
-    }
-}
-
-/// Before/after card driven by the flow: shimmer while Muse Image works, slider when ready, nothing if unavailable.
-struct BeforeAfterCard: View {
-    @Environment(FlowModel.self) private var flow
-    var aspect: CGFloat = 1.0
-
-    private var damageBox: CGRect? { flow.response?.segments.first(where: { $0.isDamage })?.normalizedBox }
-
-    /// Tall damage (in photo pixels) splits top/bottom so the same tear runs across the divider.
-    private func tallDamage(_ photo: UIImage) -> Bool {
-        guard let b = damageBox else { return false }
-        return b.height * photo.size.height > 1.3 * b.width * photo.size.width
-    }
-
-    var body: some View {
-        Group {
-            if let photo = flow.photo {
-                switch flow.afterState {
-                case .idle, .loading:
-                    placeholder(photo).transition(.opacity)
-                case .ready:
-                    if let after = flow.afterImage {
-                        VStack(spacing: 10) {
-                            // Whole photo (no square crop) and the divider on the damage: judges read a centred
-                            // divider over a diagonal tear as "two different crops" (demo review 2026-10-29).
-                            let tall = tallDamage(photo)
-                            BeforeAfterSlider(before: photo, after: after,
-                                              aspect: min(1.3, max(0.75, photo.size.width / max(photo.size.height, 1))),
-                                              initial: damageBox.map { Double(tall ? $0.midY : $0.midX) } ?? 0.5,
-                                              horizontalSplit: tall)
-                        }
-                        .transition(.opacity.combined(with: .scale(scale: 0.98)))
-                    }
-                case .unavailable:
-                    EmptyView()
-                }
-            }
-        }
-        .animation(.easeInOut(duration: 0.45), value: flow.afterState)
-    }
-
-    private func placeholder(_ photo: UIImage) -> some View {
-        Color.clear.aspectRatio(aspect, contentMode: .fit).overlay {
-          ZStack {
-            Image(uiImage: photo).resizable().scaledToFill().blur(radius: 22).overlay(Color.black.opacity(0.35))
-            VStack(spacing: 12) {
-                Image(systemName: "sparkles").font(.system(size: 26, weight: .semibold)).foregroundStyle(.white)
-                ProgressView().tint(.white)
-            }
-            .padding(.horizontal, 32)
-          }
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-        .shimmer()
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Vorschau der Reparatur wird erstellt")
     }
 }

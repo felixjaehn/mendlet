@@ -59,18 +59,13 @@ struct DimensionLineView: View {
                 p.move(to: a); p.addLine(to: b)
                 for q in [a, b] { p.move(to: CGPoint(x: q.x - n.dx, y: q.y - n.dy)); p.addLine(to: CGPoint(x: q.x + n.dx, y: q.y + n.dy)) }
             }
-            .stroke(.white.opacity(0.9), style: StrokeStyle(lineWidth: 1, lineCap: .round))
+            .stroke(.white.opacity(0.9), style: StrokeStyle(lineWidth: 0.75, lineCap: .round))
             .shadow(color: .black.opacity(0.5), radius: 1.5)
-            HStack(spacing: 5) {
-                Text(tr("ca. %@ cm", cm)).font(.system(size: 11.5, weight: .semibold, design: .rounded)).monospacedDigit()
-                Text("geschätzt").font(.system(size: 9, weight: .medium)).opacity(0.65)
-            }
-            .lineLimit(1).foregroundStyle(.white)
-            .frame(width: l.chipRect.width, height: l.chipRect.height)
-            .background(Capsule().fill(.black.opacity(0.58)))
-            .background(.ultraThinMaterial, in: Capsule())
-            .overlay(Capsule().strokeBorder(.white.opacity(0.28), lineWidth: 0.75))
-            .position(x: l.chipRect.midX, y: l.chipRect.midY)
+            Text("about \(cm) cm").font(.caption2.weight(.medium)).monospacedDigit()
+                .foregroundStyle(.white).shadow(color: .black.opacity(0.4), radius: 2)
+                .padding(.horizontal, 4).background(Color.black.opacity(0.001))
+                .lineLimit(1)
+                .position(x: l.chipRect.midX, y: l.chipRect.midY)
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)

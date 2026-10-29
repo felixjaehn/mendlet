@@ -1,27 +1,28 @@
 import SwiftUI
 
+/// "Before you start": what to gather. Two states per item (have / not yet), never blocks the first step.
 struct ShoppingListView: View {
     @Environment(FlowModel.self) private var flow
-    @State private var expanded: Set<String> = []
-    @State private var copied: String?
 
     var body: some View {
         let items = flow.shoppingItems
+        let ready = items.filter { flow.statuses[$0.id] == .have }.count
+        let missing = items.filter { $0.required && flow.statuses[$0.id] != .have }.count
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                header(items)
+            VStack(alignment: .leading, spacing: 24) {
+                header(items, ready: ready)
                 ForEach([ItemKind.material, .tool], id: \.self) { kind in
                     let group = items.filter { $0.kind == kind }
                     if !group.isEmpty {
-                        VStack(alignment: .leading, spacing: 10) {
-                            SectionLabel(text: kind == .material ? "Material" : "Werkzeug")
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(kind == .material ? "Materials" : "Tools").overline().padding(.leading, 4)
                             VStack(spacing: 0) {
                                 ForEach(Array(group.enumerated()), id: \.element.id) { i, item in
                                     row(item)
-                                    if i < group.count - 1 { Divider().overlay(Theme.hairline) }
+                                    if i < group.count - 1 { Rectangle().fill(Theme.hairline).frame(height: 0.5).padding(.leading, 58) }
                                 }
                             }
-                            .card(padding: 0)
+                            .background(Theme.card, in: RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
                         }
                     }
                 }
@@ -34,110 +35,75 @@ struct ShoppingListView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                ShareLink(item: ShoppingGate.shareText(title: flow.response?.diagnosis.summary.components(separatedBy: ".").first ?? tr("Reparatur"), items: items, statuses: flow.statuses)) {
+                ShareLink(item: ShoppingGate.shareText(title: ProjectTitle.title(summary: flow.response?.diagnosis.summary ?? ""), items: items, statuses: flow.statuses)) {
                     Image(systemName: "square.and.arrow.up")
                 }
-                .tint(.primary)
-                .accessibilityLabel("Liste teilen")
+                .accessibilityLabel(tr("Share list"))
             }
         }
         .floatingBar {
-            // Status lives in the button itself (no extra line over the list).
-            PrimaryButton(title: tr("Start step 1"), systemImage: "play.fill") { flow.startRepair() }
-                .padding(.horizontal, Theme.margin).padding(.vertical, 12)
+            VStack(spacing: 4) {
+                Text(missing == 0 ? "Everything is ready" : (missing == 1 ? "1 required item to get" : "\(missing) required items to get"))
+                    .font(.footnote).foregroundStyle(Theme.inkSecondary).padding(.top, 8)
+                PrimaryButton(title: continuing ? "Continue repair" : "Start repair") { flow.startRepair() }
+                PrimaryButton(title: "I'll gather them later", kind: .secondary) { flow.reset() }
+            }
+            .padding(.horizontal, Theme.margin).padding(.bottom, 4)
         }
     }
 
-    /// First page of the repair: check you have everything, mark what to buy. Never blocks the guide.
-    private func header(_ items: [ShoppingItem]) -> some View {
-        let ready = items.filter { flow.statuses[$0.id] == .have }.count
-        return VStack(alignment: .leading, spacing: 6) {
-            Text(tr("Before you start")).font(.largeTitle.bold()).foregroundStyle(Theme.ink)
-            Text(tr("%lld of %lld ready", ready, items.count)).font(.headline).foregroundStyle(ready == items.count ? Theme.safe : Theme.inkSecondary)
+    private var continuing: Bool { flow.currentStep > 0 || !flow.completedSteps.isEmpty }
+
+    private func header(_ items: [ShoppingItem], ready: Int) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(ready == items.count ? "All set." : "Gather these first.")
+                .font(.serif(.largeTitle)).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
+            Text("\(ready) of \(items.count) ready").font(.subheadline).foregroundStyle(Theme.inkSecondary)
                 .monospacedDigit().contentTransition(.numericText())
+            ProgressLine(value: items.isEmpty ? 0 : Double(ready) / Double(items.count))
+            if let hi = flow.response?.decision?.costEur.last, hi > 0, let lo = flow.response?.decision?.costEur.first {
+                Text("About \(Fmt.number(lo))–\(Fmt.number(hi)) EUR if you buy everything").font(.footnote).foregroundStyle(Theme.inkTertiary)
+            }
         }
         .animation(Theme.spring, value: ready)
-        .padding(.top, 4)
     }
 
     private func row(_ item: ShoppingItem) -> some View {
-        let status = flow.statuses[item.id]
-        let isOpen = expanded.contains(item.id)
-        return VStack(alignment: .leading, spacing: 10) {
+        let have = flow.statuses[item.id] == .have
+        return HStack(alignment: .top, spacing: 14) {
             Button {
-                withAnimation(Theme.spring) { if isOpen { expanded.remove(item.id) } else { expanded.insert(item.id) } }
+                withAnimation(.easeOut(duration: 0.2)) { flow.setStatus(item, .have) }
             } label: {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Text(item.name).font(.callout.weight(.semibold)).foregroundStyle(status == .have ? Theme.inkSecondary : Theme.ink)
-                            .strikethrough(status == .have, color: Theme.inkSecondary)
-                            .multilineTextAlignment(.leading)
-                        Spacer(minLength: 4)
-                        Badge(text: item.required ? "Pflicht" : "optional", tint: item.required ? Theme.thread : Theme.inkSecondary)
-                    }
-                    HStack(spacing: 6) {
-                        if !item.quantity.isEmpty { Text(item.quantity).font(.footnote).foregroundStyle(Theme.inkSecondary) }
-                        if let alt = item.householdAlternative, !alt.isEmpty {
-                            if !item.quantity.isEmpty { Text("·").foregroundStyle(Theme.inkSecondary) }
-                            Text("oder: \(alt)").font(.footnote).foregroundStyle(Theme.inkSecondary).lineLimit(1)
+                HStack(alignment: .top, spacing: 14) {
+                    CheckCircle(on: have).padding(.top, 1)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(item.name).font(.body).foregroundStyle(have ? Theme.inkSecondary : Theme.ink)
+                            .multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
+                        if !item.quantity.isEmpty { Text(item.quantity).font(.subheadline).foregroundStyle(Theme.inkSecondary).multilineTextAlignment(.leading) }
+                        if let alt = item.householdAlternative, !alt.isEmpty, !have {
+                            Text("Or: \(alt)").font(.footnote).foregroundStyle(Theme.inkTertiary).multilineTextAlignment(.leading)
                         }
+                        if flow.changedItemIds.contains(item.id) { Text("Updated from the label").font(.footnote).foregroundStyle(Theme.thread) }
                     }
+                    Spacer(minLength: 0)
                 }
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-
-            HStack(spacing: 8) {
-                statusButton("Habe ich", icon: "checkmark", tint: Theme.safe, active: status == .have) { flow.setStatus(item, .have) }
-                statusButton("Kaufen", icon: "cart", tint: Theme.thread, active: status == .buy) { flow.setStatus(item, .buy) }
-                Spacer(minLength: 0)
-                Image(systemName: "chevron.down").font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkSecondary)
-                    .rotationEffect(.degrees(isOpen ? 180 : 0))
-                    .frame(width: 32, height: 32)
-            }
-
-            if isOpen {
-                HStack(spacing: 10) {
-                    Image(systemName: "magnifyingglass").foregroundStyle(Theme.inkSecondary)
-                    Text(item.searchTerm.isEmpty ? item.name : item.searchTerm).font(.subheadline).foregroundStyle(Theme.ink)
-                    Spacer()
-                    Button {
-                        UIPasteboard.general.string = item.searchTerm.isEmpty ? item.name : item.searchTerm
-                        copied = item.id; Haptics.selection()
-                        Task { try? await Task.sleep(for: .seconds(1.5)); if copied == item.id { copied = nil } }
-                    } label: {
-                        Label(copied == item.id ? tr("Kopiert") : tr("Kopieren"), systemImage: copied == item.id ? "checkmark" : "doc.on.doc")
-                            .font(.footnote.weight(.semibold)).foregroundStyle(Theme.thread)
-                    }
-                }
-                .padding(12).background(Theme.paper, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .transition(.opacity.combined(with: .move(edge: .top)))
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(have ? .isSelected : [])
+            if !item.required {
+                Text("Optional").font(.footnote).foregroundStyle(Theme.inkTertiary).padding(.top, 3)
+            } else if !have, let url = Self.shopURL(item) {
+                Link("Find", destination: url).font(.subheadline.weight(.medium)).padding(.top, 2)
             }
         }
-        .padding(16)
-        .background(flow.changedItemIds.contains(item.id) ? Theme.threadSoft : .clear)
-        .overlay(alignment: .topTrailing) {
-            if flow.changedItemIds.contains(item.id) {
-                Label("durch Etikett angepasst", systemImage: "sparkles").font(.caption2.weight(.bold)).foregroundStyle(Theme.thread)
-                    .padding(.horizontal, 8).padding(.vertical, 3).background(Theme.card, in: Capsule())
-                    .overlay(Capsule().strokeBorder(Theme.thread.opacity(0.4), lineWidth: 1)).padding(8)
-            }
-        }
-        .accessibilityElement(children: .contain)
+        .padding(.horizontal, 16).padding(.vertical, 12)
+        .frame(minHeight: 56)
     }
 
-    private func statusButton(_ title: String, icon: String, tint: Color, active: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            HStack(spacing: 6) {
-                Image(systemName: icon).font(.caption.weight(.bold))
-                Text(tr(title)).font(.subheadline.weight(.semibold))
-            }
-            .padding(.horizontal, 12).frame(minHeight: 44)
-            .foregroundStyle(active ? .white : Theme.inkSecondary)
-            .background(active ? tint : Theme.paper, in: Capsule())
-            .overlay(Capsule().strokeBorder(active ? .clear : Theme.hairline, lineWidth: 1))
-        }
-        .buttonStyle(.plain)
-        .animation(Theme.spring, value: active)
+    static func shopURL(_ item: ShoppingItem) -> URL? {
+        let q = (item.searchTerm.isEmpty ? item.name : item.searchTerm).addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        return URL(string: "https://www.google.com/search?tbm=shop&q=\(q)")
     }
 }

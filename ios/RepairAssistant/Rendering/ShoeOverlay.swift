@@ -48,17 +48,12 @@ struct ShoeOverlay: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             if let s = target {
-                SegmentLayer(segment: s, color: Theme.caution, size: size, visible: true, pulsing: false, showLabel: false).opacity(0.55)
                 TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
                     Canvas { ctx, sz in
                         Self.draw(&ctx, size: sz, segment: s, kind: kind, time: reduceMotion ? 1.2 : tl.date.timeIntervalSinceReferenceDate)
                     }
                 }
                 .allowsHitTesting(false)
-            }
-            if kind.cure {
-                CureRing(minutes: kind.minutes, label: kind.press && !kind.glue ? tr("Andrücken") : tr("Aushärten"))
-                    .padding(12).frame(width: size.width, height: size.height, alignment: .bottomTrailing)
             }
         }
         .frame(width: size.width, height: size.height)
@@ -192,7 +187,7 @@ struct CureRing: View {
                 ZStack {
                     Circle().fill(.black.opacity(0.55))
                     Circle().stroke(.white.opacity(0.2), lineWidth: 6)
-                    Circle().trim(from: 0, to: frac).stroke(done ? Theme.safe : Theme.caution, style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                    Circle().trim(from: 0, to: frac).stroke(done ? Theme.highlight : Theme.caution, style: StrokeStyle(lineWidth: 6, lineCap: .round))
                         .rotationEffect(.degrees(-90)).animation(reduceMotion ? nil : .linear(duration: 0.5), value: frac)
                     VStack(spacing: 0) {
                         Text(done ? tr("Fertig") : Self.format(remaining)).font(.system(size: 17, weight: .bold, design: .rounded)).monospacedDigit().foregroundStyle(.white)

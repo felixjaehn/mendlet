@@ -2,7 +2,7 @@
 # Re-takes the demo screenshots in one language (default English) on the iPhone simulator, in demo mode.
 # Uses the DEBUG jump arguments of HomeView (-uiScreen/-uiScenario/-uiStep) and the fast replay.
 #
-#   ./scripts/screenshots.sh            # English → docs/screenshots/v6-en-*.png
+#   ./scripts/screenshots.sh            # English → docs/screenshots/v8-en-*.png
 #   LANG_CODE=de ./scripts/screenshots.sh
 set -euo pipefail
 
@@ -25,30 +25,45 @@ shot() {  # name, wait seconds, launch args…
   xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
   xcrun simctl launch "$UDID" "$BUNDLE" -AppleLanguages "($LANG_CODE)" -fastReplay YES "$@" >/dev/null
   sleep "$wait"
-  rm -f "$OUT/v7-$LANG_CODE-$name.png"
-  xcrun simctl io "$UDID" screenshot "$OUT/v7-$LANG_CODE-$name.png" >/dev/null
-  echo "v7-$LANG_CODE-$name.png"
+  rm -f "$OUT/v8-$LANG_CODE-$name.png"   # simctl cannot overwrite an existing PNG (error 513)
+  xcrun simctl io "$UDID" screenshot "$OUT/v8-$LANG_CODE-$name.png" >/dev/null
+  echo "v8-$LANG_CODE-$name.png"
 }
 
-shot home 7
-shot settings 4 -uiScreen settings
-shot shopping 16 -uiScreen shopping -uiScenario textile_tear
-shot completion 16 -uiScreen completion -uiScenario textile_tear
-shot analysis-agent 8  -uiScreen analysis -uiScenario textile_tear -recoveryTrace YES
-shot diagnosis-jeans 12 -uiScreen diagnosis -uiScenario textile_tear -recoveryTrace NO
-shot diagnosis-sweater 12 -uiScreen diagnosis -uiScenario textile_hole
-shot diagnosis-real-sweater 12 -uiScreen diagnosis -uiScenario real_sweater
-shot analysis 7 -uiScreen analysis -uiScenario real_sweater
-shot diagnosis-real-sole 12 -uiScreen diagnosis -uiScenario real_sole
-shot decision-real-sole 16 -uiScreen decision -uiScenario real_sole
-shot guide-real-sweater 22 -uiScreen guide -uiScenario real_sweater -uiStep 2
-shot decision-slider 16 -uiScreen decision -uiScenario textile_tear
-shot guide-darning 24 -uiScreen guide -uiScenario textile_tear -uiStep 4
-shot guide-solder 22 -uiScreen guide -uiScenario platine -uiStep 3
-shot guide-shoe 22 -uiScreen guide -uiScenario shoe_sole -uiStep 2
-shot blocked-battery 10 -uiScreen diagnosis -uiScenario battery_jacket
-shot decision-replace 16 -uiScreen decision -uiScenario worn_shirt
+ONLY="${ONLY:-}"   # ONLY="home project" re-takes just those shots
+run() { [[ -z "$ONLY" || " $ONLY " == *" $1 "* ]] && shot "$@" || true; }
+
+xcrun simctl ui "$UDID" appearance light
+run home 6 -uiScreen home
+run home-done 6 -uiScreen home -uiTab done
+run project 8 -uiScreen project
+run project-done 8 -uiScreen projectDone
+run scan 6 -uiScreen scan
+run settings 4 -uiScreen settings
+run analysis-sweep 3 -uiScreen analysis -uiScenario real_sweater
+run analysis-reveal 6 -uiScreen analysis -uiScenario real_sweater
+run analysis-agent 8 -uiScreen analysis -uiScenario textile_tear -recoveryTrace YES
+run finding-sweater 14 -uiScreen diagnosis -uiScenario real_sweater
+run finding-jeans 14 -uiScreen diagnosis -uiScenario textile_tear -recoveryTrace NO
+run finding-holes 14 -uiScreen diagnosis -uiScenario textile_hole
+run finding-sole 14 -uiScreen diagnosis -uiScenario real_sole
+run verdict-repair 18 -uiScreen decision -uiScenario real_sweater
+run verdict-repair-jeans 18 -uiScreen decision -uiScenario textile_tear
+run verdict-pro 18 -uiScreen decision -uiScenario real_sole
+run verdict-replace 18 -uiScreen decision -uiScenario worn_shirt
+run checklist 18 -uiScreen checklist -uiScenario textile_tear
+run guide-sweater 22 -uiScreen guide -uiScenario real_sweater -uiStep 2
+run guide-darning 24 -uiScreen guide -uiScenario textile_tear -uiStep 4
+run guide-solder 22 -uiScreen guide -uiScenario platine -uiStep 3
+run guide-shoe 22 -uiScreen guide -uiScenario shoe_sole -uiStep 2
+run completion 22 -uiScreen completion -uiScenario textile_tear
+run block-battery 16 -uiScreen diagnosis -uiScenario battery_jacket
+run block-helmet 16 -uiScreen diagnosis -uiScenario helmet
 xcrun simctl ui "$UDID" appearance dark
-shot guide-real-sweater-dark 22 -uiScreen guide -uiScenario real_sweater -uiStep 2
-shot diagnosis-real-sole-dark 12 -uiScreen diagnosis -uiScenario real_sole
+run home-dark 6 -uiScreen home
+run finding-sweater-dark 14 -uiScreen diagnosis -uiScenario real_sweater
+run verdict-repair-dark 18 -uiScreen decision -uiScenario real_sweater
+run checklist-dark 18 -uiScreen checklist -uiScenario real_sweater
+run guide-sweater-dark 22 -uiScreen guide -uiScenario real_sweater -uiStep 2
+run project-dark 8 -uiScreen project
 xcrun simctl ui "$UDID" appearance light

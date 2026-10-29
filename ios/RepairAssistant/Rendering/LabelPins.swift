@@ -21,16 +21,16 @@ enum LabelPlacer {
         func w(_ s: String, _ size: CGFloat, _ weight: UIFont.Weight) -> CGFloat {
             ceil((s as NSString).size(withAttributes: [.font: UIFont.systemFont(ofSize: size, weight: weight)]).width)
         }
-        var x = 18 + w(text, 11.5, .semibold) + (polarity != nil ? 20 : 0)
+        var x = 8 + w(text, 13, .semibold) + (polarity != nil ? 20 : 0)
         if let score { x += 5 + w(score, 11, .medium) }
         if let badge { x += 5 + w(badge, 8.5, .bold) + 9 }
         return x
     }
 
-    static func place(_ items: [Item], in size: CGSize, obstacles: [CGRect] = []) -> [Placed] {
+    static func place(_ items: [Item], in size: CGSize, obstacles: [CGRect] = [], clip: CGRect? = nil) -> [Placed] {
         var taken = obstacles
         var out: [Placed] = []
-        let h = chipHeight, bounds = CGRect(origin: .zero, size: size).insetBy(dx: 4, dy: 4)
+        let h = chipHeight, bounds = (clip.map { $0.intersection(CGRect(origin: .zero, size: size)) } ?? CGRect(origin: .zero, size: size)).insetBy(dx: 4, dy: 4)
         for it in items {
             let w = it.width
             func rect(_ c: CGPoint) -> CGRect {
@@ -73,26 +73,11 @@ enum LabelPlacer {
     }
 }
 
-struct LabelPinsLayer: View {
+/// Label items for one set of segments (grouped damage instances, parts); drawn by `MarkLabels`.
+struct LabelPinsLayer {
     let segments: [Segment]
     let all: [Segment]
     let size: CGSize
-    var reveal: Double? = nil
-    var extraObstacles: [CGRect] = []
-
-    var body: some View {
-        let placed = LabelPlacer.place(items(), in: size, obstacles: extraObstacles)
-        ZStack(alignment: .topLeading) {
-            ForEach(placed) { p in
-                let seg = segments.first { $0.id == p.id }
-                PinView(placed: p, color: seg.map { SolderStyle.padColor($0.polarity) ?? segmentColor($0, in: all) } ?? Theme.highlight, emphasized: seg?.isDamage == true)
-                    .opacity(reveal.map { min(1, max(0, ($0 - p.dot.y / max(size.height, 1)) * 10)) } ?? 1)
-                    .transition(.opacity)
-            }
-        }
-        .frame(width: size.width, height: size.height, alignment: .topLeading)
-        .allowsHitTesting(false)
-    }
 
     static func plural(_ label: String, _ n: Int) -> String {
         switch label {
@@ -132,7 +117,7 @@ struct LabelPinsLayer: View {
             let infos = g.compactMap { info($0) }
             guard let first = infos.first, let s0 = g.first else { continue }
             let top = g.map(\.score).max() ?? 0
-            let score = top > 0 ? "\(Int((top * 100).rounded())) %" : nil
+            let score: String? = nil
             let text = g.count > 1 ? Self.plural(s0.label, g.count) : tr(s0.label)
             let b = infos.dropFirst().reduce(first.bounds) { $0.union($1.bounds) }
             let anchor = g.count > 1 ? CGPoint(x: infos.map(\.anchor.x).reduce(0, +) / CGFloat(infos.count), y: infos.map(\.anchor.y).reduce(0, +) / CGFloat(infos.count)) : first.anchor
@@ -143,7 +128,7 @@ struct LabelPinsLayer: View {
         }
         for s in labelled where !s.isDamage {
             guard let i = info(s) else { continue }
-            let score = s.score > 0 ? "\(Int((s.score * 100).rounded())) %" : nil
+            let score: String? = nil
             let badge: String? = nil
             let large = i.bounds.width * i.bounds.height > 0.3 * size.width * size.height
             func nearest(_ t: CGPoint) -> CGPoint { i.pts.min { hypot($0.x - t.x, $0.y - t.y) < hypot($1.x - t.x, $1.y - t.y) } ?? t }
@@ -155,46 +140,5 @@ struct LabelPinsLayer: View {
                                         width: LabelPlacer.width(text: text, score: score, badge: badge, polarity: s.polarity), large: large, corners: corners))
         }
         return out
-    }
-}
-
-private struct PinView: View {
-    let placed: LabelPlacer.Placed
-    let color: Color
-    let emphasized: Bool
-
-    var body: some View {
-        let it = placed.item, r = placed.rect
-        let beside = placed.dot.y >= r.minY && placed.dot.y <= r.maxY
-        let tail = beside ? CGPoint(x: placed.dot.x < r.midX ? r.minX : r.maxX, y: r.midY)
-                          : CGPoint(x: min(max(placed.dot.x, r.minX + 12), r.maxX - 12), y: placed.dot.y < r.midY ? r.minY : r.maxY)
-        ZStack(alignment: .topLeading) {
-            let dots = it.dots.isEmpty ? [placed.dot] : it.dots
-            Path { p in for d in dots { p.move(to: d); p.addLine(to: tail) } }
-                .stroke(.white.opacity(0.9), style: StrokeStyle(lineWidth: 1, lineCap: .round))
-                .shadow(color: .black.opacity(0.5), radius: 1.5)
-            ForEach(Array(dots.enumerated()), id: \.offset) { _, d in
-                Circle().fill(color).frame(width: 8, height: 8)
-                    .overlay(Circle().strokeBorder(.white, lineWidth: 1.5))
-                    .shadow(color: .black.opacity(0.45), radius: 2)
-                    .position(d)
-            }
-            HStack(spacing: 5) {
-                if let pol = it.polarity { PolarityDisc(polarity: pol, diameter: 15) }
-                Text(it.text).font(.system(size: 11.5, weight: .semibold))
-                if let s = it.score { Text(s).font(.system(size: 11, weight: .medium, design: .rounded)).monospacedDigit().opacity(0.7) }
-                if let b = it.badge {
-                    Text(b).font(.system(size: 8.5, weight: .bold)).padding(.horizontal, 4).padding(.vertical, 1.5)
-                        .background(.white.opacity(0.18), in: Capsule())
-                }
-            }
-            .lineLimit(1).foregroundStyle(.white)
-            .frame(width: r.width, height: r.height)
-            .background(Capsule().fill(.black.opacity(0.58)))
-            .background(.ultraThinMaterial, in: Capsule())
-            .overlay(Capsule().strokeBorder(emphasized ? color.opacity(0.9) : .white.opacity(0.28), lineWidth: 0.75))
-            .shadow(color: .black.opacity(0.3), radius: 4, y: 1)
-            .position(x: r.midX, y: r.midY)
-        }
     }
 }

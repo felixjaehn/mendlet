@@ -1,65 +1,151 @@
 import SwiftUI
 
+/// The mark reveal: the user's own photo dims, a light band sweeps over it, the damage outline draws itself.
+/// A quiet sheet below says what happens (4 phases, no percentages). Tapping the status line opens the hidden agent trace.
 struct AnalysisView: View {
     @Environment(FlowModel.self) private var flow
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var showTrace = false
 
-    private let stages: [(AnalysisStage, String, String)] = [
-        (.classify, "Objekt und Sicherheit prüfen", "Muse Spark"),
-        (.segment, "Schaden markieren", "SAM 3.1"),
-        (.diagnose, "Diagnose stellen", "Muse Spark"),
-        (.plan, "Reparatur planen", "Muse Wonder"),
-    ]
+    private let phases = ["Looking at your photo", "Finding the damage", "Outlining it", "Writing your plan"]
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                if let photo = flow.photo {
-                    PhotoStage(image: photo, dim: flow.analysisError == nil ? 0.18 : 0.4, minAspect: 1.15) { size in
-                        ScanRevealView(segments: flow.earlySegments, size: size, isScanning: flow.isAnalyzing && flow.analysisError == nil)
+        GeometryReader { geo in
+            let photoHeight = geo.size.height * 0.62 + geo.safeAreaInsets.top * 0.2
+            ZStack(alignment: .top) {
+                Theme.surface.ignoresSafeArea()
+                VStack(spacing: 0) {
+                    ZStack(alignment: .topLeading) {
+                        photoView
+                        CircleIconButton(systemImage: "xmark", label: "Cancel", onPhoto: true) { flow.cancelAnalysis() }
+                            .padding(.leading, Theme.margin).padding(.top, geo.safeAreaInsets.top + 8)
                     }
-                }
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(flow.analysisError == nil ? tr("Ich schaue mir das genau an") : tr("Das hat nicht geklappt"))
-                        .font(.title3.bold()).foregroundStyle(Theme.ink)
-                    if flow.analysisError != nil {
-                        Text("Dein Foto bleibt erhalten.").font(.subheadline).foregroundStyle(Theme.inkSecondary)
-                    }
-                }
-                if let err = flow.analysisError {
-                    ErrorCard(message: err, retry: { flow.startAnalysis(resetExtras: false) },
-                              secondaryTitle: "Abbrechen", secondary: { flow.cancelAnalysis() })
-                } else {
-                    StageStrip(titles: stages.map { $0.0 == .segment && flow.groundingSeen ? "Muse Spark lokalisiert, SAM segmentiert" : $0.1 },
-                               states: stages.map { state(for: $0.0) })
-                    AgentTraceView(steps: flow.agentSteps, active: activeWork, replay: flow.settings.demoMode)
+                    .frame(height: photoHeight + (showTrace ? -photoHeight * 0.35 : 0))
+                    .clipped()
+                    sheet(bottomInset: geo.safeAreaInsets.bottom)
+                        .frame(maxHeight: .infinity, alignment: .top)
                 }
             }
-            .padding(.horizontal, Theme.margin).padding(.top, 8).padding(.bottom, 32)
+            .ignoresSafeArea(edges: [.top, .bottom])
         }
-        .scrollIndicators(.hidden)
-        .screenBackground()
         .navigationBarBackButtonHidden()
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button { flow.cancelAnalysis() } label: { Image(systemName: "xmark") }.tint(.primary)
-                    .accessibilityLabel("Abbrechen")
-            }
-        }
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarHidden(true)
+        .animation(Theme.spring, value: showTrace)
         .sensoryFeedback(.success, trigger: flow.isAnalyzing) { old, new in old && !new && flow.analysisError == nil }
+        .onAppear { if flow.settings.recoveryTrace { showTrace = true } }
     }
 
-    /// Work in progress: the first stage that is not done yet.
+    // MARK: Photo
+
+    @ViewBuilder private var photoView: some View {
+        if let photo = flow.photo {
+            let failed = flow.analysisError != nil
+            MarkedPhoto(image: photo, segments: flow.earlySegments,
+                        mode: failed ? .thumb : .analysis(arrival: flow.marksArrivedAt),
+                        focus: DamageFocus.region(for: flow.earlySegments), zoomable: false)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            Color.black
+        }
+    }
+
+    // MARK: Sheet
+
+    private func sheet(bottomInset: CGFloat) -> some View {
+        VStack(spacing: 0) {
+            Capsule().fill(Theme.inkTertiary.opacity(0.5)).frame(width: 36, height: 5).padding(.top, 8).padding(.bottom, 18)
+                .accessibilityHidden(true)
+            if let err = flow.analysisError {
+                errorBlock(err)
+            } else {
+                VStack(spacing: 14) {
+                    Button { showTrace.toggle() } label: {
+                        Text(tr(phases[phaseIndex]))
+                            .font(.title3.weight(.semibold)).foregroundStyle(Theme.ink)
+                            .contentTransition(.opacity)
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(tr(phases[phaseIndex]))
+                    .animation(.easeInOut(duration: 0.25), value: phaseIndex)
+                    PhaseDots(current: phaseIndex)
+                    if showTrace {
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Behind the scenes").font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkSecondary)
+                                AgentTraceView(steps: flow.agentSteps, active: activeWork, replay: flow.settings.demoMode)
+                            }
+                            .padding(.horizontal, Theme.margin).padding(.top, 8)
+                        }
+                        .scrollIndicators(.hidden)
+                        .transition(.opacity)
+                    }
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity)
+        .background(Theme.surface, in: UnevenRoundedRectangle(topLeadingRadius: Theme.heroRadius, topTrailingRadius: Theme.heroRadius, style: .continuous))
+        .padding(.top, -Theme.heroRadius)
+        .padding(.bottom, 0)
+    }
+
+    private func errorBlock(_ err: String) -> some View {
+        let offline = err.lowercased().contains("connect") || err.lowercased().contains("offline") || err.lowercased().contains("network") || err.lowercased().contains("verbind")
+        return VStack(spacing: 8) {
+            Text(offline ? "No connection." : "We couldn't find the damage.")
+                .font(.serif(.title2)).foregroundStyle(Theme.ink).multilineTextAlignment(.center)
+            Text(offline ? "Your photo is saved. Try again when you're back online." : "Try a closer photo in daylight, with the damage in the middle.")
+                .font(.subheadline).foregroundStyle(Theme.inkSecondary).multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 12)
+            PrimaryButton(title: "Try again") { flow.startAnalysis(resetExtras: false) }
+            PrimaryButton(title: "Choose another photo", kind: .secondary) { flow.cancelAnalysis() }
+        }
+        .padding(.horizontal, Theme.margin).padding(.bottom, 32)
+    }
+
+    // MARK: Phase
+
+    private var phaseIndex: Int {
+        let order = AnalysisStage.allCases
+        var idx = 0
+        for (i, s) in order.enumerated() where flow.stageStates[s] == .active || flow.stageStates[s] == .done { idx = i }
+        if flow.stageStates.isEmpty, !flow.isAnalyzing { idx = 3 }
+        if flow.marksArrivedAt != nil { idx = max(idx, 2) }
+        if flow.response != nil { idx = 3 }
+        return min(idx, 3)
+    }
+
     private var activeWork: (label: String, model: String)? {
         guard flow.isAnalyzing else { return nil }
-        guard let s = stages.first(where: { state(for: $0.0) == .active }) ?? stages.first(where: { state(for: $0.0) != .done }) else { return nil }
-        if s.0 == .segment && flow.groundingSeen { return ("Muse Spark lokalisiert, SAM 3.1 segmentiert", "SAM 3.1") }
+        let stages: [(AnalysisStage, String, String)] = [
+            (.classify, "Objekt und Sicherheit prüfen", "Muse Spark"), (.segment, "Schaden markieren", "SAM 3.1"),
+            (.diagnose, "Diagnose stellen", "Muse Spark"), (.plan, "Reparatur planen", "Muse Wonder"),
+        ]
+        guard let s = stages.first(where: { flow.stageStates[$0.0] == .active }) ?? stages.first(where: { flow.stageStates[$0.0] != .done }) else { return nil }
         return (s.1, s.2)
     }
+}
 
-    private func state(for stage: AnalysisStage) -> StageState {
-        if let s = flow.stageStates[stage] { return s }
-        if stage == .classify && flow.isAnalyzing && flow.stageStates.isEmpty { return .active }
-        return .pending
+/// Four small dots under the status line: done = ink, current = pulsing ink, upcoming = fill.
+struct PhaseDots: View {
+    var current: Int
+    @State private var pulse = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(0..<4, id: \.self) { i in
+                Circle().fill(i <= current ? Theme.ink : Theme.fill)
+                    .frame(width: 6, height: 6)
+                    .opacity(i == current && pulse ? 0.4 : 1)
+            }
+        }
+        .onAppear {
+            guard !reduceMotion else { return }
+            withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) { pulse = true }
+        }
+        .accessibilityHidden(true)
     }
 }

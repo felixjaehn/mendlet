@@ -69,6 +69,16 @@ final class InlineCameraSession: NSObject, @unchecked Sendable, AVCapturePhotoCa
         }
     }
 
+    /// Torch on/off (no-op without a torch).
+    func setTorch(_ on: Bool) {
+        queue.async { [self] in
+            guard let device = (session.inputs.first as? AVCaptureDeviceInput)?.device, device.hasTorch,
+                  (try? device.lockForConfiguration()) != nil else { return }
+            device.torchMode = on ? .on : .off
+            device.unlockForConfiguration()
+        }
+    }
+
     func capture() async throws -> UIImage {
         try await withCheckedThrowingContinuation { c in
             queue.async { [self] in

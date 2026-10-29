@@ -2,6 +2,8 @@ import SwiftUI
 
 // MARK: Buttons
 
+/// Primary action: an ink capsule (label colour on the fill, background colour as text), 54 pt. One per screen.
+/// Secondary: plain accent text. Destructive: red text. Disabled primary: quiet fill, tertiary text.
 struct PrimaryButtonStyle: ButtonStyle {
     enum Kind { case primary, secondary, destructive }
     var kind: Kind = .primary
@@ -9,225 +11,129 @@ struct PrimaryButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.headline)
-            .frame(maxWidth: .infinity, minHeight: 52)
+            .font(kind == .primary ? .headline : .body.weight(.medium))
+            .frame(maxWidth: .infinity, minHeight: kind == .primary ? Theme.controlHeight : 44)
             .padding(.horizontal, 20)
             .foregroundStyle(fg)
-            .background(kind == .secondary ? Color.clear : bg, in: Capsule())
-            .glass(Capsule(), interactive: true)
-            .opacity(isEnabled ? 1 : 0.5)
+            .background { if kind == .primary { Capsule().fill(isEnabled ? Theme.ink : Theme.fill) } }
+            .contentShape(Capsule())
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
-            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
+            .opacity(kind != .primary && configuration.isPressed ? 0.6 : 1)
+            .animation(Theme.press, value: configuration.isPressed)
     }
+
     private var fg: Color {
         switch kind {
-        case .primary, .destructive: isEnabled ? .white : Theme.inkSecondary
-        case .secondary: Theme.ink
-        }
-    }
-    private var bg: Color {
-        switch kind {
-        case .primary: isEnabled ? Theme.thread : Theme.fill
-        case .destructive: isEnabled ? Theme.stop : Theme.fill
-        case .secondary: Theme.card
+        case .primary: isEnabled ? Color(uiColor: .systemBackground) : Theme.inkTertiary
+        case .secondary: isEnabled ? Theme.thread : Theme.inkTertiary
+        case .destructive: Theme.stop
         }
     }
 }
 
 struct PrimaryButton: View {
     var title: String
+    /// Kept for call sites; the ink capsule carries text only.
     var systemImage: String? = nil
     var kind: PrimaryButtonStyle.Kind = .primary
     var action: () -> Void
 
     var body: some View {
-        Button(action: action) {
-            HStack(spacing: 8) {
-                if let systemImage { Image(systemName: systemImage) }
-                Text(tr(title))
-            }
-            .font(.headline)
-            .frame(maxWidth: .infinity, minHeight: 34)
-        }
-        .systemButtonStyle(kind)
-        .controlSize(.large)
-        .buttonBorderShape(.capsule)
+        Button(action: action) { Text(tr(title)) }
+            .buttonStyle(PrimaryButtonStyle(kind: kind))
     }
 }
 
-extension View {
-    /// Native iOS 26+ Liquid Glass button styles; bordered styles before.
-    @ViewBuilder func systemButtonStyle(_ kind: PrimaryButtonStyle.Kind) -> some View {
-        if #available(iOS 26.0, *) {
-            switch kind {
-            case .primary: self.buttonStyle(.glassProminent)
-            case .destructive: self.buttonStyle(.glassProminent).tint(Theme.stop)
-            case .secondary: self.buttonStyle(.glass)
-            }
-        } else {
-            switch kind {
-            case .primary: self.buttonStyle(.borderedProminent)
-            case .destructive: self.buttonStyle(.borderedProminent).tint(Theme.stop)
-            case .secondary: self.buttonStyle(.bordered)
-            }
-        }
+/// Soft press feedback for whole cards and rows.
+struct PressScaleStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .animation(Theme.press, value: configuration.isPressed)
     }
 }
 
+/// 44 pt glass circle. `onPhoto` keeps the glyph white for use over images.
 struct CircleIconButton: View {
     var systemImage: String
     var label: String
+    var onPhoto = false
     var action: () -> Void
     var body: some View {
         Button(action: action) {
             Image(systemName: systemImage)
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(Theme.ink)
-                .frame(width: 52, height: 52)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(onPhoto ? Color.white : Theme.ink)
+                .frame(width: 44, height: 44)
                 .glass(Circle(), interactive: true)
+                .contentShape(Circle())
         }
+        .buttonStyle(.plain)
         .accessibilityLabel(tr(label))
-    }
-}
-
-// MARK: Chip
-
-struct Chip: View {
-    var title: String
-    var systemImage: String? = nil
-    var tint: Color = Theme.thread
-    var isOn: Bool = true
-    var filled: Bool = false
-
-    var body: some View {
-        HStack(spacing: 6) {
-            if let systemImage { Image(systemName: systemImage).font(.caption.weight(.semibold)) }
-            Text(tr(title)).font(.subheadline.weight(.semibold))
-        }
-        .padding(.horizontal, 14)
-        .frame(minHeight: 36)
-        .foregroundStyle(filled ? Color.white : (isOn ? tint : Theme.inkSecondary))
-        .background(filled ? tint : (isOn ? tint.opacity(0.14) : Theme.fill), in: Capsule())
-        .animation(Theme.spring, value: isOn)
-    }
-}
-
-// MARK: Pills
-
-struct EstimatePill: View {
-    var text: String = "Schätzung"
-    var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "info.circle")
-            Text(tr(text))
-        }
-        .font(.footnote)
-        .foregroundStyle(Theme.inkSecondary)
-    }
-}
-
-struct Badge: View {
-    var text: String
-    var tint: Color
-    var body: some View {
-        Text(tr(text)).font(.caption.weight(.semibold))
-            .foregroundStyle(tint)
-            .padding(.horizontal, 8).padding(.vertical, 3)
-            .background(tint.opacity(0.14), in: Capsule())
-    }
-}
-
-// MARK: Confidence
-
-struct ConfidenceMeter: View {
-    var confidence: Double
-    @State private var shown = 0.0
-
-    static func level(_ c: Double) -> (text: String, color: Color) {
-        if c >= 0.75 { return (tr("ziemlich sicher"), Theme.safe) }
-        if c >= 0.6 { return (tr("eher sicher"), Theme.caution) }
-        return (tr("unsicher"), Theme.stop)
-    }
-
-    var body: some View {
-        let lv = Self.level(confidence)
-        HStack(spacing: 16) {
-            ZStack {
-                Circle().stroke(Theme.hairline, lineWidth: 7)
-                Circle().trim(from: 0, to: shown).stroke(lv.color, style: StrokeStyle(lineWidth: 7, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
-                Text("\(Int((confidence * 100).rounded()))")
-                    .font(.rounded(.headline)).monospacedDigit()
-                    .foregroundStyle(Theme.ink)
-            }
-            .frame(width: 58, height: 58)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Konfidenz").font(.footnote).foregroundStyle(Theme.inkSecondary)
-                Text(lv.text).font(.headline).foregroundStyle(lv.color)
-            }
-            Spacer(minLength: 0)
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(tr("Konfidenz %lld Prozent, %@", Int((confidence * 100).rounded()), lv.text))
-        .onAppear { withAnimation(.easeOut(duration: 0.9)) { shown = confidence } }
-        .onChange(of: confidence) { _, v in withAnimation(.easeOut(duration: 0.6)) { shown = v } }
     }
 }
 
 // MARK: Progress
 
-struct SegmentedProgressBar: View {
+/// N thin segments (Peloton / Kitchen Stories / Hims). Filled = accent, the current one half-filled.
+struct SegmentBar: View {
     var count: Int
-    var current: Int          // 0-based current step
-    var completed: Set<Int> = []
+    /// Number of finished segments.
+    var done: Int
+    var current: Int? = nil
+    var height: CGFloat = 3
+    var onPhoto = false
 
     var body: some View {
         HStack(spacing: 4) {
             ForEach(0..<max(count, 1), id: \.self) { i in
-                Capsule()
-                    .fill(i <= current || completed.contains(i) ? Theme.thread : Theme.hairline)
-                    .frame(height: 5)
-                    .opacity(i == current ? 1 : (completed.contains(i) ? 0.55 : (i < current ? 0.55 : 1)))
+                let filled = i < done
+                let isCurrent = current == i && !filled
+                Capsule().fill(onPhoto ? Color.white.opacity(0.32) : Theme.fill)
+                    .overlay(alignment: .leading) {
+                        GeometryReader { g in
+                            Capsule().fill(onPhoto ? Color.white : Theme.thread)
+                                .frame(width: filled ? g.size.width : (isCurrent ? g.size.width * 0.5 : 0))
+                                .opacity(isCurrent ? 0.6 : 1)
+                        }
+                    }
+                    .frame(height: height)
             }
         }
-        .animation(Theme.spring, value: current)
+        .animation(.easeOut(duration: 0.35), value: done)
+        .animation(.easeOut(duration: 0.35), value: current)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Schritt \(current + 1) von \(count)")
+        .accessibilityLabel(tr("Step %lld of %lld", min(done + 1, count), count))
+    }
+}
+
+/// Thin continuous progress line.
+struct ProgressLine: View {
+    var value: Double
+    var body: some View {
+        Capsule().fill(Theme.fill).frame(height: 3)
+            .overlay(alignment: .leading) {
+                GeometryReader { g in Capsule().fill(Theme.thread).frame(width: g.size.width * min(1, max(0, value))) }
+            }
+            .animation(.easeOut(duration: 0.3), value: value)
     }
 }
 
 enum StageState { case pending, active, done }
 
-struct StageRow: View {
-    var title: String
-    var subtitle: String
-    var state: StageState
-
+/// Quiet checkbox circle: empty ring, or accent fill with a white check.
+struct CheckCircle: View {
+    var on: Bool
+    var size: CGFloat = 26
     var body: some View {
-        HStack(spacing: 14) {
-            ZStack {
-                Circle().fill(state == .done ? Theme.safe : (state == .active ? Theme.threadSoft : Theme.hairline.opacity(0.6)))
-                    .frame(width: 32, height: 32)
-                switch state {
-                case .done:
-                    Image(systemName: "checkmark").font(.system(size: 14, weight: .bold)).foregroundStyle(.white)
-                        .transition(.scale.combined(with: .opacity))
-                case .active:
-                    ProgressView().controlSize(.small).tint(Theme.thread)
-                case .pending:
-                    EmptyView()
-                }
-            }
-            VStack(alignment: .leading, spacing: 1) {
-                Text(tr(title)).font(.body.weight(.semibold))
-                    .foregroundStyle(state == .pending ? Theme.inkSecondary : Theme.ink)
-                Text(tr(subtitle)).font(.caption).foregroundStyle(Theme.inkSecondary)
-            }
-            Spacer(minLength: 0)
+        ZStack {
+            Circle().strokeBorder(Theme.inkTertiary, lineWidth: 1.5).opacity(on ? 0 : 1)
+            Circle().fill(Theme.thread).scaleEffect(on ? 1 : 0.8).opacity(on ? 1 : 0)
+            Image(systemName: "checkmark").font(.system(size: size * 0.46, weight: .bold)).foregroundStyle(.white)
+                .opacity(on ? 1 : 0).scaleEffect(on ? 1 : 0.6)
         }
-        .padding(.vertical, 6)
-        .animation(Theme.spring, value: state)
-        .accessibilityElement(children: .combine)
+        .frame(width: size, height: size)
+        .animation(.spring(response: 0.18, dampingFraction: 0.7), value: on)
     }
 }
 
@@ -235,47 +141,18 @@ struct StageRow: View {
 
 struct ErrorCard: View {
     var message: String
-    var retryTitle: String = "Erneut versuchen"
+    var retryTitle: String = "Try again"
     var retry: (() -> Void)?
     var secondaryTitle: String? = nil
     var secondary: (() -> Void)? = nil
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: "exclamationmark.triangle.fill").font(.title3).foregroundStyle(Theme.stop)
-                Text(message).font(.body).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
-            }
-            if let retry {
-                PrimaryButton(title: tr(retryTitle), systemImage: "arrow.clockwise", action: retry)
-            }
-            if let secondaryTitle, let secondary {
-                PrimaryButton(title: secondaryTitle, kind: .secondary, action: secondary)
-            }
+        VStack(spacing: 12) {
+            Text(message).font(.subheadline).foregroundStyle(Theme.inkSecondary).multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            if let retry { PrimaryButton(title: retryTitle, action: retry) }
+            if let secondaryTitle, let secondary { PrimaryButton(title: secondaryTitle, kind: .secondary, action: secondary) }
         }
-        .padding(16)
-        .background(Theme.stopSoft, in: RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
-    }
-}
-
-struct MetricTile: View {
-    var icon: String
-    var title: String
-    var value: String
-    var detail: String? = nil
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: icon).font(.subheadline.weight(.semibold)).foregroundStyle(Theme.thread)
-            Text(value).font(.rounded(.title3)).monospacedDigit().foregroundStyle(Theme.ink)
-                .minimumScaleFactor(0.7).lineLimit(1)
-            VStack(alignment: .leading, spacing: 0) {
-                Text(tr(title)).font(.caption).foregroundStyle(Theme.inkSecondary)
-                if let detail { Text(tr(detail)).font(.caption2).foregroundStyle(Theme.inkSecondary) }
-            }
-        }
-        .frame(maxWidth: .infinity, minHeight: 104, alignment: .topLeading)
-        .card(padding: 14)
-        .accessibilityElement(children: .combine)
     }
 }
 
@@ -309,7 +186,7 @@ extension View {
     func shimmer(_ active: Bool = true) -> some View { modifier(Shimmer(active: active)) }
 }
 
-/// Section header label.
+/// Section header label inside sheets and forms.
 struct SectionLabel: View {
     var text: String
     var body: some View {
@@ -318,14 +195,12 @@ struct SectionLabel: View {
 }
 
 extension View {
-    /// Bottom action area: a native safe-area bar with the system scroll-edge effect on iOS 26+
-    /// (content softly fades under floating glass buttons), a material bar before.
-    @ViewBuilder func floatingBar<Bar: View>(@ViewBuilder _ bar: () -> Bar) -> some View {
-        if #available(iOS 26.0, *) {
-            self.safeAreaBar(edge: .bottom) { bar() }
-                .scrollEdgeEffectStyle(.soft, for: .bottom)
-        } else {
-            self.safeAreaInset(edge: .bottom) { bar().background(.bar) }
+    /// Bottom action area: material bar with a hairline on top.
+    func floatingBar<Bar: View>(@ViewBuilder _ bar: () -> Bar) -> some View {
+        self.safeAreaInset(edge: .bottom, spacing: 0) {
+            bar()
+                .background(.bar)
+                .overlay(alignment: .top) { Rectangle().fill(Theme.hairline).frame(height: 0.5) }
         }
     }
 }

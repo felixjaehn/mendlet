@@ -10,6 +10,7 @@ struct RepairAssistantApp: App {
         if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
             UserDefaults.standard.set(["en"], forKey: "AppleLanguages")
         }
+        Self.styleNavigationBar()
     }
 
     var body: some Scene {
@@ -19,6 +20,20 @@ struct RepairAssistantApp: App {
                 .environment(\.locale, Lang.shared.locale)
                 .preferredColorScheme(Self.forcedScheme)
         }
+    }
+
+    /// Large titles in New York (serif), the one editorial typeface of the app.
+    private static func styleNavigationBar() {
+        func serif(_ size: CGFloat, _ weight: UIFont.Weight) -> UIFont {
+            let base = UIFont.systemFont(ofSize: size, weight: weight)
+            return base.fontDescriptor.withDesign(.serif).map { UIFont(descriptor: $0, size: size) } ?? base
+        }
+        let a = UINavigationBarAppearance()
+        a.configureWithTransparentBackground()
+        a.largeTitleTextAttributes = [.font: serif(34, .semibold)]
+        a.titleTextAttributes = [.font: serif(17, .semibold)]
+        UINavigationBar.appearance().standardAppearance = a
+        UINavigationBar.appearance().scrollEdgeAppearance = a
     }
 
     private static var forcedScheme: ColorScheme? {

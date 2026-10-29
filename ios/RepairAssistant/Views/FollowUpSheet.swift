@@ -19,20 +19,20 @@ struct FollowUpSheet: View {
     var body: some View {
         VStack(spacing: 0) {
             header
-            ScrollViewReader { proxy in
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 14) {
-                        ForEach(Array(transcript.enumerated()), id: \.offset) { _, t in
-                            AssistantBubble(text: t.question)
-                            UserBubble(text: t.answer, image: t.image)
-                        }
-                        if let q = current {
-                            AssistantBubble(text: q.prompt).id("current")
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    ForEach(Array(transcript.enumerated()), id: \.offset) { _, t in
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(t.question).font(.subheadline).foregroundStyle(Theme.inkSecondary)
+                            Text(t.answer).font(.body.weight(.medium)).foregroundStyle(Theme.ink)
                         }
                     }
-                    .padding(.horizontal, Theme.margin).padding(.vertical, 12)
+                    if let q = current {
+                        Text(q.prompt).font(.serif(.title2)).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
+                    }
                 }
-                .onChange(of: index) { _, _ in withAnimation { proxy.scrollTo("current", anchor: .bottom) } }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, Theme.margin).padding(.vertical, 12)
             }
             if let q = current { answerArea(q).padding(.horizontal, Theme.margin).padding(.vertical, 12) }
         }
@@ -55,16 +55,9 @@ struct FollowUpSheet: View {
 
     private var header: some View {
         HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Rückfrage").font(.title2.bold()).foregroundStyle(Theme.ink)
-                if questions.count > 0 {
-                    Text("\(min(index + 1, questions.count)) von \(questions.count)").font(.subheadline.monospacedDigit()).foregroundStyle(Theme.inkSecondary)
-                }
-            }
+            Text("One question").overline()
             Spacer()
-            if current != nil {
-                Button("Überspringen") { skip() }.font(.body.weight(.medium)).foregroundStyle(Theme.inkSecondary)
-            }
+            if current != nil { Button("Skip") { skip() }.font(.body.weight(.medium)) }
         }
         .padding(.horizontal, Theme.margin).padding(.top, 24).padding(.bottom, 8)
     }
@@ -75,26 +68,30 @@ struct FollowUpSheet: View {
         case .photo:
             VStack(spacing: 10) {
                 if CameraPicker.isAvailable {
-                    PrimaryButton(title: photoTitle(q), systemImage: "camera.fill") { showCamera = true }
+                    PrimaryButton(title: photoTitle(q)) { showCamera = true }
                 } else if flow.settings.demoMode {
-                    PrimaryButton(title: photoTitle(q), systemImage: "camera.fill") {
+                    PrimaryButton(title: photoTitle(q)) {
                         addPhoto(LiveRecordings.recording(for: .textileTear)?.labelPhoto ?? DemoImageFactory.labelImage())
                     }
                 }
-                PrimaryButton(title: "Aus Galerie", systemImage: "photo.on.rectangle", kind: .secondary) { showGallery = true }
+                PrimaryButton(title: "Choose from your photos", kind: .secondary) { showGallery = true }
             }
         case .choice:
             let opts = q.options.isEmpty ? [tr("Baumwolle"), tr("Wolle"), tr("Polyester"), tr("Weiß ich nicht")] : q.options
             FlowLayout(spacing: 8) {
                 ForEach(opts, id: \.self) { o in
-                    Button { answer(text: o) } label: { Chip(title: o, tint: Theme.thread, isOn: true) }
+                    Button { answer(text: o) } label: {
+                        Text(o).font(.subheadline.weight(.medium)).foregroundStyle(Theme.ink)
+                            .padding(.horizontal, 16).frame(minHeight: 44).background(Theme.fill, in: Capsule())
+                    }
+                    .buttonStyle(PressScaleStyle())
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         case .voiceOrText:
             VStack(spacing: 10) {
-                VoiceTextField(placeholder: "Deine Antwort", text: $typed, lines: 1...3)
-                PrimaryButton(title: "Senden", systemImage: "arrow.up") { answer(text: typed) }
+                VoiceTextField(placeholder: "Your answer", text: $typed, lines: 1...3)
+                PrimaryButton(title: "Send") { answer(text: typed) }
                     .disabled(typed.trimmingCharacters(in: .whitespaces).isEmpty)
             }
         }
@@ -102,9 +99,9 @@ struct FollowUpSheet: View {
 
     private func photoTitle(_ q: FollowUpQuestion) -> String {
         switch q.purpose {
-        case .label: tr("Etikett fotografieren")
-        case .closeup: tr("Nahaufnahme machen")
-        case .other: tr("Foto aufnehmen")
+        case .label: "Photograph the label"
+        case .closeup: "Take a close-up"
+        case .other: "Take a photo"
         }
     }
 
@@ -140,42 +137,6 @@ struct FollowUpSheet: View {
                 try? await Task.sleep(for: .milliseconds(450))
                 flow.showFollowUp = false
                 flow.submitFollowUp(answers: a, images: i)
-            }
-        }
-    }
-}
-
-struct AssistantBubble: View {
-    var text: String
-    var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
-                .font(.system(size: 14, weight: .bold)).foregroundStyle(Theme.thread)
-                .frame(width: 32, height: 32).background(Theme.threadSoft, in: Circle())
-            Text(text).font(.body).foregroundStyle(Theme.ink)
-                .padding(14)
-                .background(Theme.card, in: UnevenRoundedRectangle(topLeadingRadius: 6, bottomLeadingRadius: 20, bottomTrailingRadius: 20, topTrailingRadius: 20))
-                .overlay(UnevenRoundedRectangle(topLeadingRadius: 6, bottomLeadingRadius: 20, bottomTrailingRadius: 20, topTrailingRadius: 20).strokeBorder(Theme.hairline, lineWidth: 1))
-                .fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: 24)
-        }
-        .transition(.move(edge: .bottom).combined(with: .opacity))
-    }
-}
-
-struct UserBubble: View {
-    var text: String
-    var image: UIImage?
-    var body: some View {
-        HStack {
-            Spacer(minLength: 56)
-            VStack(alignment: .trailing, spacing: 6) {
-                if let image {
-                    Image(uiImage: image).resizable().scaledToFill().frame(width: 150, height: 100)
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                }
-                Text(text).font(.body).foregroundStyle(.white).padding(.horizontal, 14).padding(.vertical, 10)
-                    .background(Theme.thread, in: UnevenRoundedRectangle(topLeadingRadius: 20, bottomLeadingRadius: 20, bottomTrailingRadius: 6, topTrailingRadius: 20))
             }
         }
     }

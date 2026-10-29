@@ -16,6 +16,7 @@ struct RootView: View {
                     case .guide: GuideView()
                     case .block: BlockView()
                     case .completion: CompletionView()
+                    case .project(let id): ProjectView(caseId: id)
                     }
                 }
         }
