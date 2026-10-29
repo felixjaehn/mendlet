@@ -8,7 +8,9 @@ enum DarningPhase: Sendable { case all, first, second }
 struct StitchPathView: View {
     let plan: StitchPlan
     var phase: DarningPhase = .all
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.staticRendering) private var staticRendering
+    private var reduceMotion: Bool { systemReduceMotion || staticRendering }
     @State private var start = Date()
 
     /// A polyline piece of the thread. Invisible pieces advance the needle without leaving thread (jumps, "under" gaps).

@@ -88,3 +88,8 @@ func segmentColor(_ segment: Segment, in all: [Segment]) -> Color {
     let idx = parts.firstIndex(where: { $0.id == segment.id }) ?? 0
     return Theme.partColors[idx % Theme.partColors.count]
 }
+
+extension EnvironmentValues {
+    /// Static render (PDF export): animated overlays draw their final state, like with Reduce Motion.
+    @Entry var staticRendering = false
+}

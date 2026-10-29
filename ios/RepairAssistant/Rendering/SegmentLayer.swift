@@ -11,7 +11,9 @@ struct SegmentLayer: View {
     var showLabel: Bool = false
     var reveal: Double? = nil
     @State private var appearedAt = Date()
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.staticRendering) private var staticRendering
+    private var reduceMotion: Bool { systemReduceMotion || staticRendering }
 
     var body: some View {
         ZStack(alignment: .topLeading) {

@@ -34,7 +34,9 @@ struct ShoeOverlay: View {
     let step: GuideStep
     let response: AnalyzeResponse
     let size: CGSize
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.staticRendering) private var staticRendering
+    private var reduceMotion: Bool { systemReduceMotion || staticRendering }
 
     private var kind: ShoeStepKind { ShoeStepKind(step: step) }
     private var target: Segment? {
@@ -175,7 +177,9 @@ struct CureRing: View {
     var label: String
     @State private var startedAt: Date?
     @State private var pausedRemaining: Double?
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.staticRendering) private var staticRendering
+    private var reduceMotion: Bool { systemReduceMotion || staticRendering }
 
     private var total: Double { Double((minutes ?? 10) * 60) }
 

@@ -7,7 +7,9 @@ struct ScanRevealView: View {
     let size: CGSize
     var isScanning: Bool
     @State private var arrival: Date?
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.staticRendering) private var staticRendering
+    private var reduceMotion: Bool { systemReduceMotion || staticRendering }
 
     private let sweep: TimeInterval = 1.7
     private let loop: TimeInterval = 2.6

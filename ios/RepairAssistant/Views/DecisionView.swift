@@ -89,6 +89,17 @@ struct DecisionView: View {
         .screenBackground()
         .navigationTitle("Entscheidung")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if let r = flow.response, let photo = flow.photo, !r.guide.steps.isEmpty {
+                ToolbarItem(placement: .topBarTrailing) {
+                    ShareLink(item: GuidePDF(response: r, photo: photo, after: flow.afterImage),
+                              preview: SharePreview(tr("Reparaturanleitung"), image: Image(systemName: "doc.richtext"))) {
+                        Image(systemName: "doc.richtext")
+                    }
+                    .tint(.primary).accessibilityLabel(tr("Anleitung exportieren"))
+                }
+            }
+        }
         .onAppear { if flow.response?.decision?.recommendation != .repairPro { flow.loadAfterPreview() } }
         .floatingBar {
             Group {

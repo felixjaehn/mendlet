@@ -45,6 +45,14 @@ struct GuideView: View {
             HStack {
                 Text("Schritt \(index + 1) von \(steps.count)").font(.subheadline.weight(.semibold).monospacedDigit()).foregroundStyle(Theme.inkSecondary)
                 Spacer()
+                if let r = flow.response, let photo = flow.photo {
+                    ShareLink(item: GuidePDF(response: r, photo: photo, after: flow.afterImage),
+                              preview: SharePreview(tr("Reparaturanleitung"), image: Image(systemName: "doc.richtext"))) {
+                        Image(systemName: "square.and.arrow.up").font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
+                            .frame(width: 36, height: 36).glass(Circle(), interactive: true)
+                    }
+                    .accessibilityLabel(tr("Anleitung exportieren"))
+                }
                 Button {
                     flow.persist(); flow.reset()
                 } label: {
@@ -184,8 +192,22 @@ struct StepOverlay: View {
     let size: CGSize
     let aspect: CGFloat
     var darningPhase: DarningPhase = .all
+    /// Precomputed plan for static rendering (PDF export); the live view computes it in `.task`.
+    var staticPlan: StitchPlan? = nil
 
     @State private var plan: StitchPlan = .empty
+
+    /// Same geometry for the guide and the PDF export.
+    static func stitchPlan(step: GuideStep, response: AnalyzeResponse, aspect: CGFloat) -> StitchPlan {
+        guard step.overlay?.type == .stitchPath, let s = target(step: step, response: response) else { return .empty }
+        return StitchPathPlanner.plan(for: s, stitchType: step.overlay?.stitchType ?? .runningStitch, aspect: aspect)
+    }
+
+    static func target(step: GuideStep, response: AnalyzeResponse) -> Segment? {
+        if let id = step.overlay?.segmentId, let s = response.segment(id) { return s }
+        if let id = step.segmentIds.first, let s = response.segment(id) { return s }
+        return response.segments.first { $0.isDamage }
+    }
 
     private var targetSegment: Segment? {
         if let id = step.overlay?.segmentId, let s = response.segment(id) { return s }
@@ -205,10 +227,10 @@ struct StepOverlay: View {
                 ShoeOverlay(step: step, response: response, size: size)
             } else if isStitch {
                 if let s = targetSegment {
-                    SegmentLayer(segment: s, color: Theme.thread, size: size, visible: true, pulsing: false, showLabel: false)
-                        .opacity(0.5)
+                    SegmentLayer(segment: s, color: Theme.highlight, size: size, visible: true, pulsing: false, showLabel: false)
+                        .opacity(0.35)
                 }
-                StitchPathView(plan: plan, phase: darningPhase)
+                StitchPathView(plan: staticPlan ?? plan, phase: darningPhase)
                     .frame(width: size.width, height: size.height)
                     .id(key + "\(darningPhase)")
             } else {
@@ -220,8 +242,8 @@ struct StepOverlay: View {
         }
         .frame(width: size.width, height: size.height)
         .task(id: key) {
-            guard isStitch, let s = targetSegment else { plan = .empty; return }
-            plan = StitchPathPlanner.plan(for: s, stitchType: step.overlay?.stitchType ?? .runningStitch, aspect: aspect)
+            guard staticPlan == nil else { return }
+            plan = Self.stitchPlan(step: step, response: response, aspect: aspect)
         }
     }
 }

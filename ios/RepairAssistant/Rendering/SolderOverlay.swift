@@ -83,7 +83,9 @@ struct SolderOverlay: View {
     let step: GuideStep
     let response: AnalyzeResponse
     let size: CGSize
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.staticRendering) private var staticRendering
+    private var reduceMotion: Bool { systemReduceMotion || staticRendering }
     @State private var holdStart: Date?
     @State private var finished = false
 

@@ -27,7 +27,9 @@ struct BeforeAfterSlider: View {
     @State private var frac: Double
     @State private var dragging = false
     @State private var hinted = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.staticRendering) private var staticRendering
+    private var reduceMotion: Bool { systemReduceMotion || staticRendering }
 
     init(before: UIImage, after: UIImage, aspect: CGFloat = 1.0, initial: Double = 0.5, horizontalSplit: Bool = false) {
         self.before = before; self.after = after; self.aspect = aspect; self.initial = initial; self.horizontalSplit = horizontalSplit
