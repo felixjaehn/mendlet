@@ -1,0 +1,41 @@
+{
+ "case_id": "5140e052-e366-4663-b35b-033f9f94f082",
+ "category": "low_voltage_electronics",
+ "risk_level": "warn_only",
+ "safety": {
+  "blocked": true,
+  "reason": "Laptop-Ladegerät/Netzteil mit gerissenem, verschmortem Kabel am Netzteilgehäuse - netzbetriebenes Gerät."
+ },
+ "segments": [],
+ "diagnosis": {
+  "summary": "Laptop-Ladegerät/Netzteil mit gerissenem, verschmortem Kabel am Netzteilgehäuse - netzbetriebenes Gerät.",
+  "likely_causes": [],
+  "confidence": 0.0,
+  "evidence_segment_ids": [],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_pro",
+  "reasoning": "Laptop-Ladegerät/Netzteil mit gerissenem, verschmortem Kabel am Netzteilgehäuse - netzbetriebenes Gerät.",
+  "effort": "high",
+  "time_minutes": [
+   0,
+   0
+  ],
+  "cost_eur": [
+   0.0,
+   0.0
+  ],
+  "estimate_note": "Schätzung, keine Garantie"
+ },
+ "shopping_list": [],
+ "guide": {
+  "steps": []
+ },
+ "instances": null
+}

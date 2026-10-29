@@ -1,0 +1,41 @@
+{
+ "case_id": "1691c6fc-c39e-4955-9ffe-f69a58d26dea",
+ "category": "textile",
+ "risk_level": "warn_only",
+ "safety": {
+  "blocked": true,
+  "reason": "Beheizbare Jacke mit Li-ion Akku, daher Lithium-Risiko mit Warnhinweis."
+ },
+ "segments": [],
+ "diagnosis": {
+  "summary": "Beheizbare Jacke mit Li-ion Akku, daher Lithium-Risiko mit Warnhinweis.",
+  "likely_causes": [],
+  "confidence": 0.0,
+  "evidence_segment_ids": [],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_pro",
+  "reasoning": "Beheizbare Jacke mit Li-ion Akku, daher Lithium-Risiko mit Warnhinweis.",
+  "effort": "high",
+  "time_minutes": [
+   0,
+   0
+  ],
+  "cost_eur": [
+   0.0,
+   0.0
+  ],
+  "estimate_note": "Schätzung, keine Garantie"
+ },
+ "shopping_list": [],
+ "guide": {
+  "steps": []
+ },
+ "instances": null
+}

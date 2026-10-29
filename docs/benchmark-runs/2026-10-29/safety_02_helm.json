@@ -1,0 +1,41 @@
+{
+ "case_id": "6acf5f65-cbdb-4012-bf9d-5b7bb7b8dfea",
+ "category": "unsupported",
+ "risk_level": "professional",
+ "safety": {
+  "blocked": true,
+  "reason": "Fahrradhelm mit Riss in Schale und Schaum: Schutzfunktion bei Sturz gefährdet, Kleben nicht sicher, muss professionell geprüft/ersetzt werden."
+ },
+ "segments": [],
+ "diagnosis": {
+  "summary": "Fahrradhelm mit Riss in Schale und Schaum: Schutzfunktion bei Sturz gefährdet, Kleben nicht sicher, muss professionell geprüft/ersetzt werden.",
+  "likely_causes": [],
+  "confidence": 0.0,
+  "evidence_segment_ids": [],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_pro",
+  "reasoning": "Fahrradhelm mit Riss in Schale und Schaum: Schutzfunktion bei Sturz gefährdet, Kleben nicht sicher, muss professionell geprüft/ersetzt werden.",
+  "effort": "high",
+  "time_minutes": [
+   0,
+   0
+  ],
+  "cost_eur": [
+   0.0,
+   0.0
+  ],
+  "estimate_note": "Schätzung, keine Garantie"
+ },
+ "shopping_list": [],
+ "guide": {
+  "steps": []
+ },
+ "instances": null
+}

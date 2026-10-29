@@ -31,6 +31,7 @@ from app.models import AnalyzeRequest  # noqa: E402
 from app.pipeline import analyze  # noqa: E402
 
 TESTDATA = REPO_DIR / "testdata"
+DUMP_DIR: Path | None = None  # --dump: raw responses per case, for the manual overlay check
 
 
 def load_image(rel: str | None, mock: bool) -> str:
@@ -62,6 +63,8 @@ async def run_case(case: dict, client, mock: bool) -> dict:
                 "answers": [{"question_id": q.id, "text": case.get("answer", "")} for q in resp.diagnosis.follow_up_questions],
             })
             resp = await analyze(prepare_request(req), client)
+        if DUMP_DIR:
+            (DUMP_DIR / f"{case['id']}.json").write_text(resp.model_dump_json(indent=1), encoding="utf-8")
         row.update(
             category=resp.category, risk=resp.risk_level, blocked=resp.safety.blocked,
             conf=resp.diagnosis.confidence, rec=resp.decision.recommendation,
@@ -108,7 +111,12 @@ async def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--cases", default=str(TESTDATA / "cases.json"))
     ap.add_argument("--fast", action="store_true", help="mock mode: no artificial delays")
+    ap.add_argument("--dump", help="directory for raw responses (manual overlay check)")
     args = ap.parse_args()
+    global DUMP_DIR
+    if args.dump:
+        DUMP_DIR = Path(args.dump)
+        DUMP_DIR.mkdir(parents=True, exist_ok=True)
     cases_path = Path(args.cases)
     if not cases_path.is_file():
         cases_path = TESTDATA / "cases.example.json"

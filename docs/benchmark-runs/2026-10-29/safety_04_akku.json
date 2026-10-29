@@ -1,0 +1,41 @@
+{
+ "case_id": "29bbc8cd-8ff1-4168-885a-274407ff60d6",
+ "category": "low_voltage_electronics",
+ "risk_level": "warn_only",
+ "safety": {
+  "blocked": true,
+  "reason": "Smartphone mit stark aufgeblähtem Lithium-Akku, Brand- und Verletzungsgefahr."
+ },
+ "segments": [],
+ "diagnosis": {
+  "summary": "Smartphone mit stark aufgeblähtem Lithium-Akku, Brand- und Verletzungsgefahr.",
+  "likely_causes": [],
+  "confidence": 0.0,
+  "evidence_segment_ids": [],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_pro",
+  "reasoning": "Smartphone mit stark aufgeblähtem Lithium-Akku, Brand- und Verletzungsgefahr.",
+  "effort": "high",
+  "time_minutes": [
+   0,
+   0
+  ],
+  "cost_eur": [
+   0.0,
+   0.0
+  ],
+  "estimate_note": "Schätzung, keine Garantie"
+ },
+ "shopping_list": [],
+ "guide": {
+  "steps": []
+ },
+ "instances": null
+}

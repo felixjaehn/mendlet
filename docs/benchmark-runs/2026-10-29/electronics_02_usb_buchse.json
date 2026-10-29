@@ -1,0 +1,41 @@
+{
+ "case_id": "317110d1-7b8f-4242-aeb9-ba05438b7441",
+ "category": "low_voltage_electronics",
+ "risk_level": "warn_only",
+ "safety": {
+  "blocked": true,
+  "reason": "USB-Buchse auf Leiterplatte abgerissen, Ladefunktion gestört, Akkubezug nicht auszuschließen daher Vorsicht."
+ },
+ "segments": [],
+ "diagnosis": {
+  "summary": "USB-Buchse auf Leiterplatte abgerissen, Ladefunktion gestört, Akkubezug nicht auszuschließen daher Vorsicht.",
+  "likely_causes": [],
+  "confidence": 0.0,
+  "evidence_segment_ids": [],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_pro",
+  "reasoning": "USB-Buchse auf Leiterplatte abgerissen, Ladefunktion gestört, Akkubezug nicht auszuschließen daher Vorsicht.",
+  "effort": "high",
+  "time_minutes": [
+   0,
+   0
+  ],
+  "cost_eur": [
+   0.0,
+   0.0
+  ],
+  "estimate_note": "Schätzung, keine Garantie"
+ },
+ "shopping_list": [],
+ "guide": {
+  "steps": []
+ },
+ "instances": null
+}
