@@ -223,7 +223,7 @@ struct DecisionView: View {
                         Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkTertiary)
                     }
                     .padding(16)
-                    .background(Theme.card, in: RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
+                    .background(Theme.paper, in: RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
                 }
                 .buttonStyle(PressScaleStyle())
             }

@@ -216,7 +216,7 @@ extension MarkedPhoto {
         guard let f = focus, f.width > 0, f.height > 0, container.width > 0 else { return 1 }
         let fill = AspectFit.fillSize(content: image.size, in: container)
         let auto = min(container.width / (f.width * fill.width), container.height / (f.height * fill.height))
-        return max(1, min(DamageFocus.maxZoom, auto))
+        return max(1, min(2.6, auto))
     }
 }
 

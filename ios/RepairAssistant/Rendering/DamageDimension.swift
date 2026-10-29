@@ -65,7 +65,7 @@ struct DimensionLineView: View {
                 .foregroundStyle(.white).shadow(color: .black.opacity(0.4), radius: 2)
                 .padding(.horizontal, 4).background(Color.black.opacity(0.001))
                 .lineLimit(1)
-                .position(x: l.chipRect.midX, y: l.chipRect.midY)
+                .position(x: l.chipRect.midX, y: l.chipRect.midY - 11)
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
