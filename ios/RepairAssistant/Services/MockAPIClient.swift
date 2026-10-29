@@ -6,6 +6,7 @@ enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
     case shoeSole = "shoe_sole"
     case batteryJacket = "battery_jacket"
     case helmet = "helmet"
+    case platine = "platine"
 
     var id: String { rawValue }
     var title: String {
@@ -15,6 +16,7 @@ enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
         case .shoeSole: "Sneaker (Sohle)"
         case .batteryJacket: "Heizjacke (Akku)"
         case .helmet: "Fahrradhelm"
+        case .platine: "Platine (Lötstelle)"
         }
     }
     var subtitle: String {
@@ -24,6 +26,7 @@ enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
         case .shoeSole: "Kleben"
         case .batteryJacket: "Gesperrt"
         case .helmet: "Profi empfohlen"
+        case .platine: "Anlöten, + und −"
         }
     }
     var systemImage: String {
@@ -33,6 +36,7 @@ enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
         case .shoeSole: "shoe"
         case .batteryJacket: "bolt.fill"
         case .helmet: "shield.lefthalf.filled"
+        case .platine: "cpu"
         }
     }
     var userNote: String {
@@ -42,6 +46,7 @@ enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
         case .shoeSole: "Sohle löst sich vorne"
         case .batteryJacket: "Reißverschluss kaputt"
         case .helmet: "Riss in der Schale"
+        case .platine: "USB-Lampe ohne Funktion, Kabel abgerissen"
         }
     }
 }

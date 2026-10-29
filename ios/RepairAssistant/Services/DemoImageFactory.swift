@@ -40,6 +40,7 @@ enum DemoImageFactory {
             case .shoeSole: drawShoe(c, gap: damage)
             case .batteryJacket: drawJacket(c)
             case .helmet: drawHelmet(c)
+            case .platine: drawJacket(c)
             }
         }
         lock.lock(); cache[scenario.rawValue] = img; lock.unlock()

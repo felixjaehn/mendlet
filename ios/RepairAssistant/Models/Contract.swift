@@ -85,6 +85,7 @@ enum Purpose: String, TolerantEnum {
 
 enum OverlayType: String, TolerantEnum {
     case stitchPath = "stitch_path"
+    case solder
     case highlight
     static var fallback: OverlayType { .highlight }
     init(from decoder: Decoder) throws { self = try Self.decodeTolerant(decoder) }
@@ -157,12 +158,23 @@ struct Segment: Codable, Sendable, Hashable, Identifiable {
     var mask: SegmentMask?
     var score: Double
     var source: SegmentSource?
+    /// Solder pads: "+" or "-" (read from the silkscreen). Nil for everything else.
+    var polarity: String?
 
-    private enum CodingKeys: String, CodingKey { case id, label, kind, prompt, box, mask, score, source }
+    private enum CodingKeys: String, CodingKey { case id, label, kind, prompt, box, mask, score, source, polarity }
 
-    init(id: String, label: String, kind: SegmentKind, prompt: String = "", box: [Double]? = nil, mask: SegmentMask? = nil, score: Double = 0, source: SegmentSource? = nil) {
+    init(id: String, label: String, kind: SegmentKind, prompt: String = "", box: [Double]? = nil, mask: SegmentMask? = nil, score: Double = 0, source: SegmentSource? = nil, polarity: String? = nil) {
         self.id = id; self.label = label; self.kind = kind; self.prompt = prompt
-        self.box = box; self.mask = mask; self.score = score; self.source = source
+        self.box = box; self.mask = mask; self.score = score; self.source = source; self.polarity = Self.normalize(polarity)
+    }
+
+    /// Accepts "+", "-", "−", "plus", "minus"; anything else is nil.
+    static func normalize(_ raw: String?) -> String? {
+        switch raw?.trimmingCharacters(in: .whitespaces).lowercased() {
+        case "+", "plus": "+"
+        case "-", "−", "–", "minus": "-"
+        default: nil
+        }
     }
 
     init(from decoder: Decoder) throws {
@@ -175,6 +187,7 @@ struct Segment: Codable, Sendable, Hashable, Identifiable {
         mask = (try? c.decodeIfPresent(SegmentMask.self, forKey: .mask)) ?? nil
         score = (try? c.decode(Double.self, forKey: .score)) ?? 0
         source = (try? c.decodeIfPresent(SegmentSource.self, forKey: .source)) ?? nil
+        polarity = Self.normalize((try? c.decodeIfPresent(String.self, forKey: .polarity)) ?? nil)
     }
 
     /// Normalized box (0..1) or nil.
@@ -334,15 +347,23 @@ struct Overlay: Codable, Sendable, Hashable {
     var type: OverlayType
     var stitchType: StitchType?
     var segmentId: String?
-    private enum CodingKeys: String, CodingKey { case type, stitchType, segmentId }
-    init(type: OverlayType, stitchType: StitchType? = nil, segmentId: String? = nil) {
+    /// Solder overlay: bare wire end -> pad, held for `holdSeconds`.
+    var fromSegmentId: String?
+    var toSegmentId: String?
+    var holdSeconds: Double?
+    private enum CodingKeys: String, CodingKey { case type, stitchType, segmentId, fromSegmentId, toSegmentId, holdSeconds }
+    init(type: OverlayType, stitchType: StitchType? = nil, segmentId: String? = nil, fromSegmentId: String? = nil, toSegmentId: String? = nil, holdSeconds: Double? = nil) {
         self.type = type; self.stitchType = stitchType; self.segmentId = segmentId
+        self.fromSegmentId = fromSegmentId; self.toSegmentId = toSegmentId; self.holdSeconds = holdSeconds
     }
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         type = (try? c.decode(OverlayType.self, forKey: .type)) ?? .highlight
         stitchType = (try? c.decodeIfPresent(StitchType.self, forKey: .stitchType)) ?? nil
         segmentId = (try? c.decodeIfPresent(String.self, forKey: .segmentId)) ?? nil
+        fromSegmentId = (try? c.decodeIfPresent(String.self, forKey: .fromSegmentId)) ?? nil
+        toSegmentId = (try? c.decodeIfPresent(String.self, forKey: .toSegmentId)) ?? nil
+        holdSeconds = (try? c.decodeIfPresent(Double.self, forKey: .holdSeconds)) ?? nil
     }
 }
 
