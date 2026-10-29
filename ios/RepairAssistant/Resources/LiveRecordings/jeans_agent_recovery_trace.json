@@ -1,0 +1,61 @@
+{
+ "recorded": "2026-10-29, AGENT_MODE=wonder (first version), 94 s; SAM returned HTTP 500 on step 1 and the agent recovered via Spark locate + SAM box",
+ "agent_steps": [
+  {
+   "n": 1,
+   "tool": "segment",
+   "label": "SAM sucht „rip“",
+   "model": "sam-3.1",
+   "status": "failed",
+   "ms": 2147
+  },
+  {
+   "n": 2,
+   "tool": "segment",
+   "label": "SAM sucht „hole“",
+   "model": "sam-3.1",
+   "status": "done",
+   "ms": 2840
+  },
+  {
+   "n": 3,
+   "tool": "segment",
+   "label": "SAM sucht „tear in jeans“",
+   "model": "sam-3.1",
+   "status": "done",
+   "ms": 2633
+  },
+  {
+   "n": 4,
+   "tool": "locate",
+   "label": "Spark lokalisiert „long frayed rip hole in blue jeans next…“",
+   "model": "muse-spark-1.3",
+   "status": "done",
+   "ms": 3271
+  },
+  {
+   "n": 5,
+   "tool": "segment_at",
+   "label": "SAM segmentiert die Auswahl",
+   "model": "sam-3.1",
+   "status": "done",
+   "ms": 2609
+  },
+  {
+   "n": 6,
+   "tool": "verify_mask",
+   "label": "Spark prüft Maske seg_1",
+   "model": "muse-spark-1.3",
+   "status": "done",
+   "ms": 2113
+  },
+  {
+   "n": 7,
+   "tool": "finish",
+   "label": "Plan zusammenstellen",
+   "model": "muse-wonder-1.0",
+   "status": "done",
+   "ms": 1
+  }
+ ]
+}

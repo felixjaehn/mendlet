@@ -118,6 +118,22 @@ struct Badge: View {
     }
 }
 
+/// Small tasteful marker for the demo mode (real recorded model answers).
+struct DemoChip: View {
+    var text: String = LiveRecordings.chipText
+    var body: some View {
+        HStack(spacing: 6) {
+            Circle().fill(Theme.caution).frame(width: 6, height: 6)
+            Text(text).font(.caption.weight(.semibold))
+        }
+        .foregroundStyle(Theme.inkSecondary)
+        .padding(.horizontal, 10).frame(minHeight: 26)
+        .background(Theme.card, in: Capsule())
+        .overlay(Capsule().strokeBorder(Theme.hairline, lineWidth: 1))
+        .accessibilityLabel("Demo-Modus mit echten Modellantworten vom 28. Oktober")
+    }
+}
+
 // MARK: Confidence
 
 struct ConfidenceMeter: View {

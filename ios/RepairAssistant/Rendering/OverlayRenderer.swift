@@ -5,6 +5,7 @@ struct PhotoStage<Overlay: View>: View {
     let image: UIImage
     var cornerRadius: CGFloat = 24
     var dim: Double = 0
+    var minAspect: CGFloat = 0.9
     @ViewBuilder var overlay: (CGSize) -> Overlay
 
     var body: some View {
@@ -23,7 +24,7 @@ struct PhotoStage<Overlay: View>: View {
                     .position(x: fit.midX, y: fit.midY)
             }
         }
-        .aspectRatio(min(1.5, max(0.9, image.size.width / max(image.size.height, 1))), contentMode: .fit)
+        .aspectRatio(min(1.5, max(minAspect, image.size.width / max(image.size.height, 1))), contentMode: .fit)
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous).strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
     }

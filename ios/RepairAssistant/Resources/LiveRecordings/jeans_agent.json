@@ -1,0 +1,690 @@
+{
+ "recorded": "2026-10-29, AGENT_MODE=wonder, muse-wonder-1.0 reasoning.effort=low, 50 s total",
+ "agent_steps": [
+  {
+   "n": 1,
+   "tool": "segment",
+   "label": "SAM sucht „rip“",
+   "model": "sam-3.1",
+   "status": "done",
+   "ms": 3914
+  },
+  {
+   "n": 2,
+   "tool": "verify_mask",
+   "label": "Spark prüft Maske seg_1",
+   "model": "muse-spark-1.3",
+   "status": "done",
+   "ms": 2294
+  },
+  {
+   "n": 3,
+   "tool": "finish",
+   "label": "Masken geprüft · Übergabe an den Plan",
+   "model": "muse-wonder-1.0",
+   "status": "done",
+   "ms": 0
+  }
+ ],
+ "result": {
+  "case_id": "0d6a8c65-05bf-441b-82e9-7d5991226c51",
+  "category": "textile",
+  "risk_level": "allowed",
+  "safety": {
+   "blocked": false,
+   "reason": null
+  },
+  "segments": [
+   {
+    "id": "seg_1",
+    "label": "Riss",
+    "kind": "damage",
+    "prompt": "rip",
+    "box": [
+     0.3828,
+     0.1562,
+     0.3021,
+     0.6357
+    ],
+    "mask": {
+     "format": "polygon",
+     "points": [
+      [
+       0.643229,
+       0.15625
+      ],
+      [
+       0.675781,
+       0.158203
+      ],
+      [
+       0.684896,
+       0.186523
+      ],
+      [
+       0.665365,
+       0.192383
+      ],
+      [
+       0.657552,
+       0.208008
+      ],
+      [
+       0.654948,
+       0.25
+      ],
+      [
+       0.661458,
+       0.261719
+      ],
+      [
+       0.661458,
+       0.28418
+      ],
+      [
+       0.653646,
+       0.289062
+      ],
+      [
+       0.648437,
+       0.306641
+      ],
+      [
+       0.652344,
+       0.322266
+      ],
+      [
+       0.648437,
+       0.344727
+      ],
+      [
+       0.651042,
+       0.363281
+      ],
+      [
+       0.63151,
+       0.409179
+      ],
+      [
+       0.635417,
+       0.463867
+      ],
+      [
+       0.630208,
+       0.46875
+      ],
+      [
+       0.627604,
+       0.496094
+      ],
+      [
+       0.636719,
+       0.50293
+      ],
+      [
+       0.639323,
+       0.513672
+      ],
+      [
+       0.636719,
+       0.516601
+      ],
+      [
+       0.614583,
+       0.515625
+      ],
+      [
+       0.609375,
+       0.518554
+      ],
+      [
+       0.596354,
+       0.557617
+      ],
+      [
+       0.571615,
+       0.583984
+      ],
+      [
+       0.570313,
+       0.598633
+      ],
+      [
+       0.546875,
+       0.623047
+      ],
+      [
+       0.528646,
+       0.65332
+      ],
+      [
+       0.533854,
+       0.678711
+      ],
+      [
+       0.542969,
+       0.697265
+      ],
+      [
+       0.528646,
+       0.704101
+      ],
+      [
+       0.510417,
+       0.703125
+      ],
+      [
+       0.497396,
+       0.708008
+      ],
+      [
+       0.480469,
+       0.736328
+      ],
+      [
+       0.480469,
+       0.762695
+      ],
+      [
+       0.470052,
+       0.778321
+      ],
+      [
+       0.46875,
+       0.788086
+      ],
+      [
+       0.455729,
+       0.791992
+      ],
+      [
+       0.445313,
+       0.78711
+      ],
+      [
+       0.424479,
+       0.745117
+      ],
+      [
+       0.411458,
+       0.730469
+      ],
+      [
+       0.382812,
+       0.720703
+      ],
+      [
+       0.388021,
+       0.706054
+      ],
+      [
+       0.402344,
+       0.6875
+      ],
+      [
+       0.403646,
+       0.640625
+      ],
+      [
+       0.424479,
+       0.606445
+      ],
+      [
+       0.466146,
+       0.485351
+      ],
+      [
+       0.494792,
+       0.444336
+      ],
+      [
+       0.496094,
+       0.407226
+      ],
+      [
+       0.507812,
+       0.381836
+      ],
+      [
+       0.522135,
+       0.358398
+      ],
+      [
+       0.546875,
+       0.334961
+      ],
+      [
+       0.549479,
+       0.31543
+      ],
+      [
+       0.558594,
+       0.307617
+      ],
+      [
+       0.608073,
+       0.230468
+      ],
+      [
+       0.623698,
+       0.203125
+      ],
+      [
+       0.635417,
+       0.164063
+      ]
+     ],
+     "rings": [
+      {
+       "points": [
+        [
+         0.643229,
+         0.15625
+        ],
+        [
+         0.675781,
+         0.158203
+        ],
+        [
+         0.684896,
+         0.186523
+        ],
+        [
+         0.665365,
+         0.192383
+        ],
+        [
+         0.657552,
+         0.208008
+        ],
+        [
+         0.654948,
+         0.25
+        ],
+        [
+         0.661458,
+         0.261719
+        ],
+        [
+         0.661458,
+         0.28418
+        ],
+        [
+         0.653646,
+         0.289062
+        ],
+        [
+         0.648437,
+         0.306641
+        ],
+        [
+         0.652344,
+         0.322266
+        ],
+        [
+         0.648437,
+         0.344727
+        ],
+        [
+         0.651042,
+         0.363281
+        ],
+        [
+         0.63151,
+         0.409179
+        ],
+        [
+         0.635417,
+         0.463867
+        ],
+        [
+         0.630208,
+         0.46875
+        ],
+        [
+         0.627604,
+         0.496094
+        ],
+        [
+         0.636719,
+         0.50293
+        ],
+        [
+         0.639323,
+         0.513672
+        ],
+        [
+         0.636719,
+         0.516601
+        ],
+        [
+         0.614583,
+         0.515625
+        ],
+        [
+         0.609375,
+         0.518554
+        ],
+        [
+         0.596354,
+         0.557617
+        ],
+        [
+         0.571615,
+         0.583984
+        ],
+        [
+         0.570313,
+         0.598633
+        ],
+        [
+         0.546875,
+         0.623047
+        ],
+        [
+         0.528646,
+         0.65332
+        ],
+        [
+         0.533854,
+         0.678711
+        ],
+        [
+         0.542969,
+         0.697265
+        ],
+        [
+         0.528646,
+         0.704101
+        ],
+        [
+         0.510417,
+         0.703125
+        ],
+        [
+         0.497396,
+         0.708008
+        ],
+        [
+         0.480469,
+         0.736328
+        ],
+        [
+         0.480469,
+         0.762695
+        ],
+        [
+         0.470052,
+         0.778321
+        ],
+        [
+         0.46875,
+         0.788086
+        ],
+        [
+         0.455729,
+         0.791992
+        ],
+        [
+         0.445313,
+         0.78711
+        ],
+        [
+         0.424479,
+         0.745117
+        ],
+        [
+         0.411458,
+         0.730469
+        ],
+        [
+         0.382812,
+         0.720703
+        ],
+        [
+         0.388021,
+         0.706054
+        ],
+        [
+         0.402344,
+         0.6875
+        ],
+        [
+         0.403646,
+         0.640625
+        ],
+        [
+         0.424479,
+         0.606445
+        ],
+        [
+         0.466146,
+         0.485351
+        ],
+        [
+         0.494792,
+         0.444336
+        ],
+        [
+         0.496094,
+         0.407226
+        ],
+        [
+         0.507812,
+         0.381836
+        ],
+        [
+         0.522135,
+         0.358398
+        ],
+        [
+         0.546875,
+         0.334961
+        ],
+        [
+         0.549479,
+         0.31543
+        ],
+        [
+         0.558594,
+         0.307617
+        ],
+        [
+         0.608073,
+         0.230468
+        ],
+        [
+         0.623698,
+         0.203125
+        ],
+        [
+         0.635417,
+         0.164063
+        ]
+       ],
+       "hole": false
+      }
+     ]
+    },
+    "score": 0.91,
+    "source": "text"
+   }
+  ],
+  "diagnosis": {
+   "summary": "Vermutlich Denim-Jeans mit länglichem Riss mit gerissenen Gewebefäden parallel zur Seitennaht am Hosenbein. Sichtbar sind ausgefranste Kanten und quer verlaufende weiße Restfäden mit offenem Spalt, also kein intaktes Nahtauftrennen und kein sauber schließbarer Saum.",
+   "likely_causes": [
+    "Zug- und Scheuerbelastung am Hosenbein nahe der Seitennaht",
+    "vorgeschwächte bzw. durchgescheuerte Gewebefäden im Denim",
+    "Weiterreißen nach kleiner Vorschädigung"
+   ],
+   "confidence": 0.78,
+   "evidence_segment_ids": [
+    "seg_1"
+   ],
+   "needs_more_info": false,
+   "follow_up_questions": [],
+   "label_info": {
+    "materials": [],
+    "care": []
+   }
+  },
+  "decision": {
+   "recommendation": "repair_self",
+   "reasoning": "Länglicher Geweberiss mit gerissenen Fäden und Materialschwächung neben der Naht, kein reines Auftrennen intakter Nahtzugaben. Zusammenziehen würde spannen und weiter einreißen, daher Unterlegflicken plus Stopfgewebe in Handarbeit für Selbstreparatur geeignet.",
+   "effort": "medium",
+   "time_minutes": [
+    40,
+    70
+   ],
+   "cost_eur": [
+    5.0,
+    12.0
+   ],
+   "estimate_note": "Schätzung, keine Garantie"
+  },
+  "shopping_list": [
+   {
+    "id": "needle_denim",
+    "name": "Robuste scharfe Handnadel für Denim",
+    "kind": "tool",
+    "quantity": "1 Stück",
+    "required": true,
+    "search_term": "scharfe Handnadel für Jeans Denim robust",
+    "household_alternative": null
+   },
+   {
+    "id": "thread_poly",
+    "name": "Feines Polyester-Nähgarn jeansblau",
+    "kind": "material",
+    "quantity": "1 Rolle",
+    "required": true,
+    "search_term": "feines Polyester Nähgarn jeansblau denim",
+    "household_alternative": null
+   },
+   {
+    "id": "patch_flick",
+    "name": "Flickstoff Denim jeansblau ohne Stretch",
+    "kind": "material",
+    "quantity": "1 Stück ca. 12x8 cm",
+    "required": true,
+    "search_term": "Flickstoff Denim Jeans zum Aufnähen blau",
+    "household_alternative": null
+   },
+   {
+    "id": "pins_nadeln",
+    "name": "Stecknadeln",
+    "kind": "tool",
+    "quantity": "6-8 Stück",
+    "required": true,
+    "search_term": "Stecknadeln zum Nähen",
+    "household_alternative": null
+   },
+   {
+    "id": "scissors_schere",
+    "name": "Kleine Stoffschere",
+    "kind": "tool",
+    "quantity": "1 Stück",
+    "required": true,
+    "search_term": "kleine Stoffschere scharf",
+    "household_alternative": null
+   }
+  ],
+  "guide": {
+   "steps": [
+    {
+     "n": 1,
+     "title": "Innenseite freilegen und Riss prüfen",
+     "text": "Hose auf links wenden und auf hellem Tisch so auslegen, dass die Innenseite am Riss frei zugänglich ist. Risskanten mit den Fingern spannungsfrei nebeneinander legen, lose Fussel nicht abschneiden. Fertig, wenn der Spalt flach liegt und rundherum mindestens 1-2 cm tragfähiger Denim sichtbar ist.",
+     "common_mistake": "Riss zum Nähen flach zusammenziehen – das kräuselt und reizt weiter ein; Stoff immer entspannt und flach liegen lassen.",
+     "safety_critical": false,
+     "requires_confirmation": false,
+     "segment_ids": [
+      "seg_1"
+     ],
+     "uses_items": [],
+     "overlay": {
+      "type": "highlight",
+      "stitch_type": null,
+      "segment_id": "seg_1"
+     }
+    },
+    {
+     "n": 2,
+     "title": "Unterlegflicken zuschneiden",
+     "text": "Auf der linken Stoffseite arbeiten. Aus dem Flickstoff ein Rechteck schneiden, das den Riss rundherum um etwa 2 cm überragt. Kanten gerade nachschneiden. Schere sicher führen, Finger aus der Schnittlinie halten. Fertig, wenn der Zuschnitt den Schaden voll abdeckt.",
+     "common_mistake": "Zu kleiner oder dehnbarer Flicken – dann reißt der Rand wieder ein; lieber 2 cm Überstand aus festem Denim wählen.",
+     "safety_critical": true,
+     "requires_confirmation": true,
+     "segment_ids": [],
+     "uses_items": [
+      "patch_flick",
+      "scissors_schere"
+     ],
+     "overlay": null
+    },
+    {
+     "n": 3,
+     "title": "Flicken unterlegen und feststecken",
+     "text": "Flicken von links mittig unter den Riss legen, Webrichtung parallel zum Hosenstoff. Von der linken Seite mit Stecknadeln rundherum im tragfähigen Bereich feststecken, Nadeln quer zum Riss setzen. Fertig, wenn der Flicken faltenfrei anliegt und beim leichten Anheben nicht verrutscht.",
+     "common_mistake": "Flicken wellig oder schief stecken – vor dem Nähen nochmals glatt und faltenfrei ausrichten.",
+     "safety_critical": false,
+     "requires_confirmation": false,
+     "segment_ids": [
+      "seg_1"
+     ],
+     "uses_items": [
+      "patch_flick",
+      "pins_nadeln"
+     ],
+     "overlay": {
+      "type": "highlight",
+      "stitch_type": null,
+      "segment_id": "seg_1"
+     }
+    },
+    {
+     "n": 4,
+     "title": "Riss über Flicken stopfen",
+     "text": "Robuste scharfe Handnadel mit etwa 50 cm feinem Polyestergarn einfädeln, Anfang mit 2 kleinen Sicherungsstichen im tragfähigen Denim 1 cm vor dem Rissbeginn sichern. Von links durch Flicken und Hose stechen: zuerst parallele Spannfäden längs über den Riss legen, Einstich und Austritt jeweils 3-5 mm in festem Stoff jenseits der Fransenkante, dann quer darüber im Über-Unter-Rhythmus verweben. Weiße Querfäden locker einbeziehen, nicht stramm ziehen. Fertig, wenn der Spalt mit dichtem, flachem Gewebe überbrückt ist.",
+     "common_mistake": "Faden zu straff anziehen – das zieht Kräusel; Faden nur locker anlegen, Stoff bleibt flach.",
+     "safety_critical": false,
+     "requires_confirmation": false,
+     "segment_ids": [
+      "seg_1"
+     ],
+     "uses_items": [
+      "needle_denim",
+      "thread_poly",
+      "patch_flick"
+     ],
+     "overlay": {
+      "type": "stitch_path",
+      "stitch_type": "darning",
+      "segment_id": "seg_1"
+     }
+    },
+    {
+     "n": 5,
+     "title": "Sichern, Nadeln entfernen und prüfen",
+     "text": "Endfaden auf der linken Seite mit 3 kleinen Sicherungsstichen dicht nebeneinander im tragfähigen Denim und Flicken vernähen, dann mit der Schere kurz abschneiden. Stecknadeln alle entfernen und zählen. Hose auf rechts wenden und Naht von rechts prüfen: Ränder geschlossen, flach, keine Kräusel, keine ausreißenden Stiche bei sanftem Zug seitlich. Bei Aufklaffen oder Ausreißen aufhören und Fachhilfe prüfen.",
+     "common_mistake": "Faden direkt an der Kante abschneiden – er kann sich lösen; erst im festen Stoff vernähen, dann schneiden.",
+     "safety_critical": true,
+     "requires_confirmation": true,
+     "segment_ids": [
+      "seg_1"
+     ],
+     "uses_items": [
+      "needle_denim",
+      "thread_poly",
+      "scissors_schere",
+      "pins_nadeln"
+     ],
+     "overlay": null
+    }
+   ]
+  },
+  "instances": {
+   "rip": 1
+  }
+ }
+}

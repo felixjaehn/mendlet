@@ -21,6 +21,10 @@ targets:
     platform: iOS
     sources:
       - path: RepairAssistant
+        excludes:
+          - Resources/LiveRecordings
+      - path: RepairAssistant/Resources/LiveRecordings
+        type: folder
     info:
       path: RepairAssistant/Info.plist
       properties:

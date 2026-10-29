@@ -1,5 +1,5 @@
 {
- "case_id": "371f238b-11e7-40d4-a29c-f541b9c2285a",
+ "case_id": "c70745d9-be73-481f-91c0-a1d38c50d75e",
  "category": "textile",
  "risk_level": "allowed",
  "safety": {
@@ -2922,1284 +2922,17 @@
    },
    "score": 0.77,
    "source": "text"
-  },
-  {
-   "id": "seg_5",
-   "label": "Riss",
-   "kind": "damage",
-   "prompt": "rip",
-   "box": [
-    0.5833,
-    0.5137,
-    0.0872,
-    0.0605
-   ],
-   "mask": {
-    "format": "polygon",
-    "points": [
-     [
-      0.621094,
-      0.513672
-     ],
-     [
-      0.628906,
-      0.513672
-     ],
-     [
-      0.630208,
-      0.515625
-     ],
-     [
-      0.632812,
-      0.515625
-     ],
-     [
-      0.632812,
-      0.516602
-     ],
-     [
-      0.640625,
-      0.518555
-     ],
-     [
-      0.641927,
-      0.521484
-     ],
-     [
-      0.643229,
-      0.521484
-     ],
-     [
-      0.644531,
-      0.526367
-     ],
-     [
-      0.645833,
-      0.526367
-     ],
-     [
-      0.64974,
-      0.530273
-     ],
-     [
-      0.65625,
-      0.530273
-     ],
-     [
-      0.65625,
-      0.529297
-     ],
-     [
-      0.658854,
-      0.529297
-     ],
-     [
-      0.658854,
-      0.52832
-     ],
-     [
-      0.66276,
-      0.52832
-     ],
-     [
-      0.665365,
-      0.525391
-     ],
-     [
-      0.670573,
-      0.525391
-     ],
-     [
-      0.670573,
-      0.530273
-     ],
-     [
-      0.664062,
-      0.53125
-     ],
-     [
-      0.664062,
-      0.533203
-     ],
-     [
-      0.658854,
-      0.536133
-     ],
-     [
-      0.658854,
-      0.538086
-     ],
-     [
-      0.652344,
-      0.541992
-     ],
-     [
-      0.652344,
-      0.544922
-     ],
-     [
-      0.653646,
-      0.544922
-     ],
-     [
-      0.653646,
-      0.546875
-     ],
-     [
-      0.654948,
-      0.546875
-     ],
-     [
-      0.65625,
-      0.549805
-     ],
-     [
-      0.657552,
-      0.549805
-     ],
-     [
-      0.658854,
-      0.564453
-     ],
-     [
-      0.657552,
-      0.564453
-     ],
-     [
-      0.652344,
-      0.569336
-     ],
-     [
-      0.648438,
-      0.569336
-     ],
-     [
-      0.648438,
-      0.570313
-     ],
-     [
-      0.645833,
-      0.570313
-     ],
-     [
-      0.645833,
-      0.571289
-     ],
-     [
-      0.639323,
-      0.571289
-     ],
-     [
-      0.639323,
-      0.570313
-     ],
-     [
-      0.635417,
-      0.570313
-     ],
-     [
-      0.635417,
-      0.569336
-     ],
-     [
-      0.630208,
-      0.568359
-     ],
-     [
-      0.628906,
-      0.571289
-     ],
-     [
-      0.627604,
-      0.571289
-     ],
-     [
-      0.627604,
-      0.573242
-     ],
-     [
-      0.625,
-      0.573242
-     ],
-     [
-      0.625,
-      0.574219
-     ],
-     [
-      0.622396,
-      0.574219
-     ],
-     [
-      0.621094,
-      0.569336
-     ],
-     [
-      0.619792,
-      0.569336
-     ],
-     [
-      0.617188,
-      0.563477
-     ],
-     [
-      0.613281,
-      0.561523
-     ],
-     [
-      0.613281,
-      0.55957
-     ],
-     [
-      0.609375,
-      0.557617
-     ],
-     [
-      0.609375,
-      0.555664
-     ],
-     [
-      0.602865,
-      0.551758
-     ],
-     [
-      0.602865,
-      0.549805
-     ],
-     [
-      0.601562,
-      0.549805
-     ],
-     [
-      0.60026,
-      0.547852
-     ],
-     [
-      0.597656,
-      0.547852
-     ],
-     [
-      0.596354,
-      0.545898
-     ],
-     [
-      0.584635,
-      0.542969
-     ],
-     [
-      0.584635,
-      0.537109
-     ],
-     [
-      0.583333,
-      0.537109
-     ],
-     [
-      0.583333,
-      0.536133
-     ],
-     [
-      0.584635,
-      0.536133
-     ],
-     [
-      0.584635,
-      0.530273
-     ],
-     [
-      0.589844,
-      0.527344
-     ],
-     [
-      0.589844,
-      0.525391
-     ],
-     [
-      0.591146,
-      0.525391
-     ],
-     [
-      0.595052,
-      0.521484
-     ],
-     [
-      0.598958,
-      0.521484
-     ],
-     [
-      0.598958,
-      0.520508
-     ],
-     [
-      0.614583,
-      0.520508
-     ],
-     [
-      0.614583,
-      0.519531
-     ],
-     [
-      0.617188,
-      0.519531
-     ],
-     [
-      0.617188,
-      0.517578
-     ],
-     [
-      0.619792,
-      0.516602
-     ]
-    ],
-    "rings": [
-     {
-      "points": [
-       [
-        0.621094,
-        0.513672
-       ],
-       [
-        0.628906,
-        0.513672
-       ],
-       [
-        0.630208,
-        0.515625
-       ],
-       [
-        0.632812,
-        0.515625
-       ],
-       [
-        0.632812,
-        0.516602
-       ],
-       [
-        0.640625,
-        0.518555
-       ],
-       [
-        0.641927,
-        0.521484
-       ],
-       [
-        0.643229,
-        0.521484
-       ],
-       [
-        0.644531,
-        0.526367
-       ],
-       [
-        0.645833,
-        0.526367
-       ],
-       [
-        0.64974,
-        0.530273
-       ],
-       [
-        0.65625,
-        0.530273
-       ],
-       [
-        0.65625,
-        0.529297
-       ],
-       [
-        0.658854,
-        0.529297
-       ],
-       [
-        0.658854,
-        0.52832
-       ],
-       [
-        0.66276,
-        0.52832
-       ],
-       [
-        0.665365,
-        0.525391
-       ],
-       [
-        0.670573,
-        0.525391
-       ],
-       [
-        0.670573,
-        0.530273
-       ],
-       [
-        0.664062,
-        0.53125
-       ],
-       [
-        0.664062,
-        0.533203
-       ],
-       [
-        0.658854,
-        0.536133
-       ],
-       [
-        0.658854,
-        0.538086
-       ],
-       [
-        0.652344,
-        0.541992
-       ],
-       [
-        0.652344,
-        0.544922
-       ],
-       [
-        0.653646,
-        0.544922
-       ],
-       [
-        0.653646,
-        0.546875
-       ],
-       [
-        0.654948,
-        0.546875
-       ],
-       [
-        0.65625,
-        0.549805
-       ],
-       [
-        0.657552,
-        0.549805
-       ],
-       [
-        0.658854,
-        0.564453
-       ],
-       [
-        0.657552,
-        0.564453
-       ],
-       [
-        0.652344,
-        0.569336
-       ],
-       [
-        0.648438,
-        0.569336
-       ],
-       [
-        0.648438,
-        0.570313
-       ],
-       [
-        0.645833,
-        0.570313
-       ],
-       [
-        0.645833,
-        0.571289
-       ],
-       [
-        0.639323,
-        0.571289
-       ],
-       [
-        0.639323,
-        0.570313
-       ],
-       [
-        0.635417,
-        0.570313
-       ],
-       [
-        0.635417,
-        0.569336
-       ],
-       [
-        0.630208,
-        0.568359
-       ],
-       [
-        0.628906,
-        0.571289
-       ],
-       [
-        0.627604,
-        0.571289
-       ],
-       [
-        0.627604,
-        0.573242
-       ],
-       [
-        0.625,
-        0.573242
-       ],
-       [
-        0.625,
-        0.574219
-       ],
-       [
-        0.622396,
-        0.574219
-       ],
-       [
-        0.621094,
-        0.569336
-       ],
-       [
-        0.619792,
-        0.569336
-       ],
-       [
-        0.617188,
-        0.563477
-       ],
-       [
-        0.613281,
-        0.561523
-       ],
-       [
-        0.613281,
-        0.55957
-       ],
-       [
-        0.609375,
-        0.557617
-       ],
-       [
-        0.609375,
-        0.555664
-       ],
-       [
-        0.602865,
-        0.551758
-       ],
-       [
-        0.602865,
-        0.549805
-       ],
-       [
-        0.601562,
-        0.549805
-       ],
-       [
-        0.60026,
-        0.547852
-       ],
-       [
-        0.597656,
-        0.547852
-       ],
-       [
-        0.596354,
-        0.545898
-       ],
-       [
-        0.584635,
-        0.542969
-       ],
-       [
-        0.584635,
-        0.537109
-       ],
-       [
-        0.583333,
-        0.537109
-       ],
-       [
-        0.583333,
-        0.536133
-       ],
-       [
-        0.584635,
-        0.536133
-       ],
-       [
-        0.584635,
-        0.530273
-       ],
-       [
-        0.589844,
-        0.527344
-       ],
-       [
-        0.589844,
-        0.525391
-       ],
-       [
-        0.591146,
-        0.525391
-       ],
-       [
-        0.595052,
-        0.521484
-       ],
-       [
-        0.598958,
-        0.521484
-       ],
-       [
-        0.598958,
-        0.520508
-       ],
-       [
-        0.614583,
-        0.520508
-       ],
-       [
-        0.614583,
-        0.519531
-       ],
-       [
-        0.617188,
-        0.519531
-       ],
-       [
-        0.617188,
-        0.517578
-       ],
-       [
-        0.619792,
-        0.516602
-       ]
-      ],
-      "hole": false
-     }
-    ]
-   },
-   "score": 0.515,
-   "source": "text"
-  },
-  {
-   "id": "seg_6",
-   "label": "Riss",
-   "kind": "damage",
-   "prompt": "rip",
-   "box": [
-    0.4219,
-    0.4619,
-    0.0339,
-    0.0381
-   ],
-   "mask": {
-    "format": "polygon",
-    "points": [
-     [
-      0.445313,
-      0.461914
-     ],
-     [
-      0.450521,
-      0.461914
-     ],
-     [
-      0.450521,
-      0.462891
-     ],
-     [
-      0.451823,
-      0.462891
-     ],
-     [
-      0.451823,
-      0.463867
-     ],
-     [
-      0.453125,
-      0.463867
-     ],
-     [
-      0.453125,
-      0.466797
-     ],
-     [
-      0.454427,
-      0.466797
-     ],
-     [
-      0.454427,
-      0.480469
-     ],
-     [
-      0.453125,
-      0.480469
-     ],
-     [
-      0.453125,
-      0.484375
-     ],
-     [
-      0.451823,
-      0.484375
-     ],
-     [
-      0.451823,
-      0.485352
-     ],
-     [
-      0.453125,
-      0.485352
-     ],
-     [
-      0.453125,
-      0.487305
-     ],
-     [
-      0.454427,
-      0.487305
-     ],
-     [
-      0.454427,
-      0.489258
-     ],
-     [
-      0.455729,
-      0.489258
-     ],
-     [
-      0.455729,
-      0.495117
-     ],
-     [
-      0.454427,
-      0.495117
-     ],
-     [
-      0.454427,
-      0.498047
-     ],
-     [
-      0.453125,
-      0.498047
-     ],
-     [
-      0.453125,
-      0.499023
-     ],
-     [
-      0.451823,
-      0.499023
-     ],
-     [
-      0.451823,
-      0.5
-     ],
-     [
-      0.446615,
-      0.5
-     ],
-     [
-      0.446615,
-      0.499023
-     ],
-     [
-      0.44401,
-      0.499023
-     ],
-     [
-      0.44401,
-      0.498047
-     ],
-     [
-      0.442708,
-      0.498047
-     ],
-     [
-      0.442708,
-      0.496094
-     ],
-     [
-      0.441406,
-      0.496094
-     ],
-     [
-      0.441406,
-      0.492188
-     ],
-     [
-      0.440104,
-      0.492188
-     ],
-     [
-      0.440104,
-      0.489258
-     ],
-     [
-      0.441406,
-      0.489258
-     ],
-     [
-      0.441406,
-      0.487305
-     ],
-     [
-      0.442708,
-      0.487305
-     ],
-     [
-      0.442708,
-      0.486328
-     ],
-     [
-      0.44401,
-      0.486328
-     ],
-     [
-      0.44401,
-      0.483398
-     ],
-     [
-      0.442708,
-      0.483398
-     ],
-     [
-      0.442708,
-      0.482422
-     ],
-     [
-      0.434896,
-      0.482422
-     ],
-     [
-      0.434896,
-      0.481445
-     ],
-     [
-      0.432292,
-      0.481445
-     ],
-     [
-      0.432292,
-      0.480469
-     ],
-     [
-      0.429687,
-      0.480469
-     ],
-     [
-      0.429687,
-      0.479492
-     ],
-     [
-      0.427083,
-      0.479492
-     ],
-     [
-      0.427083,
-      0.478516
-     ],
-     [
-      0.424479,
-      0.478516
-     ],
-     [
-      0.424479,
-      0.476562
-     ],
-     [
-      0.423177,
-      0.476562
-     ],
-     [
-      0.423177,
-      0.474609
-     ],
-     [
-      0.421875,
-      0.474609
-     ],
-     [
-      0.421875,
-      0.47168
-     ],
-     [
-      0.423177,
-      0.47168
-     ],
-     [
-      0.423177,
-      0.469727
-     ],
-     [
-      0.424479,
-      0.469727
-     ],
-     [
-      0.424479,
-      0.46875
-     ],
-     [
-      0.425781,
-      0.46875
-     ],
-     [
-      0.425781,
-      0.467773
-     ],
-     [
-      0.428385,
-      0.467773
-     ],
-     [
-      0.428385,
-      0.466797
-     ],
-     [
-      0.432292,
-      0.466797
-     ],
-     [
-      0.432292,
-      0.46582
-     ],
-     [
-      0.436198,
-      0.46582
-     ],
-     [
-      0.436198,
-      0.464844
-     ],
-     [
-      0.440104,
-      0.464844
-     ],
-     [
-      0.440104,
-      0.463867
-     ],
-     [
-      0.442708,
-      0.463867
-     ],
-     [
-      0.442708,
-      0.462891
-     ],
-     [
-      0.445313,
-      0.462891
-     ]
-    ],
-    "rings": [
-     {
-      "points": [
-       [
-        0.445313,
-        0.461914
-       ],
-       [
-        0.450521,
-        0.461914
-       ],
-       [
-        0.450521,
-        0.462891
-       ],
-       [
-        0.451823,
-        0.462891
-       ],
-       [
-        0.451823,
-        0.463867
-       ],
-       [
-        0.453125,
-        0.463867
-       ],
-       [
-        0.453125,
-        0.466797
-       ],
-       [
-        0.454427,
-        0.466797
-       ],
-       [
-        0.454427,
-        0.480469
-       ],
-       [
-        0.453125,
-        0.480469
-       ],
-       [
-        0.453125,
-        0.484375
-       ],
-       [
-        0.451823,
-        0.484375
-       ],
-       [
-        0.451823,
-        0.485352
-       ],
-       [
-        0.453125,
-        0.485352
-       ],
-       [
-        0.453125,
-        0.487305
-       ],
-       [
-        0.454427,
-        0.487305
-       ],
-       [
-        0.454427,
-        0.489258
-       ],
-       [
-        0.455729,
-        0.489258
-       ],
-       [
-        0.455729,
-        0.495117
-       ],
-       [
-        0.454427,
-        0.495117
-       ],
-       [
-        0.454427,
-        0.498047
-       ],
-       [
-        0.453125,
-        0.498047
-       ],
-       [
-        0.453125,
-        0.499023
-       ],
-       [
-        0.451823,
-        0.499023
-       ],
-       [
-        0.451823,
-        0.5
-       ],
-       [
-        0.446615,
-        0.5
-       ],
-       [
-        0.446615,
-        0.499023
-       ],
-       [
-        0.44401,
-        0.499023
-       ],
-       [
-        0.44401,
-        0.498047
-       ],
-       [
-        0.442708,
-        0.498047
-       ],
-       [
-        0.442708,
-        0.496094
-       ],
-       [
-        0.441406,
-        0.496094
-       ],
-       [
-        0.441406,
-        0.492188
-       ],
-       [
-        0.440104,
-        0.492188
-       ],
-       [
-        0.440104,
-        0.489258
-       ],
-       [
-        0.441406,
-        0.489258
-       ],
-       [
-        0.441406,
-        0.487305
-       ],
-       [
-        0.442708,
-        0.487305
-       ],
-       [
-        0.442708,
-        0.486328
-       ],
-       [
-        0.44401,
-        0.486328
-       ],
-       [
-        0.44401,
-        0.483398
-       ],
-       [
-        0.442708,
-        0.483398
-       ],
-       [
-        0.442708,
-        0.482422
-       ],
-       [
-        0.434896,
-        0.482422
-       ],
-       [
-        0.434896,
-        0.481445
-       ],
-       [
-        0.432292,
-        0.481445
-       ],
-       [
-        0.432292,
-        0.480469
-       ],
-       [
-        0.429687,
-        0.480469
-       ],
-       [
-        0.429687,
-        0.479492
-       ],
-       [
-        0.427083,
-        0.479492
-       ],
-       [
-        0.427083,
-        0.478516
-       ],
-       [
-        0.424479,
-        0.478516
-       ],
-       [
-        0.424479,
-        0.476562
-       ],
-       [
-        0.423177,
-        0.476562
-       ],
-       [
-        0.423177,
-        0.474609
-       ],
-       [
-        0.421875,
-        0.474609
-       ],
-       [
-        0.421875,
-        0.47168
-       ],
-       [
-        0.423177,
-        0.47168
-       ],
-       [
-        0.423177,
-        0.469727
-       ],
-       [
-        0.424479,
-        0.469727
-       ],
-       [
-        0.424479,
-        0.46875
-       ],
-       [
-        0.425781,
-        0.46875
-       ],
-       [
-        0.425781,
-        0.467773
-       ],
-       [
-        0.428385,
-        0.467773
-       ],
-       [
-        0.428385,
-        0.466797
-       ],
-       [
-        0.432292,
-        0.466797
-       ],
-       [
-        0.432292,
-        0.46582
-       ],
-       [
-        0.436198,
-        0.46582
-       ],
-       [
-        0.436198,
-        0.464844
-       ],
-       [
-        0.440104,
-        0.464844
-       ],
-       [
-        0.440104,
-        0.463867
-       ],
-       [
-        0.442708,
-        0.463867
-       ],
-       [
-        0.442708,
-        0.462891
-       ],
-       [
-        0.445313,
-        0.462891
-       ]
-      ],
-      "hole": false
-     }
-    ]
-   },
-   "score": 0.515,
-   "source": "text"
   }
  ],
  "diagnosis": {
-  "summary": "Vermutlich dunkelgrüner Wollstrick-Pullover mit drei kleinen Löchern mit Materialverlust im Vorderteil. Kein bloßes Auseinanderweichen einer Naht, sondern fehlende Maschen, daher Stopfen nötig.",
+  "summary": "Vermutlich Wollstrick-Pullover mit drei kleinen Löchern mit Materialverlust im Vorderteil. Ränder aus Maschenware, keine offene Naht.",
   "likely_causes": [
-   "Mottenfraß oder Insektenfraß mit Maschenverlust",
-   "mechanisches Hängenbleiben mit aufgeriebenen Maschen"
+   "Mottenfraß oder mechanischer Schaden mit fehlenden Maschen",
+   "Aufgeriebene Stelle durch Reibung oder Hängenbleiben"
   ],
-  "confidence": 0.78,
+  "confidence": 0.82,
   "evidence_segment_ids": [
+   "seg_1",
    "seg_2",
    "seg_3",
    "seg_4"
@@ -4213,11 +2946,11 @@
  },
  "decision": {
   "recommendation": "repair_self",
-  "reasoning": "Drei kleine Löcher mit Materialverlust im Strick, laut Nutzerangabe Wollpulli. Ränder wirken noch tragfähig, daher ist Stopfen in Handarbeit für Anfänger machbar und lohnt sich.",
+  "reasoning": "Drei kleine Löcher mit Materialverlust im Strick können in Handarbeit gestopft werden. Tragfähige Ränder sind sichtbar, keine offene Naht und kein großer Schaden.",
   "effort": "medium",
   "time_minutes": [
-   30,
-   60
+   40,
+   70
   ],
   "cost_eur": [
    5.0,
@@ -4227,49 +2960,49 @@
  },
  "shopping_list": [
   {
-   "id": "garn",
-   "name": "Weiches Stopf- / Wollgarn in Dunkelgrün, ähnliche Stärke wie Pullovergarn",
+   "id": "yarn",
+   "name": "Stopfgarn Wolle dunkelgrün",
    "kind": "material",
    "quantity": "1 Karte / kleines Knäuel",
    "required": true,
-   "search_term": "Stopfgarn Wolle dunkelgrün Stopfwolle",
-   "household_alternative": null
+   "search_term": "Stopfgarn Wolle dunkelgrün darning wool",
+   "household_alternative": "passendes Wollgarn in Stärke des Stricks"
   },
   {
-   "id": "nadel",
-   "name": "Stopfnadel mit stumpfer Spitze und großem Öhr",
+   "id": "needle",
+   "name": "Stopfnadel mit stumpfer Spitze, lang",
    "kind": "tool",
    "quantity": "1 Stück",
    "required": true,
-   "search_term": "Stopfnadel stumpf lang großes Öhr",
+   "search_term": "Stopfnadel stumpf lang",
    "household_alternative": null
   },
   {
-   "id": "stecknadeln",
-   "name": "Stecknadeln mit Glaskopf",
+   "id": "scissors",
+   "name": "Kleine Stick- oder Nähschere",
    "kind": "tool",
-   "quantity": "4 Stück",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "kleine Stickschere Nähschere",
+   "household_alternative": "saubere Nagelschere"
+  },
+  {
+   "id": "mushroom",
+   "name": "Stopfpilz als Unterlage",
+   "kind": "tool",
+   "quantity": "1 Stück",
    "required": false,
-   "search_term": "Stecknadeln Glaskopf",
-   "household_alternative": "2 Büroklammern als Ersatz zum Fixieren"
-  },
-  {
-   "id": "schere",
-   "name": "Kleine spitze Stick- oder Nähschere",
-   "kind": "tool",
-   "quantity": "1 Stück",
-   "required": true,
-   "search_term": "kleine Stickschere Nähen",
-   "household_alternative": null
+   "search_term": "Stopfpilz Holz",
+   "household_alternative": "kleine runde Dose oder Apfel als Unterlage"
   }
  ],
  "guide": {
   "steps": [
    {
     "n": 1,
-    "title": "Auslegen und Faden vorbereiten",
-    "text": "Pullover auf der Vorderseite auf glatten Tisch legen, entspannt glatt streichen, nicht dehnen. Alle drei Löcher ansehen, lose Fussel nur mit Fingern abnehmen. Ca. 40 cm Stopfgarn abschneiden, Stopfnadel einfädeln, kein Knoten, Fadenende 5 cm überstehen lassen.",
-    "common_mistake": "Löcher zum Nähen zusammenziehen – das kräuselt und reißt wieder auf; stattdessen offen liegen lassen und Gewebe neu aufbauen.",
+    "title": "Vorbereiten und flach auslegen",
+    "text": "Pullover mit der Innenseite nach außen wenden und auf einem Tisch entspannt flach auslegen. Größtes Loch in der Mitte und die zwei kleineren Löcher suchen. Stopfpilz oder kleine runde Dose von links unter das erste Loch schieben, sodass das Loch flach ohne Dehnung liegt. Fertig, wenn das Gestrick glatt aufliegt und nicht zieht.",
+    "common_mistake": "Fehler: Pulli gedehnt hinlegen – Korrektur: entspannt glatt hinlegen, damit das Stopfgewebe später nicht wellt.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
@@ -4279,28 +3012,39 @@
      "seg_4"
     ],
     "uses_items": [
-     "garn",
-     "nadel"
+     "mushroom"
     ],
-    "overlay": {
-     "type": "highlight",
-     "stitch_type": null,
-     "segment_id": "seg_2"
-    }
+    "overlay": null
    },
    {
     "n": 2,
-    "title": "Größtes Loch stopfen",
-    "text": "Größtes Loch mittig bearbeiten: Von rechts arbeiten. Nadel 4-5 mm neben dem Loch im tragfähigen Gestrick einstechen und parallele Spannfäden längs über das Loch legen, jeweils 4-5 mm über den Lochrand hinaus in festes Gestrick ein- und ausstechen. 6-8 Fäden nebeneinander, Abstand ca. 2 mm, locker lassen. Dann quer dazu im Über-Unter-Rhythmus durch die Längsfäden weben, bis das Loch geschlossen ist. Anfang und Ende im festen Gestrick mit 2-3 winzigen Rückstichen sichern.",
-    "common_mistake": "Faden straff anziehen – gibt Delle und Zuglöcher; Faden locker liegen lassen, Strick bleibt flach.",
+    "title": "Stopfgarn einfädeln",
+    "text": "Etwa 30-40 cm Stopfgarn abschneiden und in die Stopfnadel einfädeln, ohne Knoten am Ende, beide Enden ca. 10 cm überstehen lassen. Schere nur zum Abschneiden des Fadens benutzen, Finger weg von der Schneide, Faden beiseitelegen. Fertig, wenn Nadel gefädelt und Faden glatt ist.",
+    "common_mistake": "Fehler: sehr langen Faden nehmen – Korrektur: bei Verknotung kürzeren Faden nehmen, ca. 30-40 cm.",
+    "safety_critical": true,
+    "requires_confirmation": true,
+    "segment_ids": [],
+    "uses_items": [
+     "yarn",
+     "needle",
+     "scissors"
+    ],
+    "overlay": null
+   },
+   {
+    "n": 3,
+    "title": "Größtes Loch längs bespannen",
+    "text": "Von links am größten Loch arbeiten: ca. 5 mm neben dem Lochrand im tragfähigen Gestrick einstechen und parallele Spannfäden längs über das Loch legen, Abstand ca. 2 mm, jeweils 5 mm über den Rand hinaus in festes Gestrick führen. Auf der Rückseite arbeiten, Nadel von unten nach oben und zurück führen. Fertig, wenn das Loch wie mit einer Leiter aus 5-7 lockeren Längsfäden überbrückt ist.",
+    "common_mistake": "Fehler: Faden straff ziehen – Korrektur: locker lassen, Maschenware darf nicht kräuseln.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
      "seg_2"
     ],
     "uses_items": [
-     "garn",
-     "nadel"
+     "yarn",
+     "needle",
+     "mushroom"
     ],
     "overlay": {
      "type": "stitch_path",
@@ -4309,18 +3053,41 @@
     }
    },
    {
-    "n": 3,
-    "title": "Zweites kleines Loch stopfen",
-    "text": "Neues ca. 30 cm langes Garn einfädeln. Kleines oberes Loch gleich stopfen: erst 4-6 lockere Längsfäden 4-5 mm über den Rand hinaus legen, dann quer verweben bis geschlossen. Stoff dabei flach liegen lassen, nicht dehnen. Fadenenden auf der Rückseite mit 2-3 kleinen Stichen im Gestrick sichern.",
-    "common_mistake": "Nur das Loch umstechen statt tragfähigen Rand zu nutzen – reißt aus; immer 4-5 mm ins feste Gestrick hinaus nähen.",
+    "n": 4,
+    "title": "Größtes Loch quer verweben",
+    "text": "Am selben Loch von links quer weben: Nadel abwechselnd über und unter den Längsfäden durchführen, am Rand jeweils in tragfähiges Gestrick ein- und ausstechen. Reihe für Reihe dicht anschließen, locker lassen. Fadenende mit 2-3 kleinen Stichen im Gestrick neben dem Loch vernähen, dann erst abschneiden. Fertig, wenn das Loch mit einem dichten lockeren Gewebe geschlossen ist.",
+    "common_mistake": "Fehler: quer straff durchziehen – Korrektur: kleine Schlaufe am Rand stehen lassen für Dehnreserve.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_2"
+    ],
+    "uses_items": [
+     "yarn",
+     "needle",
+     "scissors",
+     "mushroom"
+    ],
+    "overlay": {
+     "type": "stitch_path",
+     "stitch_type": "darning",
+     "segment_id": "seg_2"
+    }
+   },
+   {
+    "n": 5,
+    "title": "Oberes kleines Loch stopfen",
+    "text": "Stopfpilz unter das obere kleine Loch schieben. Gleiches Vorgehen: erst 3-5 lockere Längsfäden ca. 4 mm über den Lochrand hinaus legen, dann quer über-unter verweben. Locker arbeiten, Stoff nicht verziehen. Faden mit kleinen Stichen im festen Gestrick sichern. Fertig, wenn das kleine Loch geschlossen und flach ist.",
+    "common_mistake": "Fehler: Randmaschen übergehen – Korrektur: immer 4-5 mm in festes Gestrick um das Loch herum stechen.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
      "seg_3"
     ],
     "uses_items": [
-     "garn",
-     "nadel"
+     "yarn",
+     "needle",
+     "mushroom"
     ],
     "overlay": {
      "type": "stitch_path",
@@ -4329,19 +3096,20 @@
     }
    },
    {
-    "n": 4,
-    "title": "Drittes kleines Loch stopfen",
-    "text": "Neues ca. 30 cm langes Garn einfädeln. Unteres kleines Loch gleich stopfen: Längsfäden locker über tragfähige Ränder spannen, dann quer über-unter weben bis dicht. Prüfen, dass keine Lücke bleibt und das Gestrick flach liegt.",
-    "common_mistake": "Zu langes Fadenstück verwenden – verknotet und scheuert Wolle auf; lieber neues kurzes Stück nehmen.",
+    "n": 6,
+    "title": "Unteres kleines Loch stopfen",
+    "text": "Stopfpilz unter das untere kleine Loch schieben. Wieder längs bespannen und quer verweben wie zuvor, mit 4 mm Überstand in tragfähiges Gestrick. Anfang und Ende mit 2-3 kleinen Sicherungsstichen im Gestrick vernähen, Fadenenden kurz abschneiden. Fertig, wenn auch dieses Loch dicht und flach geschlossen ist.",
+    "common_mistake": "Fehler: zu fest anziehen und Delle erzeugen – Korrektur: nach jedem Stich prüfen, dass das Gestrick flach bleibt.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
      "seg_4"
     ],
     "uses_items": [
-     "garn",
-     "nadel",
-     "stecknadeln"
+     "yarn",
+     "needle",
+     "scissors",
+     "mushroom"
     ],
     "overlay": {
      "type": "stitch_path",
@@ -4350,31 +3118,24 @@
     }
    },
    {
-    "n": 5,
-    "title": "Sichern und kontrollieren",
-    "text": "Stecknadeln entfernen. Mit kleiner Schere alle überstehenden Fadenenden auf ca. 5 mm kürzen, Schere flach führen, Finger weg von der Schneide. Pullover leicht in Breite und Länge ziehen: Stopfstellen bleiben geschlossen, flach, ohne Kräusel und ohne aufreißende Stiche. Wenn es wellt oder reißt: aufhören und Methode prüfen.",
-    "common_mistake": "Fäden bündig am Gewebe abschneiden – kann sich lösen; ca. 5 mm stehen lassen und erst nach Kontrolle kürzen.",
-    "safety_critical": true,
-    "requires_confirmation": true,
+    "n": 7,
+    "title": "Kontrollieren und fertigstellen",
+    "text": "Pullover auf rechts wenden und alle drei Stellen von außen ansehen. Gestrick sanft mit den Händen in Form ziehen und leicht quer dehnen: Ränder müssen geschlossen bleiben, keine Kräusel, keine ausreißenden Stiche. Hilfsunterlage entfernen. Fertig, wenn alle Löcher geschlossen, flach und dehnbar sind. Wenn Stiche ausreißen oder sich verziehen, aufhören und Fachhilfe prüfen.",
+    "common_mistake": "Fehler: nur optisch prüfen – Korrektur: wirklich sanft quer und längs dehnen und Nähte ansehen.",
+    "safety_critical": false,
+    "requires_confirmation": false,
     "segment_ids": [
      "seg_1",
      "seg_2",
      "seg_3",
      "seg_4"
     ],
-    "uses_items": [
-     "schere"
-    ],
-    "overlay": {
-     "type": "highlight",
-     "stitch_type": null,
-     "segment_id": "seg_1"
-    }
+    "uses_items": [],
+    "overlay": null
    }
   ]
  },
  "instances": {
-  "hole": 3,
-  "rip": 2
+  "hole": 3
  }
 }

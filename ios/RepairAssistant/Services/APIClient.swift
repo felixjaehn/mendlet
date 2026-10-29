@@ -9,6 +9,10 @@ enum AnalyzeEvent: Sendable {
     case result(AnalyzeResponse)
     /// Spark fallback: no SAM text hit, Muse Spark localizes the damage, SAM segments with the box.
     case grounding(label: String)
+    /// Masks arrive right after segmentation, before the diagnosis is done.
+    case segments([Segment])
+    /// One finished tool call of the analysis agent.
+    case agentStep(AgentStep)
 }
 
 enum APIError: LocalizedError, Sendable, Equatable {
@@ -107,6 +111,7 @@ enum SSEDecoder {
     }
     struct GroundingPayload: Decodable { var label: String? }
     struct ErrorPayload: Decodable { var message: String? }
+    struct SegmentsPayload: Decodable { var segments: [Segment]? }
 
     /// Returns nil for events to ignore.
     static func decode(_ m: SSEMessage) throws -> AnalyzeEvent? {
@@ -123,6 +128,12 @@ enum SSEDecoder {
         case "grounding":
             let g = try? decoder.decode(GroundingPayload.self, from: data)
             return .grounding(label: g?.label ?? "Schadstelle genauer lokalisieren")
+        case "segments":
+            guard let p = try? decoder.decode(SegmentsPayload.self, from: data), let segs = p.segments, !segs.isEmpty else { return nil }
+            return .segments(segs)
+        case "agent_step":
+            guard let step = try? decoder.decode(AgentStep.self, from: data), !step.label.isEmpty else { return nil }
+            return .agentStep(step)
         case "error":
             let e = try? decoder.decode(ErrorPayload.self, from: data)
             throw APIError.server(e?.message ?? "")

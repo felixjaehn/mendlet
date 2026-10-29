@@ -13,7 +13,15 @@ struct SettingsSheet: View {
                 Section {
                     Toggle("Demo-Modus (ohne Server)", isOn: $settings.demoMode).tint(Theme.thread)
                 } footer: {
-                    Text("Im Demo-Modus laufen alle Schritte mit mitgelieferten Beispieldaten, ohne Server und ohne Internet.")
+                    Text("Im Demo-Modus spielt die App echte, aufgezeichnete Modellantworten vom 28.10. ab, ohne Server und ohne Internet.")
+                }
+                if settings.demoMode {
+                    Section {
+                        Toggle("Schnell (für Videoaufnahmen)", isOn: $settings.fastReplay).tint(Theme.thread)
+                        Toggle("Agenten-Lauf mit Fehlerbehebung zeigen", isOn: $settings.recoveryTrace).tint(Theme.thread)
+                    } footer: {
+                        Text("Spielt die echten Modellantworten in etwa 6 statt 25 Sekunden ab. Der Agenten-Lauf mit Fehlerbehebung (Jeans) zeigt einen echten Lauf, in dem SAM einen Serverfehler meldete und der Agent ausgewichen ist.")
+                    }
                 }
                 Section("Demo-Szenario") {
                     Picker("Szenario", selection: $settings.scenarioRaw) {

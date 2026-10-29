@@ -198,7 +198,9 @@ struct StepOverlay: View {
 
     var body: some View {
         ZStack {
-            if isStitch {
+            if response.category == .shoe && !isStitch {
+                ShoeOverlay(step: step, response: response, size: size)
+            } else if isStitch {
                 if let s = targetSegment {
                     SegmentLayer(segment: s, color: Theme.thread, size: size, visible: true, pulsing: false, showLabel: false)
                         .opacity(0.5)

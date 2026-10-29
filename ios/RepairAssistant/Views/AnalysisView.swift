@@ -7,38 +7,31 @@ struct AnalysisView: View {
         (.classify, "Objekt und Sicherheit prüfen", "Muse Spark"),
         (.segment, "Schaden markieren", "SAM 3.1"),
         (.diagnose, "Diagnose stellen", "Muse Spark"),
-        (.plan, "Reparatur planen", "Muse Spark"),
+        (.plan, "Reparatur planen", "Muse Wonder"),
     ]
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 22) {
+            VStack(alignment: .leading, spacing: 16) {
                 if let photo = flow.photo {
-                    PhotoStage(image: photo, dim: flow.analysisError == nil ? 0.18 : 0.4) { size in
+                    PhotoStage(image: photo, dim: flow.analysisError == nil ? 0.18 : 0.4, minAspect: 1.15) { size in
                         ScanRevealView(segments: flow.earlySegments, size: size, isScanning: flow.isAnalyzing && flow.analysisError == nil)
                     }
                 }
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(flow.analysisError == nil ? "Ich schaue mir das genau an" : "Das hat nicht geklappt")
-                        .font(.title2.bold()).foregroundStyle(Theme.ink)
-                    Text(flow.analysisError == nil ? "Das dauert meist unter 30 Sekunden." : "Dein Foto bleibt erhalten.")
-                        .font(.subheadline).foregroundStyle(Theme.inkSecondary)
+                        .font(.title3.bold()).foregroundStyle(Theme.ink)
+                    if flow.analysisError != nil {
+                        Text("Dein Foto bleibt erhalten.").font(.subheadline).foregroundStyle(Theme.inkSecondary)
+                    }
                 }
                 if let err = flow.analysisError {
                     ErrorCard(message: err, retry: { flow.startAnalysis(resetExtras: false) },
                               secondaryTitle: "Abbrechen", secondary: { flow.cancelAnalysis() })
                 } else {
-                    VStack(spacing: 0) {
-                        ForEach(Array(stages.enumerated()), id: \.offset) { i, s in
-                            if s.0 == .segment && flow.groundingSeen {
-                                StageRow(title: "Muse Spark lokalisiert → SAM segmentiert", subtitle: "Zweiter Versuch mit Spark-Box", state: state(for: .segment))
-                                Divider().overlay(Theme.hairline).padding(.leading, 46)
-                            }
-                            StageRow(title: s.1, subtitle: s.2, state: s.0 == .segment && flow.groundingSeen && state(for: .segment) == .active ? .done : state(for: s.0))
-                            if i < stages.count - 1 { Divider().overlay(Theme.hairline).padding(.leading, 46) }
-                        }
-                    }
-                    .card(padding: 14)
+                    StageStrip(titles: stages.map { $0.0 == .segment && flow.groundingSeen ? "Muse Spark lokalisiert, SAM segmentiert" : $0.1 },
+                               states: stages.map { state(for: $0.0) })
+                    AgentTraceView(steps: flow.agentSteps, active: activeWork, replay: flow.settings.demoMode)
                 }
             }
             .padding(.horizontal, Theme.margin).padding(.top, 8).padding(.bottom, 32)
@@ -54,6 +47,14 @@ struct AnalysisView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .sensoryFeedback(.success, trigger: flow.isAnalyzing) { old, new in old && !new && flow.analysisError == nil }
+    }
+
+    /// Work in progress: the first stage that is not done yet.
+    private var activeWork: (label: String, model: String)? {
+        guard flow.isAnalyzing else { return nil }
+        guard let s = stages.first(where: { state(for: $0.0) == .active }) ?? stages.first(where: { state(for: $0.0) != .done }) else { return nil }
+        if s.0 == .segment && flow.groundingSeen { return ("Muse Spark lokalisiert, SAM 3.1 segmentiert", "SAM 3.1") }
+        return (s.1, s.2)
     }
 
     private func state(for stage: AnalysisStage) -> StageState {

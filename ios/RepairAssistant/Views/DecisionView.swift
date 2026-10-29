@@ -53,6 +53,7 @@ struct DecisionView: View {
         ScrollView {
             if let d = flow.response?.decision {
                 VStack(alignment: .leading, spacing: 18) {
+                    if d.recommendation == .repairSelf || d.recommendation == .replace { BeforeAfterCard() }
                     VStack(alignment: .leading, spacing: 14) {
                         HStack(spacing: 14) {
                             Image(systemName: d.recommendation.icon).font(.system(size: 22, weight: .semibold)).foregroundStyle(.white)
@@ -88,6 +89,7 @@ struct DecisionView: View {
         .screenBackground()
         .navigationTitle("Entscheidung")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear { if flow.response?.decision?.recommendation != .repairPro { flow.loadAfterPreview() } }
         .safeAreaInset(edge: .bottom) {
             Group {
                 if FlowGate.canNavigate(to: .shopping, response: flow.response) {
