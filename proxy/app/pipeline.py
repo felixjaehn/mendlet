@@ -77,6 +77,24 @@ def blocked_response(cls: ClassifyResult, pre: safety.PreCheck) -> AnalyzeRespon
 
 async def _classic_segments(req: AnalyzeRequest, client: ModelClient, cls: ClassifyResult,
                             grounding: GroundingProgress) -> list[Segment]:
+    if cls.category == "low_voltage_electronics":
+        # Bare ends are damage, but never replace the independently grounded destination pads.
+        await grounding()
+        results = await asyncio.gather(
+            client.segment(req, cls.category, SEGMENT_PROMPTS[cls.category]),
+            client.ground(req, cls.category), return_exceptions=True)
+        segments = []
+        for result in results:
+            if isinstance(result, (BudgetExceeded, asyncio.CancelledError)):
+                raise result
+            if isinstance(result, AppError):
+                log.warning("electronics segmentation unavailable: %s", result.code)
+            elif isinstance(result, BaseException):
+                raise result
+            else:
+                for segment in result:
+                    segments.append(segment.model_copy(update={"id": f"seg_{len(segments) + 1}"}))
+        return segments
     # Live probe 2026-10-28 (docs/benchmark.md): SAM text prompts find parts but rarely damage
     # ("tear" = 0 matches on an obvious tear), so Spark grounding runs in parallel instead of after.
     # It always runs to completion so its result is cached; cancelling would re-spend credits on replay.
@@ -131,7 +149,7 @@ async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress =
     await progress("segment")
     plan: DiagnosePlan | None = None
     segments: list[Segment] | None = None
-    if getattr(client, "agent_enabled", False):
+    if getattr(client, "agent_enabled", False) and cls.category != "low_voltage_electronics":
         try:
             segments, plan = await client.agent_run(req, cls, agent_step)
         except BudgetExceeded:

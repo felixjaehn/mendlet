@@ -9,6 +9,7 @@ import numpy as np
 from PIL import Image
 
 from . import mock_data as md
+from . import mock_electronics
 from .errors import AppError
 from .images import downscale_b64
 from .models import (
@@ -32,6 +33,7 @@ SCENARIOS = {
     "textile_tear_needs_label", "textile_tear", "textile_hole", "textile_open_seam", "textile_button",
     "shoe_sole", "battery_jacket", "helmet", "unsupported",
     "textile_grounding", "textile_multi", "textile_rings",
+    "electronics_wire",
 }
 
 # keyword (lowercase) -> scenario; first match wins
@@ -40,6 +42,7 @@ _KEYWORDS: list[tuple[re.Pattern[str], str]] = [
     for p, s in [
         (r"akku|beheizbar|heizjacke|lithium", "battery_jacket"),
         (r"helm", "helmet"),
+        (r"usb|platine|löt|kabel", "electronics_wire"),
         (r"fahrrad|fahrradkette|möbel|stuhl|tisch", "unsupported"),
         (r"sohle|schuh|sneaker|stiefel|absatz", "shoe_sole"),
         (r"knopf", "textile_button"),
@@ -83,6 +86,9 @@ class MockClient:
     async def classify(self, req: AnalyzeRequest) -> ClassifyResult:
         await self._sleep(0.7)
         scenario = pick_scenario(req)
+        if scenario == "electronics_wire":
+            return ClassifyResult(category="low_voltage_electronics", risk_level="allowed",
+                                  reason="USB-Kleinspannungsplatine mit losen Leitungen (Demo ohne Batterie).")
         if scenario.startswith("shoe"):
             return md.CLASSIFY["shoe"]
         if scenario.startswith("textile"):
@@ -91,6 +97,8 @@ class MockClient:
 
     async def segment(self, req: AnalyzeRequest, category: str, prompts: list[str]) -> list[Segment]:
         await self._sleep(1.1)
+        if pick_scenario(req) == "electronics_wire":
+            return mock_electronics.segments()[:5]
         return md.segments(pick_scenario(req))
 
     async def diagnose(self, req: AnalyzeRequest, cls: ClassifyResult, segments: list[Segment]) -> DiagnosePlan:
@@ -105,6 +113,7 @@ class MockClient:
             "textile_open_seam": md.textile_open_seam,
             "textile_button": md.textile_button,
             "shoe_sole": md.shoe_sole,
+            "electronics_wire": mock_electronics.plan,
         }
         return builders[scenario]()
 
@@ -138,6 +147,8 @@ class MockClient:
 
     async def ground(self, req: AnalyzeRequest, category: str) -> list[Segment]:
         await self._sleep(0.6)
+        if category == "low_voltage_electronics":
+            return mock_electronics.segments()[5:]
         return [md.segments("shoe_sole" if category == "shoe" else "textile_tear")[1].model_copy(
             update={"source": "grounding"})]
 

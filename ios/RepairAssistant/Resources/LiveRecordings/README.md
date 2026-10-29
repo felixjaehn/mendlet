@@ -15,3 +15,4 @@ Echte Antworten des Proxys im Real-Modus (Meta Model API, 28.10.2026), unveränd
 | `jeans_agent_recovery_trace.json` | – | 29.10., erste Agentenversion, 94 s: 7 echte Schritte, SAM meldet HTTP 500, der Agent weicht über Spark-Lokalisierung plus SAM-Box aus. Einstellungen: "Agenten-Lauf mit Fehlerbehebung zeigen". Enthält kein Ergebnis, es wird `jeans_agent.json` → `result` verwendet |
 
 Für Pulli, Sneaker und Heizjacke gibt es keine aufgezeichneten Agentenschritte; die App zeigt dort nur den Classify-Schritt und die Phasen, keine erfundenen Schritte.
+| `platine.json` | `platine.jpg` | Elektronik live 29.10.: Kabel, blanke Enden, Lötpads +/− (Spark liest Siebdruck, SAM segmentiert), Löt-Overlays rot→+, schwarz→− |

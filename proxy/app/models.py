@@ -143,6 +143,23 @@ class GroundingResult(Base):
         return self
 
 
+class GroundedPad(Base):
+    label: Literal["+", "-", "other"]
+    box_0_1000: Annotated[list[Annotated[float, Field(allow_inf_nan=False)]], Field(min_length=4, max_length=4)]
+
+    @model_validator(mode="after")
+    def valid_box(self):
+        self.box_0_1000 = [max(0.0, min(1000.0, v)) for v in self.box_0_1000]
+        x1, y1, x2, y2 = self.box_0_1000
+        if x2 <= x1 or y2 <= y1:
+            raise ValueError("Das lokalisierte Lötpad muss eine positive Fläche haben.")
+        return self
+
+
+class PadGroundingResult(Base):
+    pads: list[GroundedPad] = Field(max_length=12)
+
+
 # ---- Model answer: prompt A -----------------------------------------------
 
 
@@ -177,6 +194,7 @@ class Segment(Base):
     mask: Mask | None = None
     score: float
     source: SegmentSource | None = None
+    polarity: Literal["+", "-"] | None = None
 
 
 class TrackedSegment(Segment):
@@ -240,9 +258,23 @@ class ShoppingItem(Base):
 
 
 class Overlay(Base):
-    type: Literal["stitch_path", "highlight"]
+    type: Literal["stitch_path", "highlight", "solder"]
     stitch_type: StitchType | None = None
-    segment_id: str
+    segment_id: str | None = None
+    from_segment_id: str | None = None
+    to_segment_id: str | None = None
+    hold_seconds: Annotated[int, Field(strict=True, ge=2, le=3)] | None = None
+
+    @model_validator(mode="after")
+    def required_targets(self):
+        if self.type == "solder":
+            if not self.from_segment_id or not self.to_segment_id or self.from_segment_id == self.to_segment_id:
+                raise ValueError("Ein Löt-Overlay braucht zwei verschiedene Segment-IDs.")
+            if self.hold_seconds is None:
+                raise ValueError("Ein Löt-Overlay braucht eine Haltedauer von 2–3 Sekunden.")
+        elif not self.segment_id:
+            raise ValueError("Dieses Overlay braucht eine Segment-ID.")
+        return self
 
 
 class Step(Base):

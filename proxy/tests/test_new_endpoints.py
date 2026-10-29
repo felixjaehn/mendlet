@@ -24,7 +24,7 @@ def test_refine_mock_multiple_points_and_holes(client, image_b64):
     assert first.status_code == 200
     assert first.json() == client.post('/refine', json=body).json()
     segment = first.json()
-    assert set(segment) == {'id', 'label', 'kind', 'prompt', 'box', 'mask', 'score', 'source'}
+    assert set(segment) == {'id', 'label', 'kind', 'prompt', 'box', 'mask', 'score', 'source', 'polarity'}
     assert segment['source'] == 'tap' and segment['label'] == 'Riss' and segment['kind'] == 'damage'
     assert segment['mask']['points'] == segment['mask']['rings'][0]['points']
     assert sum(r['hole'] for r in segment['mask']['rings']) == 2

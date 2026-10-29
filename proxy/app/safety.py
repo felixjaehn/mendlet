@@ -61,12 +61,20 @@ def stricter(a: RiskLevel, b: RiskLevel) -> RiskLevel:
     return a if RISK_ORDER[a] >= RISK_ORDER[b] else b
 
 
+# "Kein Akku drin" blocked a battery-free USB lamp live (2026-10-29). Only an explicitly negated battery
+# ("kein/keine/ohne … Akku/Lithium") is ignored; Prompt A still checks the photo for batteries, and every
+# other hazard keyword stays conservative even when negated.
+_NEGATED_BATTERY = re.compile(
+    r"\b(?:kein(?:e|en|em|er)?|ohne)\s+(?:\w+\s+){0,2}?(?:akku[\w-]*|lithium[\w-]*|li-?ion[\w-]*|lipo)\b", re.IGNORECASE)
+
+
 def precheck_note(note: str | None) -> PreCheck:
     """Keyword pre-check on the user's free text."""
     risk: RiskLevel = "allowed"
     matches: list[str] = []
+    text = _NEGATED_BATTERY.sub(" ", note or "")
     for pattern, level, label in _KEYWORDS:
-        if pattern.search(note or ""):
+        if pattern.search(text):
             matches.append(label)
             risk = stricter(risk, level)
     if risk == "allowed":
@@ -156,10 +164,23 @@ def enforce(resp: AnalyzeResponse, *, has_answers: bool, precheck: PreCheck | No
         step.segment_ids = [i for i in step.segment_ids if i in seg_ids]
         step.uses_items = [i for i in step.uses_items if i in item_ids]
         used.update(step.uses_items)
-        if step.overlay and step.overlay.segment_id not in seg_ids:
-            step.overlay = None
-        if step.overlay and step.overlay.segment_id not in step.segment_ids:
-            step.segment_ids.append(step.overlay.segment_id)
+        if step.overlay:
+            overlay = step.overlay
+            targets = [overlay.segment_id]
+            if overlay.type == "solder":
+                targets = [overlay.from_segment_id, overlay.to_segment_id]
+                end = next((s for s in r.segments if s.id == overlay.from_segment_id), None)
+                pad = next((s for s in r.segments if s.id == overlay.to_segment_id), None)
+                if (r.category != "low_voltage_electronics" or end is None or pad is None
+                        or end.kind != "damage" or end.prompt != "copper wire strands"
+                        or pad.kind != "part" or pad.source != "grounding" or pad.polarity not in {"+", "-"}):
+                    step.overlay = None
+                # Heat and fumes require acknowledgement even if the model omitted it.
+                step.safety_critical = True
+            if any(i not in seg_ids for i in targets):
+                step.overlay = None
+            if step.overlay:
+                step.segment_ids.extend(i for i in targets if i not in step.segment_ids)
         if step.safety_critical:
             step.requires_confirmation = True
     r.shopping_list = [i for i in r.shopping_list if i.id in used]

@@ -179,3 +179,12 @@ def test_step_help_escalation():
     assert safety.step_help_escalation("Das Eisen ist heiß", "allowed")
     assert not safety.step_help_escalation("Der Faden reißt", "allowed")
     assert safety.step_help_escalation("Faden reißt", "warn_only")
+
+
+def test_negated_battery_is_not_a_hazard_but_other_negations_stay_conservative():
+    from app.safety import precheck_note
+    assert precheck_note("USB-Lampe, Kabel abgerissen. Kein Akku drin.").risk_level == "allowed"
+    assert precheck_note("Gerät ohne Lithium-Akku").risk_level == "allowed"
+    assert precheck_note("Der Akku ist aufgebläht").risk_level == "warn_only"
+    assert precheck_note("Kein Akku, aber am Netzteil").risk_level == "warn_only"
+    assert precheck_note("kein Helm").risk_level == "professional"

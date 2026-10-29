@@ -18,7 +18,7 @@ SEGMENT_PROMPTS: dict[str, list[str]] = {
     # "tear" found nothing on a clear tear live (docs/benchmark.md); "rip" did, grounding covers the rest.
     "textile": ["rip", "hole", "open seam", "frayed edge", "garment", "button"],
     "shoe": ["shoe sole", "seam", "detached sole", "heel"],
-    "low_voltage_electronics": ["cable", "connector", "housing"],
+    "low_voltage_electronics": ["red wire", "black wire", "copper wire strands", "circuit board"],
 }
 
 # prompt -> (German label, kind)
@@ -39,6 +39,10 @@ PROMPT_META: dict[str, tuple[str, str]] = {
     "cable": ("Kabel", "part"),
     "connector": ("Stecker", "part"),
     "housing": ("Gehäuse", "part"),
+    "red wire": ("Rotes Kabel", "part"),
+    "black wire": ("Schwarzes Kabel", "part"),
+    "copper wire strands": ("Abisoliertes Kabelende", "damage"),
+    "circuit board": ("Platine", "part"),
 }
 
 # Concepts the live camera (/detect) searches for; they are damage even when SAM_PROMPTS call them parts.

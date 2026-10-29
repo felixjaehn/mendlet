@@ -105,3 +105,10 @@ Folgerung für das Löt-Overlay: Kabel und blanke Enden liefert SAM per Text. Di
 | 2 | Wonder nur Wahrnehmung, Plan per Prompt B v3, `reasoning.effort=low` | SAM `rip` (gefunden), Spark prüft Maske ✓, finish | Annahme Denim, keine Rückfrage, 5 Schritte, 2 Sicherheitsschritte (Schere) | 50 s |
 
 Der klassische Pfad (etwa 30 s) bleibt Standard. Der Agent-Modus (`AGENT_MODE=wonder`) ist langsamer, prüft dafür jede Schadensmaske selbst und segmentiert bei Fehlschlag nach. Kosten Wonder-Lauf 1: etwa 0,16 $.
+
+## Elektronik-Fall live über `/analyze` (29.10.2026)
+
+Foto `electronics/01_kabel_platine.jpg`, Notiz "USB-Lampe geht nicht mehr, Kabel sind abgerissen. Kein Akku drin."
+
+- Erster Lauf: **fälschlich gesperrt** in 3 s, weil die Schlüsselwort-Vorprüfung "Akku" in "Kein Akku drin" fand. Behoben mit einer engen Verneinungsregel nur für Akku/Lithium (`proxy/app/safety.py`). Andere verneinte Gefahrenwörter sperren weiter. Spark prüft das Foto zusätzlich.
+- Zweiter Lauf, 23 s: SAM `black wire` 0,95, `red wire` 0,88, `circuit board` 0,78, `copper wire strands` ×2 (0,61/0,57). Spark-Pad-Grounding plus SAM-Box: **Lötpad + 0,90, Lötpad − 0,66**. Plan mit 6 Schritten (stromlos machen, Durchgang prüfen, fixieren, rot an +, schwarz an −, isolieren und testen), Löt-Overlays mit 3 s Haltezeit. Zuordnung geprüft: rote Litze → Pad +, schwarze Litze → Pad − ([Overlay](live-probes/2026-10-29_platine_wire-pad-mapping.jpg)).
