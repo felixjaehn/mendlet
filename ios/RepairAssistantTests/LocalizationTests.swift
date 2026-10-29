@@ -8,9 +8,8 @@ final class LocalizationTests: XCTestCase {
     override func tearDown() { Lang.shared.choice = original }
 
     private func catalog(_ name: String) throws -> [String: Any] {
-        // Tests run on the simulator, which shares the host file system: read the catalog source next to the app sources.
-        let url = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
-            .appendingPathComponent("RepairAssistant/\(name).xcstrings")
+        // The raw catalogs are copied into the test bundle (project.yml), the simulator cannot read the source tree.
+        let url = try XCTUnwrap(Bundle(for: Self.self).url(forResource: name, withExtension: "xcstrings", subdirectory: "catalogs"))
         let json = try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any]
         return try XCTUnwrap(json)
     }

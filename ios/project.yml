@@ -51,6 +51,12 @@ targets:
     platform: iOS
     sources:
       - path: RepairAssistantTests
+      - path: ../ios/RepairAssistant/Localizable.xcstrings
+        buildPhase:
+          copyFiles: {destination: resources, subpath: catalogs}
+      - path: ../ios/RepairAssistant/InfoPlist.xcstrings
+        buildPhase:
+          copyFiles: {destination: resources, subpath: catalogs}
     dependencies:
       - target: RepairAssistant
     settings:

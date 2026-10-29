@@ -64,6 +64,7 @@
 		AE74025A93A06708CE3E844E /* LiveScanState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFB5813C50C055C4601E1F1B /* LiveScanState.swift */; };
 		B067C2EA25BC2A6C881FB556 /* StitchPathPlannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E407006A6E7B69387DE68B9C /* StitchPathPlannerTests.swift */; };
 		B0F6122A7C72A886B09967E4 /* FlowModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61D022E5ED49F4DD3C2AA194 /* FlowModel.swift */; };
+		B3F4D41BEBA98BAA509C0767 /* Localizable.xcstrings in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4A6DDF2119D2ACA1AD5F6CC8 /* Localizable.xcstrings */; };
 		B697EFE92A874184E1A2CE4C /* OverlayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B34A32C7116AFB95E9395CF /* OverlayTests.swift */; };
 		B70087FAC666AE24573D3FBF /* LiveImageRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43240C5A78EF284F9AFD797 /* LiveImageRegistration.swift */; };
 		BB7E1B3C8E1971F51CCBDF0B /* CameraPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846FBD5208960FA1F7347C4C /* CameraPicker.swift */; };
@@ -78,6 +79,7 @@
 		DE42B1E0D857A1364B0B1C58 /* helmet.json in Resources */ = {isa = PBXBuildFile; fileRef = DAEBBE9A58CD6E61DDEC6818 /* helmet.json */; };
 		E026D4461BB751589522F5B2 /* LiveCameraFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21FCA99D3820E0AB616A4C35 /* LiveCameraFeed.swift */; };
 		E33552F1FF4CA0AF3B2C34C1 /* DiagnosisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6188CDF8368F759CC6EF251C /* DiagnosisView.swift */; };
+		E4C5E7127D2C247EA3E66F3F /* InfoPlist.xcstrings in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5997B796A3944269FDBCC319 /* InfoPlist.xcstrings */; };
 		E7D30C695A6F35E90F0EBBA3 /* LocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DC2397AA08F9B9C83566D19 /* LocalizationTests.swift */; };
 		F1CCC2ADF126354725F5548B /* LiveScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B34482E79C2F31720DF519 /* LiveScanView.swift */; };
 /* End PBXBuildFile section */
@@ -91,6 +93,20 @@
 			remoteInfo = RepairAssistant;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8319DA73DC0848F6847E6833 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = catalogs;
+			dstSubfolderSpec = 7;
+			files = (
+				E4C5E7127D2C247EA3E66F3F /* InfoPlist.xcstrings in CopyFiles */,
+				B3F4D41BEBA98BAA509C0767 /* Localizable.xcstrings in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		002004F61A01D2B82C734E23 /* AgentTraceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentTraceView.swift; sourceTree = "<group>"; };
@@ -169,7 +185,7 @@
 		F4F482E47A76CEDA809866E9 /* ShoeOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoeOverlay.swift; sourceTree = "<group>"; };
 		F840728B0735157F950CDD07 /* StepHelpSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepHelpSheet.swift; sourceTree = "<group>"; };
 		FDC79702C1652A582742CF18 /* AnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisView.swift; sourceTree = "<group>"; };
-		"TEMP_9CF90294-3EA7-4C0D-8BA9-7D48A0E0FB57" /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		"TEMP_C20B5317-C5B2-4B94-A65D-B8F943B3CAEE" /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -351,10 +367,10 @@
 			path = Fixtures;
 			sourceTree = "<group>";
 		};
-		"TEMP_B7A47E60-A39A-4A0D-9795-758C5890F0E4" /* ios */ = {
+		"TEMP_66A5F7C4-9814-4E92-84AA-C4E892D59E2E" /* ios */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_9CF90294-3EA7-4C0D-8BA9-7D48A0E0FB57" /* Config.xcconfig */,
+				"TEMP_C20B5317-C5B2-4B94-A65D-B8F943B3CAEE" /* Config.xcconfig */,
 			);
 			path = ios;
 			sourceTree = "<group>";
@@ -367,6 +383,7 @@
 			buildConfigurationList = C02953BE91A87095DA5F5516 /* Build configuration list for PBXNativeTarget "RepairAssistantTests" */;
 			buildPhases = (
 				DD55790F4CCFD5E8E36E97BD /* Sources */,
+				8319DA73DC0848F6847E6833 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -564,7 +581,7 @@
 		};
 		88DB0C72E15D4B1747846766 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_9CF90294-3EA7-4C0D-8BA9-7D48A0E0FB57" /* Config.xcconfig */;
+			baseConfigurationReference = "TEMP_C20B5317-C5B2-4B94-A65D-B8F943B3CAEE" /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -683,7 +700,7 @@
 		};
 		FD9CD525F142F5622F8FDCCB /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_9CF90294-3EA7-4C0D-8BA9-7D48A0E0FB57" /* Config.xcconfig */;
+			baseConfigurationReference = "TEMP_C20B5317-C5B2-4B94-A65D-B8F943B3CAEE" /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
