@@ -21,35 +21,46 @@ struct BeforeAfterSlider: View {
     let after: UIImage
     var aspect: CGFloat = 1.0
     var initial: Double = 0.5
+    /// true = divider runs left-right (before on top). Used for tall damage such as a tear along a seam,
+    /// so the same tear visibly continues across the divider (demo review 2026-10-29).
+    var horizontalSplit = false
     @State private var frac: Double
     @State private var dragging = false
     @State private var hinted = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    init(before: UIImage, after: UIImage, aspect: CGFloat = 1.0, initial: Double = 0.5) {
-        self.before = before; self.after = after; self.aspect = aspect; self.initial = initial
+    init(before: UIImage, after: UIImage, aspect: CGFloat = 1.0, initial: Double = 0.5, horizontalSplit: Bool = false) {
+        self.before = before; self.after = after; self.aspect = aspect; self.initial = initial; self.horizontalSplit = horizontalSplit
         _frac = State(initialValue: SliderMath.clamp(initial))
     }
 
     var body: some View {
         GeometryReader { geo in
-            let w = geo.size.width, h = geo.size.height, x = w * frac
+            let w = geo.size.width, h = geo.size.height
+            let pos = (horizontalSplit ? h : w) * frac
             ZStack(alignment: .topLeading) {
                 // both layers: same content aspect (the photo's), same frame, same fill mode -> pixel-aligned
                 let lf = SliderMath.layerFrame(container: geo.size)
                 layer(after, lf)
-                layer(before, lf).mask(alignment: .leading) { Rectangle().frame(width: x) }
-                // divider + knob
-                Rectangle().fill(.white).frame(width: 2, height: h)
-                    .shadow(color: .black.opacity(0.35), radius: 3).offset(x: x - 1)
+                if horizontalSplit {
+                    layer(before, lf).mask(alignment: .top) { Rectangle().frame(height: pos) }
+                    Rectangle().fill(.white).frame(width: w, height: 2)
+                        .shadow(color: .black.opacity(0.35), radius: 3).offset(y: pos - 1)
+                } else {
+                    layer(before, lf).mask(alignment: .leading) { Rectangle().frame(width: pos) }
+                    Rectangle().fill(.white).frame(width: 2, height: h)
+                        .shadow(color: .black.opacity(0.35), radius: 3).offset(x: pos - 1)
+                }
                 Circle().fill(.white).frame(width: 44, height: 44)
                     .shadow(color: .black.opacity(0.3), radius: 8, y: 2)
-                    .overlay(Image(systemName: "arrow.left.and.right").font(.system(size: 16, weight: .bold)).foregroundStyle(Theme.thread))
+                    .overlay(Image(systemName: horizontalSplit ? "arrow.up.and.down" : "arrow.left.and.right")
+                        .font(.system(size: 16, weight: .bold)).foregroundStyle(Theme.thread))
                     .scaleEffect(dragging ? 1.1 : 1)
-                    .position(x: x, y: h / 2)
+                    .position(x: horizontalSplit ? w / 2 : pos, y: horizontalSplit ? pos : h / 2)
                 // side chips
                 tag(tr("Vorher")).opacity(frac > 0.2 ? 1 : 0).padding(12).frame(width: w, height: h, alignment: .topLeading)
-                tag(tr("Nachher")).opacity(frac < 0.8 ? 1 : 0).padding(12).frame(width: w, height: h, alignment: .topTrailing)
+                tag(tr("Nachher")).opacity(frac < 0.8 ? 1 : 0).padding(12)
+                    .frame(width: w, height: h, alignment: horizontalSplit ? .bottomTrailing : .topTrailing)
                 HStack(spacing: 6) {
                     Image(systemName: "sparkles").font(.caption.weight(.bold))
                     Text("Vorschau · Muse Image").font(.caption.weight(.semibold))
@@ -63,7 +74,7 @@ struct BeforeAfterSlider: View {
             .gesture(DragGesture(minimumDistance: 0)
                 .onChanged { v in
                     if !dragging { dragging = true; Haptics.tap() }
-                    frac = SliderMath.fraction(x: v.location.x, width: w)
+                    frac = horizontalSplit ? SliderMath.fraction(x: v.location.y, width: h) : SliderMath.fraction(x: v.location.x, width: w)
                 }
                 .onEnded { _ in withAnimation(Theme.spring) { dragging = false } })
             .animation(.interactiveSpring(response: 0.18, dampingFraction: 0.9), value: dragging)
@@ -112,10 +123,12 @@ struct BeforeAfterCard: View {
     @Environment(FlowModel.self) private var flow
     var aspect: CGFloat = 1.0
 
-    /// Horizontal centre of the damage (normalized), so the divider starts on it.
-    private var damageCentreX: Double? {
-        guard let s = flow.response?.segments.first(where: { $0.isDamage }), let b = s.normalizedBox else { return nil }
-        return Double(b.midX)
+    private var damageBox: CGRect? { flow.response?.segments.first(where: { $0.isDamage })?.normalizedBox }
+
+    /// Tall damage (in photo pixels) splits top/bottom so the same tear runs across the divider.
+    private func tallDamage(_ photo: UIImage) -> Bool {
+        guard let b = damageBox else { return false }
+        return b.height * photo.size.height > 1.3 * b.width * photo.size.width
     }
 
     var body: some View {
@@ -129,9 +142,11 @@ struct BeforeAfterCard: View {
                         VStack(spacing: 10) {
                             // Whole photo (no square crop) and the divider on the damage: judges read a centred
                             // divider over a diagonal tear as "two different crops" (demo review 2026-10-29).
+                            let tall = tallDamage(photo)
                             BeforeAfterSlider(before: photo, after: after,
                                               aspect: min(1.3, max(0.75, photo.size.width / max(photo.size.height, 1))),
-                                              initial: damageCentreX ?? 0.5)
+                                              initial: damageBox.map { Double(tall ? $0.midY : $0.midX) } ?? 0.5,
+                                              horizontalSplit: tall)
                             EstimatePill(text: "So könnte es aussehen")
                         }
                         .transition(.opacity.combined(with: .scale(scale: 0.98)))
