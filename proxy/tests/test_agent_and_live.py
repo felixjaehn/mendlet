@@ -73,8 +73,35 @@ async def test_instances_follow_filtered_segments(image_b64):
         async def segment(self, req, category, prompts):
             return filter_weak_segments([*holes, rip])
 
+        async def ground(self, req, category):
+            return [holes[0].model_copy(update={'source': 'grounding'})]  # Spark points at a hole SAM already has
+
     result = await analyze(make_req(image_b64), Pulli(0.0))
     assert result.instances == {'hole': 3}
+
+
+async def test_grounding_adds_damage_sam_missed_but_never_duplicates(image_b64):
+    # Benchmark 2026-10-29 leather shoe: SAM flagged the sole, the real damage was the open heel seam.
+    sole = box_seg('s', 'damage', 'detached sole', 0.7, (0.1, 0.7, 0.8, 0.2))
+    seam = box_seg('g', 'damage', 'open seam', 0.9, (0.55, 0.2, 0.1, 0.4)).model_copy(update={'source': 'grounding'})
+    near_sole = box_seg('n', 'damage', 'detached sole', 0.9, (0.15, 0.72, 0.7, 0.15)).model_copy(update={'source': 'grounding'})
+
+    class Shoe(MockClient):
+        def __init__(self, grounded):
+            super().__init__(0.0)
+            self.grounded = grounded
+
+        async def segment(self, req, category, prompts):
+            return [sole]
+
+        async def ground(self, req, category):
+            return self.grounded
+
+    added = await analyze(make_req(image_b64, note='Naht an der Ferse ist offen'), Shoe([seam]))
+    assert sorted(s.prompt for s in added.segments if s.kind == 'damage') == ['detached sole', 'open seam']
+    assert [s.source for s in added.segments if s.prompt == 'open seam'] == ['grounding']
+    same = await analyze(make_req(image_b64, note='Sohle löst sich'), Shoe([near_sole]))
+    assert [s.prompt for s in same.segments if s.kind == 'damage'] == ['detached sole']
 
 
 # ---- /detect ---------------------------------------------------------------------------------

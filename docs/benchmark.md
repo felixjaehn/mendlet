@@ -76,7 +76,7 @@ Smoke-Test plus Sondierung: etwa 0,06 $ (geschätzt aus Token und Bildzahl, Rech
 
 **Fehlschläge und Grenzfälle, offen berichtet:**
 - `electronics_02_usb_buchse` wurde **fälschlich gesperrt** (`warn_only`): Spark begründet: "Ladefunktion gestört, Akkubezug nicht auszuschließen daher Vorsicht." Übervorsichtig, nicht gefährlich. Ein Folgefoto mit sichtbarem Gerät ohne Akku würde die Sperre lösen.
-- `shoe_02_naht_leder`: Das Overlay markiert die Sohle, nicht die offene Fersennaht. Die Diagnose im Text ist trotzdem eine Naht-Reparatur.
+- `shoe_02_naht_leder`: Das Overlay markiert die Sohle, nicht die offene Fersennaht. SAM findet die Naht mit keinem Textbegriff (`open seam`, `split seam`, `torn stitching`: 0 Treffer). **Nachträglich behoben** (`proxy/app/pipeline.py`): Spark-Grounding wird jetzt auch dann übernommen, wenn SAM zwar einen Schaden meldet, aber an anderer Stelle. Live danach: `open seam` per Grounding (0,75), alle 5 Schritte beziehen sich auf die Naht, Schritt 4 mit Stichpfad. Die Benchmark-Tabelle oben zeigt den Stand vor der Korrektur.
 - `shoe_03_absatz`: Empfehlung "Profi" (Absatzflicken ersetzen) ohne Anleitung. Fachlich vertretbar.
 - Knopf und Jacke: zusätzliche Fehltreffer (Knopflöcher, Nähte als `open seam`).
 - Testfotos sind KI-generiert. Echte Fotos stehen noch aus.

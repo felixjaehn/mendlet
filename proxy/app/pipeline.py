@@ -75,6 +75,35 @@ def blocked_response(cls: ClassifyResult, pre: safety.PreCheck) -> AnalyzeRespon
     return safety.enforce(resp, has_answers=False, precheck=pre)
 
 
+def _xyxy(seg: Segment) -> tuple[float, float, float, float] | None:
+    if not seg.box:
+        return None
+    x, y, w, h = seg.box
+    return (x, y, x + w, y + h)
+
+
+def _overlaps(a: Segment, b: Segment) -> bool:
+    """IoU > 0.3 or one box mostly inside the other: both segments mark the same damage.
+    (0.1 merged a leather shoe's open heel seam into the sole box at IoU 0.103 live.)"""
+    ba, bb = _xyxy(a), _xyxy(b)
+    if ba is None or bb is None:
+        return False
+    ix = max(0.0, min(ba[2], bb[2]) - max(ba[0], bb[0]))
+    iy = max(0.0, min(ba[3], bb[3]) - max(ba[1], bb[1]))
+    inter = ix * iy
+    area_a, area_b = (ba[2] - ba[0]) * (ba[3] - ba[1]), (bb[2] - bb[0]) * (bb[3] - bb[1])
+    union = area_a + area_b - inter
+    smaller = min(area_a, area_b)
+    return (union > 0 and inter / union > 0.3) or (smaller > 0 and inter / smaller > 0.6)
+
+
+def _free_id(segments: list[Segment]) -> str:
+    index = len(segments) + 1
+    while f"seg_{index}" in {s.id for s in segments}:
+        index += 1
+    return f"seg_{index}"
+
+
 async def _classic_segments(req: AnalyzeRequest, client: ModelClient, cls: ClassifyResult,
                             grounding: GroundingProgress) -> list[Segment]:
     if cls.category == "low_voltage_electronics":
@@ -102,7 +131,15 @@ async def _classic_segments(req: AnalyzeRequest, client: ModelClient, cls: Class
     try:
         segments = await client.segment(req, cls.category, SEGMENT_PROMPTS.get(cls.category, []))
         if any(s.kind == "damage" for s in segments):
-            await asyncio.gather(ground_task, return_exceptions=True)
+            # Benchmark 2026-10-29 (leather shoe): SAM flagged the sole while the damage was an open heel seam.
+            # Spark's grounding is already paid for; keep its mask when no SAM damage covers the same spot.
+            done = await asyncio.gather(ground_task, return_exceptions=True)
+            grounded = done[0] if isinstance(done[0], list) else []
+            if isinstance(done[0], BudgetExceeded):
+                raise done[0]
+            for segment in grounded:
+                if not any(_overlaps(segment, s) for s in segments if s.kind == "damage"):
+                    segments.append(segment.model_copy(update={"id": _free_id(segments)}))
         else:
             await grounding()
             try:
