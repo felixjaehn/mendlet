@@ -52,7 +52,7 @@ The hackathon started with the kickoff on **2026-10-26, 12:00 PM ET**. The first
 
 ## Try it (no server needed)
 
-The app starts in **demo mode**: it replays **real, unedited Meta API responses** recorded on Oct 28–29 (`ios/RepairAssistant/Resources/LiveRecordings/`), so judges can run it on the iOS Simulator without a key or proxy. Scenarios: jeans tear (with optional care-label round), sweater with three holes, sneaker sole, heated jacket with battery (blocked), USB board with broken wires. Settings → "Schnell" shortens the replay for video takes; the agent trace can replay the run where Wonder recovered from a server error.
+The app starts in **demo mode**: it replays **real, unedited Meta API responses** recorded on Oct 28–29 (`ios/RepairAssistant/Resources/LiveRecordings/`), so judges can run it on the iOS Simulator without a key or proxy. Scenarios: jeans tear (with optional care-label round), sweater with three holes, sneaker sole, heated jacket with battery (blocked), USB board with broken wires. **English and German**: the app follows the system language (or Settings → Language), and every scenario has a real English recording (`*.en.json`). Settings → "Schnell" shortens the replay for video takes; the agent trace can replay the run where Wonder recovered from a server error.
 
 ```zsh
 # One command (Xcode 27 + XcodeGen): build and start the app in demo mode on the iPhone simulator

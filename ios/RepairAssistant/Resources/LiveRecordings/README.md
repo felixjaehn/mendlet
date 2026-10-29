@@ -16,3 +16,4 @@ Echte Antworten des Proxys im Real-Modus (Meta Model API, 28.10.2026), unveränd
 
 Für Pulli, Sneaker und Heizjacke gibt es keine aufgezeichneten Agentenschritte; die App zeigt dort nur den Classify-Schritt und die Phasen, keine erfundenen Schritte.
 | `platine.json` | `platine.jpg` | Elektronik live 29.10.: Kabel, blanke Enden, Lötpads +/− (Spark liest Siebdruck, SAM segmentiert), Löt-Overlays rot→+, schwarz→− |
+| `*.en.json` | wie oben | Englische Live-Aufnahmen vom 29.10. (`locale: en`, gleiche Fotos): jeans, jeans_label, pulli, sneaker, heizjacke, platine. Die App nutzt sie, wenn die Oberfläche Englisch ist. |

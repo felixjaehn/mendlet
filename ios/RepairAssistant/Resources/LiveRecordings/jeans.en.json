@@ -1,0 +1,1316 @@
+{
+ "case_id": "fc54b8c9-7d3f-44e3-8eb6-a34f069052be",
+ "category": "textile",
+ "risk_level": "allowed",
+ "safety": {
+  "blocked": false,
+  "reason": null
+ },
+ "segments": [
+  {
+   "id": "seg_1",
+   "label": "Tear",
+   "kind": "damage",
+   "prompt": "rip",
+   "box": [
+    0.3828,
+    0.1562,
+    0.3021,
+    0.6357
+   ],
+   "mask": {
+    "format": "polygon",
+    "points": [
+     [
+      0.643229,
+      0.15625
+     ],
+     [
+      0.675781,
+      0.158203
+     ],
+     [
+      0.684896,
+      0.186523
+     ],
+     [
+      0.665365,
+      0.192383
+     ],
+     [
+      0.657552,
+      0.208008
+     ],
+     [
+      0.654948,
+      0.25
+     ],
+     [
+      0.661458,
+      0.261719
+     ],
+     [
+      0.661458,
+      0.28418
+     ],
+     [
+      0.653646,
+      0.289062
+     ],
+     [
+      0.648437,
+      0.306641
+     ],
+     [
+      0.652344,
+      0.322266
+     ],
+     [
+      0.648437,
+      0.344727
+     ],
+     [
+      0.651042,
+      0.363281
+     ],
+     [
+      0.63151,
+      0.409179
+     ],
+     [
+      0.635417,
+      0.463867
+     ],
+     [
+      0.630208,
+      0.46875
+     ],
+     [
+      0.627604,
+      0.496094
+     ],
+     [
+      0.636719,
+      0.50293
+     ],
+     [
+      0.639323,
+      0.513672
+     ],
+     [
+      0.636719,
+      0.516601
+     ],
+     [
+      0.614583,
+      0.515625
+     ],
+     [
+      0.609375,
+      0.518554
+     ],
+     [
+      0.596354,
+      0.557617
+     ],
+     [
+      0.571615,
+      0.583984
+     ],
+     [
+      0.570313,
+      0.598633
+     ],
+     [
+      0.546875,
+      0.623047
+     ],
+     [
+      0.528646,
+      0.65332
+     ],
+     [
+      0.533854,
+      0.678711
+     ],
+     [
+      0.542969,
+      0.697265
+     ],
+     [
+      0.528646,
+      0.704101
+     ],
+     [
+      0.510417,
+      0.703125
+     ],
+     [
+      0.497396,
+      0.708008
+     ],
+     [
+      0.480469,
+      0.736328
+     ],
+     [
+      0.480469,
+      0.762695
+     ],
+     [
+      0.470052,
+      0.778321
+     ],
+     [
+      0.46875,
+      0.788086
+     ],
+     [
+      0.455729,
+      0.791992
+     ],
+     [
+      0.445313,
+      0.78711
+     ],
+     [
+      0.424479,
+      0.745117
+     ],
+     [
+      0.411458,
+      0.730469
+     ],
+     [
+      0.382812,
+      0.720703
+     ],
+     [
+      0.388021,
+      0.706054
+     ],
+     [
+      0.402344,
+      0.6875
+     ],
+     [
+      0.403646,
+      0.640625
+     ],
+     [
+      0.424479,
+      0.606445
+     ],
+     [
+      0.466146,
+      0.485351
+     ],
+     [
+      0.494792,
+      0.444336
+     ],
+     [
+      0.496094,
+      0.407226
+     ],
+     [
+      0.507812,
+      0.381836
+     ],
+     [
+      0.522135,
+      0.358398
+     ],
+     [
+      0.546875,
+      0.334961
+     ],
+     [
+      0.549479,
+      0.31543
+     ],
+     [
+      0.558594,
+      0.307617
+     ],
+     [
+      0.608073,
+      0.230468
+     ],
+     [
+      0.623698,
+      0.203125
+     ],
+     [
+      0.635417,
+      0.164063
+     ]
+    ],
+    "rings": [
+     {
+      "points": [
+       [
+        0.643229,
+        0.15625
+       ],
+       [
+        0.675781,
+        0.158203
+       ],
+       [
+        0.684896,
+        0.186523
+       ],
+       [
+        0.665365,
+        0.192383
+       ],
+       [
+        0.657552,
+        0.208008
+       ],
+       [
+        0.654948,
+        0.25
+       ],
+       [
+        0.661458,
+        0.261719
+       ],
+       [
+        0.661458,
+        0.28418
+       ],
+       [
+        0.653646,
+        0.289062
+       ],
+       [
+        0.648437,
+        0.306641
+       ],
+       [
+        0.652344,
+        0.322266
+       ],
+       [
+        0.648437,
+        0.344727
+       ],
+       [
+        0.651042,
+        0.363281
+       ],
+       [
+        0.63151,
+        0.409179
+       ],
+       [
+        0.635417,
+        0.463867
+       ],
+       [
+        0.630208,
+        0.46875
+       ],
+       [
+        0.627604,
+        0.496094
+       ],
+       [
+        0.636719,
+        0.50293
+       ],
+       [
+        0.639323,
+        0.513672
+       ],
+       [
+        0.636719,
+        0.516601
+       ],
+       [
+        0.614583,
+        0.515625
+       ],
+       [
+        0.609375,
+        0.518554
+       ],
+       [
+        0.596354,
+        0.557617
+       ],
+       [
+        0.571615,
+        0.583984
+       ],
+       [
+        0.570313,
+        0.598633
+       ],
+       [
+        0.546875,
+        0.623047
+       ],
+       [
+        0.528646,
+        0.65332
+       ],
+       [
+        0.533854,
+        0.678711
+       ],
+       [
+        0.542969,
+        0.697265
+       ],
+       [
+        0.528646,
+        0.704101
+       ],
+       [
+        0.510417,
+        0.703125
+       ],
+       [
+        0.497396,
+        0.708008
+       ],
+       [
+        0.480469,
+        0.736328
+       ],
+       [
+        0.480469,
+        0.762695
+       ],
+       [
+        0.470052,
+        0.778321
+       ],
+       [
+        0.46875,
+        0.788086
+       ],
+       [
+        0.455729,
+        0.791992
+       ],
+       [
+        0.445313,
+        0.78711
+       ],
+       [
+        0.424479,
+        0.745117
+       ],
+       [
+        0.411458,
+        0.730469
+       ],
+       [
+        0.382812,
+        0.720703
+       ],
+       [
+        0.388021,
+        0.706054
+       ],
+       [
+        0.402344,
+        0.6875
+       ],
+       [
+        0.403646,
+        0.640625
+       ],
+       [
+        0.424479,
+        0.606445
+       ],
+       [
+        0.466146,
+        0.485351
+       ],
+       [
+        0.494792,
+        0.444336
+       ],
+       [
+        0.496094,
+        0.407226
+       ],
+       [
+        0.507812,
+        0.381836
+       ],
+       [
+        0.522135,
+        0.358398
+       ],
+       [
+        0.546875,
+        0.334961
+       ],
+       [
+        0.549479,
+        0.31543
+       ],
+       [
+        0.558594,
+        0.307617
+       ],
+       [
+        0.608073,
+        0.230468
+       ],
+       [
+        0.623698,
+        0.203125
+       ],
+       [
+        0.635417,
+        0.164063
+       ]
+      ],
+      "hole": false
+     }
+    ]
+   },
+   "score": 0.91,
+   "source": "text",
+   "polarity": null
+  },
+  {
+   "id": "seg_2",
+   "label": "Garment",
+   "kind": "part",
+   "prompt": "garment",
+   "box": [
+    0.0,
+    0.0,
+    1.0,
+    1.0
+   ],
+   "mask": {
+    "format": "polygon",
+    "points": [
+     [
+      0.253906,
+      0.0
+     ],
+     [
+      0.428385,
+      0.0
+     ],
+     [
+      0.428385,
+      0.001953
+     ],
+     [
+      0.429688,
+      0.0
+     ],
+     [
+      0.466146,
+      0.0
+     ],
+     [
+      0.470052,
+      0.00293
+     ],
+     [
+      0.484375,
+      0.003906
+     ],
+     [
+      0.5,
+      0.001953
+     ],
+     [
+      0.523438,
+      0.00293
+     ],
+     [
+      0.528646,
+      0.001953
+     ],
+     [
+      0.528646,
+      0.0
+     ],
+     [
+      0.546875,
+      0.0
+     ],
+     [
+      0.546875,
+      0.001953
+     ],
+     [
+      0.549479,
+      0.0
+     ],
+     [
+      0.652344,
+      0.0
+     ],
+     [
+      0.652344,
+      0.001953
+     ],
+     [
+      0.657552,
+      0.001953
+     ],
+     [
+      0.657552,
+      0.0
+     ],
+     [
+      0.736979,
+      0.0
+     ],
+     [
+      0.736979,
+      0.001953
+     ],
+     [
+      0.738281,
+      0.0
+     ],
+     [
+      0.970052,
+      0.0
+     ],
+     [
+      0.970052,
+      0.001953
+     ],
+     [
+      0.973958,
+      0.001953
+     ],
+     [
+      0.973958,
+      0.0
+     ],
+     [
+      0.986979,
+      0.0
+     ],
+     [
+      0.986979,
+      0.001953
+     ],
+     [
+      0.988281,
+      0.0
+     ],
+     [
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.022461
+     ],
+     [
+      0.997396,
+      0.022461
+     ],
+     [
+      0.994792,
+      0.032227
+     ],
+     [
+      0.967448,
+      0.044922
+     ],
+     [
+      0.960938,
+      0.050781
+     ],
+     [
+      0.93099,
+      0.06543
+     ],
+     [
+      0.91276,
+      0.079102
+     ],
+     [
+      0.907552,
+      0.080078
+     ],
+     [
+      0.89974,
+      0.09082
+     ],
+     [
+      0.888021,
+      0.120117
+     ],
+     [
+      0.856771,
+      0.222656
+     ],
+     [
+      0.81901,
+      0.330078
+     ],
+     [
+      0.815104,
+      0.334961
+     ],
+     [
+      0.783854,
+      0.431641
+     ],
+     [
+      0.748698,
+      0.582031
+     ],
+     [
+      0.72526,
+      0.665039
+     ],
+     [
+      0.714844,
+      0.716797
+     ],
+     [
+      0.68099,
+      0.825195
+     ],
+     [
+      0.677083,
+      0.845703
+     ],
+     [
+      0.66276,
+      0.880859
+     ],
+     [
+      0.660156,
+      0.897461
+     ],
+     [
+      0.63151,
+      0.992188
+     ],
+     [
+      0.627604,
+      0.99707
+     ],
+     [
+      0.615885,
+      0.998047
+     ],
+     [
+      0.615885,
+      1.0
+     ],
+     [
+      0.584635,
+      1.0
+     ],
+     [
+      0.584635,
+      0.998047
+     ],
+     [
+      0.580729,
+      0.998047
+     ],
+     [
+      0.580729,
+      1.0
+     ],
+     [
+      0.446615,
+      1.0
+     ],
+     [
+      0.446615,
+      0.998047
+     ],
+     [
+      0.445312,
+      1.0
+     ],
+     [
+      0.359375,
+      1.0
+     ],
+     [
+      0.359375,
+      0.998047
+     ],
+     [
+      0.356771,
+      1.0
+     ],
+     [
+      0.079427,
+      1.0
+     ],
+     [
+      0.079427,
+      0.998047
+     ],
+     [
+      0.078125,
+      1.0
+     ],
+     [
+      0.0,
+      1.0
+     ],
+     [
+      0.0,
+      0.157227
+     ],
+     [
+      0.018229,
+      0.143555
+     ],
+     [
+      0.045573,
+      0.128906
+     ],
+     [
+      0.09375,
+      0.107422
+     ],
+     [
+      0.173177,
+      0.066406
+     ]
+    ],
+    "rings": [
+     {
+      "points": [
+       [
+        0.253906,
+        0.0
+       ],
+       [
+        0.428385,
+        0.0
+       ],
+       [
+        0.428385,
+        0.001953
+       ],
+       [
+        0.429688,
+        0.0
+       ],
+       [
+        0.466146,
+        0.0
+       ],
+       [
+        0.470052,
+        0.00293
+       ],
+       [
+        0.484375,
+        0.003906
+       ],
+       [
+        0.5,
+        0.001953
+       ],
+       [
+        0.523438,
+        0.00293
+       ],
+       [
+        0.528646,
+        0.001953
+       ],
+       [
+        0.528646,
+        0.0
+       ],
+       [
+        0.546875,
+        0.0
+       ],
+       [
+        0.546875,
+        0.001953
+       ],
+       [
+        0.549479,
+        0.0
+       ],
+       [
+        0.652344,
+        0.0
+       ],
+       [
+        0.652344,
+        0.001953
+       ],
+       [
+        0.657552,
+        0.001953
+       ],
+       [
+        0.657552,
+        0.0
+       ],
+       [
+        0.736979,
+        0.0
+       ],
+       [
+        0.736979,
+        0.001953
+       ],
+       [
+        0.738281,
+        0.0
+       ],
+       [
+        0.970052,
+        0.0
+       ],
+       [
+        0.970052,
+        0.001953
+       ],
+       [
+        0.973958,
+        0.001953
+       ],
+       [
+        0.973958,
+        0.0
+       ],
+       [
+        0.986979,
+        0.0
+       ],
+       [
+        0.986979,
+        0.001953
+       ],
+       [
+        0.988281,
+        0.0
+       ],
+       [
+        1.0,
+        0.0
+       ],
+       [
+        1.0,
+        0.022461
+       ],
+       [
+        0.997396,
+        0.022461
+       ],
+       [
+        0.994792,
+        0.032227
+       ],
+       [
+        0.967448,
+        0.044922
+       ],
+       [
+        0.960938,
+        0.050781
+       ],
+       [
+        0.93099,
+        0.06543
+       ],
+       [
+        0.91276,
+        0.079102
+       ],
+       [
+        0.907552,
+        0.080078
+       ],
+       [
+        0.89974,
+        0.09082
+       ],
+       [
+        0.888021,
+        0.120117
+       ],
+       [
+        0.856771,
+        0.222656
+       ],
+       [
+        0.81901,
+        0.330078
+       ],
+       [
+        0.815104,
+        0.334961
+       ],
+       [
+        0.783854,
+        0.431641
+       ],
+       [
+        0.748698,
+        0.582031
+       ],
+       [
+        0.72526,
+        0.665039
+       ],
+       [
+        0.714844,
+        0.716797
+       ],
+       [
+        0.68099,
+        0.825195
+       ],
+       [
+        0.677083,
+        0.845703
+       ],
+       [
+        0.66276,
+        0.880859
+       ],
+       [
+        0.660156,
+        0.897461
+       ],
+       [
+        0.63151,
+        0.992188
+       ],
+       [
+        0.627604,
+        0.99707
+       ],
+       [
+        0.615885,
+        0.998047
+       ],
+       [
+        0.615885,
+        1.0
+       ],
+       [
+        0.584635,
+        1.0
+       ],
+       [
+        0.584635,
+        0.998047
+       ],
+       [
+        0.580729,
+        0.998047
+       ],
+       [
+        0.580729,
+        1.0
+       ],
+       [
+        0.446615,
+        1.0
+       ],
+       [
+        0.446615,
+        0.998047
+       ],
+       [
+        0.445312,
+        1.0
+       ],
+       [
+        0.359375,
+        1.0
+       ],
+       [
+        0.359375,
+        0.998047
+       ],
+       [
+        0.356771,
+        1.0
+       ],
+       [
+        0.079427,
+        1.0
+       ],
+       [
+        0.079427,
+        0.998047
+       ],
+       [
+        0.078125,
+        1.0
+       ],
+       [
+        0.0,
+        1.0
+       ],
+       [
+        0.0,
+        0.157227
+       ],
+       [
+        0.018229,
+        0.143555
+       ],
+       [
+        0.045573,
+        0.128906
+       ],
+       [
+        0.09375,
+        0.107422
+       ],
+       [
+        0.173177,
+        0.066406
+       ]
+      ],
+      "hole": false
+     }
+    ]
+   },
+   "score": 0.879,
+   "source": "text",
+   "polarity": null
+  }
+ ],
+ "diagnosis": {
+  "summary": "Assumed denim jeans leg with a long frayed tear with material loss directly beside the outer seam. White cross-threads remain, edges are frayed and cannot be closed tension-free.",
+  "likely_causes": [
+   "stress tear next to the seam",
+   "worn thin denim with broken warp or weft threads"
+  ],
+  "confidence": 0.82,
+  "evidence_segment_ids": [
+   "seg_1",
+   "seg_2"
+  ],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_self",
+  "reasoning": "Long frayed tear in denim next to the seam with fabric threads missing. Edges cannot be pulled together without tension, but surrounding denim looks stable enough for a sew-on backing patch plus darning by hand.",
+  "effort": "medium",
+  "time_minutes": [
+   35,
+   60
+  ],
+  "cost_eur": [
+   5.0,
+   12.0
+  ],
+  "estimate_note": "Estimate, no guarantee"
+ },
+ "shopping_list": [
+  {
+   "id": "thread",
+   "name": "Strong polyester sewing thread, denim blue",
+   "kind": "material",
+   "quantity": "1 spool",
+   "required": true,
+   "search_term": "strong polyester sewing thread denim blue",
+   "household_alternative": null
+  },
+  {
+   "id": "needle",
+   "name": "Sturdy sharp hand sewing needle for denim",
+   "kind": "tool",
+   "quantity": "1 pack",
+   "required": true,
+   "search_term": "sharp hand sewing needle for denim",
+   "household_alternative": null
+  },
+  {
+   "id": "patch",
+   "name": "Sew-on denim patch, light blue",
+   "kind": "material",
+   "quantity": "1 piece about 10 x 15 cm",
+   "required": true,
+   "search_term": "sew on denim patch light blue",
+   "household_alternative": "clean scrap of non-stretch denim"
+  },
+  {
+   "id": "pins",
+   "name": "Glass head sewing pins",
+   "kind": "tool",
+   "quantity": "1 pack",
+   "required": true,
+   "search_term": "glass head sewing pins",
+   "household_alternative": null
+  },
+  {
+   "id": "scissors",
+   "name": "Fabric scissors",
+   "kind": "tool",
+   "quantity": "1",
+   "required": true,
+   "search_term": "fabric scissors",
+   "household_alternative": "small sharp household scissors"
+  },
+  {
+   "id": "thimble",
+   "name": "Metal thimble",
+   "kind": "tool",
+   "quantity": "1",
+   "required": false,
+   "search_term": "metal sewing thimble",
+   "household_alternative": null
+  }
+ ],
+ "guide": {
+  "steps": [
+   {
+    "n": 1,
+    "title": "Turn inside out and inspect",
+    "text": "Turn the jeans inside out and lay the leg flat with the tear facing up. Smooth the fabric so the tear lies without pulling. Done when you can see the full frayed hole from the inside and the seam lies straight.",
+    "common_mistake": "Skipping the inside check and sewing over a twisted leg - turn fully and smooth flat first.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1",
+     "seg_2"
+    ],
+    "uses_items": [],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 2,
+    "title": "Tidy loose fibres only",
+    "text": "With fabric scissors trim only loose lint and very short frayed bits around the hole. Keep the longer cross-threads. Work on a table, fingers away from blades, cut small snips. Done when no loose balls stick up but the hole edge is still frayed.",
+    "common_mistake": "Cutting into stable fabric - trim only loose fluff, keep all longer white threads.",
+    "safety_critical": true,
+    "requires_confirmation": true,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "scissors"
+    ],
+    "overlay": null
+   },
+   {
+    "n": 3,
+    "title": "Position backing patch",
+    "text": "Place the sew-on denim patch centered under the tear on the inside, right side of patch to wrong side of jeans. Align denim direction with the leg and pin around the hole with glass head pins. Done when patch is flat, covers 2 cm beyond the tear everywhere and does not wrinkle.",
+    "common_mistake": "Patch too small or wrinkled - patch must extend at least 2 cm beyond the tear on all sides and lie flat.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1",
+     "seg_2"
+    ],
+    "uses_items": [
+     "patch",
+     "pins"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 4,
+    "title": "Baste patch in place",
+    "text": "Thread a sturdy sharp hand needle with about 50 cm strong polyester thread, knot the end. From the inside, baste around the patch about 5 mm outside the hole with small running stitches 3-4 mm long. Enter and exit through patch and jeans, keep tension loose. Done when patch edge is fixed all around the hole.",
+    "common_mistake": "Basting too tight so the jeans puckers - keep thread relaxed and fabric flat.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "needle",
+     "thread",
+     "patch"
+    ],
+    "overlay": {
+     "type": "stitch_path",
+     "stitch_type": "running_stitch",
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 5,
+    "title": "Darn across the tear",
+    "text": "From the outside, darn over the tear: sew parallel lengthwise threads across the hole into stable denim 5-8 mm beyond the frayed edge, spacing 2-3 mm, then weave crosswise over and under them to create a new fabric over the patch. Use the sturdy sharp needle, push with a thimble if needed, test in hidden area first and do not force. Done when the hole is covered with a flat woven grid without gaps.",
+    "common_mistake": "Pulling darning threads tight and puckering denim - leave slight slack so fabric stays flat.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "needle",
+     "thread",
+     "thimble"
+    ],
+    "overlay": {
+     "type": "stitch_path",
+     "stitch_type": "darning",
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 6,
+    "title": "Secure thread and check",
+    "text": "Secure the end on the inside with 3 small locking stitches in stable denim next to the patch, then trim thread close with scissors. Remove all pins. Turn right side out and gently pull the leg widthwise: edges should stay closed, flat with no puckering and no pulling stitches. If stitches tear out or fabric gaps, stop and seek professional repair.",
+    "common_mistake": "Cutting thread without locking - the darning will loosen in wash. Secure with 3 tiny backstitches in stable fabric.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "scissors",
+     "pins"
+    ],
+    "overlay": null
+   }
+  ]
+ },
+ "instances": {
+  "rip": 1
+ }
+}
