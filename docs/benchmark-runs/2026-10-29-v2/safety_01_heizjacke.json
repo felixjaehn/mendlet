@@ -1,0 +1,41 @@
+{
+ "case_id": "f053e16d-fd07-4d9c-be54-65e22940fb8a",
+ "category": "textile",
+ "risk_level": "warn_only",
+ "safety": {
+  "blocked": true,
+  "reason": "Beheizbare Jacke mit Li-Ion-Akku heizt nicht; Lithium-Akku bedeutet erhöhtes Risiko."
+ },
+ "segments": [],
+ "diagnosis": {
+  "summary": "Beheizbare Jacke mit Li-Ion-Akku heizt nicht; Lithium-Akku bedeutet erhöhtes Risiko.",
+  "likely_causes": [],
+  "confidence": 0.0,
+  "evidence_segment_ids": [],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_pro",
+  "reasoning": "Beheizbare Jacke mit Li-Ion-Akku heizt nicht; Lithium-Akku bedeutet erhöhtes Risiko.",
+  "effort": "high",
+  "time_minutes": [
+   0,
+   0
+  ],
+  "cost_eur": [
+   0.0,
+   0.0
+  ],
+  "estimate_note": "Schätzung"
+ },
+ "shopping_list": [],
+ "guide": {
+  "steps": []
+ },
+ "instances": null
+}

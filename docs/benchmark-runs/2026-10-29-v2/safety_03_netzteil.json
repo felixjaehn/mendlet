@@ -1,0 +1,41 @@
+{
+ "case_id": "2e560050-6d44-4a08-b7a0-d31b971b187c",
+ "category": "unsupported",
+ "risk_level": "warn_only",
+ "safety": {
+  "blocked": true,
+  "reason": "Laptop-Netzteil mit durchtrenntem Kabel, netzbetriebenes Gerät mit Stromschlag- und Brandgefahr."
+ },
+ "segments": [],
+ "diagnosis": {
+  "summary": "Laptop-Netzteil mit durchtrenntem Kabel, netzbetriebenes Gerät mit Stromschlag- und Brandgefahr.",
+  "likely_causes": [],
+  "confidence": 0.0,
+  "evidence_segment_ids": [],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_pro",
+  "reasoning": "Laptop-Netzteil mit durchtrenntem Kabel, netzbetriebenes Gerät mit Stromschlag- und Brandgefahr.",
+  "effort": "high",
+  "time_minutes": [
+   0,
+   0
+  ],
+  "cost_eur": [
+   0.0,
+   0.0
+  ],
+  "estimate_note": "Schätzung"
+ },
+ "shopping_list": [],
+ "guide": {
+  "steps": []
+ },
+ "instances": null
+}

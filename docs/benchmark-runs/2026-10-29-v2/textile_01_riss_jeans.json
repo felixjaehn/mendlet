@@ -1,0 +1,1312 @@
+{
+ "case_id": "2b6e78e2-553e-425c-836d-373a01661d7a",
+ "category": "textile",
+ "risk_level": "allowed",
+ "safety": {
+  "blocked": false,
+  "reason": null
+ },
+ "segments": [
+  {
+   "id": "seg_1",
+   "label": "Riss",
+   "kind": "damage",
+   "prompt": "rip",
+   "box": [
+    0.3828,
+    0.1562,
+    0.3021,
+    0.6357
+   ],
+   "mask": {
+    "format": "polygon",
+    "points": [
+     [
+      0.643229,
+      0.15625
+     ],
+     [
+      0.675781,
+      0.158203
+     ],
+     [
+      0.684896,
+      0.186523
+     ],
+     [
+      0.665365,
+      0.192383
+     ],
+     [
+      0.657552,
+      0.208008
+     ],
+     [
+      0.654948,
+      0.25
+     ],
+     [
+      0.661458,
+      0.261719
+     ],
+     [
+      0.661458,
+      0.28418
+     ],
+     [
+      0.653646,
+      0.289062
+     ],
+     [
+      0.648437,
+      0.306641
+     ],
+     [
+      0.652344,
+      0.322266
+     ],
+     [
+      0.648437,
+      0.344727
+     ],
+     [
+      0.651042,
+      0.363281
+     ],
+     [
+      0.63151,
+      0.409179
+     ],
+     [
+      0.635417,
+      0.463867
+     ],
+     [
+      0.630208,
+      0.46875
+     ],
+     [
+      0.627604,
+      0.496094
+     ],
+     [
+      0.636719,
+      0.50293
+     ],
+     [
+      0.639323,
+      0.513672
+     ],
+     [
+      0.636719,
+      0.516601
+     ],
+     [
+      0.614583,
+      0.515625
+     ],
+     [
+      0.609375,
+      0.518554
+     ],
+     [
+      0.596354,
+      0.557617
+     ],
+     [
+      0.571615,
+      0.583984
+     ],
+     [
+      0.570313,
+      0.598633
+     ],
+     [
+      0.546875,
+      0.623047
+     ],
+     [
+      0.528646,
+      0.65332
+     ],
+     [
+      0.533854,
+      0.678711
+     ],
+     [
+      0.542969,
+      0.697265
+     ],
+     [
+      0.528646,
+      0.704101
+     ],
+     [
+      0.510417,
+      0.703125
+     ],
+     [
+      0.497396,
+      0.708008
+     ],
+     [
+      0.480469,
+      0.736328
+     ],
+     [
+      0.480469,
+      0.762695
+     ],
+     [
+      0.470052,
+      0.778321
+     ],
+     [
+      0.46875,
+      0.788086
+     ],
+     [
+      0.455729,
+      0.791992
+     ],
+     [
+      0.445313,
+      0.78711
+     ],
+     [
+      0.424479,
+      0.745117
+     ],
+     [
+      0.411458,
+      0.730469
+     ],
+     [
+      0.382812,
+      0.720703
+     ],
+     [
+      0.388021,
+      0.706054
+     ],
+     [
+      0.402344,
+      0.6875
+     ],
+     [
+      0.403646,
+      0.640625
+     ],
+     [
+      0.424479,
+      0.606445
+     ],
+     [
+      0.466146,
+      0.485351
+     ],
+     [
+      0.494792,
+      0.444336
+     ],
+     [
+      0.496094,
+      0.407226
+     ],
+     [
+      0.507812,
+      0.381836
+     ],
+     [
+      0.522135,
+      0.358398
+     ],
+     [
+      0.546875,
+      0.334961
+     ],
+     [
+      0.549479,
+      0.31543
+     ],
+     [
+      0.558594,
+      0.307617
+     ],
+     [
+      0.608073,
+      0.230468
+     ],
+     [
+      0.615885,
+      0.210938
+     ],
+     [
+      0.623698,
+      0.203125
+     ],
+     [
+      0.635417,
+      0.164063
+     ]
+    ],
+    "rings": [
+     {
+      "points": [
+       [
+        0.643229,
+        0.15625
+       ],
+       [
+        0.675781,
+        0.158203
+       ],
+       [
+        0.684896,
+        0.186523
+       ],
+       [
+        0.665365,
+        0.192383
+       ],
+       [
+        0.657552,
+        0.208008
+       ],
+       [
+        0.654948,
+        0.25
+       ],
+       [
+        0.661458,
+        0.261719
+       ],
+       [
+        0.661458,
+        0.28418
+       ],
+       [
+        0.653646,
+        0.289062
+       ],
+       [
+        0.648437,
+        0.306641
+       ],
+       [
+        0.652344,
+        0.322266
+       ],
+       [
+        0.648437,
+        0.344727
+       ],
+       [
+        0.651042,
+        0.363281
+       ],
+       [
+        0.63151,
+        0.409179
+       ],
+       [
+        0.635417,
+        0.463867
+       ],
+       [
+        0.630208,
+        0.46875
+       ],
+       [
+        0.627604,
+        0.496094
+       ],
+       [
+        0.636719,
+        0.50293
+       ],
+       [
+        0.639323,
+        0.513672
+       ],
+       [
+        0.636719,
+        0.516601
+       ],
+       [
+        0.614583,
+        0.515625
+       ],
+       [
+        0.609375,
+        0.518554
+       ],
+       [
+        0.596354,
+        0.557617
+       ],
+       [
+        0.571615,
+        0.583984
+       ],
+       [
+        0.570313,
+        0.598633
+       ],
+       [
+        0.546875,
+        0.623047
+       ],
+       [
+        0.528646,
+        0.65332
+       ],
+       [
+        0.533854,
+        0.678711
+       ],
+       [
+        0.542969,
+        0.697265
+       ],
+       [
+        0.528646,
+        0.704101
+       ],
+       [
+        0.510417,
+        0.703125
+       ],
+       [
+        0.497396,
+        0.708008
+       ],
+       [
+        0.480469,
+        0.736328
+       ],
+       [
+        0.480469,
+        0.762695
+       ],
+       [
+        0.470052,
+        0.778321
+       ],
+       [
+        0.46875,
+        0.788086
+       ],
+       [
+        0.455729,
+        0.791992
+       ],
+       [
+        0.445313,
+        0.78711
+       ],
+       [
+        0.424479,
+        0.745117
+       ],
+       [
+        0.411458,
+        0.730469
+       ],
+       [
+        0.382812,
+        0.720703
+       ],
+       [
+        0.388021,
+        0.706054
+       ],
+       [
+        0.402344,
+        0.6875
+       ],
+       [
+        0.403646,
+        0.640625
+       ],
+       [
+        0.424479,
+        0.606445
+       ],
+       [
+        0.466146,
+        0.485351
+       ],
+       [
+        0.494792,
+        0.444336
+       ],
+       [
+        0.496094,
+        0.407226
+       ],
+       [
+        0.507812,
+        0.381836
+       ],
+       [
+        0.522135,
+        0.358398
+       ],
+       [
+        0.546875,
+        0.334961
+       ],
+       [
+        0.549479,
+        0.31543
+       ],
+       [
+        0.558594,
+        0.307617
+       ],
+       [
+        0.608073,
+        0.230468
+       ],
+       [
+        0.615885,
+        0.210938
+       ],
+       [
+        0.623698,
+        0.203125
+       ],
+       [
+        0.635417,
+        0.164063
+       ]
+      ],
+      "hole": false
+     }
+    ]
+   },
+   "score": 0.91,
+   "source": "text",
+   "polarity": null
+  },
+  {
+   "id": "seg_2",
+   "label": "Kleidungsstück",
+   "kind": "part",
+   "prompt": "garment",
+   "box": [
+    0.0,
+    0.0,
+    1.0,
+    1.0
+   ],
+   "mask": {
+    "format": "polygon",
+    "points": [
+     [
+      0.253906,
+      0.0
+     ],
+     [
+      0.378906,
+      0.0
+     ],
+     [
+      0.378906,
+      0.001953
+     ],
+     [
+      0.384115,
+      0.001953
+     ],
+     [
+      0.384115,
+      0.0
+     ],
+     [
+      0.428385,
+      0.0
+     ],
+     [
+      0.428385,
+      0.001953
+     ],
+     [
+      0.429688,
+      0.0
+     ],
+     [
+      0.466146,
+      0.0
+     ],
+     [
+      0.466146,
+      0.001953
+     ],
+     [
+      0.484375,
+      0.003906
+     ],
+     [
+      0.501302,
+      0.001953
+     ],
+     [
+      0.523438,
+      0.00293
+     ],
+     [
+      0.529948,
+      0.001953
+     ],
+     [
+      0.529948,
+      0.0
+     ],
+     [
+      0.546875,
+      0.0
+     ],
+     [
+      0.546875,
+      0.001953
+     ],
+     [
+      0.548177,
+      0.0
+     ],
+     [
+      0.652344,
+      0.0
+     ],
+     [
+      0.652344,
+      0.001953
+     ],
+     [
+      0.65625,
+      0.001953
+     ],
+     [
+      0.65625,
+      0.0
+     ],
+     [
+      0.736979,
+      0.0
+     ],
+     [
+      0.736979,
+      0.001953
+     ],
+     [
+      0.738281,
+      0.0
+     ],
+     [
+      0.970052,
+      0.0
+     ],
+     [
+      0.970052,
+      0.001953
+     ],
+     [
+      0.973958,
+      0.001953
+     ],
+     [
+      0.973958,
+      0.0
+     ],
+     [
+      0.986979,
+      0.0
+     ],
+     [
+      0.986979,
+      0.001953
+     ],
+     [
+      0.988281,
+      0.0
+     ],
+     [
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.022461
+     ],
+     [
+      0.997396,
+      0.022461
+     ],
+     [
+      0.994792,
+      0.032227
+     ],
+     [
+      0.967448,
+      0.044922
+     ],
+     [
+      0.960938,
+      0.050781
+     ],
+     [
+      0.93099,
+      0.06543
+     ],
+     [
+      0.91276,
+      0.079102
+     ],
+     [
+      0.907552,
+      0.080078
+     ],
+     [
+      0.89974,
+      0.09082
+     ],
+     [
+      0.888021,
+      0.120117
+     ],
+     [
+      0.856771,
+      0.222656
+     ],
+     [
+      0.81901,
+      0.330078
+     ],
+     [
+      0.815104,
+      0.334961
+     ],
+     [
+      0.783854,
+      0.431641
+     ],
+     [
+      0.748698,
+      0.582031
+     ],
+     [
+      0.72526,
+      0.665039
+     ],
+     [
+      0.714844,
+      0.716797
+     ],
+     [
+      0.68099,
+      0.825195
+     ],
+     [
+      0.677083,
+      0.845703
+     ],
+     [
+      0.66276,
+      0.880859
+     ],
+     [
+      0.660156,
+      0.897461
+     ],
+     [
+      0.63151,
+      0.992188
+     ],
+     [
+      0.627604,
+      0.99707
+     ],
+     [
+      0.615885,
+      0.998047
+     ],
+     [
+      0.615885,
+      1.0
+     ],
+     [
+      0.584635,
+      1.0
+     ],
+     [
+      0.584635,
+      0.998047
+     ],
+     [
+      0.582031,
+      1.0
+     ],
+     [
+      0.446615,
+      1.0
+     ],
+     [
+      0.446615,
+      0.998047
+     ],
+     [
+      0.445312,
+      1.0
+     ],
+     [
+      0.359375,
+      1.0
+     ],
+     [
+      0.359375,
+      0.998047
+     ],
+     [
+      0.358073,
+      1.0
+     ],
+     [
+      0.0,
+      1.0
+     ],
+     [
+      0.0,
+      0.157227
+     ],
+     [
+      0.018229,
+      0.143555
+     ],
+     [
+      0.045573,
+      0.128906
+     ],
+     [
+      0.09375,
+      0.107422
+     ],
+     [
+      0.173177,
+      0.066406
+     ]
+    ],
+    "rings": [
+     {
+      "points": [
+       [
+        0.253906,
+        0.0
+       ],
+       [
+        0.378906,
+        0.0
+       ],
+       [
+        0.378906,
+        0.001953
+       ],
+       [
+        0.384115,
+        0.001953
+       ],
+       [
+        0.384115,
+        0.0
+       ],
+       [
+        0.428385,
+        0.0
+       ],
+       [
+        0.428385,
+        0.001953
+       ],
+       [
+        0.429688,
+        0.0
+       ],
+       [
+        0.466146,
+        0.0
+       ],
+       [
+        0.466146,
+        0.001953
+       ],
+       [
+        0.484375,
+        0.003906
+       ],
+       [
+        0.501302,
+        0.001953
+       ],
+       [
+        0.523438,
+        0.00293
+       ],
+       [
+        0.529948,
+        0.001953
+       ],
+       [
+        0.529948,
+        0.0
+       ],
+       [
+        0.546875,
+        0.0
+       ],
+       [
+        0.546875,
+        0.001953
+       ],
+       [
+        0.548177,
+        0.0
+       ],
+       [
+        0.652344,
+        0.0
+       ],
+       [
+        0.652344,
+        0.001953
+       ],
+       [
+        0.65625,
+        0.001953
+       ],
+       [
+        0.65625,
+        0.0
+       ],
+       [
+        0.736979,
+        0.0
+       ],
+       [
+        0.736979,
+        0.001953
+       ],
+       [
+        0.738281,
+        0.0
+       ],
+       [
+        0.970052,
+        0.0
+       ],
+       [
+        0.970052,
+        0.001953
+       ],
+       [
+        0.973958,
+        0.001953
+       ],
+       [
+        0.973958,
+        0.0
+       ],
+       [
+        0.986979,
+        0.0
+       ],
+       [
+        0.986979,
+        0.001953
+       ],
+       [
+        0.988281,
+        0.0
+       ],
+       [
+        1.0,
+        0.0
+       ],
+       [
+        1.0,
+        0.022461
+       ],
+       [
+        0.997396,
+        0.022461
+       ],
+       [
+        0.994792,
+        0.032227
+       ],
+       [
+        0.967448,
+        0.044922
+       ],
+       [
+        0.960938,
+        0.050781
+       ],
+       [
+        0.93099,
+        0.06543
+       ],
+       [
+        0.91276,
+        0.079102
+       ],
+       [
+        0.907552,
+        0.080078
+       ],
+       [
+        0.89974,
+        0.09082
+       ],
+       [
+        0.888021,
+        0.120117
+       ],
+       [
+        0.856771,
+        0.222656
+       ],
+       [
+        0.81901,
+        0.330078
+       ],
+       [
+        0.815104,
+        0.334961
+       ],
+       [
+        0.783854,
+        0.431641
+       ],
+       [
+        0.748698,
+        0.582031
+       ],
+       [
+        0.72526,
+        0.665039
+       ],
+       [
+        0.714844,
+        0.716797
+       ],
+       [
+        0.68099,
+        0.825195
+       ],
+       [
+        0.677083,
+        0.845703
+       ],
+       [
+        0.66276,
+        0.880859
+       ],
+       [
+        0.660156,
+        0.897461
+       ],
+       [
+        0.63151,
+        0.992188
+       ],
+       [
+        0.627604,
+        0.99707
+       ],
+       [
+        0.615885,
+        0.998047
+       ],
+       [
+        0.615885,
+        1.0
+       ],
+       [
+        0.584635,
+        1.0
+       ],
+       [
+        0.584635,
+        0.998047
+       ],
+       [
+        0.582031,
+        1.0
+       ],
+       [
+        0.446615,
+        1.0
+       ],
+       [
+        0.446615,
+        0.998047
+       ],
+       [
+        0.445312,
+        1.0
+       ],
+       [
+        0.359375,
+        1.0
+       ],
+       [
+        0.359375,
+        0.998047
+       ],
+       [
+        0.358073,
+        1.0
+       ],
+       [
+        0.0,
+        1.0
+       ],
+       [
+        0.0,
+        0.157227
+       ],
+       [
+        0.018229,
+        0.143555
+       ],
+       [
+        0.045573,
+        0.128906
+       ],
+       [
+        0.09375,
+        0.107422
+       ],
+       [
+        0.173177,
+        0.066406
+       ]
+      ],
+      "hole": false
+     }
+    ]
+   },
+   "score": 0.879,
+   "source": "text",
+   "polarity": null
+  }
+ ],
+ "diagnosis": {
+  "summary": "Vermutlich Jeans aus Denim mit länglichem Riss direkt neben der Seitennaht am Hosenbein. Die blauen Gewebefäden sind gerissen, weiße Querfäden stehen lose über einer Lücke, die Naht selbst wirkt noch geschlossen.",
+  "likely_causes": [
+   "Zugbelastung am Hosenbein nahe der Seitennaht",
+   "Durchscheuern und Reißen der blauen Kettfäden bei erhaltenen weißen Schussfäden",
+   "Weiteraufgehen einer vorgeschädigten Stelle beim Tragen"
+  ],
+  "confidence": 0.78,
+  "evidence_segment_ids": [
+   "seg_1",
+   "seg_2"
+  ],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_self",
+  "reasoning": "Riss im Denim neben der Seitennaht mit gerissenen Gewebefäden und Lücke, kein glattes Öffnen der Naht. Zusammenziehen würde spannen und weiter einreißen. Mit Unterlegflicken von links und lockerem Stopfgewebe ist das in Handarbeit stabilisierbar.",
+  "effort": "medium",
+  "time_minutes": [
+   45,
+   75
+  ],
+  "cost_eur": [
+   5.0,
+   12.0
+  ],
+  "estimate_note": "Schätzung"
+ },
+ "shopping_list": [
+  {
+   "id": "needle",
+   "name": "Robuste scharfe Handnadel für Jeans Denim",
+   "kind": "tool",
+   "quantity": "1 Packung",
+   "required": true,
+   "search_term": "scharfe Handnadel Jeans Denim",
+   "household_alternative": null
+  },
+  {
+   "id": "thread",
+   "name": "Feines Polyester-Nähgarn jeansblau",
+   "kind": "material",
+   "quantity": "1 Rolle",
+   "required": true,
+   "search_term": "Polyester Nähgarn jeansblau fein",
+   "household_alternative": null
+  },
+  {
+   "id": "patch",
+   "name": "Jeans-Flickstoff hellblau aus Baumwoll-Webware",
+   "kind": "material",
+   "quantity": "1 Stück ca. 15 x 15 cm",
+   "required": true,
+   "search_term": "Jeansstoff Flickstoff hellblau Baumwolle",
+   "household_alternative": "fester Baumwollstoffrest ohne Stretch, z. B. aus altem Kissenbezug"
+  },
+  {
+   "id": "pins",
+   "name": "Stecknadeln",
+   "kind": "tool",
+   "quantity": "6 Stück",
+   "required": true,
+   "search_term": "Stecknadeln zum Nähen",
+   "household_alternative": null
+  },
+  {
+   "id": "scissors",
+   "name": "Kleine Stoffschere",
+   "kind": "tool",
+   "quantity": "1 Stück",
+   "required": true,
+   "search_term": "kleine Stoffschere",
+   "household_alternative": "scharfe Haushaltsschere"
+  }
+ ],
+ "guide": {
+  "steps": [
+   {
+    "n": 1,
+    "title": "Wenden und von links prüfen",
+    "text": "Hose auf links wenden und auf hellem Tisch flach auslegen. Innenseite zum Riss drehen, mit der Hand von links hinter den Riss fassen. Fertig, wenn du die Fransenkanten und die intakte Seitennaht daneben von links gut siehst und der Stoff faltenfrei liegt.",
+    "common_mistake": "Fehler: Außenseite bearbeiten und Riss zum Schließen zusammenziehen – das verzieht die Naht. Korrektur: von links arbeiten und Lücke flach auf Unterlage lassen.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [],
+    "uses_items": [],
+    "overlay": null
+   },
+   {
+    "n": 2,
+    "title": "Unterlegflicken zuschneiden und stecken",
+    "text": "Flickstoff auf der linken Stoffseite unter den Riss legen, Musterverlauf grob parallel ausrichten. Mit Stoffschere ein Rechteck schneiden, das den Riss ringsum etwa 2 cm überragt. Mit 4-6 Stecknadeln quer außen im tragfähigen Denim feststecken, nicht in die Fransenkante. Fertig, wenn der Flicken flach ohne Falten liegt und den ganzen Riss abdeckt. Schutz: Finger weg von der Schnittlinie, Schere sicher ablegen.",
+    "common_mistake": "Fehler: Flicken zu klein oder schief schneiden – Ränder reißen dann weiter ein. Korrektur: ringsum mindestens 2 cm Überstand lassen.",
+    "safety_critical": true,
+    "requires_confirmation": true,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "patch",
+     "scissors",
+     "pins"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 3,
+    "title": "Flicken rundum heften",
+    "text": "Von links mit etwa 40 cm jeansblauem Garn auf der Nadel den Flicken rundum anheften. Am Rand des Flickens einstechen und austreten, 4-5 mm lange Heftstiche im Abstand von etwa 5 mm nähen, Faden locker liegen lassen. Fertig, wenn der Flicken rundum ohne Wellen fixiert ist.",
+    "common_mistake": "Fehler: Flicken straff und gespannt anheften – gibt Beulen und Zugfalten. Korrektur: Stoff entspannt liegen lassen und locker heften.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "needle",
+     "thread"
+    ],
+    "overlay": {
+     "type": "stitch_path",
+     "stitch_type": "running_stitch",
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 4,
+    "title": "Riss locker stopfen",
+    "text": "Von links arbeiten, Nadel rechts neben dem Riss im festen Denim einstechen und links daneben austreten. Zuerst längs parallele Spannfäden über die Lücke legen, Einstiche etwa 2-3 mm vom Bruchkantenrand im festen Gewebe, Faden locker lassen. Dann quer im Über-Unter-Rhythmus durch diese Längsfäden weben bis die Lücke gefüllt ist. Weiße lose Querfäden dabei behutsam einbinden, nicht abschneiden. Fertig, wenn die Lücke mit flachem Gewebe geschlossen auf dem Flicken liegt.",
+    "common_mistake": "Fehler: Faden stramm anziehen und Riss zusammenraffen – das kräuselt und reibt neue Löcher. Korrektur: Faden nur locker anlegen und nach jedem Stich glatt streichen.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "needle",
+     "thread",
+     "patch"
+    ],
+    "overlay": {
+     "type": "stitch_path",
+     "stitch_type": "darning",
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 5,
+    "title": "Sichern und Hilfsmittel entfernen",
+    "text": "Auf der linken Seite den Faden mit 3 kleinen Rückstichen direkt nebeneinander im festen Denim und Flicken sichern, dann mit der Schere bündig abschneiden. Heftfaden vorsichtig herausziehen, Stecknadeln alle entfernen und zählen. Fertig, wenn kein Heftfaden und keine Stecknadel mehr im Stoff ist und der Stopffaden fest sitzt.",
+    "common_mistake": "Fehler: Faden kurz abschneiden ohne Sicherung – Naht geht beim Waschen auf. Korrektur: immer im festen Stoff vernähen.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [
+     "needle",
+     "thread",
+     "scissors",
+     "pins"
+    ],
+    "overlay": null
+   },
+   {
+    "n": 6,
+    "title": "Wenden und Zugprobe",
+    "text": "Hose auf rechts wenden und Riss von außen prüfen. Stoff seitlich sanft auseinanderziehen und wieder loslassen. Fertig, wenn die Kanten geschlossen anliegen, keine Kräusel und keine ausreißenden Stiche sichtbar sind und der Flicken von links flach anliegt.",
+    "common_mistake": "Fehler: Bei Kräusel oder ausreißenden Stichen weiter tragen – Riss vergrößert sich. Korrektur: auftrennen und lockerer wiederholen oder Fachhilfe nutzen.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1"
+    ],
+    "uses_items": [],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   }
+  ]
+ },
+ "instances": {
+  "rip": 1
+ }
+}

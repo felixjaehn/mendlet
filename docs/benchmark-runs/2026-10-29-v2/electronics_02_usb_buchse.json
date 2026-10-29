@@ -1,0 +1,41 @@
+{
+ "case_id": "10a3618f-7cef-48b1-aa80-d02a6156e3db",
+ "category": "low_voltage_electronics",
+ "risk_level": "warn_only",
+ "safety": {
+  "blocked": true,
+  "reason": "Abgerissene USB-Ladebuchse auf Leiterplatte, Ladefunktion deutet auf Akkubezug hin, daher Vorsicht beim Löten erforderlich."
+ },
+ "segments": [],
+ "diagnosis": {
+  "summary": "Abgerissene USB-Ladebuchse auf Leiterplatte, Ladefunktion deutet auf Akkubezug hin, daher Vorsicht beim Löten erforderlich.",
+  "likely_causes": [],
+  "confidence": 0.0,
+  "evidence_segment_ids": [],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_pro",
+  "reasoning": "Abgerissene USB-Ladebuchse auf Leiterplatte, Ladefunktion deutet auf Akkubezug hin, daher Vorsicht beim Löten erforderlich.",
+  "effort": "high",
+  "time_minutes": [
+   0,
+   0
+  ],
+  "cost_eur": [
+   0.0,
+   0.0
+  ],
+  "estimate_note": "Schätzung"
+ },
+ "shopping_list": [],
+ "guide": {
+  "steps": []
+ },
+ "instances": null
+}

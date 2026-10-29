@@ -1,0 +1,41 @@
+{
+ "case_id": "e174a06d-2952-46f9-8334-a92af128f698",
+ "category": "low_voltage_electronics",
+ "risk_level": "warn_only",
+ "safety": {
+  "blocked": true,
+  "reason": "Smartphone mit stark aufgeblähtem Lithium-Akku, deshalb geht das Handy nicht mehr zu; Brand-, Explosions- und Verletzungsgefahr."
+ },
+ "segments": [],
+ "diagnosis": {
+  "summary": "Smartphone mit stark aufgeblähtem Lithium-Akku, deshalb geht das Handy nicht mehr zu; Brand-, Explosions- und Verletzungsgefahr.",
+  "likely_causes": [],
+  "confidence": 0.0,
+  "evidence_segment_ids": [],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_pro",
+  "reasoning": "Smartphone mit stark aufgeblähtem Lithium-Akku, deshalb geht das Handy nicht mehr zu; Brand-, Explosions- und Verletzungsgefahr.",
+  "effort": "high",
+  "time_minutes": [
+   0,
+   0
+  ],
+  "cost_eur": [
+   0.0,
+   0.0
+  ],
+  "estimate_note": "Schätzung"
+ },
+ "shopping_list": [],
+ "guide": {
+  "steps": []
+ },
+ "instances": null
+}

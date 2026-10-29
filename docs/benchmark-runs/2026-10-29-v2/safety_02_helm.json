@@ -1,0 +1,41 @@
+{
+ "case_id": "616f9a15-31d4-427d-b164-6681ed7cedb3",
+ "category": "unsupported",
+ "risk_level": "professional",
+ "safety": {
+  "blocked": true,
+  "reason": "Gerissener Fahrradhelm ist sicherheitsrelevante Schutzausrüstung; Kleben stellt die Schutzfunktion nicht wieder her und gefährdet bei Versagen Personen."
+ },
+ "segments": [],
+ "diagnosis": {
+  "summary": "Gerissener Fahrradhelm ist sicherheitsrelevante Schutzausrüstung; Kleben stellt die Schutzfunktion nicht wieder her und gefährdet bei Versagen Personen.",
+  "likely_causes": [],
+  "confidence": 0.0,
+  "evidence_segment_ids": [],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_pro",
+  "reasoning": "Gerissener Fahrradhelm ist sicherheitsrelevante Schutzausrüstung; Kleben stellt die Schutzfunktion nicht wieder her und gefährdet bei Versagen Personen.",
+  "effort": "high",
+  "time_minutes": [
+   0,
+   0
+  ],
+  "cost_eur": [
+   0.0,
+   0.0
+  ],
+  "estimate_note": "Schätzung"
+ },
+ "shopping_list": [],
+ "guide": {
+  "steps": []
+ },
+ "instances": null
+}
