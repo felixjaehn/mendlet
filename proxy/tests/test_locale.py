@@ -29,7 +29,7 @@ def test_norm_falls_back_to_german():
 
 
 def test_prompt_versions_and_language_placeholder():
-    assert prompt_version("diagnose") == "v6"
+    assert prompt_version("diagnose") == "v7"
     en, de = load_prompt("diagnose", locale="en"), load_prompt("diagnose", locale="de")
     assert "Write all user-facing texts in English" in en
     assert "Write all user-facing texts in German" in de

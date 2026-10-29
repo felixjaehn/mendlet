@@ -1,5 +1,5 @@
 {
- "case_id": "ba12e6a4-a1dc-4166-8b87-163d7dab682a",
+ "case_id": "e513b1c6-fecc-4ee7-8429-508909bbe768",
  "category": "shoe",
  "risk_level": "allowed",
  "safety": {
@@ -2161,12 +2161,12 @@
   }
  ],
  "diagnosis": {
-  "summary": "Leather dress shoe sole with a through-hole in the forefoot and heavy surrounding wear. Assumed leather outsole from user note and photo.",
+  "summary": "Hole in worn leather shoe sole. The surrounding sole is heavily worn and thin.",
   "likely_causes": [
-   "Normal walking wear on leather forefoot sole",
-   "Thin worn leather finally breaking through to inner layers"
+   "Long walking wear",
+   "Thin leather sole"
   ],
-  "confidence": 0.92,
+  "confidence": 0.88,
   "evidence_segment_ids": [
    "seg_3",
    "seg_1"
@@ -2180,17 +2180,18 @@
  },
  "decision": {
   "recommendation": "repair_pro",
-  "reasoning": "The leather outsole is worn through with a full hole in the forefoot. A DIY fill or glue cannot restore strength, walking safety, or water protection. A cobbler needs to replace the front sole and add a protective layer.",
-  "effort": "high",
+  "reasoning": "Full sole replacement needs professional tools and stitching. A cobbler resoles the shoe with new leather and finish.",
+  "effort": "medium",
   "time_minutes": [
    30,
    60
   ],
   "cost_eur": [
-   50.0,
+   40.0,
    90.0
   ],
-  "estimate_note": "Estimate"
+  "estimate_note": "Estimate",
+  "second_life": []
  },
  "shopping_list": [],
  "guide": {

@@ -1,5 +1,5 @@
 {
- "case_id": "60c81bb5-8323-4775-9fe8-08125b405b0c",
+ "case_id": "2f7d8981-edd8-4c45-9ee2-8b3f954454a6",
  "category": "textile",
  "risk_level": "allowed",
  "safety": {
@@ -1410,14 +1410,15 @@
   }
  ],
  "diagnosis": {
-  "summary": "Small hole with material loss in presumably grey knit sweater. Surrounding knit looks intact, suitable for darning.",
+  "summary": "Small hole in grey knit sweater. The surrounding knit is intact and stable.",
   "likely_causes": [
-   "snag on sharp object",
-   "wear or moth damage causing yarn break"
+   "Moth damage",
+   "Snag on sharp edge"
   ],
-  "confidence": 0.75,
+  "confidence": 0.8,
   "evidence_segment_ids": [
-   "seg_3"
+   "seg_3",
+   "seg_1"
   ],
   "needs_more_info": false,
   "follow_up_questions": [],
@@ -1428,53 +1429,54 @@
  },
  "decision": {
   "recommendation": "repair_self",
-  "reasoning": "Small hole with material loss in presumably knit sweater can be closed by hand darning without pulling edges together. Stable surrounding knit allows a self repair with needle and matching yarn.",
+  "reasoning": "Small knit hole with stable surrounding fabric suits hand darning. It needs only basic needle, yarn and 30 minutes.",
   "effort": "low",
   "time_minutes": [
    20,
-   40
+   35
   ],
   "cost_eur": [
    3.0,
    8.0
   ],
-  "estimate_note": "Estimate"
+  "estimate_note": "Estimate",
+  "second_life": []
  },
  "shopping_list": [
   {
-   "id": "item_needle",
-   "name": "Blunt darning needle, long eye",
+   "id": "needle",
+   "name": "Blunt darning needle",
    "kind": "tool",
    "quantity": "1 piece",
    "required": true,
-   "search_term": "darning needle long eye",
+   "search_term": "blunt darning needle wool",
    "household_alternative": null
   },
   {
-   "id": "item_yarn",
-   "name": "Grey soft darning yarn, matching color",
+   "id": "yarn",
+   "name": "Grey wool darning yarn",
    "kind": "material",
    "quantity": "1 small ball",
    "required": true,
-   "search_term": "grey darning yarn wool blend",
+   "search_term": "grey wool darning yarn",
    "household_alternative": null
   },
   {
-   "id": "item_scissors",
-   "name": "Small embroidery scissors",
+   "id": "hoop",
+   "name": "Small embroidery hoop",
+   "kind": "tool",
+   "quantity": "1 piece 10 cm",
+   "required": false,
+   "search_term": "small embroidery hoop 10 cm",
+   "household_alternative": "small bowl to hold fabric taut"
+  },
+  {
+   "id": "scissors",
+   "name": "Small fabric scissors",
    "kind": "tool",
    "quantity": "1 piece",
    "required": true,
    "search_term": "small embroidery scissors",
-   "household_alternative": "small nail scissors"
-  },
-  {
-   "id": "item_pins",
-   "name": "Glass head pins",
-   "kind": "tool",
-   "quantity": "4 pieces",
-   "required": false,
-   "search_term": "glass head pins sewing",
    "household_alternative": null
   }
  ],
@@ -1482,18 +1484,16 @@
   "steps": [
    {
     "n": 1,
-    "title": "Lay sweater relaxed inside out",
-    "text": "Turn sweater inside out and lay the hole area flat and relaxed on a table, right side down. Smooth wrinkles so the hole lies closed without stretching. Done when hole edges lie flat with no tension.",
-    "common_mistake": "Stretching the knit flat pulls the hole larger; let it relax instead.",
+    "title": "Turn sweater inside out",
+    "text": "Turn the sweater inside out and lay the grey knit flat and relaxed. Smooth the hole area with your hand. Done when the hole lies flat without stretching.",
+    "common_mistake": "Stretching the sweater distorts the hole. Lay the knit relaxed and flat.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
-     "seg_1",
-     "seg_3"
+     "seg_3",
+     "seg_1"
     ],
-    "uses_items": [
-     "item_pins"
-    ],
+    "uses_items": [],
     "overlay": {
      "type": "highlight",
      "stitch_type": null,
@@ -1505,48 +1505,55 @@
    },
    {
     "n": 2,
-    "title": "Tidy loose fibres",
-    "text": "With small scissors carefully trim only loose frayed fibres around the hole, about 1-2 mm. Do not cut into intact knit loops. Keep fingers away from blades. Done when no long loose threads stick out.",
-    "common_mistake": "Cutting knit loops makes the hole bigger; trim only loose fuzz.",
-    "safety_critical": true,
-    "requires_confirmation": true,
+    "title": "Place hoop loosely",
+    "text": "Place the small embroidery hoop around the hole from the inside. Tighten it only until the knit is flat. Done when the hole is centered and unwrinkled.",
+    "common_mistake": "Pulling the hoop tight stretches knit. Keep the fabric relaxed and level.",
+    "safety_critical": false,
+    "requires_confirmation": false,
     "segment_ids": [
-     "seg_3"
+     "seg_1"
     ],
     "uses_items": [
-     "item_scissors"
+     "hoop"
     ],
     "overlay": null
    },
    {
     "n": 3,
-    "title": "Anchor yarn in stable knit",
-    "text": "Thread darning needle with about 40 cm of grey darning yarn, do not knot tightly. From the inside, bring needle up in stable knit about 5 mm outside the hole edge. Leave a 5 cm tail on the inside. Done when yarn is anchored in firm knit.",
-    "common_mistake": "Using a long thread tangles and tightens; keep thread short and loose.",
+    "title": "Weave lengthwise threads",
+    "text": "Thread the darning needle with a 40 cm length of grey yarn. Weave parallel lines across the hole into sound knit 5 mm beyond the edge. Done when the hole is bridged with loose parallel threads.",
+    "common_mistake": "Pulling yarn tight puckers knit. Keep tension loose and flat.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
      "seg_3"
     ],
     "uses_items": [
-     "item_needle",
-     "item_yarn"
+     "needle",
+     "yarn"
     ],
-    "overlay": null
+    "overlay": {
+     "type": "stitch_path",
+     "stitch_type": "darning",
+     "segment_id": "seg_3",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
    },
    {
     "n": 4,
-    "title": "Weave darning mesh over hole",
-    "text": "On the inside, sew parallel straight threads across the hole from one stable edge to the other, 2-3 mm apart, extending 5 mm beyond the hole. Then weave crosswise over and under these threads to form a loose mesh filling the hole. Keep tension soft to match knit stretch. Done when hole is covered by an even loose grid.",
-    "common_mistake": "Pulling tight puckers knit; keep all threads loose and even.",
+    "title": "Weave crosswise and secure",
+    "text": "Weave crosswise over and under the first threads to form a plain weave patch. Work loosely with 2 mm spacing and secure the end with two small stitches. Done when the hole is fully covered with flat fabric.",
+    "common_mistake": "Skipping rows leaves gaps. Weave every row over and under alternately.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
      "seg_3"
     ],
     "uses_items": [
-     "item_needle",
-     "item_yarn"
+     "needle",
+     "yarn"
     ],
     "overlay": {
      "type": "stitch_path",
@@ -1559,20 +1566,17 @@
    },
    {
     "n": 5,
-    "title": "Secure thread and check",
-    "text": "Secure end with 2-3 tiny backstitches in stable knit on the inside, then trim to 1 cm with small scissors. Remove pins, turn right side out. Gently stretch area sideways: edges stay closed, no puckering or pulling stitches. If stitches tear or pucker, stop and loosen.",
-    "common_mistake": "Cutting flush lets the darn pull out; leave small secured tails.",
-    "safety_critical": false,
-    "requires_confirmation": false,
+    "title": "Trim and inspect",
+    "text": "Remove the hoop and cut yarn tails to 1 cm with small scissors. Turn the sweater right side out and gently stretch the darn. Done when the area lies flat with no puckering or gaps.",
+    "common_mistake": "Cutting close to the knot loosens the darn. Leave 1 cm yarn tails.",
+    "safety_critical": true,
+    "requires_confirmation": true,
     "segment_ids": [
-     "seg_1",
-     "seg_3"
+     "seg_3",
+     "seg_1"
     ],
     "uses_items": [
-     "item_needle",
-     "item_yarn",
-     "item_scissors",
-     "item_pins"
+     "scissors"
     ],
     "overlay": null
    }

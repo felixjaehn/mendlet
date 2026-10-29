@@ -1,5 +1,5 @@
 {
- "case_id": "1dbee584-afad-4e45-9e71-c03c52e472fd",
+ "case_id": "92be1119-08bf-4c00-a029-a4c83ca8869e",
  "category": "textile",
  "risk_level": "allowed",
  "safety": {
@@ -1140,13 +1140,12 @@
   }
  ],
  "diagnosis": {
-  "summary": "Grey T-shirt, presumably worn cotton jersey, with dozens of small holes and several large holes across front, neckline and sides. Fabric looks overall very thin and fragile with no stable edges for repair.",
+  "summary": "Heavily holed grey jersey T-shirt. The surrounding fabric is thinned and torn throughout.",
   "likely_causes": [
-   "long-term wear and washing causing overall fabric thinning",
-   "abrasion and stretching of the knit",
-   "possible moth or pest damage"
+   "Long wear and washing",
+   "Friction and fabric thinning"
   ],
-  "confidence": 0.93,
+  "confidence": 0.95,
   "evidence_segment_ids": [
    "seg_1",
    "seg_6"
@@ -1160,27 +1159,27 @@
  },
  "decision": {
   "recommendation": "replace",
-  "reasoning": "The jersey is worn thin over the whole front with dozens of small holes and several large holes with frayed, unstable edges. There is no sound fabric left to anchor darning or patches, so hand repair would take many hours and tear out again.",
+  "reasoning": "The fabric is worn through with dozens of holes and no stable edges. Replacement needs only sorting time and no repair materials.",
   "effort": "low",
   "time_minutes": [
-   15,
-   45
+   5,
+   15
   ],
   "cost_eur": [
-   8.0,
-   25.0
+   0.0,
+   0.0
   ],
   "estimate_note": "Estimate",
   "second_life": [
    {
     "kind": "upcycle",
-    "title": "Cut into cleaning cloths",
-    "text": "Cut the still usable parts into cleaning rags or workshop cloths. The thin jersey absorbs dust and polish well."
+    "title": "Cut cleaning rags",
+    "text": "Cut intact areas into reusable cleaning cloths."
    },
    {
     "kind": "recycle",
-    "title": "Recycle via textile collection",
-    "text": "Put the worn-out shirt in a textile collection container or bring it to the local recycling centre for textile recycling."
+    "title": "Textile recycling container",
+    "text": "Bring the shirt to a textile collection container."
    }
   ]
  },

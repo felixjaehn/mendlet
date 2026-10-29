@@ -1,5 +1,5 @@
 {
- "case_id": "0bcd3925-a87c-4634-b00d-f3d2536dfcc9",
+ "case_id": "0c684985-e6a7-4341-b314-30ead3a48b02",
  "category": "shoe",
  "risk_level": "allowed",
  "safety": {
@@ -22,35 +22,39 @@
     "format": "polygon",
     "points": [
      [
-      0.223958,
+      0.222656,
       0.428711
      ],
      [
-      0.230469,
-      0.429687
+      0.231771,
+      0.428711
      ],
      [
-      0.217448,
-      0.456055
+      0.21875,
+      0.453125
      ],
      [
-      0.220052,
-      0.464844
+      0.21875,
+      0.460938
      ],
      [
-      0.234375,
-      0.481445
+      0.222656,
+      0.467773
      ],
      [
-      0.282552,
-      0.512695
+      0.233073,
+      0.479492
+     ],
+     [
+      0.277344,
+      0.509766
      ],
      [
       0.311198,
       0.526367
      ],
      [
-      0.356771,
+      0.355468,
       0.539062
      ],
      [
@@ -58,11 +62,15 @@
       0.544922
      ],
      [
-      0.377604,
-      0.545899
+      0.384115,
+      0.547852
      ],
      [
-      0.401041,
+      0.386719,
+      0.550781
+     ],
+     [
+      0.399739,
       0.554688
      ],
      [
@@ -70,44 +78,48 @@
       0.555664
      ],
      [
-      0.414062,
+      0.415365,
       0.558594
      ],
      [
-      0.460938,
+      0.440104,
+      0.5625
+     ],
+     [
+      0.441406,
+      0.564453
+     ],
+     [
+      0.475261,
       0.567383
      ],
      [
-      0.473958,
-      0.567383
-     ],
-     [
-      0.494792,
-      0.573242
+      0.490885,
+      0.572266
      ],
      [
       0.585937,
       0.580078
      ],
      [
-      0.704427,
+      0.707031,
       0.577149
      ],
      [
-      0.759115,
-      0.571289
+      0.743489,
+      0.572266
      ],
      [
-      0.848959,
+      0.850261,
       0.566406
      ],
      [
-      0.878906,
+      0.880208,
       0.55957
      ],
      [
-      0.942708,
-      0.551758
+      0.927083,
+      0.554688
      ],
      [
       0.990885,
@@ -119,47 +131,59 @@
      ],
      [
       1.0,
-      0.62793
+      0.626953
      ],
      [
-      0.949219,
-      0.647461
+      0.958334,
+      0.644531
      ],
      [
-      0.856771,
-      0.670898
+      0.893229,
+      0.663086
      ],
      [
-      0.751302,
-      0.686524
+      0.815104,
+      0.677734
      ],
      [
-      0.691407,
-      0.69043
+      0.726562,
+      0.688477
      ],
      [
-      0.602865,
+      0.651042,
       0.691406
      ],
      [
-      0.49349,
-      0.685547
+      0.532552,
+      0.688477
+     ],
+     [
+      0.434896,
+      0.677734
+     ],
+     [
+      0.40625,
+      0.670898
      ],
      [
       0.355468,
       0.663086
      ],
      [
-      0.266927,
-      0.633789
+      0.264323,
+      0.632813
      ],
      [
       0.236979,
       0.618164
      ],
      [
-      0.197916,
-      0.59082
+      0.199219,
+      0.591797
+     ],
+     [
+      0.18099,
+      0.574219
      ],
      [
       0.169271,
@@ -167,7 +191,7 @@
      ],
      [
       0.161458,
-      0.535156
+      0.537109
      ],
      [
       0.164063,
@@ -190,35 +214,39 @@
      {
       "points": [
        [
-        0.223958,
+        0.222656,
         0.428711
        ],
        [
-        0.230469,
-        0.429687
+        0.231771,
+        0.428711
        ],
        [
-        0.217448,
-        0.456055
+        0.21875,
+        0.453125
        ],
        [
-        0.220052,
-        0.464844
+        0.21875,
+        0.460938
        ],
        [
-        0.234375,
-        0.481445
+        0.222656,
+        0.467773
        ],
        [
-        0.282552,
-        0.512695
+        0.233073,
+        0.479492
+       ],
+       [
+        0.277344,
+        0.509766
        ],
        [
         0.311198,
         0.526367
        ],
        [
-        0.356771,
+        0.355468,
         0.539062
        ],
        [
@@ -226,11 +254,15 @@
         0.544922
        ],
        [
-        0.377604,
-        0.545899
+        0.384115,
+        0.547852
        ],
        [
-        0.401041,
+        0.386719,
+        0.550781
+       ],
+       [
+        0.399739,
         0.554688
        ],
        [
@@ -238,44 +270,48 @@
         0.555664
        ],
        [
-        0.414062,
+        0.415365,
         0.558594
        ],
        [
-        0.460938,
+        0.440104,
+        0.5625
+       ],
+       [
+        0.441406,
+        0.564453
+       ],
+       [
+        0.475261,
         0.567383
        ],
        [
-        0.473958,
-        0.567383
-       ],
-       [
-        0.494792,
-        0.573242
+        0.490885,
+        0.572266
        ],
        [
         0.585937,
         0.580078
        ],
        [
-        0.704427,
+        0.707031,
         0.577149
        ],
        [
-        0.759115,
-        0.571289
+        0.743489,
+        0.572266
        ],
        [
-        0.848959,
+        0.850261,
         0.566406
        ],
        [
-        0.878906,
+        0.880208,
         0.55957
        ],
        [
-        0.942708,
-        0.551758
+        0.927083,
+        0.554688
        ],
        [
         0.990885,
@@ -287,47 +323,59 @@
        ],
        [
         1.0,
-        0.62793
+        0.626953
        ],
        [
-        0.949219,
-        0.647461
+        0.958334,
+        0.644531
        ],
        [
-        0.856771,
-        0.670898
+        0.893229,
+        0.663086
        ],
        [
-        0.751302,
-        0.686524
+        0.815104,
+        0.677734
        ],
        [
-        0.691407,
-        0.69043
+        0.726562,
+        0.688477
        ],
        [
-        0.602865,
+        0.651042,
         0.691406
        ],
        [
-        0.49349,
-        0.685547
+        0.532552,
+        0.688477
+       ],
+       [
+        0.434896,
+        0.677734
+       ],
+       [
+        0.40625,
+        0.670898
        ],
        [
         0.355468,
         0.663086
        ],
        [
-        0.266927,
-        0.633789
+        0.264323,
+        0.632813
        ],
        [
         0.236979,
         0.618164
        ],
        [
-        0.197916,
-        0.59082
+        0.199219,
+        0.591797
+       ],
+       [
+        0.18099,
+        0.574219
        ],
        [
         0.169271,
@@ -335,7 +383,7 @@
        ],
        [
         0.161458,
-        0.535156
+        0.537109
        ],
        [
         0.164063,
@@ -358,7 +406,7 @@
      }
     ]
    },
-   "score": 0.914,
+   "score": 0.91,
    "source": "text",
    "polarity": null
   },
@@ -369,40 +417,44 @@
    "prompt": "detached sole",
    "box": [
     0.1615,
-    0.4287,
+    0.4277,
     0.8385,
-    0.2627
+    0.2637
    ],
    "mask": {
     "format": "polygon",
     "points": [
      [
+      0.226563,
+      0.427734
+     ],
+     [
+      0.231771,
+      0.429687
+     ],
+     [
+      0.220052,
+      0.453125
+     ],
+     [
+      0.220052,
+      0.460938
+     ],
+     [
       0.223958,
-      0.428711
+      0.467773
      ],
      [
-      0.230469,
-      0.428711
-     ],
-     [
-      0.21875,
-      0.456055
-     ],
-     [
-      0.223958,
-      0.46875
-     ],
-     [
-      0.239584,
-      0.485351
+      0.235677,
+      0.481445
      ],
      [
       0.272136,
       0.503906
      ],
      [
-      0.282552,
-      0.512695
+      0.276042,
+      0.508789
      ],
      [
       0.322917,
@@ -413,48 +465,52 @@
       0.540039
      ],
      [
-      0.368489,
-      0.544922
+      0.365886,
+      0.543945
      ],
      [
-      0.382812,
+      0.384115,
       0.546875
      ],
      [
-      0.416667,
-      0.558594
+      0.414062,
+      0.557617
      ],
      [
-      0.479167,
-      0.56836
+      0.477864,
+      0.567383
      ],
      [
-      0.486979,
+      0.489583,
       0.572266
      ],
      [
-      0.58724,
-      0.580078
+      0.544271,
+      0.575195
      ],
      [
-      0.707031,
+      0.5625,
+      0.579102
+     ],
+     [
+      0.708333,
       0.577149
      ],
      [
-      0.78776,
-      0.569336
+      0.772136,
+      0.570313
      ],
      [
       0.850261,
       0.566406
      ],
      [
-      0.873698,
+      0.875,
       0.560547
      ],
      [
-      0.925782,
-      0.554688
+      0.927083,
+      0.554687
      ],
      [
       0.990885,
@@ -466,11 +522,11 @@
      ],
      [
       1.0,
-      0.62793
+      0.626953
      ],
      [
-      0.936198,
-      0.651367
+      0.958334,
+      0.644531
      ],
      [
       0.865885,
@@ -478,99 +534,99 @@
      ],
      [
       0.751302,
-      0.686524
+      0.686523
      ],
      [
-      0.692708,
+      0.69401,
       0.69043
      ],
      [
-      0.60026,
+      0.595052,
       0.691406
      ],
      [
-      0.506511,
-      0.686524
+      0.53125,
+      0.688477
      ],
      [
-      0.449219,
-      0.679687
+      0.447917,
+      0.679688
      ],
      [
       0.355468,
       0.663086
      ],
      [
-      0.266927,
-      0.633789
-     ],
-     [
-      0.246094,
-      0.621094
+      0.264323,
+      0.632813
      ],
      [
       0.236979,
       0.618164
      ],
      [
-      0.197916,
-      0.59082
+      0.192708,
+      0.585938
      ],
      [
-      0.169271,
-      0.557617
+      0.167969,
+      0.555664
      ],
      [
       0.161458,
-      0.535156
+      0.536133
      ],
      [
-      0.164063,
-      0.484375
+      0.161458,
+      0.500977
      ],
      [
-      0.170573,
-      0.469727
+      0.167969,
+      0.474609
      ],
      [
       0.184896,
       0.451172
      ],
      [
-      0.203125,
-      0.4375
+      0.205729,
+      0.435547
      ]
     ],
     "rings": [
      {
       "points": [
        [
+        0.226563,
+        0.427734
+       ],
+       [
+        0.231771,
+        0.429687
+       ],
+       [
+        0.220052,
+        0.453125
+       ],
+       [
+        0.220052,
+        0.460938
+       ],
+       [
         0.223958,
-        0.428711
+        0.467773
        ],
        [
-        0.230469,
-        0.428711
-       ],
-       [
-        0.21875,
-        0.456055
-       ],
-       [
-        0.223958,
-        0.46875
-       ],
-       [
-        0.239584,
-        0.485351
+        0.235677,
+        0.481445
        ],
        [
         0.272136,
         0.503906
        ],
        [
-        0.282552,
-        0.512695
+        0.276042,
+        0.508789
        ],
        [
         0.322917,
@@ -581,48 +637,52 @@
         0.540039
        ],
        [
-        0.368489,
-        0.544922
+        0.365886,
+        0.543945
        ],
        [
-        0.382812,
+        0.384115,
         0.546875
        ],
        [
-        0.416667,
-        0.558594
+        0.414062,
+        0.557617
        ],
        [
-        0.479167,
-        0.56836
+        0.477864,
+        0.567383
        ],
        [
-        0.486979,
+        0.489583,
         0.572266
        ],
        [
-        0.58724,
-        0.580078
+        0.544271,
+        0.575195
        ],
        [
-        0.707031,
+        0.5625,
+        0.579102
+       ],
+       [
+        0.708333,
         0.577149
        ],
        [
-        0.78776,
-        0.569336
+        0.772136,
+        0.570313
        ],
        [
         0.850261,
         0.566406
        ],
        [
-        0.873698,
+        0.875,
         0.560547
        ],
        [
-        0.925782,
-        0.554688
+        0.927083,
+        0.554687
        ],
        [
         0.990885,
@@ -634,11 +694,11 @@
        ],
        [
         1.0,
-        0.62793
+        0.626953
        ],
        [
-        0.936198,
-        0.651367
+        0.958334,
+        0.644531
        ],
        [
         0.865885,
@@ -646,74 +706,70 @@
        ],
        [
         0.751302,
-        0.686524
+        0.686523
        ],
        [
-        0.692708,
+        0.69401,
         0.69043
        ],
        [
-        0.60026,
+        0.595052,
         0.691406
        ],
        [
-        0.506511,
-        0.686524
+        0.53125,
+        0.688477
        ],
        [
-        0.449219,
-        0.679687
+        0.447917,
+        0.679688
        ],
        [
         0.355468,
         0.663086
        ],
        [
-        0.266927,
-        0.633789
-       ],
-       [
-        0.246094,
-        0.621094
+        0.264323,
+        0.632813
        ],
        [
         0.236979,
         0.618164
        ],
        [
-        0.197916,
-        0.59082
+        0.192708,
+        0.585938
        ],
        [
-        0.169271,
-        0.557617
+        0.167969,
+        0.555664
        ],
        [
         0.161458,
-        0.535156
+        0.536133
        ],
        [
-        0.164063,
-        0.484375
+        0.161458,
+        0.500977
        ],
        [
-        0.170573,
-        0.469727
+        0.167969,
+        0.474609
        ],
        [
         0.184896,
         0.451172
        ],
        [
-        0.203125,
-        0.4375
+        0.205729,
+        0.435547
        ]
       ],
       "hole": false
      }
     ]
    },
-   "score": 0.84,
+   "score": 0.848,
    "source": "text",
    "polarity": null
   },
@@ -724,68 +780,64 @@
    "prompt": "seam",
    "box": [
     0.7409,
-    0.3857,
+    0.3867,
     0.1198,
-    0.0332
+    0.0322
    ],
    "mask": {
     "format": "polygon",
     "points": [
      [
       0.74349,
-      0.385742
+      0.386719
      ],
      [
       0.755208,
       0.389648
      ],
      [
-      0.761719,
+      0.763021,
       0.389648
      ],
      [
-      0.768229,
-      0.392578
+      0.766927,
+      0.391602
      ],
      [
-      0.776042,
-      0.392578
+      0.777344,
+      0.391602
      ],
      [
       0.779948,
-      0.394531
+      0.393555
      ],
      [
-      0.794271,
-      0.396484
+      0.799479,
+      0.398437
      ],
      [
-      0.796875,
-      0.398438
-     ],
-     [
-      0.828125,
-      0.402344
+      0.84375,
+      0.405273
      ],
      [
       0.845052,
-      0.408203
+      0.407227
      ],
      [
-      0.851562,
-      0.408203
+      0.85026,
+      0.407227
      ],
      [
-      0.855469,
-      0.410156
+      0.854167,
+      0.40918
      ],
      [
-      0.855469,
-      0.412109
+      0.854167,
+      0.411133
      ],
      [
       0.860677,
-      0.414062
+      0.415039
      ],
      [
       0.860677,
@@ -800,15 +852,15 @@
       0.416016
      ],
      [
-      0.838542,
-      0.414062
+      0.835937,
+      0.413086
      ],
      [
-      0.826823,
-      0.40918
+      0.822917,
+      0.408203
      ],
      [
-      0.8125,
+      0.813802,
       0.408203
      ],
      [
@@ -820,7 +872,15 @@
       0.400391
      ],
      [
-      0.757812,
+      0.776042,
+      0.398437
+     ],
+     [
+      0.763021,
+      0.397461
+     ],
+     [
+      0.75651,
       0.394531
      ],
      [
@@ -829,6 +889,10 @@
      ],
      [
       0.740885,
+      0.389648
+     ],
+     [
+      0.74349,
       0.388672
      ]
     ],
@@ -837,59 +901,55 @@
       "points": [
        [
         0.74349,
-        0.385742
+        0.386719
        ],
        [
         0.755208,
         0.389648
        ],
        [
-        0.761719,
+        0.763021,
         0.389648
        ],
        [
-        0.768229,
-        0.392578
+        0.766927,
+        0.391602
        ],
        [
-        0.776042,
-        0.392578
+        0.777344,
+        0.391602
        ],
        [
         0.779948,
-        0.394531
+        0.393555
        ],
        [
-        0.794271,
-        0.396484
+        0.799479,
+        0.398437
        ],
        [
-        0.796875,
-        0.398438
-       ],
-       [
-        0.828125,
-        0.402344
+        0.84375,
+        0.405273
        ],
        [
         0.845052,
-        0.408203
+        0.407227
        ],
        [
-        0.851562,
-        0.408203
+        0.85026,
+        0.407227
        ],
        [
-        0.855469,
-        0.410156
+        0.854167,
+        0.40918
        ],
        [
-        0.855469,
-        0.412109
+        0.854167,
+        0.411133
        ],
        [
         0.860677,
-        0.414062
+        0.415039
        ],
        [
         0.860677,
@@ -904,15 +964,15 @@
         0.416016
        ],
        [
-        0.838542,
-        0.414062
+        0.835937,
+        0.413086
        ],
        [
-        0.826823,
-        0.40918
+        0.822917,
+        0.408203
        ],
        [
-        0.8125,
+        0.813802,
         0.408203
        ],
        [
@@ -924,7 +984,15 @@
         0.400391
        ],
        [
-        0.757812,
+        0.776042,
+        0.398437
+       ],
+       [
+        0.763021,
+        0.397461
+       ],
+       [
+        0.75651,
         0.394531
        ],
        [
@@ -933,6 +1001,10 @@
        ],
        [
         0.740885,
+        0.389648
+       ],
+       [
+        0.74349,
         0.388672
        ]
       ],
@@ -940,7 +1012,7 @@
      }
     ]
    },
-   "score": 0.629,
+   "score": 0.64,
    "source": "text",
    "polarity": null
   },
@@ -950,17 +1022,17 @@
    "kind": "part",
    "prompt": "seam",
    "box": [
-    0.7305,
-    0.3721,
-    0.1341,
-    0.0322
+    0.7318,
+    0.373,
+    0.1328,
+    0.0312
    ],
    "mask": {
     "format": "polygon",
     "points": [
      [
       0.731771,
-      0.37207
+      0.373047
      ],
      [
       0.746094,
@@ -971,36 +1043,48 @@
       0.375
      ],
      [
-      0.75651,
-      0.375
+      0.763021,
+      0.375977
      ],
      [
       0.765625,
       0.37793
      ],
      [
+      0.773437,
+      0.37793
+     ],
+     [
       0.782552,
-      0.379883
+      0.380859
+     ],
+     [
+      0.78776,
+      0.380859
      ],
      [
       0.790365,
       0.382812
      ],
      [
-      0.816406,
-      0.386719
+      0.807292,
+      0.384766
      ],
      [
-      0.822917,
+      0.821615,
       0.389648
      ],
      [
-      0.830729,
+      0.828125,
       0.389648
      ],
      [
-      0.835938,
-      0.392578
+      0.838542,
+      0.393555
+     ],
+     [
+      0.845052,
+      0.393555
      ],
      [
       0.856771,
@@ -1023,43 +1107,51 @@
       0.404297
      ],
      [
-      0.856771,
-      0.402344
+      0.852865,
+      0.401367
      ],
      [
-      0.83724,
+      0.835938,
       0.399414
      ],
      [
-      0.832031,
+      0.829427,
       0.396484
      ],
      [
-      0.820313,
-      0.395508
+      0.822917,
+      0.396484
      ],
      [
-      0.800781,
-      0.389648
+      0.798177,
+      0.388672
      ],
      [
-      0.783854,
-      0.387695
+      0.790365,
+      0.388672
      ],
      [
-      0.761719,
-      0.381836
+      0.776042,
+      0.384766
      ],
      [
-      0.74349,
+      0.768229,
+      0.384766
+     ],
+     [
+      0.765625,
+      0.382812
+     ],
+     [
+      0.744792,
       0.379883
      ],
      [
-      0.740885,
+      0.742187,
       0.37793
      ],
      [
-      0.731771,
+      0.733073,
       0.37793
      ]
     ],
@@ -1068,7 +1160,7 @@
       "points": [
        [
         0.731771,
-        0.37207
+        0.373047
        ],
        [
         0.746094,
@@ -1079,36 +1171,48 @@
         0.375
        ],
        [
-        0.75651,
-        0.375
+        0.763021,
+        0.375977
        ],
        [
         0.765625,
         0.37793
        ],
        [
+        0.773437,
+        0.37793
+       ],
+       [
         0.782552,
-        0.379883
+        0.380859
+       ],
+       [
+        0.78776,
+        0.380859
        ],
        [
         0.790365,
         0.382812
        ],
        [
-        0.816406,
-        0.386719
+        0.807292,
+        0.384766
        ],
        [
-        0.822917,
+        0.821615,
         0.389648
        ],
        [
-        0.830729,
+        0.828125,
         0.389648
        ],
        [
-        0.835938,
-        0.392578
+        0.838542,
+        0.393555
+       ],
+       [
+        0.845052,
+        0.393555
        ],
        [
         0.856771,
@@ -1131,43 +1235,51 @@
         0.404297
        ],
        [
-        0.856771,
-        0.402344
+        0.852865,
+        0.401367
        ],
        [
-        0.83724,
+        0.835938,
         0.399414
        ],
        [
-        0.832031,
+        0.829427,
         0.396484
        ],
        [
-        0.820313,
-        0.395508
+        0.822917,
+        0.396484
        ],
        [
-        0.800781,
-        0.389648
+        0.798177,
+        0.388672
        ],
        [
-        0.783854,
-        0.387695
+        0.790365,
+        0.388672
        ],
        [
-        0.761719,
-        0.381836
+        0.776042,
+        0.384766
        ],
        [
-        0.74349,
+        0.768229,
+        0.384766
+       ],
+       [
+        0.765625,
+        0.382812
+       ],
+       [
+        0.744792,
         0.379883
        ],
        [
-        0.740885,
+        0.742187,
         0.37793
        ],
        [
-        0.731771,
+        0.733073,
         0.37793
        ]
       ],
@@ -1175,16 +1287,16 @@
      }
     ]
    },
-   "score": 0.613,
+   "score": 0.621,
    "source": "text",
    "polarity": null
   }
  ],
  "diagnosis": {
-  "summary": "Front sole of white sneaker is detached from the upper with a visible gap. Sole and upper edges appear intact, presumably suitable for gluing.",
+  "summary": "Detached front sole on white sneaker. Upper leather and stitching are intact.",
   "likely_causes": [
-   "adhesive failure from walking flex and age",
-   "dirt and moisture weakening the front bond"
+   "Worn adhesive bond",
+   "Flex stress at toe"
   ],
   "confidence": 0.85,
   "evidence_segment_ids": [
@@ -1200,22 +1312,50 @@
  },
  "decision": {
   "recommendation": "repair_self",
-  "reasoning": "Front sole is locally detached but sole and upper look intact with no missing material, so cleaning and rebonding with flexible shoe adhesive is a realistic self-repair.",
+  "reasoning": "Shoe glue re-bonds the clean toe gap securely. It needs glue, tape and one day curing time.",
   "effort": "medium",
   "time_minutes": [
    20,
-   35
+   30
   ],
   "cost_eur": [
-   8.0,
-   15.0
+   5.0,
+   12.0
   ],
-  "estimate_note": "Estimate, no guarantee"
+  "estimate_note": "Estimate",
+  "second_life": []
  },
  "shopping_list": [
   {
+   "id": "alcohol",
+   "name": "Isopropyl alcohol wipes",
+   "kind": "material",
+   "quantity": "2 wipes",
+   "required": true,
+   "search_term": "isopropyl alcohol 70% wipes",
+   "household_alternative": "Mild soap and water"
+  },
+  {
+   "id": "cloth",
+   "name": "Clean cloth",
+   "kind": "tool",
+   "quantity": "1 piece",
+   "required": true,
+   "search_term": "lint free cleaning cloth",
+   "household_alternative": "Old cotton cloth"
+  },
+  {
+   "id": "sandpaper",
+   "name": "Fine sandpaper",
+   "kind": "tool",
+   "quantity": "1 sheet",
+   "required": true,
+   "search_term": "fine sandpaper 120 grit",
+   "household_alternative": null
+  },
+  {
    "id": "glue",
-   "name": "Flexible shoe repair adhesive",
+   "name": "Flexible shoe adhesive",
    "kind": "material",
    "quantity": "1 tube",
    "required": true,
@@ -1223,31 +1363,31 @@
    "household_alternative": null
   },
   {
-   "id": "cleaner",
-   "name": "Isopropyl alcohol 70% and lint-free cloth",
-   "kind": "material",
-   "quantity": "1 bottle and 2 cloths",
+   "id": "gloves",
+   "name": "Disposable gloves",
+   "kind": "tool",
+   "quantity": "1 pair",
    "required": true,
-   "search_term": "isopropyl alcohol 70% cloth",
-   "household_alternative": "clean cotton cloth"
+   "search_term": "disposable nitrile gloves",
+   "household_alternative": null
   },
   {
    "id": "tape",
-   "name": "Painter's tape",
-   "kind": "tool",
+   "name": "Masking tape",
+   "kind": "material",
    "quantity": "1 roll",
    "required": true,
-   "search_term": "painters tape",
-   "household_alternative": "elastic bands"
+   "search_term": "masking tape",
+   "household_alternative": null
   }
  ],
  "guide": {
   "steps": [
    {
     "n": 1,
-    "title": "Open gap and clean bonding surfaces",
-    "text": "Work on a table in ventilated area. Gently open the front gap with one hand and brush out loose dirt. Dampen cloth with rubbing alcohol, wipe inside of sole and underside of upper, then let dry completely for 10 minutes. End state: both bonding surfaces dry, matte and dust-free.",
-    "common_mistake": "Glueing over dust leaves a weak bond - wipe until cloth stays clean.",
+    "title": "Inspect and clean gap",
+    "text": "Open the toe gap gently and wipe both inner faces with an alcohol wipe. Remove dust with the clean cloth. Done when both surfaces look clean and dry.",
+    "common_mistake": "Trapped dirt weakens the bond. Clean until no dust remains.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
@@ -1255,7 +1395,8 @@
      "seg_1"
     ],
     "uses_items": [
-     "cleaner"
+     "alcohol",
+     "cloth"
     ],
     "overlay": {
      "type": "highlight",
@@ -1268,17 +1409,48 @@
    },
    {
     "n": 2,
-    "title": "Apply shoe adhesive to both sides",
-    "text": "Ventilate well, do not inhale vapours, keep away from eyes. Apply a thin even layer of flexible shoe repair adhesive to both sides: inside of sole and underside of upper. Keep glue 2-3 mm away from outer visible edge. Let air-dry per tube instructions, usually 5-10 minutes until tacky. End state: both sides tacky, not wet.",
-    "common_mistake": "Too much glue squeezes out and stains white upper - use a thin even film.",
+    "title": "Roughen bonding surfaces",
+    "text": "Lightly roughen both inner faces with fine sandpaper using 3 to 4 gentle strokes. Brush away dust with the cloth. Done when surfaces look dull but undamaged.",
+    "common_mistake": "Heavy sanding damages the material. Use light pressure only.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_2"
+    ],
+    "uses_items": [
+     "sandpaper"
+    ],
+    "overlay": null
+   },
+   {
+    "n": 3,
+    "title": "Apply shoe adhesive",
+    "text": "Wear gloves and ventilate the room. Apply a thin 1 mm layer of shoe adhesive to both faces and air it as the tube directs. Done when both faces are evenly coated without drips.",
+    "common_mistake": "Excess glue squeezes out. Apply a thin even layer.",
     "safety_critical": true,
     "requires_confirmation": true,
+    "segment_ids": [
+     "seg_2"
+    ],
+    "uses_items": [
+     "glue",
+     "gloves"
+    ],
+    "overlay": null
+   },
+   {
+    "n": 4,
+    "title": "Press and tape sole",
+    "text": "Press the sole firmly against the upper for 2 minutes. Wrap masking tape tightly around the toe to hold pressure. Done when the edge is closed with no gap.",
+    "common_mistake": "Weak pressure leaves gaps. Press firmly along the toe.",
+    "safety_critical": false,
+    "requires_confirmation": false,
     "segment_ids": [
      "seg_2",
      "seg_1"
     ],
     "uses_items": [
-     "glue"
+     "tape"
     ],
     "overlay": {
      "type": "highlight",
@@ -1290,35 +1462,16 @@
     }
    },
    {
-    "n": 3,
-    "title": "Press sole closed and align",
-    "text": "Press sole firmly up to upper starting from back of gap toward toe. Hold strong hand pressure for 2-3 minutes. Immediately wipe any squeeze-out outward with dry cloth. End state: gap closed, sole edge flush with upper all around front.",
-    "common_mistake": "Pressing crooked leaves a lip - align sole edge to upper before firm pressure.",
-    "safety_critical": false,
-    "requires_confirmation": false,
-    "segment_ids": [
-     "seg_2",
-     "seg_1"
-    ],
-    "uses_items": [
-     "glue",
-     "cleaner"
-    ],
-    "overlay": null
-   },
-   {
-    "n": 4,
-    "title": "Fix and cure, then check hold",
-    "text": "Fix closed position with painter's tape wrapped tightly around toe or elastic bands, without deforming shoe. Leave shoe at room temperature for at least 24 hours per adhesive instructions. Then remove tape and gently pull toe to check: edges stay closed, no soft spots. If it reopens, stop and seek professional shoe repair.",
-    "common_mistake": "Removing fixation too early reopens the toe - leave undisturbed for full cure.",
+    "n": 5,
+    "title": "Cure and check bond",
+    "text": "Leave the shoe taped for 24 hours at room temperature. Remove the tape and pull the toe gently. Done when the sole stays closed without movement.",
+    "common_mistake": "Early use breaks the bond. Wait the full curing time.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
      "seg_2"
     ],
-    "uses_items": [
-     "tape"
-    ],
+    "uses_items": [],
     "overlay": null
    }
   ]
