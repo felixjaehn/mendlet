@@ -42,13 +42,13 @@ Open-weight models (Muse Glimmer, Muse Spark Open) are not used.
 
 The hackathon started with the kickoff on **2026-10-26, 12:00 PM ET**. The first commit of this project is **2026-10-26 20:03 CET = 15:03 ET**, three hours after kickoff. No code, assets or data from earlier projects are used. This repository contains only this project.
 
-| Date (ET) | Commits | What was built |
-| --- | --- | --- |
-| Oct 26, after kickoff | `4bbcfde` … `f90d045` | PRD and API notes from the Meta docs; FastAPI proxy in mock mode with safety gate; first SwiftUI app with demo fixtures and stitch-path geometry |
-| Oct 28 | `dd223ac` … `3dd21f1` | First real Meta API calls; Spark grounding → SAM box pipeline; mask overlays with scan reveal; live-scan module; `/refine`, `/track`, `/after-preview`; prompt B v3; latency 46 → 30 s; real recordings for demo mode |
-| Oct 29 | `931e2f5` … | Wonder agent mode with live trace; `/detect`; electronics case with solder pads and polarity; Voice keyword biasing; before/after slider; shoe glue overlay; full benchmark |
+| Date (ET) | What was built |
+| --- | --- |
+| Oct 26, 15:03–15:24 ET (after the 12:00 kickoff) | PRD and API notes from the Meta docs; FastAPI proxy in mock mode with safety gate; first SwiftUI app with demo fixtures and stitch-path geometry |
+| Oct 28 | First real Meta API calls; Spark grounding → SAM box pipeline; mask overlays with scan reveal; live-scan module; `/refine`, `/track`, `/after-preview`; prompt B v3; latency 46 → 30 s; real recordings for demo mode |
+| Oct 29 | Wonder agent mode with live trace; `/detect`; electronics case with solder pads and polarity; Voice keyword biasing; before/after slider; shoe glue overlay; full benchmark |
 
-`git log --date=iso -- repair-assistant` shows every commit with its timestamp.
+`git log --date=iso` shows every commit with its timestamp (the history was carried over unchanged when this project moved into its own repository).
 
 ## Try it (no server needed)
 
