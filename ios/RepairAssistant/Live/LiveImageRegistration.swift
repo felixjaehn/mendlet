@@ -20,18 +20,29 @@ actor LiveImageRegistrar {
         // The targeted (floating) image is the detection/photo; the handler's reference is live.
         let handler = VNImageRequestHandler(cgImage: target, orientation: .up)
         let request = VNHomographicImageRegistrationRequest(targetedCGImage: source, orientation: .up)
-        if (try? handler.perform([request])) != nil, let observation = request.results?.first, observation.confidence > 0.1 {
-            let h = LiveHomography.vision(observation.warpTransform, size: size)
-            if h.isPlausible { return h }
-        }
-        guard !Task.isCancelled else { return nil }
         let fallback = VNTranslationalImageRegistrationRequest(targetedCGImage: source, orientation: .up)
-        guard (try? handler.perform([fallback])) != nil, let result = fallback.results?.first, result.confidence > 0.1 else { return nil }
-        let t = result.alignmentTransform
-        let matrix = simd_float3x3(rows: [SIMD3(Float(t.a), Float(t.c), Float(t.tx)),
-                                        SIMD3(Float(t.b), Float(t.d), Float(t.ty)), SIMD3(0, 0, 1)])
-        let h = LiveHomography.vision(matrix, size: size)
-        return h.isPlausible ? h : nil
+        _ = try? handler.perform([request, fallback])
+        guard !Task.isCancelled else { return nil }
+        var homography: LiveHomography?
+        if let observation = request.results?.first, observation.confidence > 0.1 {
+            let h = LiveHomography.vision(observation.warpTransform, size: size)
+            if h.isPlausible { homography = h }
+        }
+        var translation: LiveHomography?
+        if let result = fallback.results?.first, result.confidence > 0.1 {
+            let t = result.alignmentTransform
+            let matrix = simd_float3x3(rows: [SIMD3(Float(t.a), Float(t.c), Float(t.tx)),
+                                            SIMD3(Float(t.b), Float(t.d), Float(t.ty)), SIMD3(0, 0, 1)])
+            let h = LiveHomography.vision(matrix, size: size)
+            if h.isPlausible { translation = h }
+        }
+        // On evenly woven fabric (real denim photo) the homography can lock onto a wrong, near-identity
+        // solution with good confidence. When it disagrees with the translation at the centre, trust the translation.
+        let centre = CGPoint(x: 0.5, y: 0.5)
+        if let h = homography, let t = translation, let ph = h.apply(centre), let pt = t.apply(centre) {
+            return hypot(ph.x - pt.x, ph.y - pt.y) > 0.02 ? t : h
+        }
+        return homography ?? translation
     }
 }
 
