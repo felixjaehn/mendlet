@@ -30,7 +30,7 @@ struct AgentTraceView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 8) {
                 SectionLabel(text: "Agenten-Protokoll")
                 Spacer()
@@ -46,7 +46,7 @@ struct AgentTraceView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .card(padding: 14)
+        .card(padding: 12)
         .animation(reduceMotion ? .easeOut(duration: 0.2) : Theme.spring, value: steps.map(\.n))
         .animation(.easeInOut(duration: 0.25), value: active?.label)
     }
@@ -54,7 +54,7 @@ struct AgentTraceView: View {
     private func tile(_ model: String, ok: Bool = true) -> some View {
         let tint = ok ? ModelStyle.tint(model) : Theme.stop
         return Image(systemName: ModelStyle.symbol(model)).font(.system(size: 13, weight: .bold)).foregroundStyle(tint)
-            .frame(width: 30, height: 30).background(tint.opacity(0.14), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+            .frame(width: 28, height: 28).background(tint.opacity(0.14), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
     }
 
     private func badge(_ model: String, ok: Bool = true) -> some View {
@@ -68,17 +68,17 @@ struct AgentTraceView: View {
         let ok = s.status == .done
         return HStack(spacing: 10) {
             tile(s.model, ok: ok)
-            VStack(alignment: .leading, spacing: 3) {
-                Text(s.label).font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink).lineLimit(2).fixedSize(horizontal: false, vertical: true)
-                badge(s.model, ok: ok)
-            }
+            Text(s.label).font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink).lineLimit(2).fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 6)
-            VStack(alignment: .trailing, spacing: 3) {
-                Image(systemName: ok ? "checkmark.circle.fill" : "xmark.circle.fill").font(.subheadline).foregroundStyle(ok ? Theme.safe : Theme.stop)
-                Text(ModelStyle.seconds(s.ms)).font(.caption.monospacedDigit().weight(.medium)).foregroundStyle(Theme.inkSecondary)
+            VStack(alignment: .trailing, spacing: 2) {
+                badge(s.model, ok: ok)
+                HStack(spacing: 4) {
+                    Text(ModelStyle.seconds(s.ms)).font(.caption.monospacedDigit().weight(.medium)).foregroundStyle(Theme.inkSecondary)
+                    Image(systemName: ok ? "checkmark.circle.fill" : "xmark.circle.fill").font(.caption).foregroundStyle(ok ? Theme.safe : Theme.stop)
+                }
             }
         }
-        .padding(.vertical, 5)
+        .padding(.vertical, 3)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(s.label), \(s.model), \(ModelStyle.seconds(s.ms)), \(ok ? "fertig" : "fehlgeschlagen")")
     }
@@ -86,14 +86,14 @@ struct AgentTraceView: View {
     private func activeRow(_ a: (label: String, model: String)) -> some View {
         HStack(spacing: 10) {
             tile(a.model)
-            VStack(alignment: .leading, spacing: 3) {
-                Text(a.label).font(.subheadline.weight(.semibold)).foregroundStyle(Theme.inkSecondary).lineLimit(2)
-                badge(a.model)
-            }
+            Text(a.label).font(.subheadline.weight(.semibold)).foregroundStyle(Theme.inkSecondary).lineLimit(2)
             Spacer(minLength: 6)
-            ProgressView().controlSize(.small).tint(ModelStyle.tint(a.model))
+            VStack(alignment: .trailing, spacing: 2) {
+                badge(a.model)
+                ProgressView().controlSize(.mini).tint(ModelStyle.tint(a.model))
+            }
         }
-        .padding(.vertical, 5)
+        .padding(.vertical, 3)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(a.label), läuft")
     }

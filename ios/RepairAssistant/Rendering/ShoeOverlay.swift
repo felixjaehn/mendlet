@@ -56,7 +56,7 @@ struct ShoeOverlay: View {
             }
             if kind.cure {
                 CureRing(minutes: kind.minutes, label: kind.press && !kind.glue ? "Andrücken" : "Aushärten")
-                    .frame(width: size.width, height: size.height, alignment: .bottomTrailing).padding(12)
+                    .padding(12).frame(width: size.width, height: size.height, alignment: .bottomTrailing)
             }
         }
         .frame(width: size.width, height: size.height)

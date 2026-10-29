@@ -18,7 +18,7 @@ struct DiagnosisView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 if let photo = flow.photo, let r {
-                    PhotoStage(image: photo) { size in
+                    PhotoStage(image: photo, minAspect: 1.15) { size in
                         SegmentOverlayView(segments: r.segments, size: size, hidden: hidden, pulsingIDs: pulsing, appeared: appeared)
                     }
                     chipBar(r)
@@ -26,8 +26,8 @@ struct DiagnosisView: View {
                 if let r {
                     if let banner = flow.newInfoBanner, r.diagnosis.labelInfo != nil { infoBanner(banner) }
                     if !flow.changedItemIds.isEmpty { changedCard(r) }
-                    summaryCard(r)
                     if flow.labelBusy { labelBusyCard } else if flow.labelOfferAvailable { labelOfferCard }
+                    summaryCard(r)
                     if r.diagnosis.needsMoreInfo { needsInfoCard(r) }
                 }
             }
@@ -146,13 +146,12 @@ struct DiagnosisView: View {
                 Image(systemName: "tag.fill").font(.system(size: 18, weight: .semibold)).foregroundStyle(Theme.thread)
                     .frame(width: 44, height: 44).background(Theme.threadSoft, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Etikett fotografieren für genauere Empfehlung (optional)").font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
-                        .multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
-                    Text("Material und Pflegehinweise passen Nadel, Garn und Flicken an.").font(.footnote).foregroundStyle(Theme.inkSecondary)
+                    (Text("Etikett fotografieren für genauere Empfehlung ").foregroundStyle(Theme.ink) + Text("(optional)").foregroundStyle(Theme.inkSecondary))
+                        .font(.subheadline.weight(.semibold)).multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
+                    Text("Material und Pflege passen Nadel, Garn und Flicken an.").font(.footnote).foregroundStyle(Theme.inkSecondary)
                         .multilineTextAlignment(.leading)
                 }
                 Spacer(minLength: 0)
-                Image(systemName: "camera.fill").foregroundStyle(Theme.inkSecondary)
             }
             .padding(14)
             .background(Theme.card, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
