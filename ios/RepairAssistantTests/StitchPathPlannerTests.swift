@@ -66,7 +66,7 @@ final class StitchPathPlannerTests: XCTestCase {
         for s in plan.stitches { XCTAssertTrue((0...1).contains(s.position.x) && (0...1).contains(s.position.y)) }
     }
 
-    func testDarningGridInsidePolygon() {
+    func testDarningGridAnchorsOutsideBlob() {
         var blob: [CGPoint] = []
         for i in 0..<28 {
             let th = 2 * CGFloat.pi * CGFloat(i) / 28
@@ -75,21 +75,94 @@ final class StitchPathPlannerTests: XCTestCase {
         }
         let plan = StitchPathPlanner.plan(polygon: blob, box: nil, stitchType: .darning)
         XCTAssertEqual(plan.kind, .darning)
-        XCTAssertGreaterThanOrEqual(plan.gridLines.count, 8)
         XCTAssertGreaterThan(plan.firstDirectionCount, 0)
         XCTAssertLessThan(plan.firstDirectionCount, plan.gridLines.count)
         for line in plan.gridLines {
             XCTAssertEqual(line.count, 2)
-            for p in line { XCTAssertTrue(StitchPathPlanner.pointInPolygon(p, blob), "\(p) outside") }
-            // midpoint too
+            for p in line { XCTAssertFalse(StitchPathPlanner.pointInPolygon(p, blob), "\(p) must anchor on intact fabric") }
             let m = CGPoint(x: (line[0].x + line[1].x) / 2, y: (line[0].y + line[1].y) / 2)
             XCTAssertTrue(StitchPathPlanner.pointInPolygon(m, blob))
         }
-        // second direction is roughly perpendicular to the first
         let f = plan.gridLines[0], s = plan.gridLines[plan.firstDirectionCount]
         let d1 = CGPoint(x: f[1].x - f[0].x, y: f[1].y - f[0].y), d2 = CGPoint(x: s[1].x - s[0].x, y: s[1].y - s[0].y)
         let cosA = abs(d1.x * d2.x + d1.y * d2.y) / (hypot(d1.x, d1.y) * hypot(d2.x, d2.y))
         XCTAssertLessThan(cosA, 0.15)
+    }
+
+    // MARK: Real jeans mask (LiveRecordings/jeans.json, 1152x1536)
+
+    private func jeansPolygon() throws -> [CGPoint] {
+        let r = try XCTUnwrap(LiveRecordings.response(file: "jeans"))
+        return try XCTUnwrap(r.segments.first { $0.isDamage }).polygon
+    }
+
+    private func distToPolygon(_ p: CGPoint, _ poly: [CGPoint]) -> CGFloat {
+        var best = CGFloat.infinity
+        for i in 0..<poly.count {
+            let a = poly[i], b = poly[(i + 1) % poly.count]
+            let dx = b.x - a.x, dy = b.y - a.y
+            let l2 = max(dx * dx + dy * dy, 1e-12)
+            let t = min(1, max(0, ((p.x - a.x) * dx + (p.y - a.y) * dy) / l2))
+            best = min(best, hypot(p.x - (a.x + dx * t), p.y - (a.y + dy * t)))
+        }
+        return best
+    }
+
+    func testJeansDarningGeometry() throws {
+        let aspect: CGFloat = 0.75
+        let poly = try jeansPolygon()
+        let plan = StitchPathPlanner.plan(polygon: poly, box: nil, stitchType: .darning, aspect: aspect)
+        XCTAssertEqual(plan.kind, .darning)
+        // aspect-corrected space for angle/length checks
+        func sp(_ p: CGPoint) -> CGPoint { CGPoint(x: p.x * aspect, y: p.y) }
+        let sPoly = poly.map(sp)
+        // centroid + principal axis (rasterised)
+        var cells: [CGPoint] = []
+        let xs = sPoly.map(\.x), ys = sPoly.map(\.y)
+        let x0 = xs.min()!, x1 = xs.max()!, y0 = ys.min()!, y1 = ys.max()!
+        for iy in 0..<120 { for ix in 0..<120 {
+            let p = CGPoint(x: x0 + (x1 - x0) * (CGFloat(ix) + 0.5) / 120, y: y0 + (y1 - y0) * (CGFloat(iy) + 0.5) / 120)
+            if StitchPathPlanner.pointInPolygon(p, sPoly) { cells.append(p) }
+        } }
+        let cx = cells.map(\.x).reduce(0, +) / CGFloat(cells.count), cy = cells.map(\.y).reduce(0, +) / CGFloat(cells.count)
+        var sxx: CGFloat = 0, syy: CGFloat = 0, sxy: CGFloat = 0
+        for p in cells { sxx += (p.x - cx) * (p.x - cx); syy += (p.y - cy) * (p.y - cy); sxy += (p.x - cx) * (p.y - cy) }
+        let theta = 0.5 * atan2(2 * sxy, sxx - syy)
+        let axis = CGPoint(x: cos(theta), y: sin(theta))
+        let major = hypot(x1 - x0, y1 - y0)
+
+        let warp = Array(plan.gridLines.prefix(plan.firstDirectionCount))
+        XCTAssertTrue((6...9).contains(warp.count), "warp count \(warp.count)")
+        for line in warp {
+            let a = sp(line[0]), b = sp(line[1])
+            let len = hypot(b.x - a.x, b.y - a.y)
+            let cosA = abs((b.x - a.x) * axis.x + (b.y - a.y) * axis.y) / len
+            XCTAssertGreaterThan(cosA, cos(5 * .pi / 180), "warp line not parallel to principal axis")
+            for e in line {
+                XCTAssertFalse(StitchPathPlanner.pointInPolygon(sp(e), sPoly), "endpoint \(e) inside mask")
+                XCTAssertLessThan(distToPolygon(sp(e), sPoly), 0.25 * major, "endpoint too far from the mask")
+            }
+        }
+        // grid centroid on the mask centroid
+        let mids = plan.gridLines.map { CGPoint(x: ($0[0].x + $0[1].x) / 2 * aspect, y: ($0[0].y + $0[1].y) / 2) }
+        let gx = mids.map(\.x).reduce(0, +) / CGFloat(mids.count), gy = mids.map(\.y).reduce(0, +) / CGFloat(mids.count)
+        XCTAssertLessThan(hypot(gx - cx, gy - cy), 0.05 * major)
+
+        // U-turns never cut through the hole
+        let turns = (plan.warpStrokes + plan.weftStrokes).filter(\.isTurn)
+        XCTAssertGreaterThan(turns.count, 5)
+        for t in turns { for p in t.points { XCTAssertFalse(StitchPathPlanner.pointInPolygon(sp(p), sPoly), "U-turn crosses the mask at \(p)") } }
+        // every needle jump between consecutive strokes is continuous
+        for strokes in [plan.warpStrokes, plan.weftStrokes] {
+            for i in 1..<strokes.count {
+                let a = strokes[i - 1].points.last!, b = strokes[i].points.first!
+                XCTAssertLessThan(hypot(a.x - b.x, a.y - b.y), 1e-6)
+            }
+        }
+        // weft is perpendicular to warp
+        let w = plan.gridLines[plan.firstDirectionCount]
+        let wa = sp(w[0]), wb = sp(w[1])
+        XCTAssertLessThan(abs((wb.x - wa.x) * axis.x + (wb.y - wa.y) * axis.y) / hypot(wb.x - wa.x, wb.y - wa.y), 0.09)
     }
 
     func testFixturePolygonsProducePlans() throws {
