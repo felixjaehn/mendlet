@@ -12,7 +12,7 @@ Ziel: unabhängige Jury bewertet 10/10 (Briefing: `docs/JUDGING-BRIEF.md`). Letz
 ## Nächste Schritte (Reihenfolge)
 1. **Echte Fotos live analysieren** und in den Benchmark aufnehmen: `testdata/real/01_ledersohle_loch.jpg` (Sohle bis zum Loch durchgelaufen, eher "Profi/neu besohlen") und `testdata/real/02_pulli_kleines_loch.jpg` (kleines, schwer sichtbares Loch). Wenn SAM/Grounding das Pulli-Loch nicht findet: Grounding-Prompt für kleine Löcher schärfen, Tap-to-refine (`/refine`) in der Diagnose sichtbar anbieten.
 2. **Demo-Fix "schwer zu erkennen":** Bei kleinen Schäden auf dem Foto automatisch auf die Schadstelle zoomen (Diagnose und Anleitung: Ausschnitt um die Damage-Box mit Rand, Pinch-to-zoom), Maske kräftiger zeichnen. Die echten Fotos als Demo-Aufnahmen speichern (`ios/RepairAssistant/Resources/LiveRecordings/`, inkl. `.en.json`).
-3. PDF-Export einmal erzeugen und ansehen, Layout korrigieren.
+3. ~~PDF-Export~~ entfällt (Owner 29.10.: "PDF brauche ich nicht. raus damit"), wird im Redesign entfernt.
 4. Screenshots neu aufnehmen und alle Screens gegen die Mobbin-Collection prüfen (`https://mobbin.com/collections/175c3475-f7b6-41b6-af7c-3dc3a68df769`).
 5. Bei Empfehlung "Replace": Upcycling-, Recycling- und Spendehinweise (Spark, optional Muse-Image-Vorschau der Upcycling-Idee).
 6. Schlanke Jury-Runde (nur Demo bzw. Kerndokumente, kurzer Bericht).

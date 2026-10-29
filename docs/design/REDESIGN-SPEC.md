@@ -479,7 +479,7 @@ Title: "Repairs". Tabs: "In progress", "Done". Floating: "Scan". Menu: "Settings
 
 **Components**
 - `GuideView` (restyle). Top `SegmentBar` (shared component with Home): N = number of steps, height 3, gap 4, filled = accent, current = accent at 0.5 opacity half-filled animating when the timer runs; sits over the photo's top safe area with a 0.18 black gradient for legibility. Remove the four-color bar, the "Step 3 of 5" label above the photo and the Close pill.
-- Top buttons: close `xmark` and share `square.and.arrow.up` (existing `GuideExporter`), 44 pt `.glass` circles over the photo.
+- Top buttons: close `xmark`, 44 pt `.glass` circle over the photo.
 - Photo `MarkedPhoto` in guide mode (step overlay only, no labels), height 46 %, bottom corner radius 28; double-tap to expand (replaces the collapse icon).
 - Text block padding 20: overline, serif title, body (`.body`, `lineSpacing(4)`), `DoneWhenLine` (client-side split of the final "Done when" sentence, section 5.5), `WatchOut` block (replaces the yellow card; 2 pt accent leading bar, overline "Watch out", `.subheadline`), `UsesLine`.
 - Safety-critical step (`requires_confirmation`): above the CTA a full-width row `Toggle`-like check "I've done this safely" with `exclamationmark.triangle` 16 pt secondary; Done stays disabled until checked (FlowGate unchanged). No yellow fill.
@@ -510,7 +510,7 @@ Title: "Repairs". Tabs: "In progress", "Done". Floating: "Scan". Menu: "Settings
 **Layout**
 ```
 ┌───────────────────────────────┐
-│ (←)                       (···)│  menu: Export guide, Delete project
+│ (←)                       (···)│  menu: Delete project
 │┌─────────────────────────────┐│
 ││▓▓▓▓ photo + outline ▓▓▓▓▓▓▓▓││  hero card 16:10, radius 28, outline static
 │└─────────────────────────────┘│
@@ -542,7 +542,7 @@ Title: "Repairs". Tabs: "In progress", "Done". Floating: "Scan". Menu: "Settings
 - "Steps": `StepTimeline`: 1 pt hairline spine at x = 20, nodes 12 pt (done: ink fill + white check 7 pt; current: 2 pt accent ring with 4 pt accent center; upcoming: 1.5 pt tertiary ring), step titles `.body` (done secondary, current semibold). Tap a step jumps into Guide at that step (allowed only for steps <= current, except "Review" for done steps).
 - Pinned bar: ink pill. Label by state: "Continue with step 3", "Start step 1" (nothing done), "Gather what's missing" if required items missing (goes to Before you start), "View before and after" for finished.
 - Finished project variant: hero becomes the `BeforeAfterSlider` (the Photoroom bare slider with BEFORE / AFTER caps, `refs/completion/photoroom-1.jpg` ([Mobbin](https://mobbin.com/screens/581c0f2a-743c-4464-bb1a-c5ac3c2c2625))), title unchanged, the numeral line becomes "Repaired" + date, and "Steps" are collapsed.
-- Menu: "Export guide" (PDF via `GuideExporter`), "Delete project" (destructive, with confirmation dialog "Delete this project? Your photo and progress will be removed.").
+- Menu: "Delete project" (destructive, with confirmation dialog "Delete this project? Your photo and progress will be removed.").
 
 **States.** Empty steps (pro verdict parked): hide Steps, show `.body` "A pro will take this one. Come back after the repair to log it." CTA "Mark as done". Error: none. Offline: fully functional.
 

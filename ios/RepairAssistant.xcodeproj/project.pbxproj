@@ -54,7 +54,6 @@
 		84CE98C01BE837C84FDC69F7 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 4A6DDF2119D2ACA1AD5F6CC8 /* Localizable.xcstrings */; };
 		8B4A74BD20900DA307F2C9CF /* LiveCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F786C6F9136070262BE453B /* LiveCamera.swift */; };
 		8CA05FAF5C19C376BA7A4D3A /* ServicesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29461B5D6EA0E176CFE12E67 /* ServicesTests.swift */; };
-		8D806414EA156B9BEFE1D6A0 /* GuideExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E281BCCD830F3B10FD309D62 /* GuideExporter.swift */; };
 		8E438585B749AE32922BD55F /* RepairAssistantApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39489FA78FE9DC5D68159888 /* RepairAssistantApp.swift */; };
 		9C405E7BFA2EE8B33AF31FF3 /* textile_tear.json in Resources */ = {isa = PBXBuildFile; fileRef = C49DFE75B7D10484AE45BC38 /* textile_tear.json */; };
 		9C440463EF08531BF3E061BA /* ShoeOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F482E47A76CEDA809866E9 /* ShoeOverlay.swift */; };
@@ -180,7 +179,6 @@
 		D43240C5A78EF284F9AFD797 /* LiveImageRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveImageRegistration.swift; sourceTree = "<group>"; };
 		D770F4F50765D368DC4152DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		DAEBBE9A58CD6E61DDEC6818 /* helmet.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = helmet.json; sourceTree = "<group>"; };
-		E281BCCD830F3B10FD309D62 /* GuideExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideExporter.swift; sourceTree = "<group>"; };
 		E407006A6E7B69387DE68B9C /* StitchPathPlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StitchPathPlannerTests.swift; sourceTree = "<group>"; };
 		E58EA56B19EC752C913A775D /* GuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideView.swift; sourceTree = "<group>"; };
 		E658E153061F1A993EE4D041 /* ImageResizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageResizer.swift; sourceTree = "<group>"; };
@@ -191,7 +189,7 @@
 		F4F482E47A76CEDA809866E9 /* ShoeOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoeOverlay.swift; sourceTree = "<group>"; };
 		F840728B0735157F950CDD07 /* StepHelpSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepHelpSheet.swift; sourceTree = "<group>"; };
 		FDC79702C1652A582742CF18 /* AnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisView.swift; sourceTree = "<group>"; };
-		"TEMP_335DBA36-DF93-40A6-9A8F-F104197617DA" /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		"TEMP_E7AE7F5C-6B9D-4F69-994F-A22C721C5762" /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -287,7 +285,6 @@
 				5678AE0EFC35C82D6FA7B41C /* AudioRecorder.swift */,
 				9AC1119F5E3AD30DF9788789 /* CaseStore.swift */,
 				8CC8C9E318EC82E163F3F486 /* DemoImageFactory.swift */,
-				E281BCCD830F3B10FD309D62 /* GuideExporter.swift */,
 				E658E153061F1A993EE4D041 /* ImageResizer.swift */,
 				5FC45F4DA89EAFE987711263 /* LiveRecordings.swift */,
 				240834AF2730B5F09B148429 /* MockAPIClient.swift */,
@@ -376,10 +373,10 @@
 			path = Fixtures;
 			sourceTree = "<group>";
 		};
-		"TEMP_38861CFC-A57D-4C77-A09E-6D401BDA8461" /* ios */ = {
+		"TEMP_738FA2F3-B222-45DA-9B02-B6D85439A7E7" /* ios */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_335DBA36-DF93-40A6-9A8F-F104197617DA" /* Config.xcconfig */,
+				"TEMP_E7AE7F5C-6B9D-4F69-994F-A22C721C5762" /* Config.xcconfig */,
 			);
 			path = ios;
 			sourceTree = "<group>";
@@ -508,7 +505,6 @@
 				B0F6122A7C72A886B09967E4 /* FlowModel.swift in Sources */,
 				C2C01610BACBFD2F1D37A516 /* FollowUpSheet.swift in Sources */,
 				158E3B154BA196BDE0288229 /* Gates.swift in Sources */,
-				8D806414EA156B9BEFE1D6A0 /* GuideExporter.swift in Sources */,
 				A1471E8012966CBB1061E8C6 /* GuideView.swift in Sources */,
 				4ADB699C634E5C4BC3311C24 /* HomeView.swift in Sources */,
 				1F9622216F94443F21377682 /* ImageResizer.swift in Sources */,
@@ -593,7 +589,7 @@
 		};
 		88DB0C72E15D4B1747846766 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_335DBA36-DF93-40A6-9A8F-F104197617DA" /* Config.xcconfig */;
+			baseConfigurationReference = "TEMP_E7AE7F5C-6B9D-4F69-994F-A22C721C5762" /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -712,7 +708,7 @@
 		};
 		FD9CD525F142F5622F8FDCCB /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_335DBA36-DF93-40A6-9A8F-F104197617DA" /* Config.xcconfig */;
+			baseConfigurationReference = "TEMP_E7AE7F5C-6B9D-4F69-994F-A22C721C5762" /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;

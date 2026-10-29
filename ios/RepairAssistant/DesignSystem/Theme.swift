@@ -90,6 +90,6 @@ func segmentColor(_ segment: Segment, in all: [Segment]) -> Color {
 }
 
 extension EnvironmentValues {
-    /// Static render (PDF export): animated overlays draw their final state, like with Reduce Motion.
+    /// Static render: animated overlays draw their final state, like with Reduce Motion.
     @Entry var staticRendering = false
 }

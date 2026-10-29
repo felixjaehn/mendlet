@@ -251,4 +251,4 @@ Zwei echte Fotos (`testdata/real/`, 2048×1536) zusätzlich zu den 16 KI-Fotos. 
 
 **Fix im Merge (`proxy/app/pipeline.py`):** Liegt eine Grounding-Box innerhalb einer SAM-Schadensbox und ist kleiner als 15 % ihrer Fläche, ersetzt sie diese. Vorher galt die kleine Box als Duplikat und wurde verworfen. Test: `test_small_grounded_hole_replaces_broad_sam_damage_around_it`.
 
-**App:** Beide Fotos sind englische Demo-Aufnahmen (`real_sweater`, `real_sole`, Pulli mit Muse-Image-Vorschau). Kleine Schäden (unter 4 % der Fläche) zoomen Diagnose, Anleitung und PDF automatisch heran (Pinch, Doppeltipp, Taste „Whole photo“). Masken sind kräftiger, kleine Schäden bekommen einen Ring. „Wrong spot marked? Refine“ schickt einen Tipp als SAM-Punkt-Prompt an `/refine`.
+**App:** Beide Fotos sind englische Demo-Aufnahmen (`real_sweater`, `real_sole`, Pulli mit Muse-Image-Vorschau). Kleine Schäden (unter 4 % der Fläche) zoomen Diagnose und Anleitung automatisch heran (Pinch, Doppeltipp, Taste „Whole photo“). Masken sind kräftiger, kleine Schäden bekommen einen Ring. „Wrong spot marked? Refine“ schickt einen Tipp als SAM-Punkt-Prompt an `/refine`.

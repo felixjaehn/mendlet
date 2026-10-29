@@ -45,14 +45,6 @@ struct GuideView: View {
             HStack {
                 Text("Schritt \(index + 1) von \(steps.count)").font(.subheadline.weight(.semibold).monospacedDigit()).foregroundStyle(Theme.inkSecondary)
                 Spacer()
-                if let r = flow.response, let photo = flow.photo {
-                    ShareLink(item: GuidePDF(response: r, photo: photo, after: flow.afterImage),
-                              preview: SharePreview(tr("Reparaturanleitung"), image: Image(systemName: "doc.richtext"))) {
-                        Image(systemName: "square.and.arrow.up").font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
-                            .frame(width: 36, height: 36).glass(Circle(), interactive: true)
-                    }
-                    .accessibilityLabel(tr("Anleitung exportieren"))
-                }
                 Button {
                     flow.persist(); flow.reset()
                 } label: {
@@ -193,12 +185,12 @@ struct StepOverlay: View {
     let size: CGSize
     let aspect: CGFloat
     var darningPhase: DarningPhase = .all
-    /// Precomputed plan for static rendering (PDF export); the live view computes it in `.task`.
+    /// Precomputed plan for static rendering; the live view computes it in `.task`.
     var staticPlan: StitchPlan? = nil
 
     @State private var plan: StitchPlan = .empty
 
-    /// Same geometry for the guide and the PDF export.
+    /// Same geometry for the guide.
     static func stitchPlan(step: GuideStep, response: AnalyzeResponse, aspect: CGFloat) -> StitchPlan {
         guard step.overlay?.type == .stitchPath, let s = target(step: step, response: response) else { return .empty }
         return StitchPathPlanner.plan(for: s, stitchType: step.overlay?.stitchType ?? .runningStitch, aspect: aspect)
