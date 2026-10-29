@@ -66,13 +66,22 @@ struct SegmentLayer: View {
         var all = Path()
         for r in rings { all.addPath(r.path) }
         if damage {
-            ctx.fill(all, with: .color(color.opacity(0.14 + 0.2 * boost)), style: FillStyle(eoFill: true))
+            // Real photos 2026-10-29: a 0.14 fill and 2 pt line vanished on a small sweater hole; draw damage boldly.
+            ctx.fill(all, with: .color(color.opacity(0.26 + 0.2 * boost)), style: FillStyle(eoFill: true))
             var outline = Path()
             for r in rings { outline.addPath(trimmed(r.path, drawn)) }
             glow(&ctx, outline, color: color, boost: boost, drawn: 1)
             // dark under-stroke keeps a white outline readable on light fabric (white sneaker, grey shirt)
-            ctx.stroke(outline, with: .color(.black.opacity(0.28)), style: StrokeStyle(lineWidth: 4 + 0.8 * boost, lineJoin: .round))
-            ctx.stroke(outline, with: .color(color), style: StrokeStyle(lineWidth: 2 + 0.8 * boost, lineJoin: .round))
+            ctx.stroke(outline, with: .color(.black.opacity(0.35)), style: StrokeStyle(lineWidth: 5.5 + 0.8 * boost, lineJoin: .round))
+            ctx.stroke(outline, with: .color(color), style: StrokeStyle(lineWidth: 3 + 0.8 * boost, lineJoin: .round))
+            let b = all.boundingRect
+            if max(b.width, b.height) < 90 {
+                // Small damage: a ring around it catches the eye even before the photo zooms in.
+                let r = max(b.width, b.height) / 2 + 14 + 3 * boost
+                let ring = Path(ellipseIn: CGRect(x: b.midX - r, y: b.midY - r, width: 2 * r, height: 2 * r))
+                ctx.stroke(trimmed(ring, drawn), with: .color(.black.opacity(0.3)), style: StrokeStyle(lineWidth: 4.5))
+                ctx.stroke(trimmed(ring, drawn), with: .color(color), style: StrokeStyle(lineWidth: 2.5))
+            }
             if animated && drawn >= 1 {
                 ctx.stroke(outline, with: .color(.white.opacity(0.85)),
                            style: StrokeStyle(lineWidth: 1, lineCap: .round, lineJoin: .round, dash: [2, 9], dashPhase: -time * 14))

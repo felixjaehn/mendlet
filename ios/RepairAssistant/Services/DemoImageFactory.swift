@@ -36,8 +36,8 @@ enum DemoImageFactory {
             let c = ctx.cgContext
             switch scenario {
             case .textileTear: drawDenim(c, tear: damage)
-            case .textileHole: drawKnit(c, hole: damage)
-            case .shoeSole: drawShoe(c, gap: damage)
+            case .textileHole, .realSweater: drawKnit(c, hole: damage)
+            case .shoeSole, .realSole: drawShoe(c, gap: damage)
             case .batteryJacket: drawJacket(c)
             case .helmet: drawHelmet(c)
             case .platine: drawJacket(c)

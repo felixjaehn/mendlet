@@ -70,7 +70,7 @@ struct GuideView: View {
     private func photo(_ step: GuideStep, _ r: AnalyzeResponse) -> some View {
         Group {
             if let img = flow.photo {
-                PhotoStage(image: img) { size in
+                PhotoStage(image: img, focus: DamageFocus.region(for: r.segments)) { size in
                     StepOverlay(step: step, response: r, size: size, aspect: img.size.width / max(img.size.height, 1), darningPhase: darningPhase(for: step, in: r))
                 }
                 .overlay(alignment: .topLeading) {

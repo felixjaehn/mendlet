@@ -486,3 +486,19 @@ async def test_unsure_text_damage_away_from_grounding_is_dropped(image_b64):
     result = await analyze(make_req(image_b64, user_note='Knopf ist abgerissen'), Shirt(0.0))
     kept = sorted((s.prompt, s.score) for s in result.segments if s.kind == 'damage')
     assert kept == [('hole', 0.9), ('rip', 0.64)]  # buttonhole dropped; grounding overlaps the kept rip
+
+
+async def test_small_grounded_hole_replaces_broad_sam_damage_around_it(image_b64):
+    # Real photo 2026-10-29: SAM marked the whole leather sole as "detached sole", Spark found the hole in it.
+    broad = box_seg('b', 'damage', 'detached sole', 0.57, (0.06, 0.22, 0.67, 0.78))
+    hole = box_seg('g', 'damage', 'hole', 0.78, (0.35, 0.43, 0.15, 0.09)).model_copy(update={'source': 'grounding'})
+
+    class Sole(MockClient):
+        async def segment(self, req, category, prompts):
+            return [broad]
+
+        async def ground(self, req, category):
+            return [hole]
+
+    result = await analyze(make_req(image_b64, user_note='Sole worn through'), Sole(0.0))
+    assert [(s.prompt, s.source) for s in result.segments if s.kind == 'damage'] == [('hole', 'grounding')]

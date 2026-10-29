@@ -1,6 +1,9 @@
 import Foundation
 
 enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
+    /// Real phone photos (29.10.2026), recorded live: a small, hard-to-see hole and a worn-through leather sole.
+    case realSweater = "real_sweater"
+    case realSole = "real_sole"
     case textileTear = "textile_tear"
     case textileHole = "textile_hole"
     case shoeSole = "shoe_sole"
@@ -11,6 +14,8 @@ enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
     var id: String { rawValue }
     var title: String {
         switch self {
+        case .realSweater: tr("Real photo: sweater")
+        case .realSole: tr("Real photo: leather sole")
         case .textileTear: tr("Jeans (Riss)")
         case .textileHole: tr("Pulli (3 Löcher)")
         case .shoeSole: tr("Sneaker (Sohle)")
@@ -21,6 +26,8 @@ enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
     }
     var subtitle: String {
         switch self {
+        case .realSweater: tr("Small hole, darning")
+        case .realSole: tr("Worn through, cobbler")
         case .textileTear: tr("Flicken, optional Etikett")
         case .textileHole: tr("Drei Stopfstellen")
         case .shoeSole: tr("Kleben")
@@ -31,6 +38,8 @@ enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
     }
     var systemImage: String {
         switch self {
+        case .realSweater: "camera"
+        case .realSole: "camera"
         case .textileTear: "scissors"
         case .textileHole: "circle.dotted"
         case .shoeSole: "shoe"
@@ -41,6 +50,8 @@ enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
     }
     var userNote: String {
         switch self {
+        case .realSweater: tr("Small hole in my sweater")
+        case .realSole: tr("Leather sole worn through to a hole")
         case .textileTear: tr("Riss am Knie meiner Jeans")
         case .textileHole: tr("Loch am Ellbogen")
         case .shoeSole: tr("Sohle löst sich vorne")
@@ -60,6 +71,9 @@ enum Fixtures {
     static func fileName(_ s: DemoScenario, labelProvided: Bool) -> String {
         switch s {
         case .textileTear: labelProvided ? "textile_tear" : "textile_tear_needs_label"
+        // No hand-written fixture: these two only exist as live recordings.
+        case .realSweater: DemoScenario.textileHole.rawValue
+        case .realSole: DemoScenario.shoeSole.rawValue
         default: s.rawValue
         }
     }
@@ -109,7 +123,7 @@ struct MockAPIClient: AnalysisService {
                         try await pause(0.7)
                         continuation.yield(.result(resp)); continuation.finish(); return
                     }
-                    if scenario == .textileHole {
+                    if scenario == .textileHole || scenario == .realSweater {
                         continuation.yield(.grounding(label: tr("Schadstelle genauer lokalisieren")))
                         try await pause(1.0)
                     }

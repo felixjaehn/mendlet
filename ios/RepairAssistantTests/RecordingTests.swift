@@ -112,4 +112,31 @@ final class RecordingTests: XCTestCase {
         XCTAssertEqual(ShoeStepKind.minutes(in: "mindestens 2 Stunden"), 120)
         XCTAssertNil(ShoeStepKind.minutes(in: "Fest andrücken"))
     }
+
+    func testRealPhotoRecordingsZoomToTheHole() throws {
+        let sweater = try XCTUnwrap(LiveRecordings.recording(for: .realSweater))
+        XCTAssertEqual(sweater.response.decision?.recommendation, .repairSelf)
+        XCTAssertNotNil(sweater.photo); XCTAssertNotNil(sweater.after)
+        let sole = try XCTUnwrap(LiveRecordings.recording(for: .realSole))
+        XCTAssertEqual(sole.response.decision?.recommendation, .repairPro)
+        for r in [sweater.response, sole.response] {
+            let hole = try XCTUnwrap(r.segments.first(where: \.isDamage)?.normalizedBounds)
+            let focus = try XCTUnwrap(DamageFocus.region(for: r.segments), "small damage zooms in")
+            XCTAssertTrue(focus.contains(CGPoint(x: hole.midX, y: hole.midY)))
+        }
+        // Large damage (jeans tear across the knee) keeps the whole photo.
+        XCTAssertNil(DamageFocus.region(for: [Segment(id: "a", label: "Tear", kind: .damage, box: [0.2, 0.2, 0.5, 0.4])]))
+    }
+
+    func testRefinedMaskReplacesOverlappingDamageAndKeepsItsId() {
+        let part = Segment(id: "seg_1", label: "Sole", kind: .part, box: [0, 0, 1, 1])
+        let wrong = Segment(id: "seg_2", label: "Hole", kind: .damage, box: [0.4, 0.4, 0.2, 0.2])
+        let other = Segment(id: "seg_3", label: "Hole", kind: .damage, box: [0.8, 0.8, 0.1, 0.1])
+        let tapped = Segment(id: "seg_1", label: "Hole", kind: .damage, box: [0.45, 0.45, 0.05, 0.05], source: .tap)
+        let merged = FlowModel.merging(refined: tapped, into: [part, wrong, other])
+        XCTAssertEqual(merged.map(\.id), ["seg_1", "seg_3", "seg_2"])
+        XCTAssertEqual(merged.last?.source, .tap)
+        let added = FlowModel.merging(refined: Segment(id: "x", label: "Hole", kind: .damage, box: [0.05, 0.05, 0.05, 0.05]), into: [part, other])
+        XCTAssertEqual(added.map(\.id), ["seg_1", "seg_3", "seg_4"])  // nothing overlapped: added with a free id
+    }
 }

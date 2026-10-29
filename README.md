@@ -43,7 +43,7 @@ The key finding from our live tests: **SAM 3.1 cannot find a tear by name** ("te
 | **SAM 3.1** (`sam-3.1`) | Masks for damage, parts, wires and solder pads; text concepts, box prompts from Spark, tap-to-refine points, video tracking (`/track`) | Tear 0.94 via Spark box, 3 sweater holes as separate instances, wires 0.88/0.95 |
 | **Muse Spark** (`muse-spark-1.3`) | Safety and category check; perception grounding for damage and solder pads (reads the +/− silkscreen); diagnosis, decision, shopping list and steps as schema-validated JSON; reads care labels | Plan in ~13–16 s at `reasoning_effort=low` |
 | **Muse Image** (`muse-image-1.0`) | Edits your own photo into the repaired state for the before/after slider | Jeans and sweater, 11–12 s |
-| **Muse Wonder** (`muse-wonder-1.0`) | Optional agent mode: plans the search, verifies every damage mask with Spark, re-segments with box/points on failure | Recovered from a live SAM HTTP 500 via Spark locate → SAM box |
+| **Muse Wonder** (`muse-wonder-1.0`) | **Precision mode** (Settings toggle or `"agent": true`): plans the search, verifies every damage mask with Spark, re-segments with box/points on failure | 10/10 masks on damage with **0 false positives** (classic path: 3 cases with extras), ~60–90 s vs ~25 s; recovered from a live SAM HTTP 500 |
 | **Muse Voice Transcribe** (`muse-voice-transcribe-1.0`) | Dictation and hands-free step control ("weiter") with keyword biasing for repair vocabulary | Error-free German transcript, 2.9 s |
 
 Open-weight models (Muse Glimmer, Muse Spark Open) are not used.

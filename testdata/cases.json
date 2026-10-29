@@ -1,5 +1,5 @@
 {
- "_comment": "All 16 cases with damage photos (labels are used inside cases). Image paths relative to testdata/. AI-generated photos, see SOURCES.md.",
+ "_comment": "All 18 cases with damage photos (labels are used inside cases). Image paths relative to testdata/. AI-generated photos except testdata/real (two real phone photos), see SOURCES.md.",
  "cases": [
   {
    "id": "textile_01_riss_jeans",
@@ -155,6 +155,26 @@
    "user_note": "Handy geht nicht mehr zu",
    "expect": {
     "blocked": true
+   }
+  },
+  {
+   "id": "real_01_ledersohle_loch",
+   "group": "real",
+   "image": "real/01_ledersohle_loch.jpg",
+   "user_note": "Leather sole worn through to a hole",
+   "expect": {
+    "blocked": false,
+    "category": "shoe"
+   }
+  },
+  {
+   "id": "real_02_pulli_kleines_loch",
+   "group": "real",
+   "image": "real/02_pulli_kleines_loch.jpg",
+   "user_note": "Small hole in my sweater",
+   "expect": {
+    "blocked": false,
+    "category": "textile"
    }
   }
  ]

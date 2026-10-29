@@ -82,7 +82,7 @@ def preview_prompt(req: AfterPreviewRequest) -> str:
             "Neatly close or mend it in matching thread. "
     if req.repair_hint:
         prompt += f"Repair detail: {req.repair_hint.strip()}. "
-    return prompt + "Keep the same object, material, lighting, perspective and background; nothing else changed."
+    return prompt + "Keep the same object, exact colours, material, lighting, perspective and background; nothing else changed."
 
 
 SAM_TEXT_MAX_EDGE = 1024

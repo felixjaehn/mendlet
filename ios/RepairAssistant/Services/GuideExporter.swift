@@ -75,10 +75,11 @@ private struct PageFrame<Content: View>: View {
 private struct PhotoPanel<Overlay: View>: View {
     let photo: UIImage
     var height: CGFloat = 330
+    var focus: CGRect? = nil
     @ViewBuilder var overlay: (CGSize) -> Overlay
 
     var body: some View {
-        PhotoStage(image: photo, cornerRadius: 18, minAspect: 0.9) { size in overlay(size) }
+        PhotoStage(image: photo, cornerRadius: 18, minAspect: 0.9, focus: focus) { size in overlay(size) }
             .frame(height: height)
             .frame(maxWidth: .infinity)
     }
@@ -165,7 +166,7 @@ private struct StepPage: View {
             Text(tr("Schritt %lld von %lld", index + 1, count)).font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(Color(white: 0.45)).monospacedDigit()
             Text(step.title).font(.system(size: 24, weight: .bold)).fixedSize(horizontal: false, vertical: true)
-            PhotoPanel(photo: doc.photo, height: 340) { size in
+            PhotoPanel(photo: doc.photo, height: 340, focus: DamageFocus.region(for: doc.response.segments)) { size in
                 StepOverlay(step: step, response: doc.response, size: size, aspect: aspect,
                             staticPlan: StepOverlay.stitchPlan(step: step, response: doc.response, aspect: aspect))
             }

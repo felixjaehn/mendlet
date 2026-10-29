@@ -35,6 +35,10 @@ shot completion 16 -uiScreen completion -uiScenario textile_tear
 shot analysis-agent 8  -uiScreen analysis -uiScenario textile_tear -recoveryTrace YES
 shot diagnosis-jeans 12 -uiScreen diagnosis -uiScenario textile_tear -recoveryTrace NO
 shot diagnosis-sweater 12 -uiScreen diagnosis -uiScenario textile_hole
+shot diagnosis-real-sweater 12 -uiScreen diagnosis -uiScenario real_sweater
+shot diagnosis-real-sole 12 -uiScreen diagnosis -uiScenario real_sole
+shot decision-real-sole 16 -uiScreen decision -uiScenario real_sole
+shot guide-real-sweater 22 -uiScreen guide -uiScenario real_sweater -uiStep 2
 shot decision-slider 16 -uiScreen decision -uiScenario textile_tear
 shot guide-darning 24 -uiScreen guide -uiScenario textile_tear -uiStep 4
 shot guide-solder 22 -uiScreen guide -uiScenario platine -uiStep 3

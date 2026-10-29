@@ -37,6 +37,10 @@ final class FlowModel {
     /// Shopping items that changed because of the label photo (highlighted for a moment).
     var changedItemIds: Set<String> = []
     private var labelBaseline: AnalyzeResponse?
+    // Tap to refine (diagnosis): one SAM point prompt when the mask missed the damage.
+    var refineMode = false
+    var refineBusy = false
+    var refineError: String?
     // Muse Image before/after
     enum AfterState: Equatable { case idle, loading, ready, unavailable }
     var afterState: AfterState = .idle
@@ -222,6 +226,45 @@ final class FlowModel {
         startAnalysis(resetExtras: false)
     }
 
+    // MARK: Tap to refine
+
+    /// `point` is normalized to the photo. The tapped mask replaces damage marks it overlaps (keeping their id, so guide
+    /// overlays still point at it) or is added as a new damage mark.
+    func refine(at point: CGPoint) {
+        guard let r = response, let photo, !refineBusy else { return }
+        refineBusy = true; refineError = nil
+        let label = r.segments.first(where: \.isDamage)?.label ?? tr("Damage")
+        let req = RefineRequest(imageBase64: ImageResizer.base64(photo),
+                                points: [RefinePoint(x: Double(point.x), y: Double(point.y), label: "positive")], box: nil, label: label)
+        let svc = service
+        Task { [weak self] in
+            do {
+                let seg = try await svc.refine(req)
+                guard let self, var resp = self.response, resp.caseId == r.caseId else { return }
+                resp.segments = Self.merging(refined: seg, into: resp.segments)
+                withAnimation(Theme.spring) { self.response = resp; self.refineMode = false }
+                Haptics.success()
+            } catch {
+                self?.refineError = APIError.from(error).errorDescription
+            }
+            self?.refineBusy = false
+        }
+    }
+
+    static func merging(refined: Segment, into segments: [Segment]) -> [Segment] {
+        let new = refined.normalizedBounds ?? .zero
+        let hit = segments.filter { $0.isDamage && ($0.normalizedBounds.map { $0.intersects(new) } ?? false) }
+        var seg = refined
+        seg.kind = .damage
+        seg.id = hit.first?.id ?? {
+            var i = segments.count + 1
+            while segments.contains(where: { $0.id == "seg_\(i)" }) { i += 1 }
+            return "seg_\(i)"
+        }()
+        let dropped = Set(hit.map(\.id))
+        return segments.filter { !dropped.contains($0.id) } + [seg]
+    }
+
     // MARK: Muse Image preview
 
     func loadAfterPreview() {
@@ -318,6 +361,7 @@ final class FlowModel {
         analysisTask?.cancel()
         path = []
         photo = nil; note = ""; response = nil; showReview = false; showFollowUp = false
+        refineMode = false; refineBusy = false; refineError = nil
         extraImages = []; answers = []; followUpUsed = false; labelImage = nil; resultPhoto = nil
         statuses = [:]; currentStep = 0; completedSteps = []; guideStartedAt = nil
         earlySegments = []; analysisError = nil; isAnalyzing = false; stageStates = [:]; groundingSeen = false

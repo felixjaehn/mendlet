@@ -18,10 +18,21 @@ struct DiagnosisView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 if let photo = flow.photo, let r {
-                    PhotoStage(image: photo, minAspect: 1.15) { size in
-                        SegmentOverlayView(segments: r.segments, size: size, hidden: hidden, pulsingIDs: pulsing, appeared: appeared)
+                    PhotoStage(image: photo, minAspect: 1.15, focus: DamageFocus.region(for: r.segments)) { size in
+                        ZStack {
+                            SegmentOverlayView(segments: r.segments, size: size, hidden: hidden, pulsingIDs: pulsing, appeared: appeared)
+                            if flow.refineMode {
+                                Color.white.opacity(0.001).contentShape(Rectangle())
+                                    .onTapGesture(coordinateSpace: .local) { p in
+                                        flow.refine(at: CGPoint(x: p.x / size.width, y: p.y / size.height))
+                                    }
+                                    .accessibilityLabel(tr("Tap the damage on the photo"))
+                            }
+                            if flow.refineBusy { ProgressView().controlSize(.large).tint(.white) }
+                        }
                     }
                     chipBar(r)
+                    refineRow
                 }
                 if let r {
                     if let banner = flow.newInfoBanner, r.diagnosis.labelInfo != nil { infoBanner(banner) }
@@ -96,6 +107,28 @@ struct DiagnosisView: View {
             .padding(.horizontal, Theme.margin)
         }
         .padding(.horizontal, -Theme.margin)
+    }
+
+    /// SAM can miss a small hole. One visible offer to point at it; the tap becomes a SAM point prompt (`/refine`).
+    private var refineRow: some View {
+        HStack(spacing: 10) {
+            Image(systemName: flow.refineMode ? "hand.tap.fill" : "hand.tap")
+                .font(.title3).foregroundStyle(Theme.thread).symbolEffect(.pulse, isActive: flow.refineMode)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(flow.refineMode ? tr("Tap the damage on the photo") : tr("Wrong spot marked?"))
+                    .font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
+                Text(flow.refineError ?? (flow.refineMode ? tr("SAM 3.1 outlines what you tap.") : tr("Tap to refine the mask.")))
+                    .font(.footnote).foregroundStyle(flow.refineError == nil ? Theme.inkSecondary : Theme.stop)
+            }
+            Spacer(minLength: 0)
+            Button(flow.refineMode ? tr("Cancel") : tr("Refine")) {
+                withAnimation(Theme.spring) { flow.refineMode.toggle(); flow.refineError = nil }
+                Haptics.selection()
+            }
+            .buttonStyle(.bordered).buttonBorderShape(.capsule).disabled(flow.refineBusy)
+        }
+        .padding(14)
+        .background(Theme.fill, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private func infoBanner(_ text: String) -> some View {

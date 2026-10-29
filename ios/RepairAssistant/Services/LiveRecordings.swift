@@ -26,6 +26,8 @@ enum LiveRecordings {
 
     static func name(for s: DemoScenario) -> String? {
         switch s {
+        case .realSweater: "real_sweater"
+        case .realSole: "real_sole"
         case .textileTear: "jeans"
         case .textileHole: "pulli"
         case .shoeSole: "sneaker"
@@ -50,7 +52,8 @@ enum LiveRecordings {
     }
 
     static func response(file: String) -> AnalyzeResponse? {
-        guard let u = url(localizedJSONName(file), "json"), let d = try? Data(contentsOf: u) else { return nil }
+        // The real-photo cases were only recorded in English.
+        guard let u = url(localizedJSONName(file), "json") ?? url(file + ".en", "json"), let d = try? Data(contentsOf: u) else { return nil }
         return try? ContractCoding.decoder().decode(AnalyzeResponse.self, from: d)
     }
 
@@ -63,7 +66,8 @@ enum LiveRecordings {
     }
 
     static func envelope(file: String) -> AgentEnvelope? {
-        guard let u = url(localizedJSONName(file), "json"), let d = try? Data(contentsOf: u) else { return nil }
+        // The real-photo cases were only recorded in English.
+        guard let u = url(localizedJSONName(file), "json") ?? url(file + ".en", "json"), let d = try? Data(contentsOf: u) else { return nil }
         return try? ContractCoding.decoder().decode(AgentEnvelope.self, from: d)
     }
 

@@ -79,6 +79,7 @@ def blocked_response(cls: ClassifyResult, pre: safety.PreCheck, locale: str | No
 
 
 UNSURE_TEXT_DAMAGE = 0.7
+PRECISE_RATIO = 0.15  # grounded damage box under 15 % of a SAM damage box around it replaces that box
 
 
 def _xyxy(seg: Segment) -> tuple[float, float, float, float] | None:
@@ -86,6 +87,10 @@ def _xyxy(seg: Segment) -> tuple[float, float, float, float] | None:
         return None
     x, y, w, h = seg.box
     return (x, y, x + w, y + h)
+
+
+def _area(seg: Segment) -> float:
+    return seg.box[2] * seg.box[3] if seg.box else 0.0
 
 
 def _overlaps(a: Segment, b: Segment) -> bool:
@@ -149,6 +154,11 @@ async def _classic_segments(req: AnalyzeRequest, client: ModelClient, cls: Class
                 segments = [s for s in segments if s.kind != "damage" or s.score >= UNSURE_TEXT_DAMAGE
                             or any(_overlaps(s, g) for g in grounded)]
             for segment in grounded:
+                # Real photo 2026-10-29 (leather sole): SAM's "detached sole" box covered the whole sole while Spark's
+                # box sat exactly on the worn-through hole. A far smaller grounded box inside it is the precise one.
+                broad = [s for s in segments if s.kind == "damage" and _overlaps(segment, s)
+                         and _area(segment) < PRECISE_RATIO * _area(s)]
+                segments = [s for s in segments if s not in broad]
                 if not any(_overlaps(segment, s) for s in segments if s.kind == "damage"):
                     segments.append(segment.model_copy(update={"id": _free_id(segments)}))
         else:
