@@ -199,9 +199,9 @@ struct SolderOverlay: View {
             ctx.fill(all, with: .color(SolderStyle.copper.opacity(0.25 + 0.25 * pulse)), style: FillStyle(eoFill: true))
             ctx.drawLayer { l in
                 l.addFilter(.blur(radius: 4 + 4 * pulse))
-                l.stroke(all, with: .color(SolderStyle.copper.opacity(0.7 + 0.3 * pulse)), style: StrokeStyle(lineWidth: 6, lineJoin: .round))
+                l.stroke(all, with: .color(SolderStyle.copper.opacity(0.5 + 0.3 * pulse)), style: StrokeStyle(lineWidth: 4, lineJoin: .round))
             }
-            ctx.stroke(all, with: .color(.white.opacity(0.95)), style: StrokeStyle(lineWidth: 1.6, lineJoin: .round))
+            ctx.stroke(all, with: .color(SolderStyle.copper), style: StrokeStyle(lineWidth: 1.4, lineJoin: .round))
             if let c = SolderStyle.centroid(end, in: sz), animated {
                 let k = CGFloat((t * 1.2).truncatingRemainder(dividingBy: 1))
                 let rr = 8 + 16 * k
