@@ -31,7 +31,7 @@ struct AnalysisView: View {
                 } else {
                     StageStrip(titles: stages.map { $0.0 == .segment && flow.groundingSeen ? "Muse Spark lokalisiert, SAM segmentiert" : $0.1 },
                                states: stages.map { state(for: $0.0) })
-                    AgentTraceView(steps: flow.agentSteps, active: activeWork)
+                    AgentTraceView(steps: flow.agentSteps, active: activeWork, replay: flow.settings.demoMode)
                 }
             }
             .padding(.horizontal, Theme.margin).padding(.top, 8).padding(.bottom, 32)

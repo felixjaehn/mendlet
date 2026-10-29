@@ -39,6 +39,8 @@ struct AgentTraceView: View {
     let steps: [AgentStep]
     /// Label and model of the work in progress (shown as the last, pulsing row).
     var active: (label: String, model: String)?
+    /// Demo mode replays recorded runs; the badge must not claim "live" then.
+    var replay = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -46,7 +48,7 @@ struct AgentTraceView: View {
             HStack(spacing: 8) {
                 SectionLabel(text: "Agenten-Protokoll")
                 Spacer()
-                if active != nil { LiveDot() }
+                if active != nil { LiveDot(replay: replay) }
             }
             .padding(.bottom, 4)
             ForEach(steps) { s in
@@ -116,12 +118,13 @@ struct AgentTraceView: View {
 }
 
 private struct LiveDot: View {
+    var replay = false
     @State private var on = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     var body: some View {
         HStack(spacing: 5) {
             Circle().fill(Theme.thread).frame(width: 7, height: 7).opacity(on ? 1 : 0.35)
-            Text("live").font(.caption2.weight(.bold)).textCase(.uppercase).foregroundStyle(Theme.thread)
+            Text(replay ? "Aufzeichnung" : "live").font(.caption2.weight(.bold)).textCase(.uppercase).foregroundStyle(Theme.thread)
         }
         .onAppear { if !reduceMotion { withAnimation(.easeInOut(duration: 0.8).repeatForever()) { on = true } } else { on = true } }
         .accessibilityHidden(true)
