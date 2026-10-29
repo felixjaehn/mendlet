@@ -4,7 +4,7 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-ESTIMATE_NOTE = "Schätzung, keine Garantie"
+ESTIMATE_NOTE = "Schätzung"
 
 Category = Literal["textile", "shoe", "low_voltage_electronics", "unsupported"]
 RiskLevel = Literal["allowed", "warn_only", "professional"]

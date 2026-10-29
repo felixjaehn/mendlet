@@ -94,7 +94,7 @@ struct Chip: View {
 // MARK: Pills
 
 struct EstimatePill: View {
-    var text: String = "Schätzung, keine Garantie"
+    var text: String = "Schätzung"
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: "info.circle")

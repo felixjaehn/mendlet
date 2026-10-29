@@ -122,7 +122,7 @@ def test_uses_items_must_exist_and_unused_items_dropped():
 def test_estimate_note_forced():
     plan = textile_tear()
     plan.decision.estimate_note = "Garantiert!"
-    assert safety.enforce(resp(plan=plan), has_answers=True).decision.estimate_note == "Schätzung, keine Garantie"
+    assert safety.enforce(resp(plan=plan), has_answers=True).decision.estimate_note == "Schätzung"
 
 
 def test_safety_critical_requires_confirmation():

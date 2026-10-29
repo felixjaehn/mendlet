@@ -74,7 +74,7 @@ def _plan(diagnosis: dict, decision: dict, items: list[dict], steps: list[dict])
 
 def _decision(rec: str, why: str, effort: str, t: list[int], c: list[float]) -> dict:
     return {"recommendation": rec, "reasoning": why, "effort": effort, "time_minutes": t, "cost_eur": c,
-            "estimate_note": "Schätzung, keine Garantie"}
+            "estimate_note": "Schätzung"}
 
 
 # ---- classification ----------------------------------------------------------------

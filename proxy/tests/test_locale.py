@@ -34,7 +34,7 @@ def test_prompt_versions_and_language_placeholder():
     assert "Write all user-facing texts in English" in en
     assert "Write all user-facing texts in German" in de
     assert "{language}" not in en and "{estimate_note}" not in en
-    assert 'estimate_note="Estimate, no guarantee"' in en and 'estimate_note="Schätzung, keine Garantie"' in de
+    assert 'estimate_note="Estimate"' in en and 'estimate_note="Schätzung"' in de
     # default stays German, v4 is kept untouched
     assert load_prompt("diagnose") == de
     assert "Alle Texte sind auf Deutsch" in (REPO_DIR / "prompts" / "prompt_b_diagnose.v4.txt").read_text(encoding="utf-8")
@@ -50,8 +50,8 @@ async def test_pipeline_labels_and_estimate_note_in_english(image_b64):
     assert [s.id for s in de.segments] == [s.id for s in en.segments]
     assert any(s.label == "Riss" for s in de.segments) and not any(s.label == "Riss" for s in en.segments)
     assert any(s.label == "Tear" for s in en.segments)
-    assert de.decision.estimate_note == "Schätzung, keine Garantie"
-    assert en.decision.estimate_note == "Estimate, no guarantee"
+    assert de.decision.estimate_note == "Schätzung"
+    assert en.decision.estimate_note == "Estimate"
 
 
 def test_stage_labels_in_sse(client, image_b64):

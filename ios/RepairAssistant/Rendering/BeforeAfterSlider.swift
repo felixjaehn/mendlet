@@ -112,6 +112,12 @@ struct BeforeAfterCard: View {
     @Environment(FlowModel.self) private var flow
     var aspect: CGFloat = 1.0
 
+    /// Horizontal centre of the damage (normalized), so the divider starts on it.
+    private var damageCentreX: Double? {
+        guard let s = flow.response?.segments.first(where: { $0.isDamage }), let b = s.normalizedBox else { return nil }
+        return Double(b.midX)
+    }
+
     var body: some View {
         Group {
             if let photo = flow.photo {
@@ -121,8 +127,12 @@ struct BeforeAfterCard: View {
                 case .ready:
                     if let after = flow.afterImage {
                         VStack(spacing: 10) {
-                            BeforeAfterSlider(before: photo, after: after, aspect: aspect)
-                            EstimatePill(text: "So könnte es aussehen – keine Garantie")
+                            // Whole photo (no square crop) and the divider on the damage: judges read a centred
+                            // divider over a diagonal tear as "two different crops" (demo review 2026-10-29).
+                            BeforeAfterSlider(before: photo, after: after,
+                                              aspect: min(1.3, max(0.75, photo.size.width / max(photo.size.height, 1))),
+                                              initial: damageCentreX ?? 0.5)
+                            EstimatePill(text: "So könnte es aussehen")
                         }
                         .transition(.opacity.combined(with: .scale(scale: 0.98)))
                     }

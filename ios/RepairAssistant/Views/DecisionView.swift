@@ -73,7 +73,7 @@ struct DecisionView: View {
                         MetricTile(icon: "clock", title: "Zeit", value: Fmt.minutes(d.timeMinutes))
                         MetricTile(icon: "eurosign.circle", title: "Kosten", value: Fmt.euro(d.costEur))
                     }
-                    EstimatePill(text: d.estimateNote)
+                    EstimatePill()  // fixed label instead of the model's wording
 
                     VStack(alignment: .leading, spacing: 10) {
                         SectionLabel(text: "Die Optionen im Vergleich")

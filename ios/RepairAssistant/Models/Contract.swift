@@ -299,7 +299,7 @@ struct Decision: Codable, Sendable, Hashable {
     var estimateNote: String
 
     private enum CodingKeys: String, CodingKey { case recommendation, reasoning, effort, timeMinutes, costEur, estimateNote }
-    init(recommendation: Recommendation, reasoning: String, effort: Effort, timeMinutes: [Int], costEur: [Double], estimateNote: String = "Schätzung, keine Garantie") {
+    init(recommendation: Recommendation, reasoning: String, effort: Effort, timeMinutes: [Int], costEur: [Double], estimateNote: String = "Schätzung") {
         self.recommendation = recommendation; self.reasoning = reasoning; self.effort = effort
         self.timeMinutes = timeMinutes; self.costEur = costEur; self.estimateNote = estimateNote
     }
@@ -311,7 +311,7 @@ struct Decision: Codable, Sendable, Hashable {
         if let d = try? c.decode([Double].self, forKey: .timeMinutes) { timeMinutes = d.filter { $0.isFinite }.map { Int($0) } } else { timeMinutes = [] }
         costEur = (try? c.decode([Double].self, forKey: .costEur))?.filter { $0.isFinite } ?? []
         let note = (try? c.decode(String.self, forKey: .estimateNote)) ?? ""
-        estimateNote = note.isEmpty ? "Schätzung, keine Garantie" : note
+        estimateNote = note.isEmpty ? "Schätzung" : note
     }
 }
 

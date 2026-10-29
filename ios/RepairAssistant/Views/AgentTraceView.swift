@@ -30,7 +30,7 @@ enum ModelStyle {
         return model
     }
     static func seconds(_ ms: Int) -> String {
-        ms < 100 ? "\(ms) ms" : String(format: "%.1f s", Double(ms) / 1000).replacingOccurrences(of: ".", with: ",")
+        ms < 100 ? "\(ms) ms" : String(format: "%.1f s", locale: Lang.shared.locale, Double(ms) / 1000)
     }
 }
 
@@ -43,15 +43,36 @@ struct AgentTraceView: View {
     var replay = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    /// Keeps the card short enough to never clip on screen or in the video (demo review 2026-10-29).
+    private let maxVisible = 5
+    private var visible: [AgentStep] { Array(steps.suffix(active == nil ? maxVisible : maxVisible - 1)) }
+    private var hiddenCount: Int { steps.count - visible.count }
+    /// First successful step after a failure: the moment the agent re-routed.
+    private var recoveredIDs: Set<Int> {
+        var ids = Set<Int>(), failed = false
+        for s in steps {
+            if s.status != .done { failed = true } else if failed { ids.insert(s.n); failed = false }
+        }
+        return ids
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 8) {
                 SectionLabel(text: "Agenten-Protokoll")
                 Spacer()
+                if !steps.isEmpty {
+                    Text(tr("%lld Schritte · %@", steps.count, ModelStyle.seconds(steps.map(\.ms).reduce(0, +))))
+                        .font(.caption.monospacedDigit().weight(.semibold)).foregroundStyle(Theme.inkSecondary)
+                }
                 if active != nil { LiveDot(replay: replay) }
             }
             .padding(.bottom, 4)
-            ForEach(steps) { s in
+            if hiddenCount > 0 {
+                Text(tr("+%lld frühere Schritte", hiddenCount))
+                    .font(.caption.weight(.semibold)).foregroundStyle(Theme.inkSecondary).padding(.leading, 38).padding(.bottom, 2)
+            }
+            ForEach(visible) { s in
                 row(s)
                     .transition(reduceMotion ? .opacity : .asymmetric(insertion: .move(edge: .bottom).combined(with: .opacity), removal: .opacity))
             }
@@ -83,7 +104,10 @@ struct AgentTraceView: View {
         return HStack(spacing: 10) {
             tile(s.model, ok: ok)
             Group {
-                if ok { Text(AgentLabel.localized(s.label)).foregroundStyle(Theme.ink) }
+                if ok && recoveredIDs.contains(s.n) {
+                    Text(AgentLabel.localized(s.label)).foregroundStyle(Theme.ink)
+                        + Text("\n✓ " + tr("Fehler behoben – Agent hat umgeplant")).font(.caption.weight(.semibold)).foregroundStyle(Theme.safe)
+                } else if ok { Text(AgentLabel.localized(s.label)).foregroundStyle(Theme.ink) }
                 else { Text(AgentLabel.localized(s.label)).foregroundStyle(Theme.ink) + Text("\nServerfehler – Agent weicht aus").font(.caption.weight(.semibold)).foregroundStyle(Theme.stop) }
             }
             .font(.subheadline.weight(.semibold)).lineLimit(3).fixedSize(horizontal: false, vertical: true)
@@ -97,6 +121,8 @@ struct AgentTraceView: View {
             }
         }
         .padding(.vertical, 3)
+        .padding(.horizontal, ok ? 0 : 6)
+        .background(ok ? Color.clear : Theme.stop.opacity(0.07), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(AgentLabel.localized(s.label)), \(ModelStyle.display(s.model)), \(ModelStyle.seconds(s.ms)), \(ok ? tr("fertig") : tr("fehlgeschlagen, Serverfehler, Agent weicht aus"))")
     }

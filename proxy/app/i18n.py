@@ -78,7 +78,7 @@ def relabel(segments: list, locale: str | None) -> list:
     return [s.model_copy(update={"label": LABELS_EN[s.label]}) if s.label in LABELS_EN else s for s in segments]
 
 
-ESTIMATE_NOTE = {"de": "Schätzung, keine Garantie", "en": "Estimate, no guarantee"}
+ESTIMATE_NOTE = {"de": "Schätzung", "en": "Estimate"}
 
 AGENT_LABELS = {
     "segment": {"de": "SAM sucht „{}“", "en": "SAM is looking for “{}”"},
