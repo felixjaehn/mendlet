@@ -29,4 +29,4 @@ Last updated: 2026-10-29 (morning).
 
 - Latency ~22–24 s (classic path), ~50 s in Wonder agent mode.
 - SAM cannot find gaps (tears, open seams) by name; Spark grounding provides the box. Extra false positives remain on some photos (buttonholes, seams).
-- Open-weight models (Glimmer, Spark Open) are not used.
+- Open-weight models (Glimmer, Spark Open) are not used, by decision: the app runs on the phone plus a thin proxy, and every step already has a hosted Meta model with a distinct job.
