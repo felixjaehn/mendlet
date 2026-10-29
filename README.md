@@ -40,7 +40,7 @@ Open-weight models (Muse Glimmer, Muse Spark Open) are not used.
 
 ## Built during the hackathon
 
-The hackathon started with the kickoff on **2026-10-26, 12:00 PM ET**. The first commit of this project is **2026-10-26 20:03 CET = 15:03 ET**, three hours after kickoff. No code, assets or data from earlier projects are used. The sibling folder `gebaerden-app/` is a separate project and not part of this submission.
+The hackathon started with the kickoff on **2026-10-26, 12:00 PM ET**. The first commit of this project is **2026-10-26 20:03 CET = 15:03 ET**, three hours after kickoff. No code, assets or data from earlier projects are used. This repository contains only this project.
 
 | Date (ET) | Commits | What was built |
 | --- | --- | --- |
@@ -74,3 +74,7 @@ The app only gives instructions where a mistake stays harmless. Lithium batterie
 ## Assets and tools
 
 All icons are SF Symbols. Test photos in `testdata/` are **AI-generated** and labelled per file in `testdata/SOURCES.md`: most with OpenAI Codex image generation, the electronics and two safety photos with Meta Muse Image. The demo video is filmed by the author with a real garment and a real iPhone. Design references from Mobbin were used for inspiration only (`docs/design-notes.md`). Code was written with AI coding assistants (Claude Code, OpenAI Codex); all components are owned by the author.
+
+## License
+
+MIT, see [`LICENSE`](LICENSE).

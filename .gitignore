@@ -1,0 +1,25 @@
+# Secrets
+.env
+*.env
+!.env.example
+**/Config.local.xcconfig
+**/Secrets.plist
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+proxy/.cache/
+**/.cache/
+
+# Xcode
+DerivedData/
+build/
+*.xcuserstate
+xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# macOS
+.DS_Store
