@@ -112,3 +112,15 @@ Foto `electronics/01_kabel_platine.jpg`, Notiz "USB-Lampe geht nicht mehr, Kabel
 
 - Erster Lauf: **fälschlich gesperrt** in 3 s, weil die Schlüsselwort-Vorprüfung "Akku" in "Kein Akku drin" fand. Behoben mit einer engen Verneinungsregel nur für Akku/Lithium (`proxy/app/safety.py`). Andere verneinte Gefahrenwörter sperren weiter. Spark prüft das Foto zusätzlich.
 - Zweiter Lauf, 23 s: SAM `black wire` 0,95, `red wire` 0,88, `circuit board` 0,78, `copper wire strands` ×2 (0,61/0,57). Spark-Pad-Grounding plus SAM-Box: **Lötpad + 0,90, Lötpad − 0,66**. Plan mit 6 Schritten (stromlos machen, Durchgang prüfen, fixieren, rot an +, schwarz an −, isolieren und testen), Löt-Overlays mit 3 s Haltezeit. Zuordnung geprüft: rote Litze → Pad +, schwarze Litze → Pad − ([Overlay](live-probes/2026-10-29_platine_wire-pad-mapping.jpg)).
+
+## Muse Voice Transcribe live (29.10.2026)
+
+Deutsche Sprachaufnahme (macOS-Stimme "Anna", 16 kHz mono WAV, 4,3 s): "Die Jeans hat einen Riss direkt neben der Seitennaht am linken Hosenbein."
+
+| Konfiguration | Transkript | Latenz |
+| --- | --- | --- |
+| `languageBias: German` | "Die **Teams hat hat** einen Riss direkt neben der Seitennaht am linken Hosenbein." | 3,9 s |
+| + `keywords` (Reparaturvokabular: Jeans, Naht, Saum, Riss, Loch, Etikett, Sohle, Lötpad …) | "die Jeans hat einen Riss direkt neben der Seitennaht am linken Hosenbein." (fehlerfrei) | 2,9 s |
+| Sprachbefehl "Weiter." (freihändige Anleitung) | "weiter." | 2,1 s |
+
+Synthetische Stimme, keine echte Sprecherin. Echte Sprache mit Nebengeräuschen bleibt zu testen.

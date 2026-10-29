@@ -11,7 +11,7 @@ import pytest
 from PIL import Image
 
 from app.budget import Budget
-from app.clients import RealMetaClient
+from app.clients import REPAIR_KEYWORDS, RealMetaClient
 from app.config import Settings
 from app.errors import AppError, ModelOutputError
 from app.images import prepare_request
@@ -144,7 +144,7 @@ async def test_asr_actual_multipart_and_cache(tmp_path):
         assert parts['request'].get_content_type() == 'application/json'
         assert json.loads(parts['request'].get_payload(decode=True)) == {
             'model': 'muse-voice-transcribe-1.0', 'audioEncoding': 'WAV',
-            'mode': 'PUSH_TO_TALK', 'languageBias': ['German']}
+            'mode': 'PUSH_TO_TALK', 'languageBias': ['German'], 'keywords': REPAIR_KEYWORDS}
         assert parts['audio'].get_content_type() == 'audio/wav'
         assert parts['audio'].get_payload(decode=True) == raw
         return httpx.Response(200, json={'sessionId': 'offline', 'transcript': 'Riss in der Hose', 'audioDurationMs': 200, 'turns': []})

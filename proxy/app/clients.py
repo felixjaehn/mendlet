@@ -85,6 +85,8 @@ def preview_prompt(req: AfterPreviewRequest) -> str:
 
 
 SAM_TEXT_MAX_EDGE = 1024
+REPAIR_KEYWORDS = ["Jeans", "Naht", "Seitennaht", "Saum", "Riss", "Loch", "Etikett", "Stopfen", "Flicken",
+                   "Sohle", "Absatz", "Sneaker", "Pullover", "Elasthan", "Kabel", "Lötpad", "Platine"]
 DETECT_MAX_EDGE = 768  # live frames: smaller is faster, the contract already caps the client at 768
 
 
@@ -442,6 +444,9 @@ class RealMetaClient:
             "audioEncoding": "WAV",
             "mode": "PUSH_TO_TALK",
             "languageBias": ["German"],
+            # Live 2026-10-29: "Jeans" came back as "Teams"; keyword biasing (docs: contextual/keyword
+            # biasing) covers the repair vocabulary users dictate.
+            "keywords": REPAIR_KEYWORDS,
         }
         key = ModelCache.key("transcribe-v1", self.s.transcribe_model, request, hashlib.sha256(wav).hexdigest())
         cached = self.cache.get(key)
