@@ -75,7 +75,7 @@ Smoke-Test plus Sondierung: etwa 0,06 $ (geschätzt aus Token und Bildzahl, Rech
 | Fehler gesamt | 0 von 16 | – |
 
 **Fehlschläge und Grenzfälle, offen berichtet:**
-- `electronics_02_usb_buchse` wurde **fälschlich gesperrt** (`warn_only`): Spark stuft ein Gerät, das "nicht mehr lädt", vorsichtig als möglicherweise akkubetrieben ein. Übervorsichtig, nicht gefährlich.
+- `electronics_02_usb_buchse` wurde **fälschlich gesperrt** (`warn_only`): Spark begründet: "Ladefunktion gestört, Akkubezug nicht auszuschließen daher Vorsicht." Übervorsichtig, nicht gefährlich. Ein Folgefoto mit sichtbarem Gerät ohne Akku würde die Sperre lösen.
 - `shoe_02_naht_leder`: Das Overlay markiert die Sohle, nicht die offene Fersennaht. Die Diagnose im Text ist trotzdem eine Naht-Reparatur.
 - `shoe_03_absatz`: Empfehlung "Profi" (Absatzflicken ersetzen) ohne Anleitung. Fachlich vertretbar.
 - Knopf und Jacke: zusätzliche Fehltreffer (Knopflöcher, Nähte als `open seam`).
