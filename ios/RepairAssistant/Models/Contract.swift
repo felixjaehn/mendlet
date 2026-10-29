@@ -290,6 +290,22 @@ struct Diagnosis: Codable, Sendable, Hashable {
 
 // MARK: - Decision
 
+/// Replace only: what to do with the old item (upcycle, recycle, donate).
+struct SecondLife: Codable, Sendable, Hashable {
+    enum Kind: String, Codable, Sendable { case upcycle, recycle, donate }
+    var kind: Kind
+    var title: String
+    var text: String
+
+    var icon: String {
+        switch kind {
+        case .upcycle: "scissors"
+        case .recycle: "arrow.3.trianglepath"
+        case .donate: "heart"
+        }
+    }
+}
+
 struct Decision: Codable, Sendable, Hashable {
     var recommendation: Recommendation
     var reasoning: String
@@ -297,8 +313,9 @@ struct Decision: Codable, Sendable, Hashable {
     var timeMinutes: [Int]
     var costEur: [Double]
     var estimateNote: String
+    var secondLife: [SecondLife] = []
 
-    private enum CodingKeys: String, CodingKey { case recommendation, reasoning, effort, timeMinutes, costEur, estimateNote }
+    private enum CodingKeys: String, CodingKey { case recommendation, reasoning, effort, timeMinutes, costEur, estimateNote, secondLife }
     init(recommendation: Recommendation, reasoning: String, effort: Effort, timeMinutes: [Int], costEur: [Double], estimateNote: String = "Schätzung") {
         self.recommendation = recommendation; self.reasoning = reasoning; self.effort = effort
         self.timeMinutes = timeMinutes; self.costEur = costEur; self.estimateNote = estimateNote
@@ -312,6 +329,7 @@ struct Decision: Codable, Sendable, Hashable {
         costEur = (try? c.decode([Double].self, forKey: .costEur))?.filter { $0.isFinite } ?? []
         let note = (try? c.decode(String.self, forKey: .estimateNote)) ?? ""
         estimateNote = note.isEmpty ? "Schätzung" : note
+        secondLife = (try? c.decode([SecondLife].self, forKey: .secondLife)) ?? []
     }
 }
 

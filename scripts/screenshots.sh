@@ -17,6 +17,7 @@ xcodebuild -project "$ROOT/ios/RepairAssistant.xcodeproj" -scheme RepairAssistan
 APP=$(find "$DERIVED/Build/Products" -name RepairAssistant.app -path "*iphonesimulator*" | head -1)
 BUNDLE=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$APP/Info.plist")
 xcrun simctl install "$UDID" "$APP"
+xcrun simctl launch "$UDID" "$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$APP/Info.plist")" >/dev/null; sleep 4
 xcrun simctl status_bar "$UDID" override --time 9:41 --batteryState charged --batteryLevel 100 2>/dev/null || true
 
 shot() {  # name, wait seconds, launch args…
@@ -24,8 +25,9 @@ shot() {  # name, wait seconds, launch args…
   xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
   xcrun simctl launch "$UDID" "$BUNDLE" -AppleLanguages "($LANG_CODE)" -fastReplay YES "$@" >/dev/null
   sleep "$wait"
-  xcrun simctl io "$UDID" screenshot "$OUT/v6-$LANG_CODE-$name.png" >/dev/null
-  echo "v6-$LANG_CODE-$name.png"
+  rm -f "$OUT/v7-$LANG_CODE-$name.png"
+  xcrun simctl io "$UDID" screenshot "$OUT/v7-$LANG_CODE-$name.png" >/dev/null
+  echo "v7-$LANG_CODE-$name.png"
 }
 
 shot home 7
@@ -36,6 +38,7 @@ shot analysis-agent 8  -uiScreen analysis -uiScenario textile_tear -recoveryTrac
 shot diagnosis-jeans 12 -uiScreen diagnosis -uiScenario textile_tear -recoveryTrace NO
 shot diagnosis-sweater 12 -uiScreen diagnosis -uiScenario textile_hole
 shot diagnosis-real-sweater 12 -uiScreen diagnosis -uiScenario real_sweater
+shot analysis 7 -uiScreen analysis -uiScenario real_sweater
 shot diagnosis-real-sole 12 -uiScreen diagnosis -uiScenario real_sole
 shot decision-real-sole 16 -uiScreen decision -uiScenario real_sole
 shot guide-real-sweater 22 -uiScreen guide -uiScenario real_sweater -uiStep 2
@@ -44,3 +47,8 @@ shot guide-darning 24 -uiScreen guide -uiScenario textile_tear -uiStep 4
 shot guide-solder 22 -uiScreen guide -uiScenario platine -uiStep 3
 shot guide-shoe 22 -uiScreen guide -uiScenario shoe_sole -uiStep 2
 shot blocked-battery 10 -uiScreen diagnosis -uiScenario battery_jacket
+shot decision-replace 16 -uiScreen decision -uiScenario worn_shirt
+xcrun simctl ui "$UDID" appearance dark
+shot guide-real-sweater-dark 22 -uiScreen guide -uiScenario real_sweater -uiStep 2
+shot diagnosis-real-sole-dark 12 -uiScreen diagnosis -uiScenario real_sole
+xcrun simctl ui "$UDID" appearance light

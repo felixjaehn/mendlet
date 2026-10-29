@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>de</string>
+	<string>en</string>
 	<key>CFBundleDisplayName</key>
 	<string>Mendlet</string>
 	<key>CFBundleExecutable</key>
@@ -14,7 +14,6 @@
 	<string>6.0</string>
 	<key>CFBundleLocalizations</key>
 	<array>
-		<string>de</string>
 		<string>en</string>
 	</array>
 	<key>CFBundleName</key>
@@ -31,13 +30,13 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Die Kamera erkennt Schäden im Live-Bild, nimmt ein Foto auf und zeigt Stichpunkte auf dem Stoff.</string>
+	<string>Mendlet uses the camera to find the damage and guide each repair step on your item.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Die App verbindet sich mit dem Analyse-Server in deinem lokalen Netzwerk.</string>
+	<string>Mendlet connects to its analysis server on your local network.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Das Mikrofon wird genutzt, um den Schaden per Sprache zu beschreiben.</string>
+	<string>Describe the damage or ask for help by voice.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Der Zugriff auf deine Fotos erlaubt dir, ein vorhandenes Bild des Schadens auszuwählen.</string>
+	<string>Pick an existing photo of the damage.</string>
 	<key>PROXY_BASE_URL</key>
 	<string>$(PROXY_BASE_URL)</string>
 	<key>UILaunchScreen</key>

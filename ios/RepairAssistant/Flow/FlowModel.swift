@@ -331,8 +331,10 @@ final class FlowModel {
         persist()
     }
 
+    /// Owner 2026-10-29: problem found → start repairing. The shopping list is a checklist, never a gate;
+    /// each step shows what it needs anyway. The safety gate still decides whether a guide exists at all.
     func startRepair() {
-        guard canStartRepair else { return }
+        guard FlowGate.canNavigate(to: .guide, response: response) else { return }
         if guideStartedAt == nil { guideStartedAt = Date() }
         go(.guide)
     }

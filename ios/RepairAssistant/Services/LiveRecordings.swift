@@ -28,6 +28,7 @@ enum LiveRecordings {
         switch s {
         case .realSweater: "real_sweater"
         case .realSole: "real_sole"
+        case .wornShirt: "worn_shirt"
         case .textileTear: "jeans"
         case .textileHole: "pulli"
         case .shoeSole: "sneaker"

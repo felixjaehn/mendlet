@@ -4,6 +4,7 @@ enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
     /// Real phone photos (29.10.2026), recorded live: a small, hard-to-see hole and a worn-through leather sole.
     case realSweater = "real_sweater"
     case realSole = "real_sole"
+    case wornShirt = "worn_shirt"
     case textileTear = "textile_tear"
     case textileHole = "textile_hole"
     case shoeSole = "shoe_sole"
@@ -16,6 +17,7 @@ enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .realSweater: tr("Real photo: sweater")
         case .realSole: tr("Real photo: leather sole")
+        case .wornShirt: tr("T-shirt (worn out)")
         case .textileTear: tr("Jeans (Riss)")
         case .textileHole: tr("Pulli (3 Löcher)")
         case .shoeSole: tr("Sneaker (Sohle)")
@@ -28,6 +30,7 @@ enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .realSweater: tr("Small hole, darning")
         case .realSole: tr("Worn through, cobbler")
+        case .wornShirt: tr("Replace, second life")
         case .textileTear: tr("Flicken, optional Etikett")
         case .textileHole: tr("Drei Stopfstellen")
         case .shoeSole: tr("Kleben")
@@ -40,6 +43,7 @@ enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .realSweater: "camera"
         case .realSole: "camera"
+        case .wornShirt: "tshirt"
         case .textileTear: "scissors"
         case .textileHole: "circle.dotted"
         case .shoeSole: "shoe"
@@ -52,6 +56,7 @@ enum DemoScenario: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .realSweater: tr("Small hole in my sweater")
         case .realSole: tr("Leather sole worn through to a hole")
+        case .wornShirt: tr("My old T-shirt is full of holes")
         case .textileTear: tr("Riss am Knie meiner Jeans")
         case .textileHole: tr("Loch am Ellbogen")
         case .shoeSole: tr("Sohle löst sich vorne")
@@ -74,6 +79,7 @@ enum Fixtures {
         // No hand-written fixture: these two only exist as live recordings.
         case .realSweater: DemoScenario.textileHole.rawValue
         case .realSole: DemoScenario.shoeSole.rawValue
+        case .wornShirt: DemoScenario.textileHole.rawValue
         default: s.rawValue
         }
     }

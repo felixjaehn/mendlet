@@ -29,14 +29,14 @@ targets:
       path: RepairAssistant/Info.plist
       properties:
         CFBundleDisplayName: Mendlet
-        CFBundleDevelopmentRegion: de
-        CFBundleLocalizations: [de, en]
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations: [en]
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
-        NSCameraUsageDescription: "Die Kamera erkennt Schäden im Live-Bild, nimmt ein Foto auf und zeigt Stichpunkte auf dem Stoff."
-        NSMicrophoneUsageDescription: "Das Mikrofon wird genutzt, um den Schaden per Sprache zu beschreiben."
-        NSPhotoLibraryUsageDescription: "Der Zugriff auf deine Fotos erlaubt dir, ein vorhandenes Bild des Schadens auszuwählen."
-        NSLocalNetworkUsageDescription: "Die App verbindet sich mit dem Analyse-Server in deinem lokalen Netzwerk."
+        NSCameraUsageDescription: "Mendlet uses the camera to find the damage and guide each repair step on your item."
+        NSMicrophoneUsageDescription: "Describe the damage or ask for help by voice."
+        NSPhotoLibraryUsageDescription: "Pick an existing photo of the damage."
+        NSLocalNetworkUsageDescription: "Mendlet connects to its analysis server on your local network."
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
         PROXY_BASE_URL: $(PROXY_BASE_URL)

@@ -53,7 +53,7 @@ struct DecisionView: View {
         ScrollView {
             if let d = flow.response?.decision {
                 VStack(alignment: .leading, spacing: 18) {
-                    if d.recommendation == .repairSelf || d.recommendation == .replace { BeforeAfterCard() }
+                    if d.recommendation == .repairSelf { BeforeAfterCard() }
                     VStack(alignment: .leading, spacing: 14) {
                         HStack(spacing: 14) {
                             Image(systemName: d.recommendation.icon).font(.system(size: 22, weight: .semibold)).foregroundStyle(.white)
@@ -67,6 +67,8 @@ struct DecisionView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .card(padding: 18)
+
+                    if d.recommendation == .replace && !d.secondLife.isEmpty { secondLife(d.secondLife) }
 
                     HStack(spacing: 10) {
                         MetricTile(icon: "gauge.with.dots.needle.33percent", title: "Aufwand", value: effortText(d.effort), detail: nil)
@@ -103,13 +105,39 @@ struct DecisionView: View {
         .onAppear { if flow.response?.decision?.recommendation != .repairPro { flow.loadAfterPreview() } }
         .floatingBar {
             Group {
-                if FlowGate.canNavigate(to: .shopping, response: flow.response) {
-                    PrimaryButton(title: "Einkaufsliste ansehen", systemImage: "cart") { flow.go(.shopping) }
+                if FlowGate.canNavigate(to: .guide, response: flow.response) {
+                    // Start repair: first the "Before you start" check (when there is anything to have), then the steps.
+                    PrimaryButton(title: tr("Reparatur starten"), systemImage: "play.fill") {
+                        if FlowGate.canNavigate(to: .shopping, response: flow.response) { flow.go(.shopping) } else { flow.startRepair() }
+                    }
                 } else {
                     PrimaryButton(title: "Neues Foto aufnehmen", systemImage: "camera.fill") { flow.reset() }
                 }
             }
             .padding(.horizontal, Theme.margin).padding(.vertical, 12)
+        }
+    }
+
+    private func secondLife(_ ideas: [SecondLife]) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            SectionLabel(text: tr("Give it a second life"))
+            VStack(spacing: 0) {
+                ForEach(Array(ideas.enumerated()), id: \.offset) { i, idea in
+                    if i > 0 { Divider().padding(.leading, 58) }
+                    HStack(alignment: .top, spacing: 14) {
+                        Image(systemName: idea.icon).font(.body.weight(.semibold)).foregroundStyle(Theme.safe)
+                            .frame(width: 30, height: 30).background(Theme.safeSoft, in: Circle())
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(idea.title).font(.body.weight(.semibold)).foregroundStyle(Theme.ink)
+                            Text(idea.text).font(.subheadline).foregroundStyle(Theme.inkSecondary).fixedSize(horizontal: false, vertical: true)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .padding(14)
+                    .accessibilityElement(children: .combine)
+                }
+            }
+            .background(Theme.card, in: RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
         }
     }
 

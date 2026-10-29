@@ -7,11 +7,9 @@ struct ShoppingListView: View {
 
     var body: some View {
         let items = flow.shoppingItems
-        let toBuy = ShoppingGate.toBuy(items: items, statuses: flow.statuses)
-        let open = ShoppingGate.requiredOpen(items: items, statuses: flow.statuses)
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                summary(toBuy.count, flow.response?.decision)
+                header(items)
                 ForEach([ItemKind.material, .tool], id: \.self) { kind in
                     let group = items.filter { $0.kind == kind }
                     if !group.isEmpty {
@@ -32,7 +30,7 @@ struct ShoppingListView: View {
         }
         .scrollIndicators(.hidden)
         .screenBackground()
-        .navigationTitle("Einkaufsliste")
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -45,28 +43,21 @@ struct ShoppingListView: View {
         }
         .floatingBar {
             // Status lives in the button itself (no extra line over the list).
-            PrimaryButton(title: open.isEmpty ? tr("Reparatur starten")
-                          : tr(open.count == 1 ? "Noch %lld Pflichtteil offen" : "Noch %lld Pflichtteile offen", open.count),
-                          systemImage: open.isEmpty ? "play.fill" : "checklist") { flow.startRepair() }
-                .disabled(!flow.canStartRepair)
+            PrimaryButton(title: tr("Start step 1"), systemImage: "play.fill") { flow.startRepair() }
                 .padding(.horizontal, Theme.margin).padding(.vertical, 12)
         }
     }
 
-    private func summary(_ buyCount: Int, _ decision: Decision?) -> some View {
-        HStack(spacing: 14) {
-            Image(systemName: "cart.fill").foregroundStyle(Theme.thread)
-                .frame(width: 44, height: 44).background(Theme.threadSoft, in: Circle())
-            VStack(alignment: .leading, spacing: 2) {
-                Text(buyCount == 0 ? tr("Noch nichts zu kaufen") : tr(buyCount == 1 ? "%lld Ding kaufen" : "%lld Dinge kaufen", buyCount))
-                    .font(.headline).foregroundStyle(Theme.ink)
-                if let d = decision, !d.costEur.isEmpty {
-                    Text("Gesamtkosten laut Schätzung \(Fmt.euro(d.costEur))").font(.footnote).foregroundStyle(Theme.inkSecondary)
-                }
-            }
-            Spacer()
+    /// First page of the repair: check you have everything, mark what to buy. Never blocks the guide.
+    private func header(_ items: [ShoppingItem]) -> some View {
+        let ready = items.filter { flow.statuses[$0.id] == .have }.count
+        return VStack(alignment: .leading, spacing: 6) {
+            Text(tr("Before you start")).font(.largeTitle.bold()).foregroundStyle(Theme.ink)
+            Text(tr("%lld of %lld ready", ready, items.count)).font(.headline).foregroundStyle(ready == items.count ? Theme.safe : Theme.inkSecondary)
+                .monospacedDigit().contentTransition(.numericText())
         }
-        .card()
+        .animation(Theme.spring, value: ready)
+        .padding(.top, 4)
     }
 
     private func row(_ item: ShoppingItem) -> some View {

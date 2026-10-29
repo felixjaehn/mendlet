@@ -16,10 +16,10 @@ struct GuideView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         photo(step, r)
+                        stepContent(step, r)
                         if step.overlay?.type == .stitchPath, let image = flow.photo {
                             LiveStitchButton(image: image, step: step, response: r, phase: darningPhase(for: step, in: r), demoMode: flow.settings.demoMode)
                         }
-                        stepContent(step, r)
                     }
                     .id(step.n)
                     .transition(.asymmetric(insertion: .move(edge: forward ? .trailing : .leading).combined(with: .opacity),
@@ -98,6 +98,21 @@ struct GuideView: View {
 
     private func stepContent(_ step: GuideStep, _ r: AnalyzeResponse) -> some View {
         VStack(alignment: .leading, spacing: 16) {
+            // Title and instruction first: that is what the user reads while working. Safety gate right below it.
+            Text(step.title).font(.title2.bold()).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
+            Text(step.text).font(.body).foregroundStyle(Theme.ink).lineSpacing(3).fixedSize(horizontal: false, vertical: true)
+            if step.needsConfirmation { safetyBanner(step) }
+            if let m = step.commonMistake, !m.isEmpty {
+                HStack(alignment: .top, spacing: 12) {
+                    Image(systemName: "exclamationmark.bubble.fill").foregroundStyle(Theme.caution).font(.title3)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Typischer Fehler").font(.subheadline.weight(.bold)).foregroundStyle(Theme.caution)
+                        Text(m).font(.subheadline).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .padding(14).frame(maxWidth: .infinity, alignment: .leading)
+                .background(Theme.cautionSoft, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            }
             let items = step.usesItems.compactMap { id in r.shoppingList.first { $0.id == id } }
             if !items.isEmpty {
                 VStack(alignment: .leading, spacing: 8) {
@@ -112,20 +127,6 @@ struct GuideView: View {
                     }
                     .padding(.horizontal, -Theme.margin)
                 }
-            }
-            if step.needsConfirmation { safetyBanner(step) }
-            Text(step.title).font(.title2.bold()).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
-            Text(step.text).font(.title3).foregroundStyle(Theme.ink).lineSpacing(3).fixedSize(horizontal: false, vertical: true)
-            if let m = step.commonMistake, !m.isEmpty {
-                HStack(alignment: .top, spacing: 12) {
-                    Image(systemName: "exclamationmark.bubble.fill").foregroundStyle(Theme.caution).font(.title3)
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("Typischer Fehler").font(.subheadline.weight(.bold)).foregroundStyle(Theme.caution)
-                        Text(m).font(.subheadline).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-                .padding(14).frame(maxWidth: .infinity, alignment: .leading)
-                .background(Theme.cautionSoft, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
         }
     }

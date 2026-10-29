@@ -140,3 +140,15 @@ final class RecordingTests: XCTestCase {
         XCTAssertEqual(added.map(\.id), ["seg_1", "seg_3", "seg_4"])  // nothing overlapped: added with a free id
     }
 }
+
+@MainActor
+final class GuidePDFTests: XCTestCase {
+    /// Renders the real-sweater guide; set PDF_OUT to keep a copy for a visual check.
+    func testRealSweaterGuidePDFRenders() throws {
+        let rec = try XCTUnwrap(LiveRecordings.recording(for: .realSweater))
+        let url = try GuideExporter.write(GuidePDF(response: rec.response, photo: try XCTUnwrap(rec.photo), after: rec.after))
+        let data = try Data(contentsOf: url)
+        XCTAssertGreaterThan(data.count, 50_000)
+        if let out = ProcessInfo.processInfo.environment["PDF_OUT"] { try data.write(to: URL(fileURLWithPath: out)) }
+    }
+}

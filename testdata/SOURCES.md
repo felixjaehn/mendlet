@@ -36,3 +36,4 @@ Die folgenden vier Fotos sind mit **Meta Muse Image** (`muse-image-1.0`, `/v1/im
 | --- | --- | --- | --- |
 | `real/01_ledersohle_loch.jpg` | Ledersohle eines Herrenschuhs, mittig bis zum Loch durchgelaufen | shoe | nein |
 | `real/02_pulli_kleines_loch.jpg` | Grauer Strickpullover, kleines Loch, schwer erkennbar (Härtetest) | textile | nein |
+| `textile/07_shirt_verschlissen.jpg` | Vollständig verschlissenes dünnes Baumwoll-T-Shirt: großflächig durchscheinend, viele Löcher, ausgefranster gedehnter Kragen, Pilling und ausgeblichene Farbe; ersetzen statt reparieren; KI-generiert (AI-generated), Modell `gpt-6-astra`, 2026-10-29 | textile | nein |

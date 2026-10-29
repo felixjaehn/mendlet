@@ -4,12 +4,6 @@
     "CFBundleDisplayName": {
       "extractionState": "manual",
       "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mendlet"
-          }
-        },
         "en": {
           "stringUnit": {
             "state": "translated",
@@ -21,16 +15,10 @@
     "NSCameraUsageDescription": {
       "extractionState": "manual",
       "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Die Kamera erkennt Schäden im Live-Bild, nimmt ein Foto auf und zeigt Stichpunkte auf dem Stoff."
-          }
-        },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The camera detects damage in the live image, takes a photo and shows stitch points on the fabric."
+            "value": "Mendlet uses the camera to find the damage and guide each repair step on your item."
           }
         }
       }
@@ -38,16 +26,10 @@
     "NSMicrophoneUsageDescription": {
       "extractionState": "manual",
       "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Das Mikrofon wird genutzt, um den Schaden per Sprache zu beschreiben."
-          }
-        },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The microphone is used to describe the damage by voice."
+            "value": "Describe the damage or ask for help by voice."
           }
         }
       }
@@ -55,16 +37,10 @@
     "NSPhotoLibraryUsageDescription": {
       "extractionState": "manual",
       "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Der Zugriff auf deine Fotos erlaubt dir, ein vorhandenes Bild des Schadens auszuwählen."
-          }
-        },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Access to your photos lets you pick an existing picture of the damage."
+            "value": "Pick an existing photo of the damage."
           }
         }
       }
@@ -72,16 +48,10 @@
     "NSLocalNetworkUsageDescription": {
       "extractionState": "manual",
       "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Die App verbindet sich mit dem Analyse-Server in deinem lokalen Netzwerk."
-          }
-        },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The app connects to the analysis server on your local network."
+            "value": "Mendlet connects to its analysis server on your local network."
           }
         }
       }

@@ -4,6 +4,14 @@ import SwiftUI
 struct RepairAssistantApp: App {
     @State private var flow = FlowModel()
 
+    init() {
+        // English-only app: SwiftUI string literals resolve against the bundle's preferred language, not `tr`,
+        // so a German iPhone would otherwise get German catalog values. Tests keep the German keys.
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
+            UserDefaults.standard.set(["en"], forKey: "AppleLanguages")
+        }
+    }
+
     var body: some Scene {
         WindowGroup {
             RootView()
