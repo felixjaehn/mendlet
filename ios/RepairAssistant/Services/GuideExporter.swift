@@ -61,7 +61,7 @@ private struct PageFrame<Content: View>: View {
             content
             Spacer(minLength: 0)
             HStack {
-                Text("Reparaturanleitung")
+                Text("Mendlet · \(tr("Reparaturanleitung"))")
                 Spacer()
                 Text(tr("Seite %lld von %lld", number, total)).monospacedDigit()
             }
@@ -91,6 +91,7 @@ private struct CoverPage: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
+            Text("Mendlet").font(.system(size: 12, weight: .semibold)).foregroundStyle(Color(white: 0.45))
             Text("Reparaturanleitung").font(.system(size: 30, weight: .bold))
             Text(r.diagnosis.summary).font(.system(size: 13)).foregroundStyle(Color(white: 0.3))
                 .fixedSize(horizontal: false, vertical: true)
@@ -120,7 +121,7 @@ private struct CoverPage: View {
                 }
                 Text(d.reasoning).font(.system(size: 12)).foregroundStyle(Color(white: 0.25)).fixedSize(horizontal: false, vertical: true)
             }
-            Text("Erstellt mit SAM 3.1, Muse Spark und Muse Image").font(.system(size: 10)).foregroundStyle(Color(white: 0.55))
+            Text("Mendlet · " + tr("Erstellt mit SAM 3.1, Muse Spark und Muse Image")).font(.system(size: 10)).foregroundStyle(Color(white: 0.55))
         }
     }
 }

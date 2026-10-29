@@ -137,21 +137,6 @@ struct Badge: View {
     }
 }
 
-/// Small tasteful marker for the demo mode (real recorded model answers).
-struct DemoChip: View {
-    var text: String = LiveRecordings.chipText
-    var body: some View {
-        HStack(spacing: 6) {
-            Circle().fill(Theme.safe).frame(width: 6, height: 6)
-            Text(tr(text)).font(.caption.weight(.semibold))
-        }
-        .foregroundStyle(Theme.inkSecondary)
-        .padding(.horizontal, 10).frame(minHeight: 26)
-        .glass(Capsule())
-        .accessibilityLabel(Text("Demo-Modus mit echten Modellantworten vom 28. Oktober"))
-    }
-}
-
 // MARK: Confidence
 
 struct ConfidenceMeter: View {
@@ -288,7 +273,7 @@ struct MetricTile: View {
                 if let detail { Text(tr(detail)).font(.caption2).foregroundStyle(Theme.inkSecondary) }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: 104, alignment: .topLeading)
         .card(padding: 14)
         .accessibilityElement(children: .combine)
     }

@@ -76,9 +76,8 @@ struct FollowUpSheet: View {
             VStack(spacing: 10) {
                 if CameraPicker.isAvailable {
                     PrimaryButton(title: photoTitle(q), systemImage: "camera.fill") { showCamera = true }
-                }
-                if flow.settings.demoMode {
-                    PrimaryButton(title: "Demo-Etikett verwenden", systemImage: "tag.fill", kind: CameraPicker.isAvailable ? .secondary : .primary) {
+                } else if flow.settings.demoMode {
+                    PrimaryButton(title: photoTitle(q), systemImage: "camera.fill") {
                         addPhoto(LiveRecordings.recording(for: .textileTear)?.labelPhoto ?? DemoImageFactory.labelImage())
                     }
                 }

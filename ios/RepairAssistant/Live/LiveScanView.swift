@@ -82,13 +82,6 @@ struct LiveCameraHeader: View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 8) {
                 Text(title).font(.title2.bold())
-                HStack(spacing: 6) {
-                    Text("SAM 3.1 · live")
-                    if let latency { Text("\(latency) ms").monospacedDigit() }
-                    if synthetic { Text("Demo").foregroundStyle(Theme.caution) }
-                }
-                .font(.caption.weight(.semibold)).padding(.horizontal, 10).padding(.vertical, 6)
-                .background(.black.opacity(0.5), in: Capsule())
             }
             Spacer()
             Button(action: close) {

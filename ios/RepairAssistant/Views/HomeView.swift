@@ -5,31 +5,41 @@ struct HomeView: View {
     @Environment(FlowModel.self) private var flow
     @State private var showLiveScan = false
     @State private var liveCapture: (UIImage, DemoScenario?)?
-    @State private var showCamera = false
     @State private var showGallery = false
+    @State private var showGrid = false
+    @State private var showHistory = false
     @State private var pickerItem: PhotosPickerItem?
+    @State private var recents = RecentPhotos()
+    @State private var demoPhoto: UIImage?
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         @Bindable var flow = flow
-        ScrollView {
-            VStack(alignment: .leading, spacing: 22) {
-                topBar
-                headline
-                HeroShowcase()
-                actions
-                if flow.store.rescuedCount >= 1 { balanceRow }
-                if flow.settings.demoMode { demoSection }
-                if !flow.store.cases.isEmpty { historySection }
+        ZStack {
+            InlineCameraCard(active: !showLiveScan && !flow.showReview && !flow.showSettings && !showGrid && !showHistory,
+                             demoPhoto: demoPhoto, lastThumb: recents.images.first?.image ?? demoPhoto,
+                             onCapture: { photo in
+                                 if InlineCameraSession.hasCamera { flow.choose(photo) }
+                                 else { flow.choose(photo, scenarioHint: .textileTear, note: DemoScenario.textileTear.userNote) }
+                             },
+                             onLiveScan: { showLiveScan = true },
+                             onGallery: { if InlineCameraSession.hasCamera { showGallery = true } else { showGrid = true } })
+            VStack {
+                HStack {
+                    if !flow.store.cases.isEmpty {
+                        glassButton("clock.arrow.circlepath", label: "History") { showHistory = true }
+                    }
+                    Spacer()
+                    glassButton("gearshape", label: tr("Einstellungen")) { flow.showSettings = true }
+                }
+                Spacer()
             }
-            .padding(.horizontal, Theme.margin)
-            .padding(.bottom, 32)
+            .padding(.horizontal, 20).padding(.top, 8)
         }
-        .scrollIndicators(.hidden)
-        .screenBackground()
+        .background(Color.black.ignoresSafeArea())
         .navigationBarHidden(true)
-        .fullScreenCover(isPresented: $showCamera) {
-            CameraPicker { flow.choose($0) }.ignoresSafeArea()
-        }
+        .statusBarHidden(false)
+        .preferredColorScheme(.dark)
         .fullScreenCover(isPresented: $showLiveScan, onDismiss: {
             if let (photo, scenario) = liveCapture {
                 liveCapture = nil
@@ -44,6 +54,8 @@ struct HomeView: View {
         #if DEBUG
         .task { await debugJump() }
         #endif
+        .task { demoPhoto = await DemoPhotos.imageAsync(for: .textileTear); await recents.load() }
+        .onChange(of: scenePhase) { _, p in if p == .active { Task { await recents.load() } } }
         .photosPicker(isPresented: $showGallery, selection: $pickerItem, matching: .images)
         .onChange(of: pickerItem) { _, item in
             guard let item else { return }
@@ -53,162 +65,79 @@ struct HomeView: View {
             }
         }
         .sheet(isPresented: $flow.showReview) { ReviewSheet() }
+        .sheet(isPresented: $showGrid) { PhotoGridSheet { showGrid = false } }
+        .sheet(isPresented: $showHistory) { HistorySheet { showHistory = false } }
     }
 
-    private var topBar: some View {
-        HStack {
-            if flow.settings.demoMode { DemoChip() }
-            Spacer()
-            Button { flow.showSettings = true } label: {
-                Image(systemName: "gearshape").font(.system(size: 17, weight: .semibold)).foregroundStyle(Theme.ink)
-                    .frame(width: 44, height: 44).glass(Circle(), interactive: true)
-            }
-            .accessibilityLabel(tr("Einstellungen"))
+    private func glassButton(_ icon: String, label: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon).font(.system(size: 17, weight: .semibold)).foregroundStyle(.white)
+                .frame(width: 44, height: 44)
+                .background(.black.opacity(0.3), in: Circle())
+                .glass(Circle(), interactive: true)
         }
-        .padding(.top, 4)
-    }
-
-    private var headline: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("Reparieren").font(.largeTitle.bold()).foregroundStyle(Theme.ink)
-                .onLongPressGesture(minimumDuration: 0.8) { Haptics.success(); flow.showSettings = true }
-            Text("Zeig mir den Schaden. Ich markiere ihn auf deinem Foto und führe dich Schritt für Schritt durch die Reparatur.")
-                .font(.body).foregroundStyle(Theme.inkSecondary).fixedSize(horizontal: false, vertical: true)
-        }
-    }
-
-    private var actions: some View {
-        VStack(spacing: 10) {
-            PrimaryButton(title: "Schaden scannen", systemImage: "viewfinder") { showLiveScan = true }
-            HStack(spacing: 10) {
-                PrimaryButton(title: "Kamera", systemImage: "camera", kind: .secondary) {
-                    if CameraPicker.isAvailable { showCamera = true } else { showGallery = true }
-                }
-                PrimaryButton(title: "Fotos", systemImage: "photo.on.rectangle", kind: .secondary) { showGallery = true }
-            }
-            Text("Kleidung, Schuhe und Niedervolt-Elektronik").font(.footnote).foregroundStyle(Theme.inkSecondary)
-                .frame(maxWidth: .infinity)
-        }
-    }
-
-    private var balanceRow: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "leaf.fill").foregroundStyle(Theme.safe)
-            VStack(alignment: .leading, spacing: 1) {
-                Text("Deine Bilanz").font(.caption).foregroundStyle(Theme.inkSecondary)
-                Text(tr(flow.store.rescuedCount == 1 ? "%lld Teil gerettet · ≈ %@ kg" : "%lld Teile gerettet · ≈ %@ kg", flow.store.rescuedCount, ImpactEstimator.format(kg: flow.store.rescuedKilograms)))
-                    .font(.rounded(.subheadline, weight: .semibold)).monospacedDigit().foregroundStyle(Theme.ink)
-            }
-            Spacer()
-        }
-        .padding(14)
-        .background(Theme.safeSoft, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .accessibilityElement(children: .combine)
-    }
-
-    private var demoSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            SectionLabel(text: "Demo-Szenarien")
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
-                    ForEach(DemoScenario.allCases) { s in ScenarioCard(scenario: s) }
-                }
-                .padding(.horizontal, Theme.margin)
-            }
-            .padding(.horizontal, -Theme.margin)
-        }
-    }
-
-    private var historySection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            SectionLabel(text: "Zuletzt analysiert")
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
-                    ForEach(flow.store.cases.prefix(8)) { c in HistoryCard(item: c) }
-                }
-                .padding(.horizontal, Theme.margin)
-            }
-            .padding(.horizontal, -Theme.margin)
-        }
+        .accessibilityLabel(label)
     }
 }
 
-private struct ScenarioCard: View {
+/// Plain photo grid (like a camera roll, no labels). Picking a photo starts the analysis with it.
+struct PhotoGridSheet: View {
     @Environment(FlowModel.self) private var flow
-    let scenario: DemoScenario
-    @State private var image: UIImage?
+    var close: () -> Void
+    @State private var images: [DemoScenario: UIImage] = [:]
+    private let cols = Array(repeating: GridItem(.flexible(), spacing: 2), count: 3)
 
     var body: some View {
-        Button {
-            Task {
-                let img = await DemoPhotos.imageAsync(for: scenario)
-                flow.choose(img, scenarioHint: scenario, note: scenario.userNote)
-            }
-        } label: {
-            VStack(alignment: .leading, spacing: 8) {
-                ZStack {
-                    if let image {
-                        Image(uiImage: image).resizable().scaledToFill()
-                    } else {
-                        Theme.hairline.overlay(Image(systemName: scenario.systemImage).foregroundStyle(Theme.inkSecondary))
+        NavigationStack {
+            ScrollView {
+                LazyVGrid(columns: cols, spacing: 2) {
+                    ForEach(DemoScenario.allCases) { s in
+                        Button {
+                            Task {
+                                let img = await DemoPhotos.imageAsync(for: s)
+                                close()
+                                flow.choose(img, scenarioHint: s, note: s.userNote)
+                            }
+                        } label: {
+                            Color(Theme.fill).aspectRatio(1, contentMode: .fit)
+                                .overlay { if let i = images[s] { Image(uiImage: i).resizable().scaledToFill() } }
+                                .clipped()
+                        }
+                        .buttonStyle(.plain).accessibilityLabel(tr("Fotos"))
+                        .task { images[s] = await DemoPhotos.imageAsync(for: s) }
                     }
                 }
-                .frame(width: 132, height: 120).clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(scenario.title).font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink).lineLimit(1)
-                    Text(scenario.subtitle).font(.caption).foregroundStyle(Theme.inkSecondary).lineLimit(1)
-                }
             }
-            .frame(width: 132)
+            .navigationTitle("Photos").navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button(tr("Abbrechen"), action: close) } }
         }
-        .buttonStyle(.plain)
-        .task {
-            image = await DemoPhotos.imageAsync(for: scenario)
-        }
+        .presentationDetents([.large])
     }
 }
 
-private struct HistoryCard: View {
+struct HistorySheet: View {
     @Environment(FlowModel.self) private var flow
-    let item: SavedCase
+    var close: () -> Void
+    private let cols = Array(repeating: GridItem(.flexible(), spacing: 2), count: 3)
+
     var body: some View {
-        Button { flow.open(item) } label: {
-            VStack(alignment: .leading, spacing: 8) {
-                Group {
-                    if let img = flow.store.image(for: item.id) {
-                        Image(uiImage: img).resizable().scaledToFill()
-                    } else { Theme.hairline }
+        NavigationStack {
+            ScrollView {
+                LazyVGrid(columns: cols, spacing: 2) {
+                    ForEach(flow.store.cases) { c in
+                        Button { close(); flow.open(c) } label: {
+                            Color(Theme.fill).aspectRatio(1, contentMode: .fit)
+                                .overlay { if let i = flow.store.image(for: c.id) { Image(uiImage: i).resizable().scaledToFill() } }
+                                .clipped()
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
-                .frame(width: 132, height: 96).clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                Text(item.response.diagnosis.summary.isEmpty ? tr("Analyse") : item.response.diagnosis.summary)
-                    .font(.caption.weight(.medium)).foregroundStyle(Theme.ink).lineLimit(2, reservesSpace: true)
-                    .multilineTextAlignment(.leading)
             }
-            .frame(width: 132)
+            .navigationTitle("History").navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done", action: close) } }
         }
-        .buttonStyle(.plain)
-    }
-}
-
-/// Hero: the real product, the recorded jeans photo with its SAM mask and pins (no illustration).
-private struct HeroShowcase: View {
-    private let rec = LiveRecordings.recording(for: .textileTear)
-    @State private var appeared = false
-
-    var body: some View {
-        if let rec, let photo = rec.photo {
-            PhotoStage(image: photo, cornerRadius: 28, minAspect: 1.15) { size in
-                SegmentOverlayView(segments: rec.response.segments.filter(\.isDamage), size: size, appeared: appeared, showLabels: true)
-            }
-            .overlay(alignment: .bottomLeading) {
-                Label("SAM 3.1 · Muse Spark", systemImage: "sparkles")
-                    .font(.caption.weight(.semibold)).foregroundStyle(.white)
-                    .padding(.horizontal, 10).padding(.vertical, 6).glass(Capsule())
-                    .padding(12)
-            }
-            .onAppear { withAnimation(.easeOut(duration: 0.9).delay(0.3)) { appeared = true } }
-            .accessibilityLabel(tr("Beispiel: Riss in einer Jeans, markiert von SAM 3.1"))
-        }
+        .presentationDetents([.large])
     }
 }
 

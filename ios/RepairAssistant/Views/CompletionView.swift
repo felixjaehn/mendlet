@@ -17,7 +17,6 @@ struct CompletionView: View {
                 checkmark.padding(.top, 8)
                 VStack(spacing: 6) {
                     Text("Repariert!").font(.largeTitle.bold()).foregroundStyle(Theme.ink)
-                    Text("Gut gemacht. Das Teil bleibt im Einsatz.").font(.body).foregroundStyle(Theme.inkSecondary)
                 }
                 BeforeAfterCard()
                 impactCard(est, isShoe: isShoe)
@@ -136,7 +135,7 @@ struct CompletionView: View {
     }
 
     private func shareText(_ est: ImpactEstimator.Estimate) -> String {
-        tr("Ich habe gerade etwas repariert statt weggeworfen: ca. %@ kg vor Deponie oder Verbrennung bewahrt (Schätzung). #Reparieren", ImpactEstimator.format(kg: est.kilograms))
+        tr("Ich habe gerade etwas repariert statt weggeworfen: ca. %@ kg vor Deponie oder Verbrennung bewahrt (Schätzung). #Reparieren", ImpactEstimator.format(kg: est.kilograms)) + " – Mendlet"
     }
 }
 

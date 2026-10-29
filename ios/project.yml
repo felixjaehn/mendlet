@@ -28,7 +28,7 @@ targets:
     info:
       path: RepairAssistant/Info.plist
       properties:
-        CFBundleDisplayName: Reparatur-Assistent
+        CFBundleDisplayName: Mendlet
         CFBundleDevelopmentRegion: de
         CFBundleLocalizations: [de, en]
         UILaunchScreen: {}

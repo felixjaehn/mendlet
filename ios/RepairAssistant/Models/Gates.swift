@@ -71,6 +71,7 @@ enum ShoppingGate {
             }
             lines.append("")
         }
+        lines.append("Mendlet")
         return lines.joined(separator: "\n")
     }
 }

@@ -24,7 +24,7 @@ struct PhotoStage<Overlay: View>: View {
             ZStack(alignment: .topLeading) {
                 Image(uiImage: image).resizable().scaledToFill()
                     .frame(width: geo.size.width, height: geo.size.height).clipped()
-                    .blur(radius: 24).overlay(Color.black.opacity(0.45))
+                    .blur(radius: 28).overlay(Color.black.opacity(0.22))
                 Image(uiImage: image).resizable()
                     .frame(width: size.width, height: size.height)
                     .overlay(Color.black.opacity(dim))
@@ -68,16 +68,18 @@ struct PhotoStage<Overlay: View>: View {
         Button {
             zoomedOut.toggle(); pinch = 1; Haptics.selection()
         } label: {
-            Label(zoomed ? tr("Whole photo") : tr("Zoom to damage"),
-                  systemImage: zoomed ? "arrow.down.right.and.arrow.up.left" : "plus.magnifyingglass")
-                .font(.caption.weight(.semibold))
-                .padding(.horizontal, 10).padding(.vertical, 6)
+            Image(systemName: zoomed ? "arrow.down.right.and.arrow.up.left" : "plus.magnifyingglass")
+                .font(.system(size: 15, weight: .semibold))
+                .frame(width: 44, height: 44)
         }
         .buttonStyle(.plain)
         .foregroundStyle(.white)
-        .glass(Capsule(), interactive: true)
+        .background(Color.black.opacity(0.55), in: Circle())
+        .overlay(Circle().strokeBorder(Color.white.opacity(0.18), lineWidth: 0.5))
+        .shadow(color: .black.opacity(0.25), radius: 6, y: 2)
         .padding(10)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+        .accessibilityLabel(zoomed ? tr("Whole photo") : tr("Zoom to damage"))
         .accessibilityHint(tr("Double-tap the photo to switch as well"))
     }
 }

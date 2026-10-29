@@ -63,13 +63,9 @@ struct BeforeAfterSlider: View {
                 tag(tr("Vorher")).opacity(frac > 0.2 ? 1 : 0).padding(12).frame(width: w, height: h, alignment: .topLeading)
                 tag(tr("Nachher")).opacity(frac < 0.8 ? 1 : 0).padding(12)
                     .frame(width: w, height: h, alignment: horizontalSplit ? .bottomTrailing : .topTrailing)
-                HStack(spacing: 6) {
-                    Image(systemName: "sparkles").font(.caption.weight(.bold))
-                    Text("Vorschau · Muse Image").font(.caption.weight(.semibold))
-                }
-                .foregroundStyle(.white).padding(.horizontal, 12).padding(.vertical, 7)
-                .background(.black.opacity(0.55), in: Capsule())
-                .padding(12).frame(width: w, height: h, alignment: .bottomLeading)
+                Image(systemName: "sparkles").font(.caption.weight(.bold)).foregroundStyle(.white)
+                    .frame(width: 30, height: 30).background(.black.opacity(0.55), in: Circle())
+                    .padding(12).frame(width: w, height: h, alignment: .bottomLeading)
             }
             .frame(width: w, height: h)
             .contentShape(Rectangle())
@@ -85,7 +81,7 @@ struct BeforeAfterSlider: View {
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Vorher-Nachher-Vergleich, Vorschau von Muse Image")
+        .accessibilityLabel("Vorher-Nachher-Vergleich")
         .accessibilityValue("\(Int((frac * 100).rounded())) Prozent Nachher")
         .accessibilityAdjustableAction { dir in
             switch dir {
@@ -149,7 +145,6 @@ struct BeforeAfterCard: View {
                                               aspect: min(1.3, max(0.75, photo.size.width / max(photo.size.height, 1))),
                                               initial: damageBox.map { Double(tall ? $0.midY : $0.midX) } ?? 0.5,
                                               horizontalSplit: tall)
-                            EstimatePill(text: "So könnte es aussehen")
                         }
                         .transition(.opacity.combined(with: .scale(scale: 0.98)))
                     }
@@ -167,8 +162,6 @@ struct BeforeAfterCard: View {
             Image(uiImage: photo).resizable().scaledToFill().blur(radius: 22).overlay(Color.black.opacity(0.35))
             VStack(spacing: 12) {
                 Image(systemName: "sparkles").font(.system(size: 26, weight: .semibold)).foregroundStyle(.white)
-                Text("Muse Image zeigt, wie es repariert aussieht")
-                    .font(.subheadline.weight(.semibold)).foregroundStyle(.white).multilineTextAlignment(.center)
                 ProgressView().tint(.white)
             }
             .padding(.horizontal, 32)
@@ -177,6 +170,6 @@ struct BeforeAfterCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .shimmer()
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Muse Image erstellt eine Vorschau der Reparatur")
+        .accessibilityLabel("Vorschau der Reparatur wird erstellt")
     }
 }

@@ -60,10 +60,10 @@ struct DecisionView: View {
                                 .frame(width: 52, height: 52).background(d.recommendation.tint, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Meine Empfehlung").font(.footnote).foregroundStyle(Theme.inkSecondary)
-                                Text(d.recommendation.title).font(.title.bold()).foregroundStyle(Theme.ink)
+                                Text(d.recommendation.title).font(.title2.bold()).foregroundStyle(Theme.ink)
                             }
                         }
-                        Text(d.reasoning).font(.body).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
+                        Text(d.reasoning).font(.callout).foregroundStyle(Theme.inkSecondary).lineSpacing(2).fixedSize(horizontal: false, vertical: true)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .card(padding: 18)
@@ -128,8 +128,8 @@ struct DecisionView: View {
             if selected { Image(systemName: "checkmark.circle.fill").foregroundStyle(o.tint) }
         }
         .padding(14)
-        .background(selected ? o.tint.opacity(0.10) : Theme.card, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(selected ? o.tint.opacity(0.5) : Theme.hairline, lineWidth: selected ? 1.5 : 1))
-        .opacity(selected ? 1 : 0.7)
+        .background(Theme.card, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(selected ? o.tint.opacity(0.6) : Color.clear, lineWidth: 1.5))
+        .opacity(selected ? 1 : 0.6)
     }
 }

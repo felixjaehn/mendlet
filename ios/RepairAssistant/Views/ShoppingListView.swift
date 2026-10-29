@@ -78,7 +78,7 @@ struct ShoppingListView: View {
             } label: {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Text(item.name).font(.body.weight(.semibold)).foregroundStyle(status == .have ? Theme.inkSecondary : Theme.ink)
+                        Text(item.name).font(.callout.weight(.semibold)).foregroundStyle(status == .have ? Theme.inkSecondary : Theme.ink)
                             .strikethrough(status == .have, color: Theme.inkSecondary)
                             .multilineTextAlignment(.leading)
                         Spacer(minLength: 4)
@@ -141,7 +141,7 @@ struct ShoppingListView: View {
                 Image(systemName: icon).font(.caption.weight(.bold))
                 Text(tr(title)).font(.subheadline.weight(.semibold))
             }
-            .padding(.horizontal, 14).frame(minHeight: 40)
+            .padding(.horizontal, 12).frame(minHeight: 44)
             .foregroundStyle(active ? .white : Theme.inkSecondary)
             .background(active ? tint : Theme.paper, in: Capsule())
             .overlay(Capsule().strokeBorder(active ? .clear : Theme.hairline, lineWidth: 1))

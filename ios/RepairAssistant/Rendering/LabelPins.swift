@@ -136,7 +136,7 @@ struct LabelPinsLayer: View {
             let text = g.count > 1 ? Self.plural(s0.label, g.count) : tr(s0.label)
             let b = infos.dropFirst().reduce(first.bounds) { $0.union($1.bounds) }
             let anchor = g.count > 1 ? CGPoint(x: infos.map(\.anchor.x).reduce(0, +) / CGFloat(infos.count), y: infos.map(\.anchor.y).reduce(0, +) / CGFloat(infos.count)) : first.anchor
-            let badge = s0.source?.badge
+            let badge: String? = nil
             out.append(LabelPlacer.Item(id: s0.id, text: text, score: score, badge: badge, anchor: anchor, bounds: b,
                                         width: LabelPlacer.width(text: text, score: score, badge: badge), large: false,
                                         dots: g.count > 1 ? infos.map(\.anchor) : []))
@@ -144,7 +144,7 @@ struct LabelPinsLayer: View {
         for s in labelled where !s.isDamage {
             guard let i = info(s) else { continue }
             let score = s.score > 0 ? "\(Int((s.score * 100).rounded())) %" : nil
-            let badge = s.source?.badge
+            let badge: String? = nil
             let large = i.bounds.width * i.bounds.height > 0.3 * size.width * size.height
             func nearest(_ t: CGPoint) -> CGPoint { i.pts.min { hypot($0.x - t.x, $0.y - t.y) < hypot($1.x - t.x, $1.y - t.y) } ?? t }
             let b = i.bounds

@@ -31,8 +31,8 @@ struct DiagnosisView: View {
                             if flow.refineBusy { ProgressView().controlSize(.large).tint(.white) }
                         }
                     }
+                    .overlay(alignment: .topTrailing) { refineButton }
                     chipBar(r)
-                    refineRow
                 }
                 if let r {
                     if let banner = flow.newInfoBanner, r.diagnosis.labelInfo != nil { infoBanner(banner) }
@@ -90,7 +90,7 @@ struct DiagnosisView: View {
                 Button {
                     withAnimation(Theme.spring) { hidden = hidden.isEmpty ? Set(r.segments.map(\.id)) : [] }
                     Haptics.selection()
-                } label: { Chip(title: "Alle", systemImage: "square.stack.3d.up", tint: Theme.ink, isOn: hidden.isEmpty, filled: hidden.isEmpty) }
+                } label: { Chip(title: "Alle", systemImage: "square.stack.3d.up", tint: Theme.thread, isOn: hidden.isEmpty, filled: hidden.isEmpty) }
                 // One chip per label ("Loch ×3"), matching the grouped label pins on the photo.
                 ForEach(chipGroups(r.segments), id: \.label) { g in
                     let off = g.ids.allSatisfy(hidden.contains)
@@ -109,26 +109,27 @@ struct DiagnosisView: View {
         .padding(.horizontal, -Theme.margin)
     }
 
-    /// SAM can miss a small hole. One visible offer to point at it; the tap becomes a SAM point prompt (`/refine`).
-    private var refineRow: some View {
-        HStack(spacing: 10) {
-            Image(systemName: flow.refineMode ? "hand.tap.fill" : "hand.tap")
-                .font(.title3).foregroundStyle(Theme.thread).symbolEffect(.pulse, isActive: flow.refineMode)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(flow.refineMode ? tr("Tap the damage on the photo") : tr("Wrong spot marked?"))
-                    .font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
-                Text(flow.refineError ?? (flow.refineMode ? tr("SAM 3.1 outlines what you tap.") : tr("Tap to refine the mask.")))
-                    .font(.footnote).foregroundStyle(flow.refineError == nil ? Theme.inkSecondary : Theme.stop)
-            }
-            Spacer(minLength: 0)
-            Button(flow.refineMode ? tr("Cancel") : tr("Refine")) {
+    /// SAM can miss a small hole. A glass icon on the photo; the next tap becomes a point prompt (`/refine`).
+    private var refineButton: some View {
+        VStack(alignment: .trailing, spacing: 8) {
+            Button {
                 withAnimation(Theme.spring) { flow.refineMode.toggle(); flow.refineError = nil }
                 Haptics.selection()
+            } label: {
+                Image(systemName: flow.refineMode ? "xmark" : "hand.tap").font(.system(size: 15, weight: .semibold)).foregroundStyle(.white)
+                    .frame(width: 44, height: 44).background(.black.opacity(0.55), in: Circle())
+                    .overlay(Circle().strokeBorder(.white.opacity(0.18), lineWidth: 0.5))
+                    .symbolEffect(.pulse, isActive: flow.refineMode)
             }
-            .buttonStyle(.bordered).buttonBorderShape(.capsule).disabled(flow.refineBusy)
+            .disabled(flow.refineBusy)
+            .accessibilityLabel(flow.refineMode ? tr("Cancel") : tr("Refine"))
+            .accessibilityHint(tr("Tap the damage on the photo"))
+            if let e = flow.refineError {
+                Text(e).font(.caption.weight(.semibold)).foregroundStyle(.white).padding(.horizontal, 10).padding(.vertical, 5)
+                    .background(Theme.stop.opacity(0.85), in: Capsule())
+            }
         }
-        .padding(14)
-        .background(Theme.fill, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .padding(10)
     }
 
     private func infoBanner(_ text: String) -> some View {
@@ -193,8 +194,6 @@ struct DiagnosisView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     (Text("Etikett fotografieren für genauere Empfehlung ").foregroundStyle(Theme.ink) + Text("(optional)").foregroundStyle(Theme.inkSecondary))
                         .font(.subheadline.weight(.semibold)).multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
-                    Text("Material und Pflege passen Nadel, Garn und Flicken an.").font(.footnote).foregroundStyle(Theme.inkSecondary)
-                        .multilineTextAlignment(.leading)
                 }
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkSecondary.opacity(0.6))
@@ -215,8 +214,7 @@ struct DiagnosisView: View {
 
             }
             VStack(alignment: .leading, spacing: 2) {
-                Text("Muse Spark liest das Etikett").font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
-                Text("Material und Pflege fließen in die Empfehlung ein.").font(.footnote).foregroundStyle(Theme.inkSecondary)
+                Text("Reading the label").font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
             }
             Spacer(minLength: 0)
             ProgressView().tint(Theme.thread)

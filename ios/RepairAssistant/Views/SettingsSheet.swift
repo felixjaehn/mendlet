@@ -11,44 +11,21 @@ struct SettingsSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    Toggle("Demo-Modus (ohne Server)", isOn: $settings.demoMode).tint(Theme.thread)
-                } footer: {
-                    Text("Im Demo-Modus spielt die App echte, aufgezeichnete Modellantworten vom 28.10. ab, ohne Server und ohne Internet.")
-                }
-                if settings.demoMode {
-                    Section {
-                        Toggle("Schnell (für Videoaufnahmen)", isOn: $settings.fastReplay).tint(Theme.thread)
-                        Toggle("Agenten-Lauf mit Fehlerbehebung zeigen", isOn: $settings.recoveryTrace).tint(Theme.thread)
-                    } footer: {
-                        Text("Spielt die echten Modellantworten in etwa 6 statt 25 Sekunden ab. Der Agenten-Lauf mit Fehlerbehebung (Jeans) zeigt einen echten Lauf, in dem SAM einen Serverfehler meldete und der Agent ausgewichen ist.")
-                    }
+                    Toggle("Use server", isOn: Binding(get: { !settings.demoMode }, set: { settings.demoMode = !$0 })).tint(Theme.thread)
                 }
                 if !settings.demoMode {
-                    Section {
+                    Section("Server") {
+                        TextField("http://localhost:8787", text: $settings.baseURLString)
+                            .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
+                        Button {
+                            Task { await check() }
+                        } label: {
+                            HStack { Text("Verbindung testen"); Spacer(); if checking { ProgressView() } else if let status { Text(status).foregroundStyle(status.hasPrefix("OK") ? Theme.safe : Theme.stop) } }
+                        }
                         Toggle("Präzisionsmodus (Muse Wonder)", isOn: $settings.precisionMode).tint(Theme.thread)
-                    } footer: {
-                        Text("Ein Muse-Wonder-Agent prüft jede Schadensmaske selbst und segmentiert bei Bedarf neu. Im Test: alle Masken auf dem Schaden, keine Fehltreffer, dafür etwa 60–90 statt 25 Sekunden.")
                     }
                 }
-                Section("Demo-Szenario") {
-                    Picker("Szenario", selection: $settings.scenarioRaw) {
-                        ForEach(DemoScenario.allCases) { Text($0.title).tag($0.rawValue) }
-                        if !settings.demoMode { Text("Keins (echtes Modell)").tag("") }
-                    }
-                    if !settings.demoMode {
-                        Text("Im Live-Modus wird das Szenario als mock_scenario an den Server gesendet.").font(.footnote).foregroundStyle(.secondary)
-                    }
-                }
-                Section("Server") {
-                    TextField("http://localhost:8787", text: $settings.baseURLString)
-                        .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
-                    Button {
-                        Task { await check() }
-                    } label: {
-                        HStack { Text("Verbindung testen"); Spacer(); if checking { ProgressView() } else if let status { Text(status).foregroundStyle(status.hasPrefix("OK") ? Theme.safe : Theme.stop) } }
-                    }
-                }
-                Section("Daten") {
+                Section {
                     Button("Verlauf löschen", role: .destructive) { flow.store.clearHistory() }
                 }
             }

@@ -150,7 +150,7 @@ private struct LiveDot: View {
     var body: some View {
         HStack(spacing: 5) {
             Circle().fill(Theme.thread).frame(width: 7, height: 7).opacity(on ? 1 : 0.35)
-            Text(replay ? tr("Aufzeichnung") : tr("live")).font(.caption2.weight(.bold)).textCase(.uppercase).foregroundStyle(Theme.thread)
+            Text(tr("live")).font(.caption2.weight(.bold)).textCase(.uppercase).foregroundStyle(Theme.thread)
         }
         .onAppear { if !reduceMotion { withAnimation(.easeInOut(duration: 0.8).repeatForever()) { on = true } } else { on = true } }
         .accessibilityHidden(true)
