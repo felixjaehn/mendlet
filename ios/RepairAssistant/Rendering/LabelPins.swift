@@ -7,6 +7,7 @@ enum LabelPlacer {
     struct Item: Identifiable {
         let id: String
         let text: String, score: String?, badge: String?
+        var polarity: String? = nil  // solder pads: coloured +/− disc in front of the text
         let anchor: CGPoint          // pin dot on the mask (px)
         let bounds: CGRect           // mask bounds (px), chips avoid it
         let width: CGFloat
@@ -16,11 +17,11 @@ enum LabelPlacer {
     }
     struct Placed: Identifiable { let item: Item; let dot: CGPoint; let rect: CGRect; var id: String { item.id } }
 
-    static func width(text: String, score: String?, badge: String?) -> CGFloat {
+    static func width(text: String, score: String?, badge: String?, polarity: String? = nil) -> CGFloat {
         func w(_ s: String, _ size: CGFloat, _ weight: UIFont.Weight) -> CGFloat {
             ceil((s as NSString).size(withAttributes: [.font: UIFont.systemFont(ofSize: size, weight: weight)]).width)
         }
-        var x = 18 + w(text, 11.5, .semibold)
+        var x = 18 + w(text, 11.5, .semibold) + (polarity != nil ? 20 : 0)
         if let score { x += 5 + w(score, 11, .medium) }
         if let badge { x += 5 + w(badge, 8.5, .bold) + 9 }
         return x
@@ -84,7 +85,7 @@ struct LabelPinsLayer: View {
         ZStack(alignment: .topLeading) {
             ForEach(placed) { p in
                 let seg = segments.first { $0.id == p.id }
-                PinView(placed: p, color: seg.map { segmentColor($0, in: all) } ?? Theme.thread, emphasized: seg?.isDamage == true)
+                PinView(placed: p, color: seg.map { SolderStyle.padColor($0.polarity) ?? segmentColor($0, in: all) } ?? Theme.thread, emphasized: seg?.isDamage == true)
                     .opacity(reveal.map { min(1, max(0, ($0 - p.dot.y / max(size.height, 1)) * 10)) } ?? 1)
                     .transition(.opacity)
             }
@@ -100,6 +101,13 @@ struct LabelPinsLayer: View {
         case "Fleck": return "\(n) Flecken"
         default: return "\(n)× \(label)"
         }
+    }
+
+    static func stripPolarity(_ label: String) -> String {
+        var t = label.trimmingCharacters(in: .whitespaces)
+        if let last = t.last, "+-−–".contains(last) { t.removeLast() }
+        t = t.trimmingCharacters(in: .whitespaces)
+        return t.isEmpty ? label : t
     }
 
     private func info(_ s: Segment) -> (anchor: CGPoint, bounds: CGRect, pts: [CGPoint])? {
@@ -141,8 +149,10 @@ struct LabelPinsLayer: View {
             func nearest(_ t: CGPoint) -> CGPoint { i.pts.min { hypot($0.x - t.x, $0.y - t.y) < hypot($1.x - t.x, $1.y - t.y) } ?? t }
             let b = i.bounds
             let corners = [b.origin, CGPoint(x: b.maxX, y: b.minY), CGPoint(x: b.minX, y: b.maxY), CGPoint(x: b.maxX, y: b.maxY)].map { i.pts.isEmpty ? $0 : nearest($0) }
-            out.append(LabelPlacer.Item(id: s.id, text: s.label, score: score, badge: badge, anchor: i.anchor, bounds: b,
-                                        width: LabelPlacer.width(text: s.label, score: score, badge: badge), large: large, corners: corners))
+            // "Lötpad +" -> disc "+" and text "Lötpad": the sign is not shown twice
+            let text = s.polarity == nil ? s.label : Self.stripPolarity(s.label)
+            out.append(LabelPlacer.Item(id: s.id, text: text, score: score, badge: badge, polarity: s.polarity, anchor: i.anchor, bounds: b,
+                                        width: LabelPlacer.width(text: text, score: score, badge: badge, polarity: s.polarity), large: large, corners: corners))
         }
         return out
     }
@@ -170,6 +180,7 @@ private struct PinView: View {
                     .position(d)
             }
             HStack(spacing: 5) {
+                if let pol = it.polarity { PolarityDisc(polarity: pol, diameter: 15) }
                 Text(it.text).font(.system(size: 11.5, weight: .semibold))
                 if let s = it.score { Text(s).font(.system(size: 11, weight: .medium, design: .rounded)).monospacedDigit().opacity(0.7) }
                 if let b = it.badge {

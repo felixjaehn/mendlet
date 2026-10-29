@@ -198,7 +198,11 @@ struct StepOverlay: View {
 
     var body: some View {
         ZStack {
-            if response.category == .shoe && !isStitch {
+            if step.overlay?.type == .solder {
+                SolderOverlay(step: step, response: response, size: size)
+            } else if response.category == .lowVoltageElectronics {
+                ElectronicsOverview(step: step, response: response, size: size)
+            } else if response.category == .shoe && !isStitch {
                 ShoeOverlay(step: step, response: response, size: size)
             } else if isStitch {
                 if let s = targetSegment {
