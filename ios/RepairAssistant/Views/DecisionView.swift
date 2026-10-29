@@ -90,7 +90,7 @@ struct DecisionView: View {
         .navigationTitle("Entscheidung")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { if flow.response?.decision?.recommendation != .repairPro { flow.loadAfterPreview() } }
-        .safeAreaInset(edge: .bottom) {
+        .floatingBar {
             Group {
                 if FlowGate.canNavigate(to: .shopping, response: flow.response) {
                     PrimaryButton(title: "Einkaufsliste ansehen", systemImage: "cart") { flow.go(.shopping) }
@@ -98,7 +98,7 @@ struct DecisionView: View {
                     PrimaryButton(title: "Neues Foto aufnehmen", systemImage: "camera.fill") { flow.reset() }
                 }
             }
-            .padding(.horizontal, Theme.margin).padding(.vertical, 12).background(.regularMaterial)
+            .padding(.horizontal, Theme.margin).padding(.vertical, 12)
         }
     }
 

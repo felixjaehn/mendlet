@@ -49,8 +49,7 @@ struct GuideView: View {
                     flow.persist(); flow.reset()
                 } label: {
                     Text("Schließen").font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
-                        .padding(.horizontal, 12).frame(minHeight: 36).background(Theme.card, in: Capsule())
-                        .overlay(Capsule().strokeBorder(Theme.hairline, lineWidth: 1))
+                        .padding(.horizontal, 14).frame(minHeight: 36).glass(Capsule(), interactive: true)
                 }
                 .accessibilityHint("Der Stand bleibt gespeichert")
             }
@@ -170,11 +169,11 @@ struct GuideView: View {
             Button { showHelp = true } label: {
                 Text("Hilft nicht").font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
                     .padding(.horizontal, 14).frame(minHeight: 56)
-                    .background(Theme.card, in: Capsule()).overlay(Capsule().strokeBorder(Theme.hairline, lineWidth: 1.5))
+                    .glass(Capsule(), interactive: true)
             }
         }
         .padding(.horizontal, Theme.margin).padding(.vertical, 10)
-        .background(.regularMaterial)
+        
     }
 }
 

@@ -172,7 +172,7 @@ struct StitchPathView: View {
             }
             if amt < len { break }
         }
-        let thread = Theme.thread
+        let thread = Theme.highlight
         let shadowT = CGAffineTransform(translationX: 0.9, y: 1.0), hiT = CGAffineTransform(translationX: -0.5, y: -0.6)
         let dash: [CGFloat] = [5, 4]
         for (path, d) in [(solid, [CGFloat]()), (dashed, dash)] {
@@ -185,7 +185,7 @@ struct StitchPathView: View {
 
     private func draw(_ ctx: inout GraphicsContext, _ size: CGSize, progress: Double, alpha: Double) {
         ctx.opacity = alpha
-        let thread = Theme.thread
+        let thread = Theme.highlight
         var tr: Trace
         switch plan.kind {
         case .stitches:

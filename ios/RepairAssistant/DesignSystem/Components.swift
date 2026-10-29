@@ -10,12 +10,12 @@ struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.headline)
-            .frame(maxWidth: .infinity, minHeight: 56)
+            .frame(maxWidth: .infinity, minHeight: 52)
             .padding(.horizontal, 20)
             .foregroundStyle(fg)
-            .background(bg, in: Capsule())
-            .overlay(Capsule().strokeBorder(kind == .secondary ? Theme.hairline : .clear, lineWidth: 1.5))
-            .opacity(isEnabled ? 1 : 0.55)
+            .background(kind == .secondary ? Color.clear : bg, in: Capsule())
+            .glass(Capsule(), interactive: true)
+            .opacity(isEnabled ? 1 : 0.5)
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
     }
@@ -27,8 +27,8 @@ struct PrimaryButtonStyle: ButtonStyle {
     }
     private var bg: Color {
         switch kind {
-        case .primary: isEnabled ? Theme.thread : Theme.hairline
-        case .destructive: isEnabled ? Theme.stop : Theme.hairline
+        case .primary: isEnabled ? Theme.thread : Theme.fill
+        case .destructive: isEnabled ? Theme.stop : Theme.fill
         case .secondary: Theme.card
         }
     }
@@ -42,12 +42,35 @@ struct PrimaryButton: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 if let systemImage { Image(systemName: systemImage) }
                 Text(tr(title))
             }
+            .font(.headline)
+            .frame(maxWidth: .infinity, minHeight: 34)
         }
-        .buttonStyle(PrimaryButtonStyle(kind: kind))
+        .systemButtonStyle(kind)
+        .controlSize(.large)
+        .buttonBorderShape(.capsule)
+    }
+}
+
+extension View {
+    /// Native iOS 26+ Liquid Glass button styles; bordered styles before.
+    @ViewBuilder func systemButtonStyle(_ kind: PrimaryButtonStyle.Kind) -> some View {
+        if #available(iOS 26.0, *) {
+            switch kind {
+            case .primary: self.buttonStyle(.glassProminent)
+            case .destructive: self.buttonStyle(.glassProminent).tint(Theme.stop)
+            case .secondary: self.buttonStyle(.glass)
+            }
+        } else {
+            switch kind {
+            case .primary: self.buttonStyle(.borderedProminent)
+            case .destructive: self.buttonStyle(.borderedProminent).tint(Theme.stop)
+            case .secondary: self.buttonStyle(.bordered)
+            }
+        }
     }
 }
 
@@ -58,11 +81,10 @@ struct CircleIconButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: systemImage)
-                .font(.system(size: 18, weight: .semibold))
+                .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(Theme.ink)
-                .frame(width: 56, height: 56)
-                .background(Theme.card, in: Circle())
-                .overlay(Circle().strokeBorder(Theme.hairline, lineWidth: 1.5))
+                .frame(width: 52, height: 52)
+                .glass(Circle(), interactive: true)
         }
         .accessibilityLabel(tr(label))
     }
@@ -85,8 +107,7 @@ struct Chip: View {
         .padding(.horizontal, 14)
         .frame(minHeight: 36)
         .foregroundStyle(filled ? Color.white : (isOn ? tint : Theme.inkSecondary))
-        .background(filled ? tint : (isOn ? tint.opacity(0.14) : Theme.card), in: Capsule())
-        .overlay(Capsule().strokeBorder(isOn ? tint.opacity(0.0) : Theme.hairline, lineWidth: 1))
+        .background(filled ? tint : (isOn ? tint.opacity(0.14) : Theme.fill), in: Capsule())
         .animation(Theme.spring, value: isOn)
     }
 }
@@ -100,10 +121,8 @@ struct EstimatePill: View {
             Image(systemName: "info.circle")
             Text(tr(text))
         }
-        .font(.footnote.weight(.semibold))
-        .foregroundStyle(Theme.caution)
-        .padding(.horizontal, 12).frame(minHeight: 30)
-        .background(Theme.cautionSoft, in: Capsule())
+        .font(.footnote)
+        .foregroundStyle(Theme.inkSecondary)
     }
 }
 
@@ -111,7 +130,7 @@ struct Badge: View {
     var text: String
     var tint: Color
     var body: some View {
-        Text(tr(text)).font(.caption2.weight(.bold)).textCase(.uppercase)
+        Text(tr(text)).font(.caption.weight(.semibold))
             .foregroundStyle(tint)
             .padding(.horizontal, 8).padding(.vertical, 3)
             .background(tint.opacity(0.14), in: Capsule())
@@ -123,13 +142,12 @@ struct DemoChip: View {
     var text: String = LiveRecordings.chipText
     var body: some View {
         HStack(spacing: 6) {
-            Circle().fill(Theme.caution).frame(width: 6, height: 6)
+            Circle().fill(Theme.safe).frame(width: 6, height: 6)
             Text(tr(text)).font(.caption.weight(.semibold))
         }
         .foregroundStyle(Theme.inkSecondary)
         .padding(.horizontal, 10).frame(minHeight: 26)
-        .background(Theme.card, in: Capsule())
-        .overlay(Capsule().strokeBorder(Theme.hairline, lineWidth: 1))
+        .glass(Capsule())
         .accessibilityLabel(Text("Demo-Modus mit echten Modellantworten vom 28. Oktober"))
     }
 }
@@ -252,7 +270,6 @@ struct ErrorCard: View {
         }
         .padding(16)
         .background(Theme.stopSoft, in: RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous).strokeBorder(Theme.stop.opacity(0.3), lineWidth: 1))
     }
 }
 
@@ -311,7 +328,19 @@ extension View {
 struct SectionLabel: View {
     var text: String
     var body: some View {
-        Text(tr(text)).font(.footnote.weight(.semibold)).textCase(.uppercase)
-            .foregroundStyle(Theme.inkSecondary).tracking(0.6)
+        Text(tr(text)).font(.headline).foregroundStyle(Theme.ink)
+    }
+}
+
+extension View {
+    /// Bottom action area: a native safe-area bar with the system scroll-edge effect on iOS 26+
+    /// (content softly fades under floating glass buttons), a material bar before.
+    @ViewBuilder func floatingBar<Bar: View>(@ViewBuilder _ bar: () -> Bar) -> some View {
+        if #available(iOS 26.0, *) {
+            self.safeAreaBar(edge: .bottom) { bar() }
+                .scrollEdgeEffectStyle(.soft, for: .bottom)
+        } else {
+            self.safeAreaInset(edge: .bottom) { bar().background(.bar) }
+        }
     }
 }

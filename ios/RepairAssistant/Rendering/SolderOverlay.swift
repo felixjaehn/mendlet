@@ -180,7 +180,7 @@ struct SolderOverlay: View {
         // 1. wire mask in its own colour
         if let wire {
             let tone = SolderStyle.tone(wire)
-            let fill: Color = tone == .red ? SolderStyle.red : (tone == .black ? .black : Theme.thread)
+            let fill: Color = tone == .red ? SolderStyle.red : (tone == .black ? .black : Theme.highlight)
             let edge: Color = tone == .black ? .white : fill
             var all = Path(); for r in SegmentLayer.ringPaths(for: wire, in: sz) { all.addPath(r.path) }
             ctx.fill(all, with: .color(fill.opacity(tone == .black ? 0.5 : 0.38)), style: FillStyle(eoFill: true))
@@ -211,7 +211,7 @@ struct SolderOverlay: View {
         }
 
         // 3. pad
-        let padTint = SolderStyle.padColor(pad?.polarity) ?? Theme.thread
+        let padTint = SolderStyle.padColor(pad?.polarity) ?? Theme.highlight
         if let pad {
             let rings = SegmentLayer.ringPaths(for: pad, in: sz)
             var all = Path(); for r in rings { all.addPath(r.path) }
@@ -313,6 +313,6 @@ struct ElectronicsOverview: View {
     }
 
     private func wireColor(_ s: Segment) -> Color {
-        switch SolderStyle.tone(s) { case .red: SolderStyle.red; case .black: Color(hex: 0x4A5058); case .other: Theme.thread }
+        switch SolderStyle.tone(s) { case .red: SolderStyle.red; case .black: Color(hex: 0x4A5058); case .other: Theme.highlight }
     }
 }

@@ -93,7 +93,7 @@ struct AgentTraceView: View {
     }
 
     private func badge(_ model: String, ok: Bool = true) -> some View {
-        Text(ModelStyle.display(model)).font(.system(size: 10.5, weight: .bold)).textCase(.uppercase).tracking(0.3)
+        Text(ModelStyle.display(model)).font(.caption2.weight(.semibold))
             .foregroundStyle(ok ? ModelStyle.tint(model) : Theme.stop)
             .padding(.horizontal, 7).padding(.vertical, 2)
             .background((ok ? ModelStyle.tint(model) : Theme.stop).opacity(0.12), in: Capsule())

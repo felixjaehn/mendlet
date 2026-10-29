@@ -38,11 +38,11 @@ struct ScanRevealView: View {
                 let band = CGRect(x: 0, y: y - trail, width: sz.width, height: trail + 16)
                 ctx.blendMode = .plusLighter
                 ctx.fill(Path(band), with: .linearGradient(
-                    Gradient(stops: [.init(color: .clear, location: 0), .init(color: Theme.thread.opacity(0.30), location: 0.88),
+                    Gradient(stops: [.init(color: .clear, location: 0), .init(color: Theme.highlight.opacity(0.30), location: 0.88),
                                      .init(color: Color.white.opacity(0.22), location: 0.93), .init(color: .clear, location: 1)]),
                     startPoint: CGPoint(x: 0, y: band.minY), endPoint: CGPoint(x: 0, y: band.maxY)))
                 let line = Path(CGRect(x: 0, y: y - 0.75, width: sz.width, height: 1.5))
-                ctx.drawLayer { l in l.addFilter(.blur(radius: 4)); l.fill(line, with: .color(Theme.thread.opacity(0.9))) }
+                ctx.drawLayer { l in l.addFilter(.blur(radius: 4)); l.fill(line, with: .color(Theme.highlight.opacity(0.9))) }
                 ctx.fill(line, with: .linearGradient(
                     Gradient(colors: [.clear, .white.opacity(0.95), .white.opacity(0.95), .clear]),
                     startPoint: CGPoint(x: 0, y: y), endPoint: CGPoint(x: sz.width, y: y)))

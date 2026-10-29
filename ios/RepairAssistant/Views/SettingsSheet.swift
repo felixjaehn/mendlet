@@ -30,15 +30,6 @@ struct SettingsSheet: View {
                         Text("Ein Muse-Wonder-Agent prüft jede Schadensmaske selbst und segmentiert bei Bedarf neu. Im Test: alle Masken auf dem Schaden, keine Fehltreffer, dafür etwa 60–90 statt 25 Sekunden.")
                     }
                 }
-                Section {
-                    Picker(selection: $settings.language) {
-                        Text("System").tag("system")
-                        Text("Deutsch").tag("de")
-                        Text("English").tag("en")
-                    } label: { Label("Sprache / Language", systemImage: "globe") }
-                } footer: {
-                    Text("Die App folgt der Systemsprache. Die Sprache wird auch an den Server gesendet, damit Diagnose und Anleitung passen.")
-                }
                 Section("Demo-Szenario") {
                     Picker("Szenario", selection: $settings.scenarioRaw) {
                         ForEach(DemoScenario.allCases) { Text($0.title).tag($0.rawValue) }

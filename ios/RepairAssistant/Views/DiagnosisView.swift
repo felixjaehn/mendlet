@@ -35,12 +35,12 @@ struct DiagnosisView: View {
         }
         .scrollIndicators(.hidden)
         .screenBackground()
-        .safeAreaInset(edge: .bottom) { ctaBar(r) }
+        .floatingBar { ctaBar(r) }
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button { flow.reset() } label: { Image(systemName: "xmark") }.accessibilityLabel("Schließen")
+                Button { flow.reset() } label: { Image(systemName: "xmark") }.tint(.primary).accessibilityLabel("Schließen")
             }
         }
         .sheet(isPresented: $flow.showFollowUp) { FollowUpSheet() }
@@ -88,7 +88,7 @@ struct DiagnosisView: View {
                         Haptics.selection()
                     } label: {
                         Chip(title: g.ids.count > 1 ? "\(tr(g.label)) ×\(g.ids.count)" : g.label, systemImage: off ? "eye.slash" : "eye",
-                             tint: segmentColor(g.first, in: r.segments), isOn: !off)
+                             tint: g.first.isDamage ? Theme.thread : Theme.inkSecondary, isOn: !off)
                     }
                     .accessibilityLabel(tr(off ? "%@ einblenden" : "%@ ausblenden", tr(g.label)))
                 }
@@ -155,8 +155,8 @@ struct DiagnosisView: View {
             else if CameraPicker.isAvailable { showLabelCamera = true } else { showLabelGallery = true }
         } label: {
             HStack(spacing: 14) {
-                Image(systemName: "tag.fill").font(.system(size: 18, weight: .semibold)).foregroundStyle(Theme.thread)
-                    .frame(width: 44, height: 44).background(Theme.threadSoft, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                Image(systemName: "tag.fill").font(.system(size: 17, weight: .semibold)).foregroundStyle(.white)
+                    .frame(width: 40, height: 40).background(Theme.thread, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
                 VStack(alignment: .leading, spacing: 2) {
                     (Text("Etikett fotografieren für genauere Empfehlung ").foregroundStyle(Theme.ink) + Text("(optional)").foregroundStyle(Theme.inkSecondary))
                         .font(.subheadline.weight(.semibold)).multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
@@ -164,10 +164,10 @@ struct DiagnosisView: View {
                         .multilineTextAlignment(.leading)
                 }
                 Spacer(minLength: 0)
+                Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkSecondary.opacity(0.6))
             }
             .padding(14)
-            .background(Theme.card, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Theme.thread.opacity(0.35), style: StrokeStyle(lineWidth: 1.2, dash: [5, 4])))
+            .background(Theme.card, in: RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
         }
         .buttonStyle(.plain)
         .accessibilityHint("Optional, du kannst auch direkt weitermachen")
@@ -179,7 +179,7 @@ struct DiagnosisView: View {
             if let img = flow.labelImage {
                 Image(uiImage: img).resizable().scaledToFill().frame(width: 44, height: 44)
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Theme.thread.opacity(0.5), lineWidth: 1.5))
+
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text("Muse Spark liest das Etikett").font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
@@ -214,8 +214,7 @@ struct DiagnosisView: View {
             }
         }
         .padding(14).frame(maxWidth: .infinity, alignment: .leading)
-        .background(Theme.threadSoft, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(Theme.thread.opacity(0.35), lineWidth: 1))
+        .background(Theme.card, in: RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
         .transition(.scale(scale: 0.96).combined(with: .opacity))
         .onAppear { changedShown = true }
     }
@@ -248,7 +247,7 @@ struct DiagnosisView: View {
                 }
             }
             .padding(.horizontal, Theme.margin).padding(.vertical, 12)
-            .background(.regularMaterial)
+            
         }
     }
 

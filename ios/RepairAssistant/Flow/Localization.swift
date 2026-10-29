@@ -19,7 +19,8 @@ final class Lang: @unchecked Sendable {
         let stored = defaults.string(forKey: Self.defaultsKey) ?? "system"
         // Unit tests assert the German texts; under XCTest the default is German instead of the simulator language.
         let testing = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
-        choice = Self.supported.contains(stored) ? stored : (testing ? "de" : "system")
+        // The submitted app is English-only (UI, model answers, voice). Tests keep the German catalog keys.
+        choice = testing ? (Self.supported.contains(stored) ? stored : "de") : "en"
     }
 
     /// Resolved language, "de" or "en". Reads `choice`, so SwiftUI views calling `tr` re-render when it changes.

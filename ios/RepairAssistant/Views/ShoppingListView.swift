@@ -39,19 +39,17 @@ struct ShoppingListView: View {
                 ShareLink(item: ShoppingGate.shareText(title: flow.response?.diagnosis.summary.components(separatedBy: ".").first ?? tr("Reparatur"), items: items, statuses: flow.statuses)) {
                     Image(systemName: "square.and.arrow.up")
                 }
+                .tint(.primary)
                 .accessibilityLabel("Liste teilen")
             }
         }
-        .safeAreaInset(edge: .bottom) {
-            VStack(spacing: 8) {
-                if !open.isEmpty {
-                    Text(tr(open.count == 1 ? "Noch %lld Pflichtteil offen" : "Noch %lld Pflichtteile offen", open.count))
-                        .font(.footnote.weight(.medium)).foregroundStyle(Theme.inkSecondary)
-                }
-                PrimaryButton(title: "Reparatur starten", systemImage: "play.fill") { flow.startRepair() }
-                    .disabled(!flow.canStartRepair)
-            }
-            .padding(.horizontal, Theme.margin).padding(.vertical, 12).background(.regularMaterial)
+        .floatingBar {
+            // Status lives in the button itself (no extra line over the list).
+            PrimaryButton(title: open.isEmpty ? tr("Reparatur starten")
+                          : tr(open.count == 1 ? "Noch %lld Pflichtteil offen" : "Noch %lld Pflichtteile offen", open.count),
+                          systemImage: open.isEmpty ? "play.fill" : "checklist") { flow.startRepair() }
+                .disabled(!flow.canStartRepair)
+                .padding(.horizontal, Theme.margin).padding(.vertical, 12)
         }
     }
 

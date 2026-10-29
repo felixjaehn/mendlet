@@ -12,23 +12,11 @@ struct HomeView: View {
     var body: some View {
         @Bindable var flow = flow
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 22) {
                 topBar
-                if flow.settings.demoMode { DemoChip().padding(.top, -12) }
                 headline
-                ThreadHero().frame(height: 132)
-                VStack(spacing: 12) {
-                    PrimaryButton(title: "Live-Scan", systemImage: "viewfinder") { showLiveScan = true }
-                    PrimaryButton(title: "Foto aufnehmen", systemImage: "camera.fill") {
-                        if CameraPicker.isAvailable { showCamera = true } else { showGallery = true }
-                    }
-                    PrimaryButton(title: "Aus Galerie", systemImage: "photo.on.rectangle", kind: .secondary) { showGallery = true }
-                }
-                HStack(spacing: 8) {
-                    Chip(title: "Kleidung", systemImage: "tshirt", tint: Theme.inkSecondary, isOn: true)
-                    Chip(title: "Schuhe", systemImage: "shoe", tint: Theme.inkSecondary, isOn: true)
-                    Spacer()
-                }
+                HeroShowcase()
+                actions
                 if flow.store.rescuedCount >= 1 { balanceRow }
                 if flow.settings.demoMode { demoSection }
                 if !flow.store.cases.isEmpty { historySection }
@@ -69,29 +57,37 @@ struct HomeView: View {
 
     private var topBar: some View {
         HStack {
-            HStack(spacing: 8) {
-                Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
-                    .font(.system(size: 17, weight: .bold)).foregroundStyle(Theme.thread)
-                Text("Reparatur-Assistent").font(.headline).foregroundStyle(Theme.ink)
-            }
-            .onLongPressGesture(minimumDuration: 0.8) { Haptics.success(); flow.showSettings = true }
+            if flow.settings.demoMode { DemoChip() }
             Spacer()
             Button { flow.showSettings = true } label: {
-                Image(systemName: "gearshape").font(.system(size: 18, weight: .medium)).foregroundStyle(Theme.inkSecondary)
-                    .frame(width: 44, height: 44)
+                Image(systemName: "gearshape").font(.system(size: 17, weight: .semibold)).foregroundStyle(Theme.ink)
+                    .frame(width: 44, height: 44).glass(Circle(), interactive: true)
             }
-            .accessibilityLabel("Einstellungen")
+            .accessibilityLabel(tr("Einstellungen"))
         }
         .padding(.top, 4)
     }
 
     private var headline: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Was ist kaputt?\nZeig's mir.")
-                .font(.largeTitle.bold()).foregroundStyle(Theme.ink)
-                .fixedSize(horizontal: false, vertical: true)
-            Text("Foto machen, Schaden markieren lassen und Schritt für Schritt reparieren.")
-                .font(.body).foregroundStyle(Theme.inkSecondary)
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Reparieren").font(.largeTitle.bold()).foregroundStyle(Theme.ink)
+                .onLongPressGesture(minimumDuration: 0.8) { Haptics.success(); flow.showSettings = true }
+            Text("Zeig mir den Schaden. Ich markiere ihn auf deinem Foto und führe dich Schritt für Schritt durch die Reparatur.")
+                .font(.body).foregroundStyle(Theme.inkSecondary).fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private var actions: some View {
+        VStack(spacing: 10) {
+            PrimaryButton(title: "Schaden scannen", systemImage: "viewfinder") { showLiveScan = true }
+            HStack(spacing: 10) {
+                PrimaryButton(title: "Kamera", systemImage: "camera", kind: .secondary) {
+                    if CameraPicker.isAvailable { showCamera = true } else { showGallery = true }
+                }
+                PrimaryButton(title: "Fotos", systemImage: "photo.on.rectangle", kind: .secondary) { showGallery = true }
+            }
+            Text("Kleidung, Schuhe und Niedervolt-Elektronik").font(.footnote).foregroundStyle(Theme.inkSecondary)
+                .frame(maxWidth: .infinity)
         }
     }
 
@@ -194,63 +190,25 @@ private struct HistoryCard: View {
     }
 }
 
-/// Self-made hero: a tear that closes with thread, looping.
-private struct ThreadHero: View {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var start = Date()
+/// Hero: the real product, the recorded jeans photo with its SAM mask and pins (no illustration).
+private struct HeroShowcase: View {
+    private let rec = LiveRecordings.recording(for: .textileTear)
+    @State private var appeared = false
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
-            let t = reduceMotion ? 3.0 : tl.date.timeIntervalSince(start)
-            Canvas { ctx, size in
-                let cycle = 5.5
-                let local = t.truncatingRemainder(dividingBy: cycle)
-                let p = min(1, local / 3.6)
-                let alpha = local > cycle - 0.4 ? max(0, (cycle - local) / 0.4) : 1
-                let mid = size.height / 2
-                let x0 = 28.0, x1 = size.width - 28
-                // slit
-                var slit = Path()
-                let n = 40
-                for i in 0...n {
-                    let u = Double(i) / Double(n), x = x0 + (x1 - x0) * u
-                    let w = 9 * pow(sin(.pi * u), 0.7) + 1.5
-                    let y = mid + 6 * sin(u * 6)
-                    if i == 0 { slit.move(to: CGPoint(x: x, y: y - w)) } else { slit.addLine(to: CGPoint(x: x, y: y - w)) }
-                }
-                for i in stride(from: n, through: 0, by: -1) {
-                    let u = Double(i) / Double(n), x = x0 + (x1 - x0) * u
-                    let w = 9 * pow(sin(.pi * u), 0.7) + 1.5
-                    slit.addLine(to: CGPoint(x: x, y: mid + 6 * sin(u * 6) + w))
-                }
-                slit.closeSubpath()
-                ctx.fill(slit, with: .color(Theme.ink.opacity(0.78)))
-                // stitches
-                let count = 9
-                ctx.opacity = alpha
-                var thread = Path()
-                var head = CGPoint(x: x0, y: mid)
-                for i in 0..<count {
-                    let u = (Double(i) + 0.5) / Double(count)
-                    let x = x0 + (x1 - x0) * u
-                    let y = mid + 6 * sin(u * 6) + (i % 2 == 0 ? -20 : 20)
-                    let pt = CGPoint(x: x, y: y)
-                    let frac = Double(i) / Double(count)
-                    guard p >= frac else { break }
-                    if i == 0 { thread.move(to: pt) } else { thread.addLine(to: pt) }
-                    head = pt
-                    let s = min(1, (p - frac) * Double(count) * 2)
-                    ctx.fill(Path(ellipseIn: CGRect(x: x - 5 * s, y: y - 5 * s, width: 10 * s, height: 10 * s)), with: .color(i % 2 == 0 ? Theme.thread : Theme.card))
-                    ctx.stroke(Path(ellipseIn: CGRect(x: x - 5 * s, y: y - 5 * s, width: 10 * s, height: 10 * s)), with: .color(Theme.thread), lineWidth: 2)
-                }
-                ctx.stroke(thread, with: .color(Theme.thread), style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
-                _ = head
+        if let rec, let photo = rec.photo {
+            PhotoStage(image: photo, cornerRadius: 28, minAspect: 1.15) { size in
+                SegmentOverlayView(segments: rec.response.segments.filter(\.isDamage), size: size, appeared: appeared, showLabels: true)
             }
+            .overlay(alignment: .bottomLeading) {
+                Label("SAM 3.1 · Muse Spark", systemImage: "sparkles")
+                    .font(.caption.weight(.semibold)).foregroundStyle(.white)
+                    .padding(.horizontal, 10).padding(.vertical, 6).glass(Capsule())
+                    .padding(12)
+            }
+            .onAppear { withAnimation(.easeOut(duration: 0.9).delay(0.3)) { appeared = true } }
+            .accessibilityLabel(tr("Beispiel: Riss in einer Jeans, markiert von SAM 3.1"))
         }
-        .frame(maxWidth: .infinity)
-        .background(Theme.threadSoft, in: RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
-        .onAppear { start = Date() }
-        .accessibilityHidden(true)
     }
 }
 
@@ -262,17 +220,20 @@ extension HomeView {
         guard let screen = d.string(forKey: "uiScreen") else { return }
         flow.settings.demoMode = true
         if screen == "liveScan" { try? await Task.sleep(for: .milliseconds(400)); showLiveScan = true; return }
+        if screen == "settings" { try? await Task.sleep(for: .milliseconds(400)); flow.showSettings = true; return }
         let scenario = DemoScenario(rawValue: d.string(forKey: "uiScenario") ?? "") ?? .textileTear
         let img = await DemoPhotos.imageAsync(for: scenario)
         flow.choose(img, scenarioHint: scenario, note: scenario.userNote)
         flow.answers = [AnswerPayload(questionId: "debug", text: "Jeans, Baumwolle")]
         flow.startAnalysis(resetExtras: false)
-        guard screen == "guide" || screen == "decision" else { return }
+        guard ["guide", "decision", "shopping", "completion"].contains(screen) else { return }
         let flow = self.flow
         Task { @MainActor in  // unstructured: survives HomeView's .task cancellation on navigation
         while flow.isAnalyzing || flow.response == nil { try? await Task.sleep(for: .milliseconds(200)) }
         try? await Task.sleep(for: .milliseconds(900))
         if screen == "decision" { flow.go(.decision); return }
+        if screen == "shopping" { flow.go(.shopping); return }
+        if screen == "completion" { flow.finishRepair(); return }
         for i in flow.shoppingItems { flow.statuses[i.id] = .have }
         flow.currentStep = d.integer(forKey: "uiStep")
         flow.startRepair()

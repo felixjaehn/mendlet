@@ -28,6 +28,10 @@ shot() {  # name, wait seconds, launch args…
   echo "v6-$LANG_CODE-$name.png"
 }
 
+shot home 7
+shot settings 4 -uiScreen settings
+shot shopping 16 -uiScreen shopping -uiScenario textile_tear
+shot completion 16 -uiScreen completion -uiScenario textile_tear
 shot analysis-agent 8  -uiScreen analysis -uiScenario textile_tear -recoveryTrace YES
 shot diagnosis-jeans 12 -uiScreen diagnosis -uiScenario textile_tear -recoveryTrace NO
 shot diagnosis-sweater 12 -uiScreen diagnosis -uiScenario textile_hole

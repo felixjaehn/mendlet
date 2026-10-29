@@ -85,7 +85,7 @@ struct LabelPinsLayer: View {
         ZStack(alignment: .topLeading) {
             ForEach(placed) { p in
                 let seg = segments.first { $0.id == p.id }
-                PinView(placed: p, color: seg.map { SolderStyle.padColor($0.polarity) ?? segmentColor($0, in: all) } ?? Theme.thread, emphasized: seg?.isDamage == true)
+                PinView(placed: p, color: seg.map { SolderStyle.padColor($0.polarity) ?? segmentColor($0, in: all) } ?? Theme.highlight, emphasized: seg?.isDamage == true)
                     .opacity(reveal.map { min(1, max(0, ($0 - p.dot.y / max(size.height, 1)) * 10)) } ?? 1)
                     .transition(.opacity)
             }

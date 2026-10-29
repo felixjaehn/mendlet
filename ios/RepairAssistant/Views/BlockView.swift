@@ -42,7 +42,7 @@ struct BlockView: View {
                         if let r = flow.response { SegmentOverlayView(segments: r.segments, size: size, showLabels: false) }
                     }
                     .frame(height: 170)
-                    .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).strokeBorder(tint, lineWidth: 3))
+
                 }
                 VStack(spacing: 14) {
                     Image(systemName: icon).font(.system(size: 34, weight: .semibold)).foregroundStyle(tint)
@@ -58,7 +58,7 @@ struct BlockView: View {
                     SectionLabel(text: "Was du stattdessen tun kannst")
                     ForEach(tips, id: \.self) { t in
                         HStack(alignment: .top, spacing: 10) {
-                            Image(systemName: "arrow.right.circle.fill").foregroundStyle(tint)
+                            Image(systemName: "arrow.right.circle.fill").foregroundStyle(Theme.inkSecondary)
                             Text(t).font(.subheadline).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                         }
                     }
@@ -70,12 +70,12 @@ struct BlockView: View {
         .scrollIndicators(.hidden)
         .screenBackground()
         .navigationBarBackButtonHidden()
-        .safeAreaInset(edge: .bottom) {
+        .floatingBar {
             VStack(spacing: 10) {
                 PrimaryButton(title: "Neues Foto", systemImage: "camera.fill") { flow.reset() }
                 Button("Verstanden") { flow.reset() }.font(.headline).foregroundStyle(Theme.inkSecondary).frame(minHeight: 44)
             }
-            .padding(.horizontal, Theme.margin).padding(.vertical, 10).background(.regularMaterial)
+            .padding(.horizontal, Theme.margin).padding(.vertical, 10)
         }
         .onAppear { Haptics.warning() }
     }

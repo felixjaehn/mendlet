@@ -41,7 +41,7 @@ struct AnalysisView: View {
         .navigationBarBackButtonHidden()
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button { flow.cancelAnalysis() } label: { Image(systemName: "xmark") }
+                Button { flow.cancelAnalysis() } label: { Image(systemName: "xmark") }.tint(.primary)
                     .accessibilityLabel("Abbrechen")
             }
         }

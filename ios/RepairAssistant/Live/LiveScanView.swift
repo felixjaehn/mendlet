@@ -50,8 +50,8 @@ struct LiveScanView: View {
                     Button { model.category = category; Haptics.selection() } label: {
                         Label(category.title, systemImage: category.symbol)
                             .font(.caption.weight(.semibold)).padding(.horizontal, 12).frame(minHeight: 44)
-                            .background(model.category == category ? Theme.threadSoft : Theme.card, in: Capsule())
-                            .overlay(Capsule().strokeBorder(model.category == category ? Theme.thread : Theme.hairline, lineWidth: 1))
+                            .foregroundStyle(model.category == category ? Color.white : Theme.ink)
+                            .glass(Capsule(), tint: model.category == category ? Theme.thread : nil, interactive: true)
                     }
                     .accessibilityAddTraits(model.category == category ? .isSelected : [])
                 }
@@ -112,8 +112,8 @@ private struct LiveScanOverlay: View {
                     func point(_ p: CGPoint) -> CGPoint { CGPoint(x: rect.minX + p.x * rect.width, y: rect.minY + p.y * rect.height) }
                     var path = Path(); path.move(to: point(first))
                     model.polygon.dropFirst().forEach { path.addLine(to: point($0)) }; path.closeSubpath()
-                    context.fill(path, with: .color(Theme.thread.opacity(0.2)))
-                    context.stroke(path, with: .color(Theme.thread), style: StrokeStyle(lineWidth: 2.5, lineJoin: .round))
+                    context.fill(path, with: .color(Theme.highlight.opacity(0.2)))
+                    context.stroke(path, with: .color(Theme.highlight), style: StrokeStyle(lineWidth: 2.5, lineJoin: .round))
                 }
                 let pulse = reduceMotion ? 0 : sin(timeline.date.timeIntervalSinceReferenceDate * 2) * 3
                 let width = size.width * 0.76 + pulse, height = min(size.height * 0.32, width)
@@ -124,7 +124,7 @@ private struct LiveScanOverlay: View {
                     brackets.move(to: CGPoint(x: x, y: y + dy * 24)); brackets.addLine(to: CGPoint(x: x, y: y))
                     brackets.addLine(to: CGPoint(x: x + dx * 24, y: y))
                 }
-                context.stroke(brackets, with: .color(model.state == .searching ? .white : Theme.thread), style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
+                context.stroke(brackets, with: .color(model.state == .searching ? .white.opacity(0.75) : Color(uiColor: .systemYellow)), style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
             }
         }
         .allowsHitTesting(false).accessibilityHidden(true)

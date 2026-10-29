@@ -111,7 +111,7 @@ struct BeforeAfterSlider: View {
     }
 
     private func tag(_ text: String) -> some View {
-        Text(text).font(.caption.weight(.bold)).textCase(.uppercase).tracking(0.5)
+        Text(text).font(.caption.weight(.semibold))
             .foregroundStyle(.white).padding(.horizontal, 10).padding(.vertical, 5)
             .background(.black.opacity(0.45), in: Capsule())
             .animation(.easeInOut(duration: 0.2), value: frac > 0.2)

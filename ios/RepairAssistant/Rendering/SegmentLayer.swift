@@ -68,15 +68,17 @@ struct SegmentLayer: View {
             var outline = Path()
             for r in rings { outline.addPath(trimmed(r.path, drawn)) }
             glow(&ctx, outline, color: color, boost: boost, drawn: 1)
+            // dark under-stroke keeps a white outline readable on light fabric (white sneaker, grey shirt)
+            ctx.stroke(outline, with: .color(.black.opacity(0.28)), style: StrokeStyle(lineWidth: 4 + 0.8 * boost, lineJoin: .round))
             ctx.stroke(outline, with: .color(color), style: StrokeStyle(lineWidth: 2 + 0.8 * boost, lineJoin: .round))
             if animated && drawn >= 1 {
                 ctx.stroke(outline, with: .color(.white.opacity(0.85)),
                            style: StrokeStyle(lineWidth: 1, lineCap: .round, lineJoin: .round, dash: [2, 9], dashPhase: -time * 14))
             }
         } else {
-            ctx.fill(all, with: .color(color.opacity(0.09 + 0.08 * boost)), style: FillStyle(eoFill: true))
+            ctx.fill(all, with: .color(color.opacity(0.04 + 0.06 * boost)), style: FillStyle(eoFill: true))
             for r in rings {
-                ctx.stroke(trimmed(r.path, drawn), with: .color(color.opacity(0.7 + 0.25 * boost)), style: StrokeStyle(lineWidth: 1.5 + 0.8 * boost, lineJoin: .round))
+                ctx.stroke(trimmed(r.path, drawn), with: .color(color.opacity(0.55 + 0.3 * boost)), style: StrokeStyle(lineWidth: 1 + 0.6 * boost, lineJoin: .round))
             }
         }
     }

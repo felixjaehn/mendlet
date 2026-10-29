@@ -29,14 +29,15 @@ struct CompletionView: View {
         .scrollIndicators(.hidden)
         .screenBackground()
         .navigationBarBackButtonHidden()
-        .safeAreaInset(edge: .bottom) {
-            VStack(spacing: 8) {
-                PrimaryButton(title: "Fertig", systemImage: "checkmark") { flow.reset() }
-                ShareLink(item: shareText(est)) {
-                    Label("Teilen", systemImage: "square.and.arrow.up").font(.headline).foregroundStyle(Theme.inkSecondary).frame(minHeight: 44)
-                }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                ShareLink(item: shareText(est)) { Image(systemName: "square.and.arrow.up") }
+                    .tint(.primary).accessibilityLabel(tr("Teilen"))
             }
-            .padding(.horizontal, Theme.margin).padding(.vertical, 10).background(.regularMaterial)
+        }
+        .floatingBar {
+            PrimaryButton(title: "Fertig", systemImage: "checkmark") { flow.reset() }
+                .padding(.horizontal, Theme.margin).padding(.vertical, 10)
         }
         .fullScreenCover(isPresented: $showCamera) { CameraPicker { flow.resultPhoto = ImageResizer.resized($0) }.ignoresSafeArea() }
         .photosPicker(isPresented: $gallery, selection: $pickerItem, matching: .images)
@@ -53,20 +54,19 @@ struct CompletionView: View {
     }
 
     private var checkmark: some View {
-        ZStack {
-            Circle().fill(Theme.safeSoft)
-            Circle().trim(from: 0, to: ring).stroke(Theme.thread, style: StrokeStyle(lineWidth: 6, lineCap: .round)).rotationEffect(.degrees(-90))
-            CheckShape().trim(from: 0, to: check).stroke(Theme.safe, style: StrokeStyle(lineWidth: 9, lineCap: .round, lineJoin: .round)).padding(36)
-        }
-        .frame(width: 124, height: 124)
-        .accessibilityHidden(true)
+        Image(systemName: "checkmark.circle.fill")
+            .font(.system(size: 76, weight: .regular))
+            .symbolRenderingMode(.palette).foregroundStyle(.white, Theme.safe)
+            .scaleEffect(0.6 + 0.4 * check).opacity(Double(check))
+            .symbolEffect(.bounce, value: check)
+            .accessibilityHidden(true)
     }
 
     private func impactCard(_ est: ImpactEstimator.Estimate, isShoe: Bool) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 8) {
                 Image(systemName: "leaf.fill").foregroundStyle(Theme.safe)
-                Text("Dein Beitrag").font(.footnote.weight(.semibold)).textCase(.uppercase).tracking(0.6).foregroundStyle(Theme.inkSecondary)
+                Text("Dein Beitrag").font(.headline).foregroundStyle(Theme.inkSecondary)
             }
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text("≈ \(ImpactEstimator.format(kg: est.kilograms)) kg")
