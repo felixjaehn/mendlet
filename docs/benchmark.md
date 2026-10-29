@@ -161,3 +161,13 @@ Deutsche Sprachaufnahme (macOS-Stimme "Anna", 16 kHz mono WAV, 4,3 s): "Die Jean
 | Sprachbefehl "Weiter." (freihändige Anleitung) | "weiter." | 2,1 s |
 
 Synthetische Stimme, keine echte Sprecherin. Echte Sprache mit Nebengeräuschen bleibt zu testen.
+
+## Muse Image: weitere Vorher/Nachher-Fälle (29.10.2026, live)
+
+| Fall | Anweisung | Ergebnis | Latenz |
+| --- | --- | --- | --- |
+| Sneaker, Sohle vorne gelöst | `category: shoe` (neu verklebt, keine Stiche, kein sichtbarer Kleber) | Sohle bündig, Spalt geschlossen, Bild sonst identisch | 13,6 s |
+| T-Shirt, offene Seitennaht | Leiterstich | Naht geschlossen, feine Stiche sichtbar | 11,7 s |
+| Jacke, L-Riss | Stopfen | Riss gestopft, Stopffläche sichtbar | 10,6 s |
+
+Vergleichsbild: [live-probes/2026-10-29_muse-image_sneaker_shirt_jacket.jpg](live-probes/2026-10-29_muse-image_sneaker_shirt_jacket.jpg). Damit 5 von 5 getesteten Fällen mit glaubwürdiger Vorschau. Die Sneaker-Vorschau liegt jetzt auch im Demo-Modus (`sneaker_after.jpg`).
