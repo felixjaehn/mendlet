@@ -23,7 +23,7 @@ struct ProjectView: View {
     var body: some View {
         ScrollView {
             if let r, let c = saved {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 20) {
                     hero(r)
                     VStack(alignment: .leading, spacing: 4) {
                         Text(ProjectInfo.title(c)).font(.serif(.title)).foregroundStyle(Theme.ink)
@@ -66,10 +66,10 @@ struct ProjectView: View {
         if let photo = flow.photo {
             Group {
                 if finished, flow.afterState == .ready, let after = flow.afterImage {
-                    BeforeAfterSlider(before: photo, after: after, aspect: 2.0, cornerRadius: Theme.heroRadius)
+                    BeforeAfterSlider(before: photo, after: after, aspect: 2.4, cornerRadius: Theme.heroRadius)
                 } else {
                     Button { showViewer = true } label: {
-                        Color(uiColor: .secondarySystemFill).aspectRatio(2.0, contentMode: .fit)
+                        Color(uiColor: .secondarySystemFill).aspectRatio(2.4, contentMode: .fit)
                             .overlay { MarkedPhoto(image: photo, segments: r.segments, mode: .thumb, showLabels: false, zoomable: false) }
                             .clipShape(RoundedRectangle(cornerRadius: Theme.heroRadius, style: .continuous))
                     }
@@ -126,7 +126,7 @@ struct ProjectView: View {
                                 Text(it.required ? "Needed" : "Optional").font(.footnote).foregroundStyle(Theme.inkSecondary)
                                 Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkTertiary)
                             }
-                            .padding(.vertical, 10).frame(minHeight: 56).contentShape(Rectangle())
+                            .padding(.vertical, 4).frame(minHeight: 48).contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
                         if i < needed.count - 1 { Rectangle().fill(Theme.hairline).frame(height: 0.5) }

@@ -235,7 +235,8 @@ struct DecisionView: View {
                         Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkTertiary)
                     }
                     .padding(16)
-                    .background(Theme.paper, in: RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
+                    .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous).strokeBorder(Theme.hairline.opacity(0.6), lineWidth: 0.5))
                 }
                 .buttonStyle(PressScaleStyle())
             }
