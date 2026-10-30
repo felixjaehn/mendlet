@@ -157,7 +157,6 @@ struct ProjectView: View {
                     let isDone = flow.completedSteps.contains(i) || i < flow.currentStep
                     let isCurrent = i == flow.currentStep && !isDone
                     Button {
-                        guard i <= flow.currentStep || isDone else { return }
                         flow.currentStep = i; flow.startRepair()
                     } label: {
                         HStack(alignment: .center, spacing: 16) {

@@ -19,7 +19,7 @@ struct ShoppingListView: View {
                             VStack(spacing: 0) {
                                 ForEach(Array(group.enumerated()), id: \.element.id) { i, item in
                                     row(item)
-                                    if i < group.count - 1 { Rectangle().fill(Theme.hairline).frame(height: 0.5).padding(.leading, 58) }
+                                    if i < group.count - 1 { Rectangle().fill(Theme.hairline).frame(height: 0.5).padding(.leading, 96) }
                                 }
                             }
                             .background(Theme.card, in: RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
@@ -55,6 +55,19 @@ struct ShoppingListView: View {
     private var continuing: Bool { flow.currentStep > 0 || !flow.completedSteps.isEmpty }
 
     private func header(_ items: [ShoppingItem], ready: Int) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            if let photo = flow.photo, let r = flow.response {
+                Color(uiColor: .secondarySystemFill).frame(width: 64, height: 64)
+                    .overlay { MarkedPhoto(image: photo, segments: r.segments, mode: .thumb, showLabels: false, zoomable: false) }
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .accessibilityHidden(true)
+            }
+            headerText(items, ready: ready)
+        }
+        .animation(Theme.spring, value: ready)
+    }
+
+    private func headerText(_ items: [ShoppingItem], ready: Int) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(ready == items.count ? "All set" : "Gather these first")
                 .font(.largeTitle.bold()).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
@@ -76,6 +89,8 @@ struct ShoppingListView: View {
             } label: {
                 HStack(alignment: .top, spacing: 14) {
                     CheckCircle(on: have).padding(.top, 1)
+                    Image(systemName: Self.symbol(item)).font(.system(size: 17)).foregroundStyle(Theme.inkSecondary)
+                        .frame(width: 24).padding(.top, 2).accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 3) {
                         Text(item.name).font(.body).foregroundStyle(have ? Theme.inkSecondary : Theme.ink)
                             .multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
@@ -100,6 +115,23 @@ struct ShoppingListView: View {
         }
         .padding(.horizontal, 16).padding(.vertical, 12)
         .frame(minHeight: 56)
+    }
+
+    /// Small SF Symbol matching what the item is.
+    static func symbol(_ item: ShoppingItem) -> String {
+        let n = (item.name + " " + item.searchTerm).lowercased()
+        func has(_ k: [String]) -> Bool { k.contains { n.contains($0) } }
+        if has(["scissor", "shears", "snip"]) { return "scissors" }
+        if has(["needle"]) { return "pencil.line" }
+        if has(["thread", "yarn", "floss", "spool"]) { return "scribble.variable" }
+        if has(["pin", "clip"]) { return "pin" }
+        if has(["patch", "fabric", "denim", "cloth", "iron-on", "interfacing"]) { return "square.on.square.dashed" }
+        if has(["glue", "adhesive", "cement", "epoxy", "tape"]) { return "drop.fill" }
+        if has(["solder"]) { return "flame" }
+        if has(["screwdriver", "screw", "wrench", "pliers", "tool"]) { return "wrench.and.screwdriver" }
+        if has(["sandpaper", "brush", "cleaner", "cloth", "wipe"]) { return "paintbrush" }
+        if has(["ruler", "tape measure", "measur", "chalk", "marker", "pen"]) { return "ruler" }
+        return item.kind == .tool ? "wrench.and.screwdriver" : "circle.dotted"
     }
 
     static func shopURL(_ item: ShoppingItem) -> URL? {
