@@ -1,5 +1,5 @@
 {
- "case_id": "e55195ea-0ed2-4215-bd3f-bf2451771d12",
+ "case_id": "dbf22213-7228-440c-adb9-5ccc385f6a7c",
  "category": "textile",
  "risk_level": "allowed",
  "safety": {
@@ -685,11 +685,7 @@
       0.99707
      ],
      [
-      0.610677,
-      0.998047
-     ],
-     [
-      0.610677,
+      0.611979,
       1.0
      ],
      [
@@ -717,30 +713,6 @@
       1.0
      ],
      [
-      0.53776,
-      1.0
-     ],
-     [
-      0.53776,
-      0.998047
-     ],
-     [
-      0.536458,
-      1.0
-     ],
-     [
-      0.529948,
-      1.0
-     ],
-     [
-      0.529948,
-      0.998047
-     ],
-     [
-      0.528646,
-      1.0
-     ],
-     [
       0.436198,
       1.0
      ],
@@ -753,39 +725,15 @@
       1.0
      ],
      [
-      0.123698,
+      0.359375,
       1.0
      ],
      [
-      0.123698,
+      0.359375,
       0.998047
      ],
      [
-      0.122396,
-      1.0
-     ],
-     [
-      0.075521,
-      1.0
-     ],
-     [
-      0.075521,
-      0.998047
-     ],
-     [
-      0.074219,
-      1.0
-     ],
-     [
-      0.050781,
-      1.0
-     ],
-     [
-      0.050781,
-      0.998047
-     ],
-     [
-      0.049479,
+      0.358073,
       1.0
      ],
      [
@@ -977,11 +925,7 @@
         0.99707
        ],
        [
-        0.610677,
-        0.998047
-       ],
-       [
-        0.610677,
+        0.611979,
         1.0
        ],
        [
@@ -1009,30 +953,6 @@
         1.0
        ],
        [
-        0.53776,
-        1.0
-       ],
-       [
-        0.53776,
-        0.998047
-       ],
-       [
-        0.536458,
-        1.0
-       ],
-       [
-        0.529948,
-        1.0
-       ],
-       [
-        0.529948,
-        0.998047
-       ],
-       [
-        0.528646,
-        1.0
-       ],
-       [
         0.436198,
         1.0
        ],
@@ -1045,39 +965,15 @@
         1.0
        ],
        [
-        0.123698,
+        0.359375,
         1.0
        ],
        [
-        0.123698,
+        0.359375,
         0.998047
        ],
        [
-        0.122396,
-        1.0
-       ],
-       [
-        0.075521,
-        1.0
-       ],
-       [
-        0.075521,
-        0.998047
-       ],
-       [
-        0.074219,
-        1.0
-       ],
-       [
-        0.050781,
-        1.0
-       ],
-       [
-        0.050781,
-        0.998047
-       ],
-       [
-        0.049479,
+        0.358073,
         1.0
        ],
        [
@@ -1173,7 +1069,7 @@
      ],
      [
       0.654948,
-      0.216797
+      0.21582
      ],
      [
       0.653646,
@@ -1281,7 +1177,7 @@
      ],
      [
       0.483073,
-      0.776367
+      0.777344
      ],
      [
       0.476562,
@@ -1417,7 +1313,7 @@
        ],
        [
         0.654948,
-        0.216797
+        0.21582
        ],
        [
         0.653646,
@@ -1525,7 +1421,7 @@
        ],
        [
         0.483073,
-        0.776367
+        0.777344
        ],
        [
         0.476562,
@@ -1797,8 +1693,8 @@
         0.572265
        ],
        [
-        0.533854,
-        0.56836
+        0.53125,
+        0.569336
        ],
        [
         0.539063,
@@ -2060,11 +1956,11 @@
        ],
        [
         0.445313,
-        0.672851
+        0.671875
        ],
        [
         0.44401,
-        0.672851
+        0.671875
        ],
        [
         0.442708,
@@ -2171,20 +2067,20 @@
         0.705078
        ],
        [
-        0.451823,
-        0.700195
+        0.450521,
+        0.701172
+       ],
+       [
+        0.453125,
+        0.701172
        ],
        [
         0.454427,
-        0.700195
+        0.698242
        ],
        [
-        0.455729,
-        0.697265
-       ],
-       [
-        0.458333,
-        0.697265
+        0.457031,
+        0.698242
        ],
        [
         0.464844,
@@ -2449,11 +2345,11 @@
        ],
        [
         0.579427,
-        0.308594
+        0.30957
        ],
        [
         0.580729,
-        0.308594
+        0.30957
        ],
        [
         0.580729,
@@ -2554,9 +2450,9 @@
   }
  ],
  "diagnosis": {
-  "summary": "Long frayed tear in blue denim. The surrounding denim and side seam are intact.",
+  "summary": "Long frayed tear in blue denim. The surrounding fabric and side seam are intact.",
   "likely_causes": [
-   "Knee stress and friction",
+   "Knee stress and abrasion",
    "Worn thin denim fabric"
   ],
   "confidence": 0.85,
@@ -2573,55 +2469,59 @@
  },
  "decision": {
   "recommendation": "repair_self",
-  "reasoning": "The frayed tear needs a backing patch plus darning for strength. The work needs basic hand sewing and stable fabric.",
+  "reasoning": "The tear has frayed edges but sound surrounding denim holds a backing patch. It needs basic hand sewing tools and about an hour.",
   "effort": "medium",
   "time_minutes": [
-   30,
-   60
+   45,
+   75
   ],
   "cost_eur": [
    3.0,
    8.0
   ],
   "estimate_note": "Estimate",
-  "second_life": []
+  "second_life": [],
+  "new_price_eur": [
+   40.0,
+   90.0
+  ]
  },
  "shopping_list": [
   {
    "id": "patch",
-   "name": "Light blue sew-on denim patch",
+   "name": "Iron on denim patch blue",
    "kind": "material",
-   "quantity": "1 piece 15 x 10 cm",
+   "quantity": "1 patch 15x20 cm",
    "required": true,
-   "search_term": "light blue denim patch for jeans repair",
-   "household_alternative": "cut piece from old light blue jeans"
+   "search_term": "blue denim iron on patch for jeans",
+   "household_alternative": "clean scrap denim from old jeans"
   },
   {
    "id": "thread",
-   "name": "Blue polyester sewing thread",
+   "name": "Polyester sewing thread denim blue",
    "kind": "material",
    "quantity": "1 spool",
    "required": true,
-   "search_term": "blue polyester sewing thread denim",
+   "search_term": "blue polyester sewing thread for denim",
    "household_alternative": null
   },
   {
    "id": "needle",
-   "name": "Strong sharp hand needle for denim",
+   "name": "Sharp hand sewing needle for denim",
    "kind": "tool",
    "quantity": "1 pack",
    "required": true,
-   "search_term": "hand sewing needle for denim",
+   "search_term": "sharp hand sewing needle for denim jeans",
    "household_alternative": null
   },
   {
    "id": "pins",
-   "name": "Glass head sewing pins",
+   "name": "Straight pins for sewing",
    "kind": "tool",
-   "quantity": "4 pins",
-   "required": false,
-   "search_term": "glass head sewing pins",
-   "household_alternative": "small tape strips to hold patch"
+   "quantity": "8 pins",
+   "required": true,
+   "search_term": "straight sewing pins",
+   "household_alternative": "safety pins"
   },
   {
    "id": "scissors",
@@ -2637,30 +2537,55 @@
   "steps": [
    {
     "n": 1,
-    "title": "Turn jeans inside out",
-    "text": "Turn the jeans inside out and lay the torn knee flat with the side seam to the right. Smooth out folds by hand. Done when the full tear is visible from the inside.",
-    "common_mistake": "Skipping the inside check misplaces the patch. Smooth the leg fully flat first.",
+    "title": "Turn jeans inside",
+    "text": "Turn the jeans inside out and lay the knee flat with the tear centered. Smooth the frayed edges flat without pulling. Done when the tear lies flat with 15 mm sound fabric around.",
+    "common_mistake": "Forcing stiff edges together puckers. Keep the fabric relaxed and flat.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
+     "seg_1",
      "seg_2"
     ],
     "uses_items": [],
-    "overlay": null
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_1",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
    },
    {
     "n": 2,
-    "title": "Trim loose threads",
-    "text": "With fabric scissors trim only long loose frayed tips to 3 mm, keeping strong edge threads. Leave the white cross threads in place. Done when the edges look neat without new gaps.",
-    "common_mistake": "Cutting into solid fabric enlarges the hole. Trim only soft frayed tips.",
+    "title": "Cut backing patch",
+    "text": "Trim only loose fuzz with small scissors and cut a denim patch 25 mm larger than the tear on all sides. Slide the patch under the tear on the inside. Done when the patch covers the tear fully.",
+    "common_mistake": "Cutting the patch too small weakens hold. Add 25 mm overlap on all sides.",
     "safety_critical": true,
     "requires_confirmation": true,
     "segment_ids": [
      "seg_1",
-     "seg_3"
+     "seg_2"
     ],
     "uses_items": [
+     "patch",
      "scissors"
+    ],
+    "overlay": null
+   },
+   {
+    "n": 3,
+    "title": "Pin patch flat",
+    "text": "Pin the patch around the tear every 20 mm, keeping the denim relaxed and flat. Keep pins 10 mm from the frayed edges. Done when the patch stays flat without wrinkles.",
+    "common_mistake": "Pinning under tension distorts the knee. Keep the denim relaxed and smooth.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_1",
+     "seg_2"
+    ],
+    "uses_items": [
+     "pins"
     ],
     "overlay": {
      "type": "highlight",
@@ -2672,10 +2597,10 @@
     }
    },
    {
-    "n": 3,
-    "title": "Position backing patch",
-    "text": "Place a light blue denim patch under the tear, extending at least 20 mm beyond all edges. Align the patch grain with the jeans and pin the corners. Done when the tear closes flat without tension.",
-    "common_mistake": "A small patch pulls loose quickly. Extend the patch well beyond the tear.",
+    "n": 4,
+    "title": "Sew patch edges",
+    "text": "Thread a sturdy sharp hand needle with 50 cm blue polyester thread and knot the end. Sew around the patch with small running stitches 2 to 3 mm long, 5 mm from the patch edge. Done when the patch edge is fully secured.",
+    "common_mistake": "Long loose stitches catch and tear. Use small 2 to 3 mm stitches.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
@@ -2683,25 +2608,8 @@
      "seg_2"
     ],
     "uses_items": [
-     "patch",
-     "pins"
-    ],
-    "overlay": null
-   },
-   {
-    "n": 4,
-    "title": "Sew patch edges",
-    "text": "Thread a strong sharp hand needle with 50 cm blue polyester thread and knot the end. Sew around the patch edge with 2-3 mm running stitches through patch and jeans. Done when the patch edge is fully attached and flat.",
-    "common_mistake": "Tight stitches pucker the denim. Keep the thread relaxed and even.",
-    "safety_critical": false,
-    "requires_confirmation": false,
-    "segment_ids": [
-     "seg_1"
-    ],
-    "uses_items": [
-     "thread",
      "needle",
-     "patch"
+     "thread"
     ],
     "overlay": {
      "type": "stitch_path",
@@ -2715,8 +2623,8 @@
    {
     "n": 5,
     "title": "Darn across tear",
-    "text": "From the outside darn across the tear with parallel rows 2 mm apart, catching both edges and the patch. Work from solid fabric 10 mm above to 10 mm below the tear. Done when the gap is bridged by even loose threads.",
-    "common_mistake": "Pulling cross threads tight puckers the leg. Lay stitches loose and flat.",
+    "text": "Work from the right side with matching thread, making parallel stitches across the tear 3 mm apart into sound fabric. Weave crosswise over and under to fill gaps loosely. Done when the tear is bridged with flat threads.",
+    "common_mistake": "Pulling darning tight puckers denim. Keep threads loose and even.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
@@ -2724,8 +2632,8 @@
      "seg_3"
     ],
     "uses_items": [
-     "thread",
-     "needle"
+     "needle",
+     "thread"
     ],
     "overlay": {
      "type": "stitch_path",
@@ -2738,18 +2646,15 @@
    },
    {
     "n": 6,
-    "title": "Check the repair",
-    "text": "Remove all pins, turn the jeans right side out and secure thread ends in the patch. Pull the knee gently crosswise to test the hold. Done when edges stay closed with no puckering or tearing stitches.",
-    "common_mistake": "Leaving pins in risks needle damage. Remove all pins before wearing.",
+    "title": "Check finished repair",
+    "text": "Remove all pins, turn right side out and pull the knee gently sideways. Secure the thread with small backstitches and trim ends to 5 mm. Done when edges stay closed without puckering under gentle pull.",
+    "common_mistake": "Skipping the pull test hides loose stitches. Test gently before wearing.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
-     "seg_1",
-     "seg_2"
+     "seg_1"
     ],
-    "uses_items": [
-     "pins"
-    ],
+    "uses_items": [],
     "overlay": null
    }
   ]

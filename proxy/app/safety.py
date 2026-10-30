@@ -201,6 +201,8 @@ def enforce(
             ]
     # Upcycling/recycling/donation ideas belong to "replace" only, and never to a blocked hazard.
     dec.second_life = dec.second_life[:3] if dec.recommendation == "replace" and not blocked else []
+    prices = sorted(max(0.0, p) for p in dec.new_price_eur)
+    dec.new_price_eur = prices if len(prices) == 2 and not blocked else []
     dec.estimate_note = i18n.pick(i18n.ESTIMATE_NOTE, locale) if i18n.norm(locale) == "en" else ESTIMATE_NOTE
     dec.time_minutes = sorted(max(0, t) for t in dec.time_minutes)
     dec.cost_eur = sorted(max(0.0, c) for c in dec.cost_eur)

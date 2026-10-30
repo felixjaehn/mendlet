@@ -58,7 +58,7 @@ def test_schema_preserves_actual_title_property():
     step = inline_schema(DiagnosePlan)["properties"]["guide"]["properties"]["steps"]["items"]
     assert step["properties"]["title"] == {"type": "string"}
     assert set(step["required"]) <= set(step["properties"])
-    assert prompt_version("diagnose") == "v8"
+    assert prompt_version("diagnose") == "v9"
 
 
 def test_prompt_b_v3_label_and_safety_rules():

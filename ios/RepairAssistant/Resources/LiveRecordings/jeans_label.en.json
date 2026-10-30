@@ -1,5 +1,5 @@
 {
- "case_id": "c8371406-4ade-4d81-aa61-def668a8d6ba",
+ "case_id": "dd46dd84-12db-499b-b5ff-19b70b472dd0",
  "category": "textile",
  "risk_level": "allowed",
  "safety": {
@@ -2450,10 +2450,10 @@
   }
  ],
  "diagnosis": {
-  "summary": "Long frayed tear in blue denim. The surrounding denim and side seam are intact.",
+  "summary": "Long frayed tear in blue denim. Surrounding denim and side seam are intact.",
   "likely_causes": [
-   "Wear at knee stress",
-   "Snag on sharp edge"
+   "Knee stress wear",
+   "Abrasion near seam"
   ],
   "confidence": 0.85,
   "evidence_segment_ids": [
@@ -2468,49 +2468,53 @@
     "2% elastane"
    ],
    "care": [
-    "wash at 30C",
-    "do not bleach",
-    "iron at medium temperature"
+    "Wash at 30C",
+    "Do not bleach",
+    "Iron at medium heat"
    ]
   }
  },
  "decision": {
   "recommendation": "repair_self",
-  "reasoning": "The tear has frayed edges but solid margins for a backing patch. It needs basic hand sewing with denim patch and thread.",
+  "reasoning": "Backing patch plus darning restores strength for this frayed knee tear. It needs basic hand sewing, patch and thread.",
   "effort": "medium",
   "time_minutes": [
-   45,
-   75
+   40,
+   70
   ],
   "cost_eur": [
    3.0,
    8.0
   ],
   "estimate_note": "Estimate",
-  "second_life": []
+  "second_life": [],
+  "new_price_eur": [
+   40.0,
+   90.0
+  ]
  },
  "shopping_list": [
   {
    "id": "patch",
-   "name": "Light blue sew on denim patch",
+   "name": "Sew-on denim backing patch in blue",
    "kind": "material",
    "quantity": "1 piece 15 x 20 cm",
    "required": true,
-   "search_term": "light blue sew on denim patch",
-   "household_alternative": "sturdy blue jeans scrap"
+   "search_term": "sew on denim patch blue",
+   "household_alternative": "Clean scrap of strong cotton denim"
   },
   {
    "id": "thread",
-   "name": "Blue polyester sewing thread",
+   "name": "Polyester sewing thread in blue",
    "kind": "material",
    "quantity": "1 spool",
    "required": true,
-   "search_term": "blue polyester sewing thread",
+   "search_term": "polyester sewing thread blue denim",
    "household_alternative": null
   },
   {
    "id": "needle",
-   "name": "Sturdy sharp hand needle for denim",
+   "name": "Strong sharp hand sewing needle for denim",
    "kind": "tool",
    "quantity": "1 pack",
    "required": true,
@@ -2519,12 +2523,12 @@
   },
   {
    "id": "pins",
-   "name": "Glass head sewing pins",
+   "name": "Glass head pins",
    "kind": "tool",
-   "quantity": "1 pack",
+   "quantity": "8 pins",
    "required": true,
-   "search_term": "glass head sewing pins",
-   "household_alternative": null
+   "search_term": "glass head pins sewing",
+   "household_alternative": "Small safety pins"
   },
   {
    "id": "scissors",
@@ -2541,17 +2545,15 @@
    {
     "n": 1,
     "title": "Turn jeans inside",
-    "text": "Turn the jeans inside out and lay the tear flat with the inside facing you. Trim only loose fuzz with scissors and keep the white cross threads. Done when the inside of the tear is clean and flat.",
-    "common_mistake": "Cutting white threads weakens edges. Leave them in place.",
-    "safety_critical": true,
-    "requires_confirmation": true,
+    "text": "Turn the jeans inside out and lay the knee flat with the tear centered. Smooth the denim relaxed without stretching. Done when the tear edges lie flat together.",
+    "common_mistake": "Stretching the knee distorts the repair. Lay the denim relaxed and flat.",
+    "safety_critical": false,
+    "requires_confirmation": false,
     "segment_ids": [
      "seg_1",
      "seg_2"
     ],
-    "uses_items": [
-     "scissors"
-    ],
+    "uses_items": [],
     "overlay": {
      "type": "highlight",
      "stitch_type": null,
@@ -2563,9 +2565,32 @@
    },
    {
     "n": 2,
+    "title": "Trim loose threads",
+    "text": "Hold the scissors flat on the inside and trim only long loose frayed tips. Leave the white cross threads and 2 mm fringe in place. Done when no long tangled threads remain.",
+    "common_mistake": "Cutting into solid denim enlarges the hole. Trim only loose frayed tips.",
+    "safety_critical": true,
+    "requires_confirmation": true,
+    "segment_ids": [
+     "seg_3",
+     "seg_1"
+    ],
+    "uses_items": [
+     "scissors"
+    ],
+    "overlay": {
+     "type": "highlight",
+     "stitch_type": null,
+     "segment_id": "seg_3",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
+    "n": 3,
     "title": "Position backing patch",
-    "text": "Slide the denim patch under the tear extending 2 cm beyond all edges and smooth the leg relaxed. Pin around the tear about 1 cm from the edge. Done when the patch covers the tear without folds.",
-    "common_mistake": "Wrinkled patch causes bulk. Smooth it completely flat.",
+    "text": "Center the denim backing patch over the tear on the inside, extending 2 cm beyond all edges. Pin around the patch every 2 cm through both layers. Done when the patch lies smooth and covers the tear.",
+    "common_mistake": "Wrinkled patch causes bulk. Smooth the patch fully flat before pinning.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
@@ -2579,10 +2604,10 @@
     "overlay": null
    },
    {
-    "n": 3,
-    "title": "Baste patch flat",
-    "text": "Thread the needle with 40 cm blue thread and knot the end. Baste around the tear through denim and patch with 3 to 4 mm running stitches. Done when the patch stays flat without shifting.",
-    "common_mistake": "Tight basting puckers denim. Keep stitches relaxed and even.",
+    "n": 4,
+    "title": "Sew patch edge",
+    "text": "Thread the sharp needle with 50 cm blue polyester thread and knot the end. Sew around the patch edge with running stitches 3 mm long and 3 mm from the edge. Done when the full patch edge is secured.",
+    "common_mistake": "Tight stitches pucker stretch denim. Keep stitches loose with slight give.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
@@ -2591,7 +2616,9 @@
     ],
     "uses_items": [
      "needle",
-     "thread"
+     "thread",
+     "patch",
+     "pins"
     ],
     "overlay": {
      "type": "stitch_path",
@@ -2603,15 +2630,14 @@
     }
    },
    {
-    "n": 4,
-    "title": "Darn tear closed",
-    "text": "Sew parallel rows across the tear 2 to 3 mm apart catching the patch and firm edges. Then weave crosswise over and under the first threads. Done when the gap is bridged by a loose grid without tension.",
-    "common_mistake": "Pulling tight puckers denim. Keep threads loose with stretch.",
+    "n": 5,
+    "title": "Darn across tear",
+    "text": "From the outside, darn across the tear with parallel rows 3 mm apart into solid denim. Weave cross rows over and under to close gaps without tension. Done when the tear is covered with flat threads.",
+    "common_mistake": "Pulling tight puckers the denim. Keep the darning threads loose and flat.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
-     "seg_1",
-     "seg_3"
+     "seg_1"
     ],
     "uses_items": [
      "needle",
@@ -2627,10 +2653,10 @@
     }
    },
    {
-    "n": 5,
+    "n": 6,
     "title": "Secure and check",
-    "text": "Secure the thread in the patch with two small backstitches and cut to 1 cm, then remove all pins. Turn right side out and pull gently across the repair. Done when edges hold flat without puckering or tearing.",
-    "common_mistake": "Cutting too short loosens knot. Leave 1 cm thread tail.",
+    "text": "Secure the thread on the inside with three small stitches in solid denim, then cut close. Remove all pins and turn the jeans right side out. Done when edges hold under gentle pull without puckering.",
+    "common_mistake": "Loose thread ends unravel quickly. Secure ends with three tiny backstitches.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [

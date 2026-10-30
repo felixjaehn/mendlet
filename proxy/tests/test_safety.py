@@ -216,3 +216,12 @@ def test_second_life_only_for_replace_and_capped_at_three():
     plan = textile_tear()
     plan.decision.second_life = ideas  # repair_self: ideas are dropped
     assert safety.enforce(resp(plan=plan), has_answers=True).decision.second_life == []
+
+
+def test_new_price_is_sorted_and_dropped_for_blocked_items():
+    plan = textile_tear()
+    plan.decision.new_price_eur = [60.0, 25.0]
+    assert safety.enforce(resp(plan=plan), has_answers=True).decision.new_price_eur == [25.0, 60.0]
+    plan = textile_tear()
+    plan.decision.new_price_eur = [40.0, 80.0]
+    assert safety.enforce(resp("textile", "warn_only", plan=plan), has_answers=True).decision.new_price_eur == []

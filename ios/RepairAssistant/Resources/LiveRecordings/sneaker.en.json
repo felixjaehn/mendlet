@@ -1,5 +1,5 @@
 {
- "case_id": "0c684985-e6a7-4341-b314-30ead3a48b02",
+ "case_id": "a09310d0-c8a7-4b15-905d-4c6f61d45492",
  "category": "shoe",
  "risk_level": "allowed",
  "safety": {
@@ -1293,10 +1293,10 @@
   }
  ],
  "diagnosis": {
-  "summary": "Detached front sole on white sneaker. Upper leather and stitching are intact.",
+  "summary": "Detached front sole on white sneaker. Upper leather and sole edge are intact.",
   "likely_causes": [
    "Worn adhesive bond",
-   "Flex stress at toe"
+   "Repeated flex stress"
   ],
   "confidence": 0.85,
   "evidence_segment_ids": [
@@ -1312,63 +1312,31 @@
  },
  "decision": {
   "recommendation": "repair_self",
-  "reasoning": "Shoe glue re-bonds the clean toe gap securely. It needs glue, tape and one day curing time.",
+  "reasoning": "Front sole separation with clean gap bonds well with shoe adhesive. It needs cleaning, gluing and clamped curing time.",
   "effort": "medium",
   "time_minutes": [
-   20,
-   30
+   25,
+   40
   ],
   "cost_eur": [
    5.0,
    12.0
   ],
   "estimate_note": "Estimate",
-  "second_life": []
+  "second_life": [],
+  "new_price_eur": [
+   40.0,
+   90.0
+  ]
  },
  "shopping_list": [
   {
-   "id": "alcohol",
-   "name": "Isopropyl alcohol wipes",
-   "kind": "material",
-   "quantity": "2 wipes",
-   "required": true,
-   "search_term": "isopropyl alcohol 70% wipes",
-   "household_alternative": "Mild soap and water"
-  },
-  {
-   "id": "cloth",
-   "name": "Clean cloth",
-   "kind": "tool",
-   "quantity": "1 piece",
-   "required": true,
-   "search_term": "lint free cleaning cloth",
-   "household_alternative": "Old cotton cloth"
-  },
-  {
-   "id": "sandpaper",
-   "name": "Fine sandpaper",
-   "kind": "tool",
-   "quantity": "1 sheet",
-   "required": true,
-   "search_term": "fine sandpaper 120 grit",
-   "household_alternative": null
-  },
-  {
    "id": "glue",
-   "name": "Flexible shoe adhesive",
+   "name": "Shoe contact adhesive",
    "kind": "material",
    "quantity": "1 tube",
    "required": true,
-   "search_term": "flexible shoe glue",
-   "household_alternative": null
-  },
-  {
-   "id": "gloves",
-   "name": "Disposable gloves",
-   "kind": "tool",
-   "quantity": "1 pair",
-   "required": true,
-   "search_term": "disposable nitrile gloves",
+   "search_term": "shoe sole contact adhesive",
    "household_alternative": null
   },
   {
@@ -1379,15 +1347,33 @@
    "required": true,
    "search_term": "masking tape",
    "household_alternative": null
+  },
+  {
+   "id": "cleaner",
+   "name": "Isopropyl alcohol 70%",
+   "kind": "material",
+   "quantity": "50 ml",
+   "required": false,
+   "search_term": "isopropyl alcohol 70 percent",
+   "household_alternative": "clean cloth"
+  },
+  {
+   "id": "clamp",
+   "name": "Small clamp or elastic band",
+   "kind": "tool",
+   "quantity": "2 pieces",
+   "required": true,
+   "search_term": "small spring clamp",
+   "household_alternative": "elastic bands"
   }
  ],
  "guide": {
   "steps": [
    {
     "n": 1,
-    "title": "Inspect and clean gap",
-    "text": "Open the toe gap gently and wipe both inner faces with an alcohol wipe. Remove dust with the clean cloth. Done when both surfaces look clean and dry.",
-    "common_mistake": "Trapped dirt weakens the bond. Clean until no dust remains.",
+    "title": "Clean bonding gap",
+    "text": "Open the front gap gently and brush out loose dirt from both faces. Wipe both faces with alcohol dampened cloth. Done when both surfaces are clean and fully dry.",
+    "common_mistake": "Forcing the gap wide. Open only enough to clean.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
@@ -1395,8 +1381,7 @@
      "seg_1"
     ],
     "uses_items": [
-     "alcohol",
-     "cloth"
+     "cleaner"
     ],
     "overlay": {
      "type": "highlight",
@@ -1409,40 +1394,24 @@
    },
    {
     "n": 2,
-    "title": "Roughen bonding surfaces",
-    "text": "Lightly roughen both inner faces with fine sandpaper using 3 to 4 gentle strokes. Brush away dust with the cloth. Done when surfaces look dull but undamaged.",
-    "common_mistake": "Heavy sanding damages the material. Use light pressure only.",
-    "safety_critical": false,
-    "requires_confirmation": false,
-    "segment_ids": [
-     "seg_2"
-    ],
-    "uses_items": [
-     "sandpaper"
-    ],
-    "overlay": null
-   },
-   {
-    "n": 3,
-    "title": "Apply shoe adhesive",
-    "text": "Wear gloves and ventilate the room. Apply a thin 1 mm layer of shoe adhesive to both faces and air it as the tube directs. Done when both faces are evenly coated without drips.",
-    "common_mistake": "Excess glue squeezes out. Apply a thin even layer.",
+    "title": "Apply sole adhesive",
+    "text": "Follow manufacturer instructions for ventilation and open time. Apply a thin even layer of adhesive to upper and sole faces. Done when the film turns evenly tacky as directed.",
+    "common_mistake": "Thick glue layer. Apply thinly to avoid squeeze out.",
     "safety_critical": true,
     "requires_confirmation": true,
     "segment_ids": [
      "seg_2"
     ],
     "uses_items": [
-     "glue",
-     "gloves"
+     "glue"
     ],
     "overlay": null
    },
    {
-    "n": 4,
-    "title": "Press and tape sole",
-    "text": "Press the sole firmly against the upper for 2 minutes. Wrap masking tape tightly around the toe to hold pressure. Done when the edge is closed with no gap.",
-    "common_mistake": "Weak pressure leaves gaps. Press firmly along the toe.",
+    "n": 3,
+    "title": "Press and fix",
+    "text": "Press the toe upper firmly down into the sole for 60 seconds. Wrap masking tape around the toe and add clamps. Done when the front gap is fully closed without voids.",
+    "common_mistake": "Uneven pressure. Press centre then edges equally.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
@@ -1450,7 +1419,8 @@
      "seg_1"
     ],
     "uses_items": [
-     "tape"
+     "tape",
+     "clamp"
     ],
     "overlay": {
      "type": "highlight",
@@ -1462,13 +1432,14 @@
     }
    },
    {
-    "n": 5,
-    "title": "Cure and check bond",
-    "text": "Leave the shoe taped for 24 hours at room temperature. Remove the tape and pull the toe gently. Done when the sole stays closed without movement.",
-    "common_mistake": "Early use breaks the bond. Wait the full curing time.",
+    "n": 4,
+    "title": "Cure and check",
+    "text": "Leave the shoe untouched for the full curing time stated by the manufacturer. Remove tape and flex the toe gently. Done when the sole stays closed under gentle flex.",
+    "common_mistake": "Early loading. Keep the shoe still during curing.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
+     "seg_1",
      "seg_2"
     ],
     "uses_items": [],

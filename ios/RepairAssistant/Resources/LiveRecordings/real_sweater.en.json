@@ -1,5 +1,5 @@
 {
- "case_id": "2f7d8981-edd8-4c45-9ee2-8b3f954454a6",
+ "case_id": "d5db020b-356f-46ea-b07b-7f37ffea17b4",
  "category": "textile",
  "risk_level": "allowed",
  "safety": {
@@ -1413,12 +1413,11 @@
   "summary": "Small hole in grey knit sweater. The surrounding knit is intact and stable.",
   "likely_causes": [
    "Moth damage",
-   "Snag on sharp edge"
+   "Friction wear"
   ],
   "confidence": 0.8,
   "evidence_segment_ids": [
-   "seg_3",
-   "seg_1"
+   "seg_3"
   ],
   "needs_more_info": false,
   "follow_up_questions": [],
@@ -1429,46 +1428,41 @@
  },
  "decision": {
   "recommendation": "repair_self",
-  "reasoning": "Small knit hole with stable surrounding fabric suits hand darning. It needs only basic needle, yarn and 30 minutes.",
-  "effort": "low",
+  "reasoning": "Darning rebuilds the missing knit without tension and keeps elasticity. It needs only a needle, matching yarn and about half an hour.",
+  "effort": "medium",
   "time_minutes": [
    20,
-   35
+   40
   ],
   "cost_eur": [
-   3.0,
+   0.0,
    8.0
   ],
   "estimate_note": "Estimate",
-  "second_life": []
+  "second_life": [],
+  "new_price_eur": [
+   30.0,
+   80.0
+  ]
  },
  "shopping_list": [
   {
    "id": "needle",
-   "name": "Blunt darning needle",
+   "name": "Long eye darning needle",
    "kind": "tool",
    "quantity": "1 piece",
    "required": true,
-   "search_term": "blunt darning needle wool",
+   "search_term": "long eye darning needle",
    "household_alternative": null
   },
   {
    "id": "yarn",
-   "name": "Grey wool darning yarn",
+   "name": "Grey darning yarn wool",
    "kind": "material",
    "quantity": "1 small ball",
    "required": true,
-   "search_term": "grey wool darning yarn",
+   "search_term": "grey darning yarn wool",
    "household_alternative": null
-  },
-  {
-   "id": "hoop",
-   "name": "Small embroidery hoop",
-   "kind": "tool",
-   "quantity": "1 piece 10 cm",
-   "required": false,
-   "search_term": "small embroidery hoop 10 cm",
-   "household_alternative": "small bowl to hold fabric taut"
   },
   {
    "id": "scissors",
@@ -1477,21 +1471,21 @@
    "quantity": "1 piece",
    "required": true,
    "search_term": "small embroidery scissors",
-   "household_alternative": null
+   "household_alternative": "small sharp scissors"
   }
  ],
  "guide": {
   "steps": [
    {
     "n": 1,
-    "title": "Turn sweater inside out",
-    "text": "Turn the sweater inside out and lay the grey knit flat and relaxed. Smooth the hole area with your hand. Done when the hole lies flat without stretching.",
-    "common_mistake": "Stretching the sweater distorts the hole. Lay the knit relaxed and flat.",
+    "title": "Turn sweater inside",
+    "text": "Turn the sweater inside out and lay the hole flat on a table. Smooth the knit relaxed without stretching. Done when the hole lies flat with intact loops around it.",
+    "common_mistake": "Stretching the knit flat. Lay the fabric relaxed and smooth.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
-     "seg_3",
-     "seg_1"
+     "seg_1",
+     "seg_3"
     ],
     "uses_items": [],
     "overlay": {
@@ -1505,24 +1499,24 @@
    },
    {
     "n": 2,
-    "title": "Place hoop loosely",
-    "text": "Place the small embroidery hoop around the hole from the inside. Tighten it only until the knit is flat. Done when the hole is centered and unwrinkled.",
-    "common_mistake": "Pulling the hoop tight stretches knit. Keep the fabric relaxed and level.",
-    "safety_critical": false,
-    "requires_confirmation": false,
+    "title": "Trim loose fibres",
+    "text": "Trim only loose frayed fibres around the hole with small scissors. Leave all intact loops in place. Done when no loose ends cross the hole.",
+    "common_mistake": "Cutting intact loops. Trim only loose frayed ends.",
+    "safety_critical": true,
+    "requires_confirmation": true,
     "segment_ids": [
-     "seg_1"
+     "seg_3"
     ],
     "uses_items": [
-     "hoop"
+     "scissors"
     ],
     "overlay": null
    },
    {
     "n": 3,
-    "title": "Weave lengthwise threads",
-    "text": "Thread the darning needle with a 40 cm length of grey yarn. Weave parallel lines across the hole into sound knit 5 mm beyond the edge. Done when the hole is bridged with loose parallel threads.",
-    "common_mistake": "Pulling yarn tight puckers knit. Keep tension loose and flat.",
+    "title": "Create foundation threads",
+    "text": "Thread the darning needle with about 40 cm grey yarn and secure in solid knit 5 mm outside the hole. Lay parallel threads across the hole with 2 mm spacing. Done when the hole is bridged with loose parallel threads.",
+    "common_mistake": "Pulling foundation threads tight. Keep them loose and even.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
@@ -1543,9 +1537,9 @@
    },
    {
     "n": 4,
-    "title": "Weave crosswise and secure",
-    "text": "Weave crosswise over and under the first threads to form a plain weave patch. Work loosely with 2 mm spacing and secure the end with two small stitches. Done when the hole is fully covered with flat fabric.",
-    "common_mistake": "Skipping rows leaves gaps. Weave every row over and under alternately.",
+    "title": "Weave hole closed",
+    "text": "Weave across the foundation threads over and under to fill the hole. Work from the inside with relaxed tension and extend 3 mm into solid knit. Done when the hole is fully covered with an even loose weave.",
+    "common_mistake": "Pulling the weave tight. Keep the darn soft and elastic.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
@@ -1566,16 +1560,18 @@
    },
    {
     "n": 5,
-    "title": "Trim and inspect",
-    "text": "Remove the hoop and cut yarn tails to 1 cm with small scissors. Turn the sweater right side out and gently stretch the darn. Done when the area lies flat with no puckering or gaps.",
-    "common_mistake": "Cutting close to the knot loosens the darn. Leave 1 cm yarn tails.",
-    "safety_critical": true,
-    "requires_confirmation": true,
+    "title": "Secure and check",
+    "text": "Secure the yarn with three small stitches in solid knit and cut the excess. Turn the sweater right side out and gently stretch the area. Done when the darn holds flat with no puckering or gaps.",
+    "common_mistake": "Cutting the thread short. Weave the end securely first.",
+    "safety_critical": false,
+    "requires_confirmation": false,
     "segment_ids": [
-     "seg_3",
-     "seg_1"
+     "seg_1",
+     "seg_3"
     ],
     "uses_items": [
+     "needle",
+     "yarn",
      "scissors"
     ],
     "overlay": null

@@ -6,7 +6,7 @@ Versioned system prompts for the three Muse Spark calls. The file names carry th
 | Prompt | File | Purpose |
 | --- | --- | --- |
 | A | `prompt_a_classify.v2.txt` | Object, material and risk classification |
-| B | `prompt_b_diagnose.v8.txt` | Diagnosis, repair plan and step-by-step guide |
+| B | `prompt_b_diagnose.v9.txt` | Diagnosis, repair plan and step-by-step guide |
 | C | `prompt_c_step_help.v2.txt` | Help for a single repair step |
 
 Versioning rules:

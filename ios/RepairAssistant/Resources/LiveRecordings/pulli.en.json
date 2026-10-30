@@ -1,5 +1,5 @@
 {
- "case_id": "e14a4392-1758-473b-b19b-a63b329f6f07",
+ "case_id": "aa12cba0-b5d2-49a8-85f4-f9a8413c0b5c",
  "category": "textile",
  "risk_level": "allowed",
  "safety": {
@@ -2548,7 +2548,7 @@
   }
  ],
  "diagnosis": {
-  "summary": "Three small holes in dark green knit. Surrounding knit is intact and stable.",
+  "summary": "Three small holes in dark green knit. The surrounding knit is intact and stable.",
   "likely_causes": [
    "Moth feeding damage",
    "Friction wear thinning"
@@ -2568,7 +2568,7 @@
  },
  "decision": {
   "recommendation": "repair_self",
-  "reasoning": "Darning closes small knit holes durably and preserves the sweater shape. It needs only matching yarn, a darning needle and about an hour.",
+  "reasoning": "Darning rebuilds knit fabric without tension and preserves the sweater shape. It needs only needle, matching yarn and about one hour.",
   "effort": "medium",
   "time_minutes": [
    30,
@@ -2579,43 +2579,47 @@
    8.0
   ],
   "estimate_note": "Estimate",
-  "second_life": []
+  "second_life": [],
+  "new_price_eur": [
+   40.0,
+   90.0
+  ]
  },
  "shopping_list": [
   {
+   "id": "needle",
+   "name": "Blunt darning needle",
+   "kind": "tool",
+   "quantity": "1 needle",
+   "required": true,
+   "search_term": "blunt darning needle long",
+   "household_alternative": null
+  },
+  {
    "id": "yarn",
-   "name": "Dark green darning yarn",
+   "name": "Dark green wool darning yarn",
    "kind": "material",
    "quantity": "1 ball",
    "required": true,
-   "search_term": "dark green darning yarn wool",
+   "search_term": "dark green wool darning yarn",
    "household_alternative": null
   },
   {
-   "id": "needle",
-   "name": "Long eye darning needle",
+   "id": "hoop",
+   "name": "Small embroidery hoop",
    "kind": "tool",
-   "quantity": "1 piece",
-   "required": true,
-   "search_term": "long eye darning needle",
-   "household_alternative": null
-  },
-  {
-   "id": "mushroom",
-   "name": "Wooden darning mushroom",
-   "kind": "tool",
-   "quantity": "1 piece",
+   "quantity": "1 hoop 10 cm",
    "required": false,
-   "search_term": "wooden darning mushroom",
-   "household_alternative": "Small cup or jar"
+   "search_term": "small embroidery hoop 10 cm",
+   "household_alternative": "clean jam jar ring"
   },
   {
    "id": "scissors",
-   "name": "Small embroidery scissors",
+   "name": "Small fabric scissors",
    "kind": "tool",
-   "quantity": "1 piece",
+   "quantity": "1 pair",
    "required": true,
-   "search_term": "small embroidery scissors",
+   "search_term": "small fabric scissors",
    "household_alternative": null
   }
  ],
@@ -2623,49 +2627,33 @@
   "steps": [
    {
     "n": 1,
-    "title": "Lay sweater flat",
-    "text": "Turn the sweater inside out and lay the holed area flat on a table. Slide the darning mushroom under the holes and smooth the knit without stretching. Done when the knit lies flat and relaxed.",
-    "common_mistake": "Stretching the knit distorts the shape. Smooth it flat without pulling.",
+    "title": "Position knit flat",
+    "text": "Turn the sweater to the wrong side and lay the holed area flat on a table. Place the small hoop loosely around the holes without stretching. Done when the knit lies flat and relaxed in the hoop.",
+    "common_mistake": "Stretching the knit distorts stitches. Lay the fabric relaxed and flat.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
-     "seg_1",
-     "seg_2"
+     "seg_1"
     ],
     "uses_items": [
-     "mushroom"
+     "hoop"
     ],
     "overlay": null
    },
    {
     "n": 2,
-    "title": "Thread darning needle",
-    "text": "Cut a 40 cm length of dark green yarn with small scissors and thread the darning needle. Tie a small knot at one end and keep the yarn relaxed. Done when the needle is threaded and ready.",
-    "common_mistake": "Using very long yarn tangles quickly. Use about 40 cm length.",
-    "safety_critical": true,
-    "requires_confirmation": true,
-    "segment_ids": [],
-    "uses_items": [
-     "yarn",
-     "needle",
-     "scissors"
-    ],
-    "overlay": null
-   },
-   {
-    "n": 3,
     "title": "Darn largest hole",
-    "text": "Work on the wrong side over the mushroom and lay parallel threads across the largest hole, extending 5 mm into sound knit. Weave crosswise over and under to form a loose grid. Done when the hole is fully covered with flat fabric.",
-    "common_mistake": "Pulling the yarn tight puckers the knit. Keep all threads soft and even.",
+    "text": "Thread the darning needle with a 40 cm length of yarn and anchor in solid knit 5 mm outside the largest hole. Lay parallel lines across the hole 2 mm apart, then weave across them over and under. Done when the largest hole is covered with a flat loose grid.",
+    "common_mistake": "Pulling yarn tight puckers knit. Keep tension loose and flat.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
      "seg_2"
     ],
     "uses_items": [
-     "yarn",
      "needle",
-     "mushroom"
+     "yarn",
+     "hoop"
     ],
     "overlay": {
      "type": "stitch_path",
@@ -2677,19 +2665,41 @@
     }
    },
    {
+    "n": 3,
+    "title": "Darn lower hole",
+    "text": "Move the hoop to the lower hole and anchor new yarn 5 mm in solid knit around it. Work the same loose lengthwise threads and crosswise weave with 2 mm spacing. Done when the lower hole is fully bridged with flat fabric.",
+    "common_mistake": "Knotting the start creates a bump. Weave the tail into solid stitches instead.",
+    "safety_critical": false,
+    "requires_confirmation": false,
+    "segment_ids": [
+     "seg_4"
+    ],
+    "uses_items": [
+     "needle",
+     "yarn"
+    ],
+    "overlay": {
+     "type": "stitch_path",
+     "stitch_type": "darning",
+     "segment_id": "seg_4",
+     "from_segment_id": null,
+     "to_segment_id": null,
+     "hold_seconds": null
+    }
+   },
+   {
     "n": 4,
-    "title": "Darn upper hole",
-    "text": "Move the mushroom under the upper small hole and smooth the knit flat. Lay parallel threads across the hole and weave crosswise with loose tension. Done when the small hole is fully closed without puckering.",
-    "common_mistake": "Pulling the yarn tight puckers the knit. Keep all threads soft and even.",
+    "title": "Darn small hole",
+    "text": "Move the hoop to the small upper hole and repeat the darn with 5 mm anchoring and 2 mm thread spacing. Keep the knit relaxed and leave slight slack for stretch. Done when the small hole is closed with an even patch.",
+    "common_mistake": "Closing the hole by pulling edges together tears stitches. Keep a full woven patch.",
     "safety_critical": false,
     "requires_confirmation": false,
     "segment_ids": [
      "seg_3"
     ],
     "uses_items": [
-     "yarn",
      "needle",
-     "mushroom"
+     "yarn"
     ],
     "overlay": {
      "type": "stitch_path",
@@ -2702,33 +2712,9 @@
    },
    {
     "n": 5,
-    "title": "Darn lower hole",
-    "text": "Move the mushroom under the lower small hole and smooth the knit flat. Repeat parallel threads and crosswise weaving with 5 mm overlap into sound knit. Done when the hole is filled with an even loose weave.",
-    "common_mistake": "Closing the hole by pulling edges together puckers. Build a woven patch instead.",
-    "safety_critical": false,
-    "requires_confirmation": false,
-    "segment_ids": [
-     "seg_4"
-    ],
-    "uses_items": [
-     "yarn",
-     "needle",
-     "mushroom"
-    ],
-    "overlay": {
-     "type": "stitch_path",
-     "stitch_type": "darning",
-     "segment_id": "seg_4",
-     "from_segment_id": null,
-     "to_segment_id": null,
-     "hold_seconds": null
-    }
-   },
-   {
-    "n": 6,
     "title": "Secure and check",
-    "text": "Secure each yarn end with two small stitches in sound knit and trim tails to 1 cm with scissors. Remove the mushroom, turn the sweater right side out and stretch the area gently. Done when edges stay closed, flat and without holes.",
-    "common_mistake": "Cutting too close loosens the knot. Leave a 1 cm tail.",
+    "text": "Remove the hoop and weave each yarn tail 10 mm into solid knit with the needle, then trim tails with scissors. Turn right side out and gently stretch the patches sideways. Done when edges stay closed with no puckering or loose threads.",
+    "common_mistake": "Cutting threads too short loosens the patch. Leave 10 mm tails woven in.",
     "safety_critical": true,
     "requires_confirmation": true,
     "segment_ids": [
@@ -2737,6 +2723,8 @@
      "seg_4"
     ],
     "uses_items": [
+     "needle",
+     "yarn",
      "scissors"
     ],
     "overlay": null

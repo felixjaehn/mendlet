@@ -265,6 +265,8 @@ class Decision(Base):
     cost_eur: Annotated[list[float], Field(min_length=2, max_length=2)]
     estimate_note: str = ESTIMATE_NOTE
     second_life: list[SecondLife] = Field(default_factory=list)
+    # Typical price range of a comparable new item, for "saved vs. buying new". Empty when unknown.
+    new_price_eur: Annotated[list[float], Field(max_length=2)] = Field(default_factory=list)
 
 
 class ShoppingItem(Base):

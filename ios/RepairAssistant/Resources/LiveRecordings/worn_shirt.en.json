@@ -1,5 +1,5 @@
 {
- "case_id": "92be1119-08bf-4c00-a029-a4c83ca8869e",
+ "case_id": "23e5a050-f0a6-4153-a6f2-4e2f3754faf1",
  "category": "textile",
  "risk_level": "allowed",
  "safety": {
@@ -1140,12 +1140,12 @@
   }
  ],
  "diagnosis": {
-  "summary": "Heavily holed grey jersey T-shirt. The surrounding fabric is thinned and torn throughout.",
+  "summary": "Heavily holed grey cotton T-shirt. The surrounding fabric is thinned, torn and fragile.",
   "likely_causes": [
    "Long wear and washing",
-   "Friction and fabric thinning"
+   "Fabric thinning and abrasion"
   ],
-  "confidence": 0.95,
+  "confidence": 0.92,
   "evidence_segment_ids": [
    "seg_1",
    "seg_6"
@@ -1159,11 +1159,11 @@
  },
  "decision": {
   "recommendation": "replace",
-  "reasoning": "The fabric is worn through with dozens of holes and no stable edges. Replacement needs only sorting time and no repair materials.",
-  "effort": "low",
+  "reasoning": "The fabric is destroyed with dozens of holes and no stable edges. Replacement costs less than any lasting repair.",
+  "effort": "high",
   "time_minutes": [
-   5,
-   15
+   0,
+   0
   ],
   "cost_eur": [
    0.0,
@@ -1173,14 +1173,23 @@
   "second_life": [
    {
     "kind": "upcycle",
-    "title": "Cut cleaning rags",
-    "text": "Cut intact areas into reusable cleaning cloths."
+    "title": "Cleaning rags",
+    "text": "Cut intact areas into small cloths for cleaning."
    },
    {
     "kind": "recycle",
-    "title": "Textile recycling container",
-    "text": "Bring the shirt to a textile collection container."
+    "title": "Textile recycling",
+    "text": "Put the worn shirt in a textile recycling container."
+   },
+   {
+    "kind": "upcycle",
+    "title": "Cloth strips",
+    "text": "Use soft strips as garden ties or dust cloths."
    }
+  ],
+  "new_price_eur": [
+   10.0,
+   25.0
   ]
  },
  "shopping_list": [],

@@ -1,5 +1,5 @@
 {
- "case_id": "e513b1c6-fecc-4ee7-8429-508909bbe768",
+ "case_id": "19c3d0e1-074c-492f-a255-c92f01aa8dd7",
  "category": "shoe",
  "risk_level": "allowed",
  "safety": {
@@ -2161,7 +2161,7 @@
   }
  ],
  "diagnosis": {
-  "summary": "Hole in worn leather shoe sole. The surrounding sole is heavily worn and thin.",
+  "summary": "Hole in leather shoe sole. The surrounding sole is heavily worn and thin.",
   "likely_causes": [
    "Long walking wear",
    "Thin leather sole"
@@ -2180,18 +2180,22 @@
  },
  "decision": {
   "recommendation": "repair_pro",
-  "reasoning": "Full sole replacement needs professional tools and stitching. A cobbler resoles the shoe with new leather and finish.",
+  "reasoning": "The sole is worn through and needs a full resole. A cobbler has the tools and materials for a durable repair.",
   "effort": "medium",
   "time_minutes": [
-   30,
-   60
+   20,
+   40
   ],
   "cost_eur": [
-   40.0,
-   90.0
+   25.0,
+   60.0
   ],
   "estimate_note": "Estimate",
-  "second_life": []
+  "second_life": [],
+  "new_price_eur": [
+   120.0,
+   250.0
+  ]
  },
  "shopping_list": [],
  "guide": {

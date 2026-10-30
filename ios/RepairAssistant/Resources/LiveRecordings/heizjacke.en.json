@@ -1,5 +1,5 @@
 {
- "case_id": "27d37ce5-0588-4c92-8b82-966c0a6722ee",
+ "case_id": "d37e8029-9862-45db-b3f4-f596c71e3fe3",
  "category": "textile",
  "risk_level": "warn_only",
  "safety": {
@@ -32,7 +32,8 @@
    0.0
   ],
   "estimate_note": "Estimate",
-  "second_life": []
+  "second_life": [],
+  "new_price_eur": []
  },
  "shopping_list": [],
  "guide": {
