@@ -43,7 +43,7 @@ struct AgentTraceView: View {
     var replay = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    /// Keeps the card short enough to never clip on screen or in the video (demo review 2026-10-29).
+    /// Keeps the card short enough to never clip on screen or in the video.
     private let maxVisible = 5
     private var visible: [AgentStep] { Array(steps.suffix(active == nil ? maxVisible : maxVisible - 1)) }
     private var hiddenCount: Int { steps.count - visible.count }
@@ -140,35 +140,6 @@ struct AgentTraceView: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(tr("%@, läuft", AgentLabel.localized(a.label)))
-    }
-}
-
-/// Four-segment stage strip with the current stage as text.
-struct StageStrip: View {
-    let titles: [String]
-    let states: [StageState]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 5) {
-                ForEach(0..<states.count, id: \.self) { i in
-                    Capsule().fill(color(states[i])).frame(height: 5)
-                        .overlay(alignment: .leading) {
-                            if states[i] == .active { Capsule().fill(Theme.thread).frame(height: 5).shimmer() }
-                        }
-                }
-            }
-            .animation(Theme.spring, value: states)
-            if let i = states.firstIndex(of: .active) ?? (states.allSatisfy { $0 == .done } ? states.count - 1 : nil) {
-                Text(states.allSatisfy { $0 == .done } ? tr("Fertig") : tr("%lld von %lld · %@", i + 1, states.count, tr(titles[i])))
-                    .font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkSecondary)
-            }
-        }
-        .accessibilityElement(children: .combine)
-    }
-
-    private func color(_ s: StageState) -> Color {
-        switch s { case .done: Theme.safe; case .active: Theme.threadSoft; case .pending: Theme.hairline }
     }
 }
 

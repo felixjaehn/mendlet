@@ -119,7 +119,6 @@ struct LabelPinsLayer {
         for g in groups {
             let infos = g.compactMap { info($0) }
             guard let first = infos.first, let s0 = g.first else { continue }
-            let top = g.map(\.score).max() ?? 0
             let score: String? = nil
             let text = g.count > 1 ? Self.plural(s0.label, g.count) : tr(s0.label)
             let b = infos.dropFirst().reduce(first.bounds) { $0.union($1.bounds) }

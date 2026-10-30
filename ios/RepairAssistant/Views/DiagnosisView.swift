@@ -4,7 +4,6 @@ import PhotosUI
 /// Finding: one headline about what is wrong, with the marked photo as the hero.
 struct DiagnosisView: View {
     @Environment(FlowModel.self) private var flow
-    @State private var causesOpen = false
     @State private var showLabelCamera = false
     @State private var showLabelGallery = false
     @State private var labelPicker: PhotosPickerItem?

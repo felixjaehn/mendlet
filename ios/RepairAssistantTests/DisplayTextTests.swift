@@ -1,7 +1,7 @@
 import XCTest
 @testable import RepairAssistant
 
-final class RedesignTests: XCTestCase {
+final class DisplayTextTests: XCTestCase {
     func testCopyPolishRemovesHedgesAndCapitalizes() {
         XCTAssertEqual(CopyPolish.sentence("small hole in presumably grey knit"), "Small hole in grey knit.")
         XCTAssertEqual(CopyPolish.sentence("Assumed leather outsole from the photo."), "")

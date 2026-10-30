@@ -84,7 +84,7 @@ struct ShoeOverlay: View {
     // MARK: Geometry
 
     /// Largest outer ring in pixels.
-    static func contour(of s: Segment, in size: CGSize) -> [CGPoint] {
+    nonisolated static func contour(of s: Segment, in size: CGSize) -> [CGPoint] {
         let rings = s.ringPolygons.filter { !$0.hole }
         let best = rings.max { area($0.points) < area($1.points) }?.points ?? []
         if best.count >= 3 { return best.map { CGPoint(x: $0.x * size.width, y: $0.y * size.height) } }
@@ -93,7 +93,7 @@ struct ShoeOverlay: View {
         return [CGPoint(x: r.minX, y: r.minY), CGPoint(x: r.maxX, y: r.minY), CGPoint(x: r.maxX, y: r.maxY), CGPoint(x: r.minX, y: r.maxY)]
     }
 
-    static func area(_ p: [CGPoint]) -> CGFloat {
+    nonisolated static func area(_ p: [CGPoint]) -> CGFloat {
         guard p.count >= 3 else { return 0 }
         var a: CGFloat = 0
         for i in 0..<p.count { let q = p[(i + 1) % p.count]; a += p[i].x * q.y - q.x * p[i].y }
@@ -206,58 +206,5 @@ struct ShoeOverlay: View {
         p.addLine(to: CGPoint(x: b.x - dir.dx * h - side.dx * h * 0.7, y: b.y - dir.dy * h - side.dy * h * 0.7))
         ctx.stroke(p, with: .color(.black.opacity(0.45)), style: StrokeStyle(lineWidth: 7, lineCap: .round, lineJoin: .round))
         ctx.stroke(p, with: .color(.white), style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
-    }
-}
-
-/// Tap-to-start countdown ring for curing / pressing times.
-struct CureRing: View {
-    let minutes: Int?
-    var label: String
-    @State private var startedAt: Date?
-    @State private var pausedRemaining: Double?
-    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
-    @Environment(\.staticRendering) private var staticRendering
-    private var reduceMotion: Bool { systemReduceMotion || staticRendering }
-
-    private var total: Double { Double((minutes ?? 10) * 60) }
-
-    var body: some View {
-        TimelineView(.periodic(from: .now, by: 0.5)) { tl in
-            let remaining = remainingSeconds(at: tl.date)
-            let frac = total > 0 ? remaining / total : 0
-            let done = startedAt != nil && remaining <= 0
-            Button { toggle(at: tl.date) } label: {
-                ZStack {
-                    Circle().fill(.black.opacity(0.55))
-                    Circle().stroke(.white.opacity(0.2), lineWidth: 6)
-                    Circle().trim(from: 0, to: frac).stroke(done ? Theme.highlight : Theme.caution, style: StrokeStyle(lineWidth: 6, lineCap: .round))
-                        .rotationEffect(.degrees(-90)).animation(reduceMotion ? nil : .linear(duration: 0.5), value: frac)
-                    VStack(spacing: 0) {
-                        Text(done ? tr("Fertig") : Self.format(remaining)).font(.system(size: 17, weight: .bold)).monospacedDigit().foregroundStyle(.white)
-                        Text(startedAt == nil && pausedRemaining == nil ? tr("Start") : label).font(.system(size: 10, weight: .semibold)).foregroundStyle(.white.opacity(0.75))
-                    }
-                }
-                .frame(width: 84, height: 84)
-            }
-            .buttonStyle(.plain)
-        }
-        .accessibilityLabel("Countdown \(label)")
-        .accessibilityValue(Self.format(remainingSeconds(at: .now)))
-        .accessibilityHint("Tippen zum Starten oder Pausieren")
-    }
-
-    private func remainingSeconds(at now: Date) -> Double {
-        if let s = startedAt { return max(0, (pausedRemaining ?? total) - now.timeIntervalSince(s)) }
-        return pausedRemaining ?? total
-    }
-
-    private func toggle(at now: Date) {
-        Haptics.tap()
-        if startedAt != nil { pausedRemaining = remainingSeconds(at: now); startedAt = nil }
-        else { startedAt = now }
-    }
-
-    static func format(_ s: Double) -> String {
-        let t = Int(s.rounded(.up)); return String(format: "%d:%02d", t / 60, t % 60)
     }
 }

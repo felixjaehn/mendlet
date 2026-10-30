@@ -22,8 +22,6 @@ struct AgentEnvelope: Decodable {
 }
 
 enum LiveRecordings {
-    static var chipText: String { tr("Demo · echte Modellantworten vom 28.10.") }
-
     static func name(for s: DemoScenario) -> String? {
         switch s {
         case .realSweater: "real_sweater"

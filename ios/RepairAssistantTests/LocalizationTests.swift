@@ -3,7 +3,7 @@ import XCTest
 
 @MainActor
 final class LocalizationTests: XCTestCase {
-    private var original = "de"
+    nonisolated(unsafe) private var original = "de"
     override func setUp() { original = Lang.shared.choice }
     override func tearDown() {
         Lang.shared.choice = original

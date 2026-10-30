@@ -81,13 +81,3 @@ struct CompletionView: View {
         tr("Ich habe gerade etwas repariert statt weggeworfen: ca. %@ kg vor Deponie oder Verbrennung bewahrt (Schätzung). #Reparieren", ImpactEstimator.format(kg: est.kilograms)) + " – Mendlet"
     }
 }
-
-struct CheckShape: Shape {
-    func path(in r: CGRect) -> Path {
-        var p = Path()
-        p.move(to: CGPoint(x: r.minX + r.width * 0.05, y: r.midY + r.height * 0.02))
-        p.addLine(to: CGPoint(x: r.minX + r.width * 0.38, y: r.maxY - r.height * 0.12))
-        p.addLine(to: CGPoint(x: r.maxX - r.width * 0.02, y: r.minY + r.height * 0.1))
-        return p
-    }
-}

@@ -12,7 +12,7 @@ extension Color {
     }
 }
 
-/// Mendlet design tokens (docs/design/REDESIGN-SPEC.md 1.1): neutral ink and paper, one accent (system blue, state only),
+/// Mendlet design tokens: neutral ink and paper, one accent (system blue, state only),
 /// white for everything drawn on photos.  One typeface: SF Pro.
 enum Theme {
     static let paper = Color(uiColor: .systemGroupedBackground)
@@ -29,13 +29,10 @@ enum Theme {
     /// Everything drawn on a photo (masks, stitch path, routes) is white.
     static let highlight = Color.white
     static let scrim = Color.black.opacity(0.30)
-    /// Legacy names kept for the trace drawer and overlays: no extra hues, white on photos, red only for destructive.
+    /// Semantic aliases used by the trace drawer and overlays: no extra hues, white on photos, red only for destructive.
     static let safe = Color.accentColor
-    static let safeSoft = Color.accentColor.opacity(0.14)
     static let caution = Color.white
-    static let cautionSoft = Color(uiColor: .tertiarySystemFill)
     static let stop = Color(uiColor: .systemRed)
-    static let stopSoft = Color(uiColor: .systemRed).opacity(0.12)
 
     static let partColors: [Color] = [.white, .white, .white]
 
@@ -93,7 +90,7 @@ extension View {
         }
     }
 
-    /// Text on top of a photo (mark labels, "Glue here", "Preview"): owner 2026-10-30 — always on a dark backing for legibility.
+    /// Text on top of a photo (mark labels, "Glue here", "Preview"): always on a dark backing for legibility.
     func photoLabel() -> some View {
         self.foregroundStyle(.white)
             .padding(.horizontal, 8).padding(.vertical, 3)
@@ -103,14 +100,6 @@ extension View {
     func screenBackground() -> some View {
         self.background(Theme.paper.ignoresSafeArea())
     }
-}
-
-/// Segment colours: damage = thread, parts cycle through the palette.
-func segmentColor(_ segment: Segment, in all: [Segment]) -> Color {
-    if segment.isDamage { return Theme.highlight }
-    let parts = all.filter { !$0.isDamage }
-    let idx = parts.firstIndex(where: { $0.id == segment.id }) ?? 0
-    return Theme.partColors[idx % Theme.partColors.count]
 }
 
 extension EnvironmentValues {

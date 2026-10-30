@@ -207,11 +207,6 @@ final class FlowModel {
         startAnalysis(resetExtras: false)
     }
 
-    func skipFollowUp() {
-        let qs = response?.diagnosis.followUpQuestions ?? []
-        submitFollowUp(answers: qs.map { AnswerPayload(questionId: $0.id, text: tr("Keine Angabe")) }, images: [])
-    }
-
     // MARK: Optional label photo (jeans)
 
     /// Card "Etikett fotografieren" is offered for textile cases without label data.
@@ -389,7 +384,6 @@ final class FlowModel {
         let ready = shoppingItems.filter { statuses[$0.id] == .have }.count
         return (total, ready, total - ready)
     }
-    var canStartRepair: Bool { ShoppingGate.canStart(items: shoppingItems, statuses: statuses) }
 
     func setStatus(_ item: ShoppingItem, _ status: ItemStatus) {
         statuses[item.id] = (statuses[item.id] == status) ? nil : status
@@ -397,7 +391,7 @@ final class FlowModel {
         persist()
     }
 
-    /// Owner 2026-10-29: problem found → start repairing. The shopping list is a checklist, never a gate;
+    /// Problem found → start repairing. The shopping list is a checklist, never a gate;
     /// each step shows what it needs anyway. The safety gate still decides whether a guide exists at all.
     func startRepair() {
         guard FlowGate.canNavigate(to: .guide, response: response) else { return }
@@ -465,25 +459,11 @@ final class FlowModel {
     var inProgress: [SavedCase] { projects.filter { !$0.finished } }
     var doneProjects: [SavedCase] { projects.filter(\.finished).sorted { ($0.finishedAt ?? $0.createdAt) > ($1.finishedAt ?? $1.createdAt) } }
 
-    /// Items (required first) the user does not have yet.
-    func missingItems(_ c: SavedCase) -> [ShoppingItem] {
-        c.response.shoppingList.filter { $0.required && c.shoppingStatus[$0.id] != .have }
-    }
-
     /// Home -> Project detail.
     func openProject(_ c: SavedCase) {
         guard store.image(for: c.id) != nil else { return }
         loadCase(c)
         path = [.project(c.id)]
-    }
-
-    /// From the project: back into the guide (or the checklist when nothing is gathered yet).
-    func continueProject() {
-        if !missingItems(currentCase).isEmpty && currentStep == 0 && completedSteps.isEmpty { go(.shopping) } else { startRepair() }
-    }
-
-    private var currentCase: SavedCase {
-        store.savedCase(response?.caseId ?? "") ?? SavedCase(id: "", createdAt: Date(), userNote: "", response: response!, shoppingStatus: statuses, currentStep: currentStep, completedSteps: [], finished: false)
     }
 
     private func loadCase(_ c: SavedCase) {

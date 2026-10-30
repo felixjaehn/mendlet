@@ -23,7 +23,7 @@ struct CameraPreviewLayer: UIViewRepresentable {
     func updateUIView(_ uiView: PreviewView, context: Context) { context.coordinator.onTap = onTap }
     func makeCoordinator() -> Coordinator { Coordinator(onTap) }
 
-    final class Coordinator: NSObject {
+    @MainActor final class Coordinator: NSObject {
         var onTap: (CGPoint, CGPoint) -> Void
         weak var view: PreviewView?
         init(_ onTap: @escaping (CGPoint, CGPoint) -> Void) { self.onTap = onTap }

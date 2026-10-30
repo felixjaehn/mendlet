@@ -1,6 +1,6 @@
 import Foundation
 
-/// Pure safety gating. No guide or shopping UI is reachable unless this says so (PRD §7, §8).
+/// Pure safety gating. No guide or shopping UI is reachable unless this says so.
 enum FlowGate {
     enum Destination: Equatable, Sendable { case block, diagnosis }
     enum Route: Equatable, Sendable { case diagnosis, decision, shopping, guide, block, completion }
@@ -109,11 +109,4 @@ enum ImpactEstimator {
         f.maximumFractionDigits = 1
         return f.string(from: NSNumber(value: kg)) ?? String(format: "%.1f", kg)
     }
-}
-
-enum ImpactFacts {
-    struct Fact: Sendable { let text: String; let source: String }
-    static var headline: Fact { Fact(text: tr("Jede Sekunde landet weltweit eine Lkw-Ladung Kleidung auf der Deponie oder in der Verbrennung."), source: "Ellen MacArthur Foundation") }
-    static var secondary: Fact { Fact(text: tr("In der EU fallen pro Kopf 16 kg Textilabfall im Jahr an – nur 4,6 kg davon werden getrennt gesammelt."), source: "EEA, 2022") }
-    static var lifetime: Fact { Fact(text: tr("9 Monate länger tragen senkt den CO₂-, Wasser- und Abfall-Fußabdruck um bis zu 20 %."), source: "WRAP") }
 }

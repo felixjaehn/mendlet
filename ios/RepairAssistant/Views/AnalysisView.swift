@@ -154,25 +154,3 @@ struct AnalysisView: View {
         return (s.1, s.2)
     }
 }
-
-/// Four small dots under the status line: done = ink, current = pulsing ink, upcoming = fill.
-struct PhaseDots: View {
-    var current: Int
-    @State private var pulse = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    var body: some View {
-        HStack(spacing: 8) {
-            ForEach(0..<4, id: \.self) { i in
-                Circle().fill(i <= current ? Theme.ink : Theme.fill)
-                    .frame(width: 6, height: 6)
-                    .opacity(i == current && pulse ? 0.4 : 1)
-            }
-        }
-        .onAppear {
-            guard !reduceMotion else { return }
-            withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) { pulse = true }
-        }
-        .accessibilityHidden(true)
-    }
-}

@@ -101,14 +101,6 @@ enum StitchType: String, TolerantEnum {
     init(from decoder: Decoder) throws { self = try Self.decodeTolerant(decoder) }
     func encode(to encoder: Encoder) throws { try encodeRaw(encoder) }
 
-    var germanName: String {
-        switch self {
-        case .ladderStitch: tr("Leiterstich")
-        case .runningStitch: tr("Vorstich")
-        case .darning: tr("Stopfen")
-        case .whipStitch: tr("Überwendlingstich")
-        }
-    }
 }
 
 // MARK: - Segments
@@ -297,13 +289,6 @@ struct SecondLife: Codable, Sendable, Hashable {
     var title: String
     var text: String
 
-    var icon: String {
-        switch kind {
-        case .upcycle: "scissors"
-        case .recycle: "arrow.3.trianglepath"
-        case .donate: "heart"
-        }
-    }
 }
 
 struct Decision: Codable, Sendable, Hashable {

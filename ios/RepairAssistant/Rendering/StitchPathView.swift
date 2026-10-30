@@ -200,7 +200,7 @@ struct StitchPathView: View {
 
     // MARK: Crafted stitch diagram
 
-    private let stitchLen: CGFloat = 7, stitchGap: CGFloat = 4  // owner: 3/2 pt read as noise on knit
+    private let stitchLen: CGFloat = 7, stitchGap: CGFloat = 4  // shorter and sparser stitches read as noise on knit
 
     private func maskPath(_ size: CGSize) -> Path? {
         guard !plan.mask.isEmpty else { return nil }
@@ -236,17 +236,6 @@ struct StitchPathView: View {
         c.fill(Path(ellipseIn: CGRect(x: -13.5, y: -0.7, width: 5, height: 1.4)), with: .color(.black.opacity(0.55)))
         var thread = Path(); thread.move(to: CGPoint(x: -11, y: 0)); thread.addCurve(to: CGPoint(x: -30, y: 5), control1: CGPoint(x: -18, y: 0), control2: CGPoint(x: -22, y: 6))
         c.stroke(thread, with: .color(.white.opacity(0.9)), style: StrokeStyle(lineWidth: 1.2, lineCap: .round))
-    }
-
-    private func drawArrow(_ ctx: inout GraphicsContext, at m: CGPoint, from a: CGPoint, to b: CGPoint) {
-        let ang = atan2(b.y - a.y, b.x - a.x)
-        var c = ctx
-        c.translateBy(x: m.x, y: m.y); c.rotate(by: .radians(Double(ang)))
-        var arrow = Path()
-        arrow.move(to: CGPoint(x: -7, y: 0)); arrow.addLine(to: CGPoint(x: 6, y: 0))
-        arrow.move(to: CGPoint(x: 1.5, y: -4)); arrow.addLine(to: CGPoint(x: 6.5, y: 0)); arrow.addLine(to: CGPoint(x: 1.5, y: 4))
-        c.stroke(arrow, with: .color(.black.opacity(0.6)), style: StrokeStyle(lineWidth: 3.4, lineCap: .round, lineJoin: .round))
-        c.stroke(arrow, with: .color(.white), style: StrokeStyle(lineWidth: 1.6, lineCap: .round, lineJoin: .round))
     }
 
     private func drawDarning(_ ctx: inout GraphicsContext, _ size: CGSize, progress: Double) {
@@ -319,7 +308,6 @@ struct StitchPathView: View {
         ctx.opacity = alpha
         if plan.kind == .darning { drawDarning(&ctx, size, progress: progress); return }
         if plan.kind == .stitches { drawLadder(&ctx, size, progress: progress); return }
-        let thread = Theme.highlight
         var tr: Trace
         switch plan.kind {
         case .stitches:
