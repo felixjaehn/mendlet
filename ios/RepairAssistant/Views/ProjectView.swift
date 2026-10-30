@@ -86,7 +86,7 @@ struct ProjectView: View {
         if finished {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Repaired").font(.system(size: 34, weight: .semibold)).foregroundStyle(Theme.ink)
-                Text((c.finishedAt ?? c.createdAt).formatted(.dateTime.day().month(.wide).year())).font(.footnote).foregroundStyle(Theme.inkSecondary)
+                Text((c.finishedAt ?? c.createdAt).formatted(.dateTime.day().month(.wide).year().locale(Lang.shared.locale))).font(.footnote).foregroundStyle(Theme.inkSecondary)
             }
         } else {
             VStack(alignment: .leading, spacing: 10) {

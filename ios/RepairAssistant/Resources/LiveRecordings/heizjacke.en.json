@@ -1,14 +1,14 @@
 {
- "case_id": "42d6c7bb-b68b-48ae-8c66-35549e5e27a3",
+ "case_id": "27d37ce5-0588-4c92-8b82-966c0a6722ee",
  "category": "textile",
  "risk_level": "warn_only",
  "safety": {
   "blocked": true,
-  "reason": "Heated jacket powered by Li-ion battery pack, lithium battery requires warning."
+  "reason": "Heated jacket with visible Li-ion battery pack, so lithium-battery warning applies despite zipper issue."
  },
  "segments": [],
  "diagnosis": {
-  "summary": "Heated jacket powered by Li-ion battery pack, lithium battery requires warning.",
+  "summary": "Heated jacket with visible Li-ion battery pack, so lithium-battery warning applies despite zipper issue.",
   "likely_causes": [],
   "confidence": 0.0,
   "evidence_segment_ids": [],
@@ -21,7 +21,7 @@
  },
  "decision": {
   "recommendation": "repair_pro",
-  "reasoning": "Heated jacket powered by Li-ion battery pack, lithium battery requires warning.",
+  "reasoning": "Heated jacket with visible Li-ion battery pack, so lithium-battery warning applies despite zipper issue.",
   "effort": "high",
   "time_minutes": [
    0,
@@ -31,7 +31,8 @@
    0.0,
    0.0
   ],
-  "estimate_note": "Estimate, no guarantee"
+  "estimate_note": "Estimate",
+  "second_life": []
  },
  "shopping_list": [],
  "guide": {

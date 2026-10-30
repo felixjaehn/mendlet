@@ -1,0 +1,42 @@
+{
+ "case_id": "1649f9e9-ffc9-4051-bfbc-3f346171d479",
+ "category": "unsupported",
+ "risk_level": "professional",
+ "safety": {
+  "blocked": true,
+  "reason": "Cracked bicycle helmet shell compromises impact protection and endangers user if it fails."
+ },
+ "segments": [],
+ "diagnosis": {
+  "summary": "Cracked bicycle helmet shell compromises impact protection and endangers user if it fails.",
+  "likely_causes": [],
+  "confidence": 0.0,
+  "evidence_segment_ids": [],
+  "needs_more_info": false,
+  "follow_up_questions": [],
+  "label_info": {
+   "materials": [],
+   "care": []
+  }
+ },
+ "decision": {
+  "recommendation": "repair_pro",
+  "reasoning": "Cracked bicycle helmet shell compromises impact protection and endangers user if it fails.",
+  "effort": "high",
+  "time_minutes": [
+   0,
+   0
+  ],
+  "cost_eur": [
+   0.0,
+   0.0
+  ],
+  "estimate_note": "Estimate",
+  "second_life": []
+ },
+ "shopping_list": [],
+ "guide": {
+  "steps": []
+ },
+ "instances": null
+}

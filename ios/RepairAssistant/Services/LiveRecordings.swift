@@ -33,7 +33,7 @@ enum LiveRecordings {
         case .textileHole: "pulli"
         case .shoeSole: "sneaker"
         case .batteryJacket: "heizjacke"
-        case .helmet: nil
+        case .helmet: "helmet"
         case .platine: "platine"
         }
     }

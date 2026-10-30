@@ -213,7 +213,7 @@ struct DoneRow: View {
                     .clipShape(RoundedRectangle(cornerRadius: Theme.thumbRadius, style: .continuous))
                 VStack(alignment: .leading, spacing: 2) {
                     Text(ProjectInfo.title(project)).font(.body.weight(.semibold)).foregroundStyle(Theme.ink)
-                    Text("Repaired " + (project.finishedAt ?? project.createdAt).formatted(.dateTime.day().month(.abbreviated)))
+                    Text("Repaired " + (project.finishedAt ?? project.createdAt).formatted(.dateTime.day().month(.abbreviated).locale(Lang.shared.locale)))
                         .font(.subheadline).foregroundStyle(Theme.inkSecondary)
                 }
                 Spacer(minLength: 0)
