@@ -89,11 +89,19 @@ struct ProjectView: View {
                 Text((c.finishedAt ?? c.createdAt).formatted(.dateTime.day().month(.wide).year().locale(Lang.shared.locale))).font(.footnote).foregroundStyle(Theme.inkSecondary)
             }
         } else {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("\(doneCount)/\(steps.count)").font(.system(size: 56, weight: .semibold).monospacedDigit()).foregroundStyle(Theme.ink)
-                    .contentTransition(.numericText())
-                Text("steps done").font(.footnote).foregroundStyle(Theme.inkSecondary).offset(y: -6)
-                SegmentBar(count: steps.count, done: doneCount)
+            let cur = min(max(flow.currentStep, 0), max(steps.count - 1, 0))
+            VStack(alignment: .leading, spacing: 12) {
+                if let s = steps[safe: cur] {
+                    Text("Step \(cur + 1) of \(steps.count) · \(s.title)").font(.headline).foregroundStyle(Theme.ink)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                SegmentBar(count: steps.count, done: doneCount, current: cur)
+                if let next = steps[safe: cur + 1] {
+                    HStack(spacing: 8) {
+                        Text("Next").overline()
+                        Text(next.title).font(.subheadline).foregroundStyle(Theme.inkSecondary).lineLimit(1)
+                    }
+                }
             }
             .accessibilityElement(children: .combine)
         }
@@ -103,7 +111,7 @@ struct ProjectView: View {
 
     private var needSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("What you still need").overline()
+            Text("What you still need" + (needed.isEmpty ? "" : " · \(needed.count)")).overline()
             if needed.isEmpty {
                 Text("You have everything you need.").font(.subheadline).foregroundStyle(Theme.inkSecondary).padding(.vertical, 4)
             } else {

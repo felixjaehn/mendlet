@@ -138,7 +138,14 @@ enum ProjectInfo {
     static func title(_ c: SavedCase) -> String { ProjectTitle.title(summary: c.response.diagnosis.summary, english: Lang.shared.isEnglish) }
     static func subtitle(_ c: SavedCase) -> String { ProjectTitle.subtitle(for: c.response, parked: c.parked == true) }
 
-    static func missing(_ c: SavedCase) -> [ShoppingItem] { c.response.shoppingList.filter { $0.required && c.shoppingStatus[$0.id] != .have } }
+    /// Everything not yet ticked, required or not: the same count as the checklist and the verdict.
+    static func missing(_ c: SavedCase) -> [ShoppingItem] { c.response.shoppingList.filter { c.shoppingStatus[$0.id] != .have } }
+
+    /// Quiet verdict label for cards and rows.
+    static func verdict(_ c: SavedCase) -> String? {
+        if c.parked == true { return tr("Zum Profi") }
+        return c.response.decision?.recommendation.title
+    }
 
     static func stillNeeded(_ c: SavedCase) -> String? {
         let names = missing(c).map { ($0.name.components(separatedBy: ",").first ?? $0.name).lowercasedFirst }
@@ -172,6 +179,7 @@ struct ProjectCard: View {
                     .aspectRatio(16.0 / 10.0, contentMode: .fit)
                     .clipShape(UnevenRoundedRectangle(topLeadingRadius: Theme.cardRadius, topTrailingRadius: Theme.cardRadius, style: .continuous))
                 VStack(alignment: .leading, spacing: 4) {
+                    if let v = ProjectInfo.verdict(project) { Text(v).overline().padding(.bottom, 2) }
                     Text(ProjectInfo.title(project)).font(.headline).foregroundStyle(Theme.ink)
                     Text(ProjectInfo.subtitle(project)).font(.subheadline).foregroundStyle(Theme.inkSecondary)
                     if !parked && steps > 0 {
@@ -212,6 +220,7 @@ struct DoneRow: View {
                     .frame(width: 56, height: 56)
                     .clipShape(RoundedRectangle(cornerRadius: Theme.thumbRadius, style: .continuous))
                 VStack(alignment: .leading, spacing: 2) {
+                    if let v = ProjectInfo.verdict(project) { Text(v).overline() }
                     Text(ProjectInfo.title(project)).font(.body.weight(.semibold)).foregroundStyle(Theme.ink)
                     Text("Repaired " + (project.finishedAt ?? project.createdAt).formatted(.dateTime.day().month(.abbreviated).locale(Lang.shared.locale)))
                         .font(.subheadline).foregroundStyle(Theme.inkSecondary)

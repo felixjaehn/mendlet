@@ -49,7 +49,7 @@ extension Recommendation {
         switch self {
         case .repairSelf: "Repair it yourself."
         case .repairPro: "Take it to a pro."
-        case .replace: "Time to let it go."
+        case .replace: "Replace it."
         }
     }
 }
@@ -209,8 +209,8 @@ struct DecisionView: View {
 
     private func checklistRow(_ r: AnalyzeResponse) -> some View {
         let items = r.shoppingList
-        let have = items.filter { flow.statuses[$0.id] == .have }.count
-        let subtitle = have == items.count ? "Everything is ready" : (have == 0 ? "\(items.count) things to gather" : "\(items.count) things to gather, you have \(have)")
+        let p = flow.shoppingProgress
+        let subtitle = p.missing == 0 ? "Everything is ready" : (p.ready == 0 ? "\(p.total) things to gather" : "\(p.ready) of \(p.total) ready")
         return Group {
             if !items.isEmpty {
                 Button { startAndGather() } label: {

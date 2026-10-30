@@ -16,14 +16,29 @@ struct SettingsSheet: View {
         NavigationStack {
             List {
                 Section {
-                    Button("Delete all repairs", role: .destructive) { confirmClear = true }
+                    HStack { Text("Photo analysis"); Spacer(); Text("On our server").foregroundStyle(Theme.inkSecondary) }
+                } header: {
+                    Text("Server")
                 } footer: {
                     Text("Photos are sent to the analysis server only to assess the repair.")
                 }
-                Section("About") {
+                Section {
+                    Button("Delete all repairs", role: .destructive) { confirmClear = true }
+                } header: {
+                    Text("Data")
+                } footer: {
+                    Text("Removes every photo and all progress from this device.")
+                }
+                Section {
                     HStack { Text("Mendlet"); Spacer(); Text(version).foregroundStyle(Theme.inkSecondary) }
                         .contentShape(Rectangle())
                         .onTapGesture { taps += 1; if taps >= 5 { dev = true } }
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Powered by Meta SAM 3.1, Muse Spark, Muse Image")
+                            .font(.subheadline).foregroundStyle(Theme.inkSecondary)
+                    }
+                } header: {
+                    Text("About")
                 }
                 if dev {
                     Section("Developer") {
@@ -51,7 +66,7 @@ struct SettingsSheet: View {
                 Button("Cancel", role: .cancel) {}
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.large])
     }
 
     private func check() async {

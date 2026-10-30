@@ -14,7 +14,7 @@ struct BlockView: View {
 
     private var title: String {
         switch variant {
-        case .battery, .professional: "Not one to repair at home."
+        case .battery, .professional: "This needs a specialist."
         case .unsupported: "Not something we can mend."
         }
     }

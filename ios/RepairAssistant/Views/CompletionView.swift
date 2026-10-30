@@ -20,7 +20,7 @@ struct CompletionView: View {
                 slider
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Mended.").font(.serif(.largeTitle)).foregroundStyle(Theme.ink)
-                    Text("One less thing in the bin.").font(.body).foregroundStyle(Theme.inkSecondary)
+                    Text(usedAgain).font(.body).foregroundStyle(Theme.inkSecondary)
                     Text(isShoe ? "About \(ImpactEstimator.format(kg: est.kilograms)) kg kept out of the bin." : "About \(ImpactEstimator.format(kg: est.kilograms)) kg of textile kept in use.")
                         .font(.subheadline).foregroundStyle(Theme.inkSecondary)
                 }
@@ -68,6 +68,16 @@ struct CompletionView: View {
                     .clipShape(RoundedRectangle(cornerRadius: Theme.heroRadius, style: .continuous))
             }
         }
+    }
+
+    /// Concrete line from the item's own title: "Your sweater is back in use."
+    private var usedAgain: String {
+        let summary = flow.response?.diagnosis.summary ?? ""
+        let title = ProjectTitle.title(summary: summary, english: Lang.shared.isEnglish)
+        let noun = title.split(separator: " ").last.map { String($0).lowercased() } ?? ""
+        if noun.isEmpty { return "It's back in use." }
+        let plural = noun.hasSuffix("s") && !noun.hasSuffix("ss")
+        return "Your \(noun) \(plural ? "are" : "is") back in use."
     }
 
     private func shareText(_ est: ImpactEstimator.Estimate) -> String {

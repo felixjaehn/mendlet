@@ -37,8 +37,11 @@ enum DamageDimension {
         let cm = Double((hi - lo) / (pb.width * size.width)) * width
         guard cm.isFinite, cm > 0.5, cm < 200 else { return nil }
         var n = CGVector(dx: -u.dy, dy: u.dx); if n.dy < 0 { n = CGVector(dx: -n.dx, dy: -n.dy) }
-        let off = CGVector(dx: n.dx * 30, dy: n.dy * 30)
-        let mid = CGPoint(x: (a.x + b.x) / 2 + off.dx, y: (a.y + b.y) / 2 + off.dy)
+        // the line and its label sit clear of the mask: beyond its widest point across the axis
+        let perp = pts.map { ($0.x - mean.x) * n.dx + ($0.y - mean.y) * n.dy }.max() ?? 0
+        let gap = max(perp, 0) + 16
+        let off = CGVector(dx: n.dx * gap, dy: n.dy * gap)
+        let mid = CGPoint(x: (a.x + b.x) / 2 + n.dx * (gap + 20), y: (a.y + b.y) / 2 + n.dy * (gap + 20))
         let chipW: CGFloat = 134, chipH: CGFloat = 24
         var r = CGRect(x: mid.x - chipW / 2, y: mid.y - chipH / 2, width: chipW, height: chipH)
         r.origin.x = min(max(r.origin.x, 4), size.width - chipW - 4); r.origin.y = min(max(r.origin.y, 4), size.height - chipH - 4)
@@ -61,11 +64,17 @@ struct DimensionLineView: View {
             }
             .stroke(.white.opacity(0.9), style: StrokeStyle(lineWidth: 0.75, lineCap: .round))
             .shadow(color: .black.opacity(0.5), radius: 1.5)
+            Path { p in
+                p.move(to: CGPoint(x: (a.x + b.x) / 2, y: (a.y + b.y) / 2))
+                p.addLine(to: CGPoint(x: min(max((a.x + b.x) / 2, l.chipRect.minX + 6), l.chipRect.maxX - 6), y: l.chipRect.minY + 2))
+            }
+            .stroke(.white.opacity(0.8), style: StrokeStyle(lineWidth: 0.75, lineCap: .round))
+            .shadow(color: .black.opacity(0.5), radius: 1.5)
             Text("about \(cm) cm").font(.caption2.weight(.medium)).monospacedDigit()
                 .foregroundStyle(.white).shadow(color: .black.opacity(0.4), radius: 2)
                 .padding(.horizontal, 4).background(Color.black.opacity(0.001))
                 .lineLimit(1)
-                .position(x: l.chipRect.midX, y: l.chipRect.midY - 11)
+                .position(x: l.chipRect.midX, y: l.chipRect.midY)
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)

@@ -351,6 +351,12 @@ final class FlowModel {
     }
 
     var shoppingItems: [ShoppingItem] { response?.shoppingList ?? [] }
+    /// One source for every checklist number: "N things" = all items, ready = marked as have, missing = the rest (required or not).
+    var shoppingProgress: (total: Int, ready: Int, missing: Int) {
+        let total = shoppingItems.count
+        let ready = shoppingItems.filter { statuses[$0.id] == .have }.count
+        return (total, ready, total - ready)
+    }
     var canStartRepair: Bool { ShoppingGate.canStart(items: shoppingItems, statuses: statuses) }
 
     func setStatus(_ item: ShoppingItem, _ status: ItemStatus) {

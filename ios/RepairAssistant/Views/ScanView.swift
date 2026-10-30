@@ -54,7 +54,8 @@ struct ScanView: View {
                         .position(x: geo.size.width / 2, y: geo.size.height * 0.44)
                         .allowsHitTesting(false)
                     Text("Fill the frame with the damage").font(.footnote.weight(.medium)).foregroundStyle(.white)
-                        .padding(.horizontal, 14).padding(.vertical, 8).glass(Capsule(), tint: Color.black.opacity(0.25))
+                        .padding(.horizontal, 14).padding(.vertical, 8)
+                        .background(.ultraThinMaterial, in: Capsule()).background(Color.black.opacity(0.35), in: Capsule())
                         .position(x: geo.size.width / 2, y: geo.size.height * 0.44 + frame / 2 + 36)
                         .opacity(capturing ? 0 : 1)
                 }

@@ -6,8 +6,8 @@ struct ShoppingListView: View {
 
     var body: some View {
         let items = flow.shoppingItems
-        let ready = items.filter { flow.statuses[$0.id] == .have }.count
-        let missing = items.filter { $0.required && flow.statuses[$0.id] != .have }.count
+        let ready = flow.shoppingProgress.ready
+        let missing = flow.shoppingProgress.missing
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 header(items, ready: ready)
@@ -43,7 +43,7 @@ struct ShoppingListView: View {
         }
         .floatingBar {
             VStack(spacing: 4) {
-                Text(missing == 0 ? "Everything is ready" : (missing == 1 ? "1 required item to get" : "\(missing) required items to get"))
+                Text(missing == 0 ? "Everything is ready" : (missing == 1 ? "1 thing still to get" : "\(missing) things still to get"))
                     .font(.footnote).foregroundStyle(Theme.inkSecondary).padding(.top, 8)
                 PrimaryButton(title: continuing ? "Continue repair" : "Start repair") { flow.startRepair() }
                 PrimaryButton(title: "I'll gather them later", kind: .secondary) { flow.reset() }
