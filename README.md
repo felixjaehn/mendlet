@@ -10,6 +10,8 @@ Point your phone at a sweater with a small hole, a sole worn through, a sneaker 
 
 **Measured on real input** ([`docs/benchmark.md`](docs/benchmark.md)): 18 cases incl. two real phone photos. The small sweater hole covers 0.7 % of the photo and is still outlined exactly (Spark → SAM). The worn-through leather sole is sent to a cobbler, the threadbare T-shirt is honestly called a replace with ideas for a second life, and lithium batteries and cracked helmets are blocked before any instruction is written. Estimated cost of the sweater repair: €3–8 and about 30 minutes.
 
+**Built for iPhone:** timed steps (glue curing, solder hold) run as a Live Activity on the Lock Screen and in the Dynamic Island, the photo zooms from finding to verdict, and haptics mark the moment the outline closes. Unfinished repairs wait on Home with what you still need.
+
 ## Screenshots
 
 Demo mode, English, real recorded Meta API responses (`scripts/screenshots.sh` re-takes them). The sweater and the leather sole are real phone photos.
