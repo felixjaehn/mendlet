@@ -39,14 +39,14 @@ struct HandsFreeGlow: View {
         return Canvas { ctx, size in
             let rect = CGRect(origin: .zero, size: size)
             let radius = max(8, UIScreen.main.displayCornerRadiusApprox)
-            let width: CGFloat = 24
-            // Stroke centre line sits half a stroke inside the display edge, so the outer edge follows the display corners.
-            let inset = width / 2
+            let width: CGFloat = 16
+            // Stroke centred on the display edge: half of it lies off-screen, so it reads as light bleeding inward.
+            let inset: CGFloat = 0
             let path = RoundedRectangle(cornerRadius: max(8, radius - inset), style: .continuous).path(in: rect.insetBy(dx: inset, dy: inset))
             let angle = Angle.radians(t * 2 * .pi / 8)   // 8 s per revolution
             ctx.drawLayer { l in
                 l.opacity = k
-                l.addFilter(.blur(radius: 9))
+                l.addFilter(.blur(radius: 12))
                 l.stroke(path, with: .conicGradient(Gradient(colors: Self.colors), center: CGPoint(x: size.width / 2, y: size.height / 2), angle: angle), lineWidth: width)
             }
         }
@@ -125,6 +125,7 @@ struct HandsFreeCapsule: View {
                     .foregroundStyle(model.phase == .idle && model.notice == nil && model.caption.isEmpty ? .white.opacity(0.78) : .white)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
                     .contentTransition(.opacity)
             }
             .frame(maxWidth: 260, alignment: .leading)

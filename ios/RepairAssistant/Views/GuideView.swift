@@ -199,7 +199,7 @@ struct GuideView: View {
         return HStack(spacing: 12) {
             Text("Step \(index + 1) of \(steps.count) · \(step.title)")
                 .font(.subheadline.weight(.semibold)).foregroundStyle(.white)
-                .lineLimit(1).minimumScaleFactor(0.8).multilineTextAlignment(.leading)
+                .lineLimit(2).multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 8)
             Button { advance(last: last) } label: {
                 Text(last ? "Finish" : "Done").font(.subheadline.weight(.semibold)).foregroundStyle(.white).lineLimit(1)
