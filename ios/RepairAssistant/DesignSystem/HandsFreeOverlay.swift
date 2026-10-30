@@ -27,11 +27,12 @@ struct HandsFreeGlow: View {
         }
     }
 
-    /// One soft inner stroke: 0.55 opacity (0.35 while the answer card is up), a touch brighter with the mic level.
+    /// Siri-like edge: a crisp luminous line with a soft bloom. Never fades below 0.6 so it stays present in every
+    /// state, a touch brighter with the mic level.
     private var opacity: Double {
         if phase == .off { return 0 }
-        if answerShown { return 0.35 }
-        return 0.55 + (phase == .hearing ? 0.15 * Double(level) : 0)
+        if answerShown { return 0.65 }
+        return 0.85 + (phase == .hearing ? 0.15 * Double(level) : 0)
     }
 
     private func canvas(t: Double) -> some View {
@@ -39,15 +40,21 @@ struct HandsFreeGlow: View {
         return Canvas { ctx, size in
             let rect = CGRect(origin: .zero, size: size)
             let radius = max(8, UIScreen.main.displayCornerRadiusApprox)
-            let width: CGFloat = 16
-            // Stroke centred on the display edge: half of it lies off-screen, so it reads as light bleeding inward.
-            let inset: CGFloat = 0
+            let width: CGFloat = 4
+            // A crisp line just inside the display edge, following its corner radius; the bloom below softens it.
+            let inset: CGFloat = width / 2
             let path = RoundedRectangle(cornerRadius: max(8, radius - inset), style: .continuous).path(in: rect.insetBy(dx: inset, dy: inset))
             let angle = Angle.radians(t * 2 * .pi / 8)   // 8 s per revolution
-            ctx.drawLayer { l in
-                l.opacity = k
+            let shading = GraphicsContext.Shading.conicGradient(Gradient(colors: Self.colors), center: CGPoint(x: size.width / 2, y: size.height / 2), angle: angle)
+            ctx.drawLayer { l in   // soft bloom
+                l.opacity = k * 0.7
                 l.addFilter(.blur(radius: 12))
-                l.stroke(path, with: .conicGradient(Gradient(colors: Self.colors), center: CGPoint(x: size.width / 2, y: size.height / 2), angle: angle), lineWidth: width)
+                l.stroke(path, with: shading, lineWidth: 14)
+            }
+            ctx.drawLayer { l in   // crisp luminous line
+                l.opacity = k
+                l.addFilter(.blur(radius: 1.2))
+                l.stroke(path, with: shading, lineWidth: width)
             }
         }
         .ignoresSafeArea()
@@ -118,7 +125,7 @@ struct HandsFreeCapsule: View {
                 .background(Circle().fill(Color.black.opacity(0.45)).overlay(Circle().strokeBorder(Color.white.opacity(0.25), lineWidth: 0.5)).frame(width: 66, height: 66))
             VStack(alignment: .leading, spacing: 2) {
                 if model.phase == .thinking, !model.caption.isEmpty, model.notice == nil {
-                    Text(model.caption).font(.system(size: 15, weight: .semibold)).foregroundStyle(.white.opacity(0.7)).lineLimit(1)
+                    Text(model.caption).font(.system(size: 15, weight: .semibold)).foregroundStyle(.white.opacity(0.75)).lineLimit(1)
                 }
                 Text(statusText)
                     .font(.body.weight(.medium))
@@ -150,7 +157,7 @@ struct HandsFreeCapsule: View {
                     ThinkingOrb(state: .listening, size: 36, tempo: 0.7).frame(width: 40, height: 40)
                         .background(Circle().fill(Color.black.opacity(0.45)).overlay(Circle().strokeBorder(Color.white.opacity(0.25), lineWidth: 0.5)).frame(width: 34, height: 34))
                     if !model.caption.isEmpty {
-                        Text(model.caption).font(.system(size: 15, weight: .semibold)).foregroundStyle(.white.opacity(0.7)).lineLimit(1)
+                        Text(model.caption).font(.system(size: 15, weight: .semibold)).foregroundStyle(.white.opacity(0.75)).lineLimit(1)
                     }
                     Spacer(minLength: 0)
                 }
