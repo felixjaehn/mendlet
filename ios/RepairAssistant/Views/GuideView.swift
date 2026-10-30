@@ -107,11 +107,8 @@ struct GuideView: View {
             if !items.isEmpty {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Uses").overline()
-                    VStack(alignment: .leading, spacing: 2) {
-                        ForEach(Array(items.enumerated()), id: \.offset) { _, it in
-                            Text(Self.shortName(it.name)).font(.footnote).foregroundStyle(Theme.ink)
-                        }
-                    }
+                    Text(items.map { Self.shortName($0.name) }.joined(separator: ", "))
+                        .font(.footnote).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                 }
             }
             if let m = step.commonMistake, !m.isEmpty {
