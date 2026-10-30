@@ -87,6 +87,10 @@ def preview_prompt(req: AfterPreviewRequest) -> str:
                   "darning": "darning", "whip_stitch": "whip stitch"}.get(req.stitch_type or "")
         prompt += f"Neatly close or mend it with {stitch} in matching thread. " if stitch else \
             "Neatly close or mend it in matching thread. "
+        # Owner 2026-10-30: previews showed thick, contrasting thread and X-shaped stitches. A good mend is barely visible.
+        prompt += ("The mend is fine and barely visible from a normal viewing distance: thread exactly the fabric's colour and "
+                   "thickness, following the weave or knit, no contrasting thread, no thick or loose threads, no X or cross "
+                   "shapes, no visible knots. ")
     if req.repair_hint:
         prompt += f"Repair detail: {req.repair_hint.strip()}. "
     return prompt + "Keep the same object, exact colours, material, lighting, perspective and background; nothing else changed."

@@ -509,3 +509,8 @@ def test_step_prompt_shows_mid_repair_state_only():
                                            step_text='Lay parallel threads.'))
     assert 'Weave lengthwise threads' in p and 'nothing from later steps' in p and 'repaired state' not in p
     assert 'same framing' in p.lower()
+
+
+def test_textile_preview_asks_for_a_barely_visible_mend():
+    p = preview_prompt(AfterPreviewRequest(image_base64='x', diagnosis_summary='Small hole', stitch_type='darning'))
+    assert 'barely visible' in p and 'no contrasting thread' in p and 'no X' in p
