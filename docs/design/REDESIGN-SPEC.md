@@ -6,6 +6,8 @@ Reference images live in `docs/design/refs/<screen>/<app>-<n>.jpg` (downloaded f
 
 ---
 
+> Reference images (Mobbin screenshots of third-party apps) are not part of the repo. Each reference links to its Mobbin page; local copies: `/Volumes/Extreme SSD/signa-data/mendlet-design-refs/` (paths `refs/...` below are relative to that folder).
+
 ## 0. Diagnosis of the v7 app (why it reads as a hackathon demo)
 
 Looking at `v7-en-home / analysis / diagnosis-real-sweater / decision-replace / shopping / guide-real-sweater`:

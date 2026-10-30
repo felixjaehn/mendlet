@@ -23,3 +23,6 @@ xcuserdata/
 
 # macOS
 .DS_Store
+
+# Mobbin reference screenshots of third-party apps: kept locally on /Volumes/Extreme SSD/signa-data/mendlet-design-refs, never published
+docs/design/refs/
