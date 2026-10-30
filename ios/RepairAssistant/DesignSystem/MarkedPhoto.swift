@@ -183,6 +183,7 @@ private struct ZoomedStage<Overlay: View>: View, @preconcurrency Animatable {
                     }
                 }
                 overlay(size).frame(width: size.width, height: size.height)
+                    .environment(\.photoVisibleRect, CGRect(x: -origin.x, y: -origin.y, width: container.width, height: container.height))
                 if let onTap {
                     Color.white.opacity(0.001).frame(width: size.width, height: size.height).contentShape(Rectangle())
                         .onTapGesture(coordinateSpace: .local) { p in onTap(CGPoint(x: p.x / size.width, y: p.y / size.height)) }

@@ -21,9 +21,10 @@ struct GuideView: View {
                             .id(step.n)
                             .transition(.asymmetric(insertion: .move(edge: forward ? .trailing : .leading).combined(with: .opacity),
                                                     removal: .opacity))
-                            .padding(.horizontal, Theme.margin).padding(.top, 20).padding(.bottom, 20)
+                            .padding(.horizontal, Theme.margin).padding(.top, 20).padding(.bottom, 28)
                     }
                     .scrollIndicators(.hidden)
+                    .contentMargins(.bottom, 16, for: .scrollContent)
                     .clipped()
                     bottomBar(step)
                 }
@@ -76,7 +77,7 @@ struct GuideView: View {
         let polishedBody = CopyPolish.text(parts.body, english: english)
         let words = polishedBody.split(separator: " ").count
         let sentences = CopyPolish.sentences(polishedBody)
-        let long = words > 60 && sentences.count > 2
+        let long = words > 45 && sentences.count > 2
         let showAll = expanded.contains(step.n) || !long
         return VStack(alignment: .leading, spacing: 14) {
             Text("Step \(index + 1) of \(steps.count)").overline()

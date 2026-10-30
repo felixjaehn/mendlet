@@ -108,4 +108,6 @@ func segmentColor(_ segment: Segment, in all: [Segment]) -> Color {
 extension EnvironmentValues {
     /// Static render: animated overlays draw their final state, like with Reduce Motion.
     @Entry var staticRendering = false
+    /// Visible part of the photo in overlay coordinates (the overlay can be larger than the frame when zoomed).
+    @Entry var photoVisibleRect: CGRect? = nil
 }

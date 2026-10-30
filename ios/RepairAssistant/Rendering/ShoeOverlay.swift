@@ -38,6 +38,7 @@ struct ShoeOverlay: View {
     @Environment(\.staticRendering) private var staticRendering
     private var reduceMotion: Bool { systemReduceMotion || staticRendering }
 
+    @Environment(\.photoVisibleRect) private var visibleRect
     private var kind: ShoeStepKind { ShoeStepKind(step: step) }
     private var target: Segment? {
         if let id = step.overlay?.segmentId, let s = response.segment(id) { return s }
@@ -50,13 +51,34 @@ struct ShoeOverlay: View {
             if let s = target {
                 TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
                     Canvas { ctx, sz in
-                        Self.draw(&ctx, size: sz, segment: s, kind: kind, time: reduceMotion ? 1.2 : tl.date.timeIntervalSinceReferenceDate)
+                        Self.draw(&ctx, size: sz, segment: s, kind: kind, time: reduceMotion ? 1.2 : tl.date.timeIntervalSinceReferenceDate, clip: visibleRect)
                     }
                 }
                 .allowsHitTesting(false)
+                if kind.glue { glueLabel(for: s) }
             }
         }
         .frame(width: size.width, height: size.height)
+    }
+
+    /// One typographic label in the style of the finding labels: text, hairline leader, dot on the band. Always inside the photo.
+    @ViewBuilder private func glueLabel(for s: Segment) -> some View {
+        let pts = Self.contour(of: s, in: size)
+        let vis = (visibleRect ?? CGRect(origin: .zero, size: size)).insetBy(dx: 14, dy: 14)
+        let inside = pts.filter { vis.contains($0) }
+        if let anchor = inside.min(by: { $0.y < $1.y }) {
+            let text = tr("Glue here")
+            let w = LabelPlacer.width(text: text, score: nil, badge: nil), h = LabelPlacer.chipHeight
+            let rect = CGRect(x: min(max(anchor.x - w / 2, vis.minX), vis.maxX - w), y: max(vis.minY, anchor.y - 44 - h / 2), width: w, height: h)
+            ZStack(alignment: .topLeading) {
+                Path { p in p.move(to: anchor); p.addLine(to: CGPoint(x: min(max(anchor.x, rect.minX + 8), rect.maxX - 8), y: rect.maxY)) }
+                    .stroke(.white.opacity(0.8), style: StrokeStyle(lineWidth: 0.75, lineCap: .round)).shadow(color: .black.opacity(0.35), radius: 1.5)
+                Circle().fill(.white).frame(width: 4, height: 4).shadow(color: .black.opacity(0.35), radius: 1.5).position(anchor)
+                Text(text).font(.footnote.weight(.semibold)).foregroundStyle(.white).shadow(color: .black.opacity(0.35), radius: 2)
+                    .lineLimit(1).fixedSize().position(x: rect.midX, y: rect.midY)
+            }
+            .frame(width: size.width, height: size.height, alignment: .topLeading).allowsHitTesting(false)
+        }
     }
 
     // MARK: Geometry
@@ -94,7 +116,8 @@ struct ShoeOverlay: View {
 
     // MARK: Drawing
 
-    static func draw(_ ctx: inout GraphicsContext, size sz: CGSize, segment: Segment, kind: ShoeStepKind, time t: Double) {
+    static func draw(_ ctx: inout GraphicsContext, size sz: CGSize, segment: Segment, kind: ShoeStepKind, time t: Double, clip: CGRect? = nil) {
+        if let clip { ctx.clip(to: Path(roundedRect: clip.insetBy(dx: 14, dy: 14), cornerRadius: 10)) }
         let pts = contour(of: segment, in: sz)
         guard pts.count >= 3 else { return }
         var path = Path()
@@ -103,41 +126,11 @@ struct ShoeOverlay: View {
         path.closeSubpath()
         let amber = Theme.caution
 
-        // glue band: hatched, along the contour
+        // glue band: a calm translucent strip along the contour, no hatch, no extra marks
         let w: CGFloat = max(12, min(sz.width, sz.height) * 0.035)
         let band = path.strokedPath(StrokeStyle(lineWidth: w, lineJoin: .round))
-        ctx.fill(band, with: .color(amber.opacity(kind.glue ? 0.28 : 0.18)))
-        ctx.drawLayer { l in
-            l.clip(to: band)
-            var hatch = Path()
-            let b = path.boundingRect.insetBy(dx: -w, dy: -w)
-            let step: CGFloat = 7, drift = CGFloat((t * 6).truncatingRemainder(dividingBy: Double(step)))
-            var x = b.minX - b.height
-            while x < b.maxX {
-                hatch.move(to: CGPoint(x: x + drift, y: b.maxY)); hatch.addLine(to: CGPoint(x: x + drift + b.height, y: b.minY))
-                x += step
-            }
-            l.stroke(hatch, with: .color(amber.opacity(0.85)), lineWidth: 1.4)
-        }
+        ctx.fill(band, with: .color(amber.opacity(kind.glue ? 0.30 : 0.18)))
         ctx.stroke(band, with: .color(amber.opacity(0.9)), lineWidth: 1)
-
-        // brush strokes travelling along the contour (glue application)
-        if kind.glue {
-            for k in 0..<2 {
-                let p = (t * 0.22 + Double(k) * 0.5).truncatingRemainder(dividingBy: 1)
-                let tail = max(0, p - 0.2)
-                for (i, a) in [0.25, 0.5, 0.9].enumerated() {
-                    let from = tail + (p - tail) * Double(i) / 3
-                    let seg = path.trimmedPath(from: from, to: max(from + 0.001, p))
-                    ctx.stroke(seg, with: .color(Color.white.opacity(a * 0.45)), style: StrokeStyle(lineWidth: w * 0.55, lineCap: .round, lineJoin: .round))
-                    ctx.stroke(seg, with: .color(amber.opacity(a)), style: StrokeStyle(lineWidth: w * 0.35, lineCap: .round, lineJoin: .round))
-                }
-                if let head = path.trimmedPath(from: max(0, p - 0.002), to: p).currentPoint {
-                    ctx.fill(Path(ellipseIn: CGRect(x: head.x - 5, y: head.y - 5, width: 10, height: 10)), with: .color(.white))
-                    ctx.stroke(Path(ellipseIn: CGRect(x: head.x - 5, y: head.y - 5, width: 10, height: 10)), with: .color(amber), lineWidth: 2)
-                }
-            }
-        }
 
         // press arrows perpendicular to the sole edge
         if kind.press {

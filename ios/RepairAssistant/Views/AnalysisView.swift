@@ -60,19 +60,22 @@ struct AnalysisView: View {
             } else {
                 VStack(spacing: 14) {
                     Button { showTrace.toggle() } label: {
-                        Text(tr(phases[phaseIndex]))
-                            .font(.title3.weight(.semibold)).foregroundStyle(Theme.ink)
-                            .contentTransition(.opacity)
-                            .frame(maxWidth: .infinity, minHeight: 44)
+                        Group {
+                            if showTrace {
+                                Text(tr(phases[phaseIndex]))
+                                    .font(.title3.weight(.semibold)).foregroundStyle(Theme.ink)
+                                    .frame(maxWidth: .infinity, minHeight: 44)
+                            } else {
+                                stageList
+                            }
+                        }
+                        .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(tr(phases[phaseIndex]))
-                    .animation(.easeInOut(duration: 0.25), value: phaseIndex)
-                    PhaseDots(current: phaseIndex)
                     if showTrace {
                         ScrollView {
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("Behind the scenes").font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkSecondary)
                                 AgentTraceView(steps: flow.agentSteps, active: activeWork, replay: flow.settings.demoMode)
                             }
                             .padding(.horizontal, Theme.margin).padding(.top, 8)
@@ -88,6 +91,29 @@ struct AnalysisView: View {
         .background(Theme.surface, in: UnevenRoundedRectangle(topLeadingRadius: Theme.heroRadius, topTrailingRadius: Theme.heroRadius, style: .continuous))
         .padding(.top, -Theme.heroRadius)
         .padding(.bottom, 0)
+    }
+
+    /// Quiet checklist of the four stages: done = check, current = bold with spinner, upcoming = tertiary.
+    /// Rows change state without cross-fading text, so a screenshot at any moment shows one legible line per stage.
+    private var stageList: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            ForEach(Array(phases.enumerated()), id: \.offset) { i, title in
+                HStack(spacing: 14) {
+                    ZStack {
+                        if i < phaseIndex { Image(systemName: "checkmark").font(.system(size: 13, weight: .bold)).foregroundStyle(Theme.inkSecondary) }
+                        else if i == phaseIndex { ProgressView().controlSize(.small) }
+                        else { Circle().stroke(Theme.hairline, lineWidth: 1.5).frame(width: 12, height: 12) }
+                    }
+                    .frame(width: 22, height: 22)
+                    Text(tr(title))
+                        .font(i == phaseIndex ? .title3.weight(.semibold) : .title3)
+                        .foregroundStyle(i == phaseIndex ? Theme.ink : (i < phaseIndex ? Theme.inkSecondary : Theme.inkTertiary))
+                    Spacer(minLength: 0)
+                }
+            }
+        }
+        .padding(.horizontal, Theme.margin + 8).padding(.top, 4)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func errorBlock(_ err: String) -> some View {
