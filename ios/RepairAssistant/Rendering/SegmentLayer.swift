@@ -45,7 +45,7 @@ struct SegmentLayer: View {
 
     // MARK: Drawing
 
-    /// Calm marking style (spec 4.1): damage = faint white tint and a thin white contour over a dark hairline, parts = a quiet
+    /// Calm marking style: damage = faint white tint and a thin white contour over a dark hairline, parts = a quiet
     /// hairline. No glow, no ring, no marching ants. Box-only segments get corner brackets.
     static func draw(_ ctx: inout GraphicsContext, size sz: CGSize, segment: Segment, color: Color, boost: Double,
                      time: Double, animated: Bool, drawn: CGFloat, reveal: Double?) {

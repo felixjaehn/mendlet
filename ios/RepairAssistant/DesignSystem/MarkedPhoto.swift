@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// The user's own photo with the damage marked: scrim with a lifted cut-out, a thin white contour, a typographic label.
-/// One component for Analysis (reveal), Finding, Verdict, Guide, Home and Project (docs/design/REDESIGN-SPEC.md section 4).
+/// One component for Analysis (reveal), Finding, Verdict, Guide, Home and Project.
 struct MarkedPhoto<Overlay: View>: View {
     enum Mode: Equatable {
         /// Final state: scrim, interior tint, outline, label.

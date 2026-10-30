@@ -37,7 +37,7 @@ struct StitchPlan: Equatable, Sendable {
     }
 }
 
-/// Pure geometry. No model calls (PRD FR-23, §16).
+/// Pure geometry. No model calls.
 enum StitchPathPlanner {
     struct Config: Sendable {
         var gridLongSide = 128

@@ -1,10 +1,10 @@
 import Foundation
 
-/// Display-only text polish for model copy (docs/design/REDESIGN-SPEC.md 5.3). Never changes what is stored or sent;
+/// Display-only text polish for model copy. Never changes what is stored or sent;
 /// German text is returned untouched. No other rewriting happens on the device.
 enum CopyPolish {
     private static let hedges = ["presumably ", "assumed ", "likely ", "probably ", "apparently "]
-    /// Owner 2026-10-30: no safety boilerplate in steps (older recordings still contain it). Whole sentences starting so are dropped.
+    /// No safety boilerplate in steps (older recordings still contain it). Whole sentences starting so are dropped.
     private static let safetyLeads = ["wear gloves", "wear disposable gloves", "ventilate", "work in a well-ventilated", "work in a ventilated",
                                       "keep your fingers", "keep fingers", "be careful", "take care"]
 

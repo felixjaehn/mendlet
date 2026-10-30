@@ -204,7 +204,7 @@ struct GuideView: View {
         .animation(Theme.spring, value: open)
     }
 
-    /// Owner 2026-10-30: no safety checkbox or "confirm safe" gate on steps. Dangerous items are blocked before any guide exists.
+    /// No safety checkbox or "confirm safe" gate on steps. Dangerous items are blocked before any guide exists.
     private func actions(last: Bool) -> some View {
         HStack(spacing: 8) {
             Button { go(to: index - 1) } label: {

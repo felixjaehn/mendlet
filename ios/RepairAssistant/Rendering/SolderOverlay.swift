@@ -202,7 +202,7 @@ struct SolderOverlay: View {
 
     static func draw(_ ctx: inout GraphicsContext, size sz: CGSize, wire: Segment?, end: Segment?, pad: Segment?,
                      time t: Double, animated: Bool, hold: Double) {
-        // One white style (docs/design/REDESIGN-SPEC.md 4.4): outlines of wire, bare end and pad, one route with an arrow,
+        // One white style: outlines of wire, bare end and pad, one route with an arrow,
         // a progress ring only while the hold timer runs. Polarity discs are drawn by the view.
         func outline(_ seg: Segment, corner: CGFloat, dashed: Bool = false) {
             let rings = SegmentLayer.ringPaths(for: seg, in: sz)
