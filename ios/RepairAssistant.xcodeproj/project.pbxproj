@@ -251,7 +251,7 @@
 		F4F482E47A76CEDA809866E9 /* ShoeOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoeOverlay.swift; sourceTree = "<group>"; };
 		F840728B0735157F950CDD07 /* StepHelpSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepHelpSheet.swift; sourceTree = "<group>"; };
 		FDC79702C1652A582742CF18 /* AnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisView.swift; sourceTree = "<group>"; };
-		"TEMP_E2F60668-FE02-4F02-AB97-21C23458B0CD" /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		"TEMP_C9AAED92-1730-4001-96FE-E201C86A728E" /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -481,10 +481,10 @@
 			path = Fixtures;
 			sourceTree = "<group>";
 		};
-		"TEMP_882B2B4D-0DEF-4B85-BA2F-3B3C7F9139A3" /* ios */ = {
+		"TEMP_5E0576F7-335A-4B74-80A6-9145AB947C2A" /* ios */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_E2F60668-FE02-4F02-AB97-21C23458B0CD" /* Config.xcconfig */,
+				"TEMP_C9AAED92-1730-4001-96FE-E201C86A728E" /* Config.xcconfig */,
 			);
 			path = ios;
 			sourceTree = "<group>";
@@ -789,7 +789,7 @@
 		};
 		88DB0C72E15D4B1747846766 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_E2F60668-FE02-4F02-AB97-21C23458B0CD" /* Config.xcconfig */;
+			baseConfigurationReference = "TEMP_C9AAED92-1730-4001-96FE-E201C86A728E" /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -823,7 +823,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_LANGUAGE = de;
 				DEVELOPMENT_TEAM = 4D7QB2HZ25;
@@ -926,7 +926,7 @@
 		};
 		FD9CD525F142F5622F8FDCCB /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_E2F60668-FE02-4F02-AB97-21C23458B0CD" /* Config.xcconfig */;
+			baseConfigurationReference = "TEMP_C9AAED92-1730-4001-96FE-E201C86A728E" /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -960,7 +960,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_LANGUAGE = de;
 				DEVELOPMENT_TEAM = 4D7QB2HZ25;

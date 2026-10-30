@@ -9,7 +9,7 @@ settings:
   base:
     SWIFT_VERSION: "6.0"
     MARKETING_VERSION: "1.0"
-    CURRENT_PROJECT_VERSION: "1"
+    CURRENT_PROJECT_VERSION: "2"
     CODE_SIGN_STYLE: Automatic
     DEVELOPMENT_TEAM: 4D7QB2HZ25
     DEVELOPMENT_LANGUAGE: de
@@ -30,6 +30,8 @@ targets:
     info:
       path: RepairAssistant/Info.plist
       properties:
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleDisplayName: Mendlet
         CFBundleDevelopmentRegion: en
         CFBundleLocalizations: [en]
@@ -63,6 +65,8 @@ targets:
     info:
       path: RepairWidgets/Info.plist
       properties:
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleDisplayName: Mendlet
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
