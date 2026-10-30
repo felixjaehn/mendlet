@@ -89,8 +89,6 @@ struct ShoppingListView: View {
             } label: {
                 HStack(alignment: .top, spacing: 14) {
                     CheckCircle(on: have).padding(.top, 1)
-                    Image(systemName: Self.symbol(item)).font(.system(size: 17)).foregroundStyle(Theme.inkSecondary)
-                        .frame(width: 24).padding(.top, 2).accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 3) {
                         Text(item.name).font(.body).foregroundStyle(have ? Theme.inkSecondary : Theme.ink)
                             .multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
@@ -115,23 +113,6 @@ struct ShoppingListView: View {
         }
         .padding(.horizontal, 16).padding(.vertical, 12)
         .frame(minHeight: 56)
-    }
-
-    /// Small SF Symbol matching what the item is.
-    static func symbol(_ item: ShoppingItem) -> String {
-        let n = (item.name + " " + item.searchTerm).lowercased()
-        func has(_ k: [String]) -> Bool { k.contains { n.contains($0) } }
-        if has(["scissor", "shears", "snip"]) { return "scissors" }
-        if has(["needle"]) { return "pencil.line" }
-        if has(["thread", "yarn", "floss", "spool"]) { return "scribble.variable" }
-        if has(["pin", "clip"]) { return "pin" }
-        if has(["patch", "fabric", "denim", "cloth", "iron-on", "interfacing"]) { return "square.on.square.dashed" }
-        if has(["glue", "adhesive", "cement", "epoxy", "tape"]) { return "drop.fill" }
-        if has(["solder"]) { return "flame" }
-        if has(["screwdriver", "screw", "wrench", "pliers", "tool"]) { return "wrench.and.screwdriver" }
-        if has(["sandpaper", "brush", "cleaner", "cloth", "wipe"]) { return "paintbrush" }
-        if has(["ruler", "tape measure", "measur", "chalk", "marker", "pen"]) { return "ruler" }
-        return item.kind == .tool ? "wrench.and.screwdriver" : "circle.dotted"
     }
 
     static func shopURL(_ item: ShoppingItem) -> URL? {
