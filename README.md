@@ -1,20 +1,26 @@
-# Repair Assistant: fix it on your own photo
+# Mendlet: fix it on your own photo
 
-Point your phone at a torn shirt, a split seam, a sneaker whose sole is coming off or a USB lamp with a broken wire. The app marks the damage pixel-accurately on **your** photo, tells you honestly whether to repair it yourself, go to a pro or replace it, shows your own item repaired before you start, builds a shopping list and guides you step by step. On textiles it draws the stitch path along the real tear, on shoes the glue zone, on electronics which wire goes to which pad.
+Point your phone at a sweater with a small hole, a sole worn through, a sneaker coming apart or a USB lamp with a broken wire. Mendlet outlines the damage pixel-accurately on **your** photo, tells you honestly whether to repair it yourself, take it to a pro or replace it, shows your own item repaired before you start, checks what you need and guides you step by step, with the stitch path, glue zone or solder route drawn on your photo. Unfinished repairs stay on Home as projects.
 
 > Meta Global AI Developer Hackathon 2026 · Indie track · Theme: **Build for Your World**
 
-**Why it matters:** Every second, one garbage truck of clothing is landfilled or burned worldwide (Ellen MacArthur Foundation). Every person in the EU throws away about 16 kg of textiles a year (EEA, 2022). Wearing clothes nine months longer cuts their footprint by up to 20 % (WRAP). Many of those items fail at one tear that could be fixed in 20 minutes. Sources and verification status: [`docs/impact.md`](docs/impact.md).
+**Who it is for:** people who own a needle and a tube of glue but throw things away because they don't know where to start. The hard part of a small repair is not the stitching, it is knowing *what exactly* is broken, *whether* it is worth fixing and *how* to start. That is what the app answers, on the item itself.
+
+**Why it matters:** Every second, one garbage truck of clothing is landfilled or burned worldwide (Ellen MacArthur Foundation). Every person in the EU throws away about 16 kg of textiles a year (EEA, 2022). Wearing clothes nine months longer cuts their footprint by up to 20 % (WRAP). Sources and verification status: [`docs/impact.md`](docs/impact.md).
+
+**Measured on real input** ([`docs/benchmark.md`](docs/benchmark.md)): 18 cases incl. two real phone photos. The small sweater hole covers 0.7 % of the photo and is still outlined exactly (Spark → SAM). The worn-through leather sole is sent to a cobbler, the threadbare T-shirt is honestly called a replace with ideas for a second life, and lithium batteries and cracked helmets are blocked before any instruction is written. Estimated cost of the sweater repair: €3–8 and about 30 minutes.
 
 ## Screenshots
 
-Demo mode, English, real recorded Meta API responses (`scripts/screenshots.sh` re-takes them).
+Demo mode, English, real recorded Meta API responses (`scripts/screenshots.sh` re-takes them). The sweater and the leather sole are real phone photos.
 
-| Agent log with recovery | Mask on the real tear | 3 holes, one label | Before / after (Muse Image) |
+| Repairs (projects) | Scan | Damage outlined (real photo) | Verdict |
 | --- | --- | --- | --- |
-| ![](docs/screenshots/v6-en-analysis-agent.png) | ![](docs/screenshots/v6-en-diagnosis-jeans.png) | ![](docs/screenshots/v6-en-diagnosis-sweater.png) | ![](docs/screenshots/v6-en-decision-slider.png) |
-| **Darning path from the mask** | **Wire → pad, with polarity** | **Glue zone, press direction, timer** | **Battery: blocked** |
-| ![](docs/screenshots/v6-en-guide-darning.png) | ![](docs/screenshots/v6-en-guide-solder.png) | ![](docs/screenshots/v6-en-guide-shoe.png) | ![](docs/screenshots/v6-en-blocked-battery.png) |
+| ![](docs/screenshots/v8-en-home.png) | ![](docs/screenshots/v8-en-scan.png) | ![](docs/screenshots/v8-en-finding-sweater.png) | ![](docs/screenshots/v8-en-verdict-repair.png) |
+| **Before you start** | **Darning path from the mask** | **Wire → pad, with polarity** | **Glue zone and timer** |
+| ![](docs/screenshots/v8-en-checklist.png) | ![](docs/screenshots/v8-en-guide-darning.png) | ![](docs/screenshots/v8-en-guide-solder.png) | ![](docs/screenshots/v8-en-guide-shoe.png) |
+| **Pro verdict (real sole)** | **Replace, second life** | **Battery: blocked** | **What happened (agent trace)** |
+| ![](docs/screenshots/v8-en-verdict-pro.png) | ![](docs/screenshots/v8-en-verdict-replace.png) | ![](docs/screenshots/v8-en-block-battery.png) | ![](docs/screenshots/v8-en-analysis-agent.png) |
 
 ## Not an image analyzer: what happens between photo and plan
 
