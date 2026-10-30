@@ -41,7 +41,7 @@ run project-done 8 -uiScreen projectDone
 run scan 6 -uiScreen scan
 run settings 4 -uiScreen settings
 run analysis-sweep 3 -uiScreen analysis -uiScenario real_sweater
-run analysis-reveal 6 -uiScreen analysis -uiScenario real_sweater
+run analysis-reveal 5.8 -uiScreen analysis -uiScenario textile_tear
 run analysis-agent 8 -uiScreen analysis -uiScenario textile_tear -recoveryTrace YES
 run finding-sweater 14 -uiScreen diagnosis -uiScenario real_sweater
 run finding-jeans 14 -uiScreen diagnosis -uiScenario textile_tear -recoveryTrace NO

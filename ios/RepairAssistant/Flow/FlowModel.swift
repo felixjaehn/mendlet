@@ -168,9 +168,9 @@ final class FlowModel {
         // let the last checkmark land before navigating
         Task { [weak self] in
             try? await Task.sleep(for: .milliseconds(600))
-            // the mark reveal (2.5 s) always runs to its end before the screen changes
+            // the mark reveal (3.6 s) always runs to its end before the screen changes
             if let t = self?.marksArrivedAt {
-                let left = t.timeIntervalSinceNow + 2.9
+                let left = t.timeIntervalSinceNow + 4.1
                 if left > 0 { try? await Task.sleep(for: .seconds(left)) }
             }
             guard let self, self.response?.caseId == r.caseId else { return }

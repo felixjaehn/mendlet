@@ -31,7 +31,7 @@ struct MarkedPhoto<Overlay: View>: View {
     @State private var revealDone = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    static var revealDuration: Double { 2.5 }
+    static var revealDuration: Double { 3.6 }
 
     var body: some View {
         GeometryReader { geo in
@@ -45,7 +45,10 @@ struct MarkedPhoto<Overlay: View>: View {
         .task(id: mode) {
             revealDone = false
             guard case .analysis(let arrival?) = mode else { return }
-            let wait = max(0, arrival.timeIntervalSinceNow + 1.9 + 0.12 * Double(max(damage.count - 1, 0)) + 0.4)
+            // soft haptic when the outline starts to draw, then once more when it closes and the label arrives
+            try? await Task.sleep(for: .seconds(max(0, arrival.timeIntervalSinceNow + 0.95)))
+            if !Task.isCancelled { Haptics.soft() }
+            let wait = max(0, arrival.timeIntervalSinceNow + 2.6 + 0.12 * Double(max(damage.count - 1, 0)))
             try? await Task.sleep(for: .seconds(wait))
             if !Task.isCancelled { Haptics.soft() }
             try? await Task.sleep(for: .seconds(max(0, arrival.timeIntervalSinceNow + Self.revealDuration)))
@@ -110,10 +113,10 @@ struct MarkedPhoto<Overlay: View>: View {
             let t = now.timeIntervalSince(arrival)
             s.scrim = 0.30 * easeOut(t / 0.5)
             s.sweep = t >= 0.2 && t <= 1.3 ? ease((t - 0.2) / 1.1) : nil
-            s.outline = (0..<n).map { ease((t - 0.9 - 0.12 * Double($0)) / 0.9) }
-            s.tint = 0.10 * ease((t - 1.5) / 0.5)
-            s.holeScale = 0.96 + 0.04 * CGFloat(easeOut((t - 1.5) / 0.6))
-            s.label = ease((t - 1.9) / 0.4)
+            s.outline = (0..<n).map { ease((t - 0.9 - 0.12 * Double($0)) / 1.7) }
+            s.tint = 0.10 * ease((t - 2.2) / 0.5)
+            s.holeScale = 0.96 + 0.04 * CGFloat(easeOut((t - 2.2) / 0.6))
+            s.label = ease((t - 2.7) / 0.5)
             s.zoomMix = ease((t - 0.9) / 0.9)
         }
         return s
