@@ -410,7 +410,8 @@ final class FlowModel {
         let c = SavedCase(id: r.caseId, createdAt: old?.createdAt ?? Date(), userNote: note, response: r,
                           shoppingStatus: statuses, currentStep: currentStep, completedSteps: completedSteps.sorted(),
                           finished: nowFinished, started: projectStarted || (old?.started ?? false), parked: projectParked || (old?.parked ?? false),
-                          finishedAt: nowFinished ? (old?.finishedAt ?? Date()) : nil)
+                          finishedAt: nowFinished ? (old?.finishedAt ?? Date()) : nil,
+                          scenario: old?.scenario ?? (settings.demoMode ? settings.scenario.rawValue : nil))
         store.upsert(c, image: photo)
     }
 
@@ -454,6 +455,7 @@ final class FlowModel {
         statuses = c.shoppingStatus; currentStep = c.currentStep; completedSteps = Set(c.completedSteps)
         projectStarted = c.started == true; projectParked = c.parked == true
         followUpUsed = true
+        if settings.demoMode, let raw = c.scenario, let s = DemoScenario(rawValue: raw) { settings.scenario = s }
     }
 
     func open(_ c: SavedCase) {

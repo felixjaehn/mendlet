@@ -339,7 +339,7 @@ extension HomeView {
             r.caseId = id
             let r2 = FlowGate.sanitized(r)
             let img = ImageResizer.resized(await DemoPhotos.imageAsync(for: s))
-            return SavedCase(id: id, createdAt: Date(), userNote: s.userNote, response: r2, shoppingStatus: [:], currentStep: 0, completedSteps: [], finished: false, started: true, parked: nil, finishedAt: nil).withImage(img, store: flow.store)
+            return SavedCase(id: id, createdAt: Date(), userNote: s.userNote, response: r2, shoppingStatus: [:], currentStep: 0, completedSteps: [], finished: false, started: true, parked: nil, finishedAt: nil, scenario: s.rawValue).withImage(img, store: flow.store)
         }
         var a = await make(.realSweater, id: "seed-sweater")!
         let required = a.response.shoppingList.filter(\.required)

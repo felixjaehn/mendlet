@@ -15,6 +15,8 @@ struct SavedCase: Codable, Sendable, Identifiable, Hashable {
     /// "Save for later" on a pro verdict: the project waits for a professional.
     var parked: Bool? = nil
     var finishedAt: Date? = nil
+    /// Demo mode only: which recorded scenario this project replays (its after-preview, recordings).
+    var scenario: String? = nil
 }
 
 struct RescueEntry: Codable, Sendable, Hashable {
