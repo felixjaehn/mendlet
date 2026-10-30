@@ -334,7 +334,7 @@ async def test_agent_full_loop_wire_steps_budget_and_contract(tmp_path):
             assert [t["name"] for t in data["tools"]] == ["segment", "segment_at", "locate", "verify_mask", "finish"]
             assert all(t["type"] == "function" and "function" not in t for t in data["tools"])  # flat format
             assert "previous_response_id" not in data and "nur die Wahrnehmung" in data["instructions"]
-            assert data["reasoning"] == {"effort": "minimal"}  # docs/reasoning: nested on the Responses API
+            assert data["reasoning"] == {"effort": "minimal"}  # nested on the Responses API
             assert next(t for t in data["tools"] if t["name"] == "finish")["parameters"]["properties"] == {}
             content = data["input"][0]["content"]
             assert content[0]["type"] == "input_text" and content[1]["image_url"].startswith("data:image/jpeg;base64,")
@@ -373,7 +373,7 @@ async def test_agent_full_loop_wire_steps_budget_and_contract(tmp_path):
         assert result.instances == {"rip": 1} and result.guide.steps
         assert set(result.diagnosis.evidence_segment_ids) <= {"seg_1"}  # plan from prompt B, only kept segments
         assert ("/v1/chat/completions", "muse-spark-1.3") in script.paths
-        # three Wonder rounds at $4/$20 per 1M tokens (UNBESTÄTIGT only for live billing, price from the docs)
+        # three Wonder rounds at $4/$20 per 1M tokens (UNCONFIRMED only for live billing, price from the docs)
         assert len(script.wonder) == 3 and c.budget.spent_today() >= 3 * wonder_cost(1000, 200)
         assert wonder_cost(1_000_000, 1_000_000) == pytest.approx(24.0)
         assert wonder_cost(1_000_000, 0, cached_tokens=1_000_000) == pytest.approx(0.2)

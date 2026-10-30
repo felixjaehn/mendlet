@@ -1,4 +1,4 @@
-"""Analysis pipeline (PRD section 6): classify -> segment -> diagnose+plan, with safety enforcement."""
+"""Analysis pipeline: classify -> segment -> diagnose+plan, with safety enforcement."""
 
 import asyncio
 import logging
@@ -24,7 +24,6 @@ from .sam import SEGMENT_PROMPTS
 
 log = logging.getLogger("proxy.pipeline")
 
-STAGES: tuple[Stage, ...] = ("classify", "segment", "diagnose", "plan")
 STAGE_LABELS: dict[str, str] = i18n.STAGE_LABELS["de"]  # German default; use stage_label() for a locale
 
 
@@ -189,7 +188,7 @@ async def _classic_segments(
         raise
     except AppError as exc:
         await asyncio.gather(ground_task, return_exceptions=True)
-        # PRD §6: continue with text guidance when segmentation is unavailable.
+        # Continue with text guidance when segmentation is unavailable.
         log.warning("segmentation unavailable: %s", exc.code)
         segments = []
     return segments

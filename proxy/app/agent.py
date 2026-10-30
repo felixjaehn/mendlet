@@ -1,6 +1,6 @@
 """Muse Wonder agent mode (AGENT_MODE=wonder): a tool-calling loop on the Responses API.
 
-Facts (docs/agent-notes.md, primary docs): flat function tools, `function_call` output items,
+Facts (Meta Model API docs): flat function tools, `function_call` output items,
 `function_call_output` inputs with `previous_response_id`, tool_choice only "auto", parallel calls
 possible, our own round cap. The deterministic safety/classify step runs BEFORE this and is never delegated.
 Any failure of the loop (no/invalid `finish`, round cap, upstream error) falls back to the classic pipeline.
@@ -388,7 +388,7 @@ class WonderAgent:
                 tool_choice="auto",
                 parallel_tool_calls=True,
                 max_output_tokens=c.s.muse_max_completion_tokens,
-                # docs/reasoning: Responses API nests the effort; "low" keeps the perception loop fast.
+                # Responses API nests the effort; "low" keeps the perception loop fast.
                 reasoning={"effort": c.s.wonder_reasoning_effort},
                 **kw,
             )

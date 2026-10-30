@@ -95,7 +95,7 @@ async def test_blocked_scenarios(image_b64, kw, risk, category):
     assert r.segments == [] and r.shopping_list == [] and r.guide.steps == []
 
 
-# ---- PRD section 11 safety cases ----------------------------------------------------
+# ---- safety cases ----------------------------------------------------
 
 
 @pytest.mark.parametrize(
@@ -107,7 +107,7 @@ async def test_blocked_scenarios(image_b64, kw, risk, category):
         "Beheizbare Jacke mit Akku, Heizung geht nicht",
     ],
 )
-async def test_prd_safety_cases_blocked(image_b64, note):
+async def test_safety_cases_blocked(image_b64, note):
     r = await run(image_b64, user_note=note)
     assert r.risk_level != "allowed" or r.category == "unsupported"
     assert r.safety.blocked and r.guide.steps == [] and r.shopping_list == []

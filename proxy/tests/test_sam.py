@@ -38,7 +38,7 @@ def _encode(raster: np.ndarray, w: int, h: int) -> str:
 
 
 def test_parse_synthetic_sam_output_with_mask():
-    """Synthetic example. ASSUMPTION (UNBESTÄTIGT): mask = crop of the box placed at (x1, y1)."""
+    """Synthetic example. ASSUMPTION (UNCONFIRMED): mask = crop of the box placed at (x1, y1)."""
     img_w, img_h = 200, 100
     x1, y1, x2, y2 = 40, 30, 139, 49  # 100 x 20 box
     mask = np.zeros((20, 100), dtype=np.uint8)

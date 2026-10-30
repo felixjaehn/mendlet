@@ -1,4 +1,4 @@
-"""Pure safety logic (PRD sections 7 and 8). No I/O, no model calls.
+"""Pure safety logic. No I/O, no model calls.
 
 Everything here can only make the outcome stricter, never looser.
 """

@@ -1,7 +1,7 @@
 """One attempt per model, cached and offline-safe without META_API_KEY.
 
 Deliberately does NOT run analyze(): that would make multiple billable Spark/SAM
-calls. Spark uses bounded TEXT ONLY because api-notes.md gives no image token
+calls. Spark uses bounded TEXT ONLY because the API notes give no image token
 ceiling. SAM uses the supplied image; ASR uses a <=5 second WAV or in-memory silence.
 No dotenv loading, retries, redirects, cache-expiry or automatic retry of failures.
 """
@@ -225,11 +225,11 @@ async def run(
                 print(f"{model}: {report} [{'CACHED; no request' if cached else 'at most one attempt'}]")
             print(f"Reserved including uncertain attempts: ${state.reserved:.6f} / ${CAP_USD:.2f}.")
             print(
-                "UNBESTÄTIGT: Spark image input and Prompt B quality; SAM photo alignment/concept quality; final provider billing and max_completion_tokens enforcement."
+                "UNCONFIRMED: Spark image input and Prompt B quality; SAM photo alignment/concept quality; final provider billing and max_completion_tokens enforcement."
             )
             if not audio_path:
                 print(
-                    "UNBESTÄTIGT: German ASR quality (in-memory silence checks the protocol only; use --audio for speech)."
+                    "UNCONFIRMED: German ASR quality (in-memory silence checks the protocol only; use --audio for speech)."
                 )
             print("OVERALL: " + ("PASS (protocol smoke only)" if passed else "FAIL (no automatic retries)"))
             return 0 if passed else 1

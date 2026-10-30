@@ -240,7 +240,7 @@ def parse_sam_output(
     """Documented key=value wire records -> validated boxes and polygons.
 
     The official library confirms box-local half-open mask bounds offline. Actual
-    non-stream response envelopes and placement on real photos are UNBESTÄTIGT.
+    non-stream response envelopes and placement on real photos are UNCONFIRMED.
     Invalid masks degrade to boxes; invalid coordinates/frames are discarded.
     """
     if img_w <= 0 or img_h <= 0:

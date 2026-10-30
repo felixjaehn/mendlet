@@ -361,7 +361,7 @@ class RealMetaClient:
         text = self.cache.get(key)
         if text is None:
             self.budget.check()
-            # SAM's documented examples use PNG; JPEG support is UNBESTÄTIGT.
+            # SAM's documented examples use PNG; JPEG support is UNCONFIRMED.
             png = io.BytesIO()
             with Image.open(io.BytesIO(base64.b64decode(image_b64))) as image:
                 image.convert("RGB").save(png, format="PNG")

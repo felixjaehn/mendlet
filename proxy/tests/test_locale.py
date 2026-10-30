@@ -4,7 +4,6 @@ import json
 
 from app import i18n, safety
 from app.agent import WonderAgent
-from app.config import REPO_DIR
 from app.errors import AppError, BudgetExceeded
 from app.mock_client import MockClient
 from app.pipeline import analyze, stage_label
@@ -41,11 +40,8 @@ def test_prompt_versions_and_language_placeholder():
     assert "Write all user-facing texts in German" in de
     assert "{language}" not in en and "{estimate_note}" not in en
     assert 'estimate_note="Estimate"' in en and 'estimate_note="Schätzung"' in de
-    # default stays German, v4 is kept untouched
+    # default stays German
     assert load_prompt("diagnose") == de
-    assert "Alle Texte sind auf Deutsch" in (REPO_DIR / "prompts" / "prompt_b_diagnose.v4.txt").read_text(
-        encoding="utf-8"
-    )
     for key in ("classify", "step_help"):
         assert "Write" in load_prompt(key, locale="en") and "English" in load_prompt(key, locale="en")
         assert "German" in load_prompt(key, locale="de")

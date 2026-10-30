@@ -1,4 +1,4 @@
-"""Pydantic models mirroring the JSON contract in PRD section 8."""
+"""Pydantic models mirroring the JSON API contract (see API.md)."""
 
 from typing import Annotated, Literal
 
