@@ -184,8 +184,97 @@ struct StitchPathView: View {
         return head
     }
 
+    // MARK: Crafted stitch diagram
+
+    private let stitchLen: CGFloat = 3, stitchGap: CGFloat = 2
+
+    private func maskPath(_ size: CGSize) -> Path? {
+        guard !plan.mask.isEmpty else { return nil }
+        var path = Path()
+        for ring in plan.mask where ring.count >= 3 {
+            path.addLines(ring.map { px($0, size) }); path.closeSubpath()
+        }
+        return path
+    }
+
+    /// Dark under-stroke plus white thread, both dashed.
+    private func strokeDashed(_ ctx: inout GraphicsContext, _ path: Path, phase: CGFloat, dash: [CGFloat]) {
+        ctx.stroke(path, with: .color(.black.opacity(0.6)), style: StrokeStyle(lineWidth: 3.0, lineCap: .butt, dash: dash, dashPhase: phase))
+        ctx.stroke(path, with: .color(.white), style: StrokeStyle(lineWidth: 1.5, lineCap: .butt, dash: dash, dashPhase: phase))
+    }
+
+    private func drawArrow(_ ctx: inout GraphicsContext, at m: CGPoint, from a: CGPoint, to b: CGPoint) {
+        let ang = atan2(b.y - a.y, b.x - a.x)
+        var c = ctx
+        c.translateBy(x: m.x, y: m.y); c.rotate(by: .radians(Double(ang)))
+        var arrow = Path()
+        arrow.move(to: CGPoint(x: -7, y: 0)); arrow.addLine(to: CGPoint(x: 6, y: 0))
+        arrow.move(to: CGPoint(x: 1.5, y: -4)); arrow.addLine(to: CGPoint(x: 6.5, y: 0)); arrow.addLine(to: CGPoint(x: 1.5, y: 4))
+        c.stroke(arrow, with: .color(.black.opacity(0.6)), style: StrokeStyle(lineWidth: 3.4, lineCap: .round, lineJoin: .round))
+        c.stroke(arrow, with: .color(.white), style: StrokeStyle(lineWidth: 1.6, lineCap: .round, lineJoin: .round))
+    }
+
+    private func drawDarning(_ ctx: inout GraphicsContext, _ size: CGSize, progress: Double) {
+        let rows = plan.gridLines.compactMap { l -> (CGPoint, CGPoint)? in
+            guard l.count == 2 else { return nil }
+            return (px(l[0], size), px(l[1], size))
+        }
+        guard !rows.isEmpty else { return }
+        let nWarp = min(plan.firstDirectionCount, rows.count)
+        let animated: Range<Int> = phase == .first ? 0..<nWarp : phase == .second ? nWarp..<rows.count : 0..<rows.count
+        let staticRows: Range<Int> = phase == .second ? 0..<nWarp : 0..<0
+        let shown = progress >= 1 ? animated.count : min(animated.count, Int(progress * Double(animated.count)) + 1)
+        let activeIdx = progress >= 1 ? animated.lowerBound + animated.count / 2 : animated.lowerBound + shown - 1
+        let rowProgress = progress >= 1 ? 1 : (progress * Double(animated.count)) - Double(shown - 1)
+        let dash = [stitchLen, stitchGap]
+        ctx.drawLayer { l in
+            if let m = maskPath(size) { l.clip(to: m, style: FillStyle(eoFill: true)) }
+            for i in staticRows {
+                var p = Path(); p.move(to: rows[i].0); p.addLine(to: rows[i].1)
+                strokeDashed(&l, p, phase: i % 2 == 0 ? 0 : 2.5, dash: dash)
+            }
+            for k in 0..<shown {
+                let i = animated.lowerBound + k
+                let f = (k == shown - 1 && progress < 1) ? CGFloat(min(1, max(0.02, rowProgress))) : 1
+                var p = Path(); p.move(to: rows[i].0); p.addLine(to: lerp(rows[i].0, rows[i].1, f))
+                strokeDashed(&l, p, phase: i % 2 == 0 ? 0 : 2.5, dash: dash)
+            }
+        }
+        if rows.indices.contains(activeIdx) {
+            let r = rows[activeIdx]
+            drawArrow(&ctx, at: lerp(r.0, r.1, progress >= 1 ? 0.5 : max(0.1, CGFloat(rowProgress) * 0.9)), from: r.0, to: r.1)
+        }
+    }
+
+    private func drawLadder(_ ctx: inout GraphicsContext, _ size: CGSize, progress: Double) {
+        let pts = plan.stitches.map { px($0.position, size) }
+        guard pts.count >= 2 else { return }
+        let legs = pts.count - 1
+        let shown = progress >= 1 ? legs : min(legs, Int(progress * Double(legs)) + 1)
+        for i in 0..<legs {
+            let a = pts[i], b = pts[i + 1]
+            let d = max(hypot(b.x - a.x, b.y - a.y), 1)
+            let inset = min(3 / d, 0.3)
+            let s = lerp(a, b, inset), e = lerp(a, b, 1 - inset)
+            // hole at the entry point of every leg
+            let r: CGFloat = 2.2
+            let hole = Path(ellipseIn: CGRect(x: a.x - r, y: a.y - r, width: r * 2, height: r * 2))
+            if i < shown { ctx.stroke(hole, with: .color(.white.opacity(0.9)), lineWidth: 1); }
+            if plan.running && i % 2 == 1 { continue }
+            guard i < shown else { continue }
+            let f: CGFloat = (i == shown - 1 && progress < 1) ? CGFloat(min(1, max(0.1, progress * Double(legs) - Double(i)))) : 1
+            var p = Path(); p.move(to: s); p.addLine(to: lerp(s, e, f))
+            ctx.stroke(p, with: .color(.black.opacity(0.6)), style: StrokeStyle(lineWidth: 3.2, lineCap: .round))
+            ctx.stroke(p, with: .color(.white), style: StrokeStyle(lineWidth: 1.7, lineCap: .round))
+        }
+        let ai = min(legs - 1, progress >= 1 ? legs / 2 : shown - 1)
+        drawArrow(&ctx, at: lerp(pts[ai], pts[ai + 1], 0.5), from: pts[ai], to: pts[ai + 1])
+    }
+
     private func draw(_ ctx: inout GraphicsContext, _ size: CGSize, progress: Double, alpha: Double) {
         ctx.opacity = alpha
+        if plan.kind == .darning { drawDarning(&ctx, size, progress: progress); return }
+        if plan.kind == .stitches { drawLadder(&ctx, size, progress: progress); return }
         let thread = Theme.highlight
         var tr: Trace
         switch plan.kind {

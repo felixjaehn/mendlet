@@ -20,6 +20,10 @@ struct StitchPlan: Equatable, Sendable {
     var warpStrokes: [StitchPathPlanner.DarnStroke] = []
     var weftStrokes: [StitchPathPlanner.DarnStroke] = []
     var isFallback = false
+    /// Running stitch: only every other leg is visible on top of the fabric.
+    var running = false
+    /// Damage mask rings (normalized) the stitch rows are clipped to; empty = no clipping.
+    var mask: [[CGPoint]] = []
     static let empty = StitchPlan()
 
     /// Keeps every point inside `r` (normalized image coordinates).
@@ -50,6 +54,7 @@ enum StitchPathPlanner {
 
     static func plan(polygon: [CGPoint], box: CGRect?, stitchType: StitchType, aspect: CGFloat = 1, config: Config = Config()) -> StitchPlan {
         var p = rawPlan(polygon: polygon, box: box, stitchType: stitchType, aspect: aspect, config: config)
+        p.running = stitchType == .runningStitch
         let clean = polygon.filter { $0.x.isFinite && $0.y.isFinite }
         var r: CGRect? = clean.count >= 3 ? bounds(clean) : box
         if let b = r, b.width <= 1e-5 || b.height <= 1e-5 { r = box }
@@ -453,7 +458,9 @@ enum StitchPathPlanner {
 
     /// Convenience for a segment.
     static func plan(for segment: Segment, stitchType: StitchType, aspect: CGFloat) -> StitchPlan {
-        plan(polygon: segment.polygon, box: segment.normalizedBox, stitchType: stitchType, aspect: aspect)
+        var p = plan(polygon: segment.polygon, box: segment.normalizedBox, stitchType: stitchType, aspect: aspect)
+        p.mask = segment.ringPolygons.map(\.points)
+        return p
     }
 }
 
