@@ -138,70 +138,44 @@ enum OrbEngine {
     }
 }
 
-/// Luminous dotted orb: the library geometry, dots tinted cyan, violet, magenta by depth and position, over a soft halo.
+/// Dotted orb, painted exactly like the library: matte grayscale dots, z-sorted far to near. On the dark glass the ink
+/// value is mirrored (1 - white) so near dots read bright (core.ts `paint`). No colour, no glow: the original look.
 struct ThinkingOrb: View {
     var state: OrbState = .listening
     /// Rendered edge length in points (the 64 pt geometry is scaled to it).
     var size: CGFloat = 44
     /// Speed multiplier on the library preset (1 = as shipped).
     var tempo: Double = 1
-    /// Microphone level 0...1: scales the orb with a spring.
+    /// Microphone level 0...1: the orb breathes slightly with the voice.
     var level: Float = 0
+    /// Dark substrate (the voice glass is dark in both appearances).
+    var dark = true
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private static let cyan = (r: 0.30, g: 0.86, b: 1.00)
-    private static let violet = (r: 0.55, g: 0.45, b: 1.00)
-    private static let magenta = (r: 1.00, g: 0.36, b: 0.75)
-
-    private static func tint(_ u: Double) -> Color {
-        let u = min(1, max(0, u))
-        let (a, b, f) = u < 0.5 ? (cyan, violet, u * 2) : (violet, magenta, (u - 0.5) * 2)
-        return Color(red: a.r + (b.r - a.r) * f, green: a.g + (b.g - a.g) * f, blue: a.b + (b.b - a.b) * f)
-    }
-
     var body: some View {
-        ZStack {
-            // halo and core glow behind the dots
-            Circle()
-                .fill(RadialGradient(colors: [Color(red: 0.55, green: 0.5, blue: 1).opacity(0.55), Color(red: 0.3, green: 0.85, blue: 1).opacity(0.22), .clear],
-                                     center: .center, startRadius: 0, endRadius: size * 0.78))
-                .frame(width: size * 1.6, height: size * 1.6)
-                .blur(radius: size * 0.12)
-            Circle()
-                .fill(RadialGradient(colors: [Color(red: 0.75, green: 0.6, blue: 1).opacity(0.45), .clear], center: .center, startRadius: 0, endRadius: size * 0.36))
-                .frame(width: size * 0.8, height: size * 0.8)
-                .blur(radius: 3)
-            Group {
-                if reduceMotion {
-                    orb(t: OrbEngine.staticTime)
-                } else {
-                    TimelineView(.animation) { tl in
-                        orb(t: tl.date.timeIntervalSinceReferenceDate * OrbEngine.speed(state) * tempo)
-                    }
+        Group {
+            if reduceMotion {
+                orb(t: OrbEngine.staticTime)
+            } else {
+                TimelineView(.animation) { tl in
+                    orb(t: tl.date.timeIntervalSinceReferenceDate * OrbEngine.speed(state) * tempo)
                 }
             }
-            .frame(width: size, height: size)
         }
         .frame(width: size, height: size)
-        .scaleEffect(1 + 0.2 * CGFloat(level))
-        .animation(reduceMotion ? nil : .interpolatingSpring(stiffness: 220, damping: 14), value: level)
+        .scaleEffect(1 + 0.08 * CGFloat(level))
+        .animation(reduceMotion ? nil : .interpolatingSpring(stiffness: 220, damping: 18), value: level)
         .accessibilityHidden(true)
     }
 
     private func orb(t: Double) -> some View {
         Canvas { ctx, canvasSize in
             let k = canvasSize.width / OrbEngine.size
-            ctx.blendMode = .plusLighter
             for d in OrbEngine.frame(state, t: t) {
-                let depth = min(1, max(0, (d.z / 28 + 1) / 2))
-                // position along the diagonal mixes with depth so the colour sweeps across the sphere
-                let pos = ((d.x - 32) + (32 - d.y)) / 90 + 0.5
-                let u = 0.55 * (1 - depth) + 0.45 * pos
-                let r = d.r * 1.25
-                let rect = CGRect(x: (d.x - r) * k, y: (d.y - r) * k, width: r * 2 * k, height: r * 2 * k)
-                let alpha = d.a * (0.45 + 0.55 * depth)
-                ctx.fill(Path(ellipseIn: rect.insetBy(dx: -k * 0.7, dy: -k * 0.7)), with: .color(Self.tint(u).opacity(alpha * 0.28)))
-                ctx.fill(Path(ellipseIn: rect), with: .color(Self.tint(u).opacity(alpha)))
+                let w = min(1, max(0, d.white))
+                let g = dark ? 1 - w : w
+                let rect = CGRect(x: (d.x - d.r) * k, y: (d.y - d.r) * k, width: d.r * 2 * k, height: d.r * 2 * k)
+                ctx.fill(Path(ellipseIn: rect), with: .color(Color(white: g).opacity(d.a)))
             }
         }
     }

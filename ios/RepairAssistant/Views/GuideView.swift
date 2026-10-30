@@ -32,7 +32,7 @@ struct GuideView: View {
                                 .frame(width: geo.size.width, height: geo.size.height).clipped()
                                 .overlay(alignment: .topTrailing) { previewTag.padding(.top, geo.safeAreaInsets.top + 112).padding(.trailing, Theme.margin) }
                         } else {
-                            photo(step, r, size: geo.size)
+                            photo(step, r, geo: geo)
                         }
                     }
                     .id("\(step.n)-\(showMuse)")
@@ -44,16 +44,25 @@ struct GuideView: View {
                             .frame(height: geo.safeAreaInsets.top + 90).allowsHitTesting(false)
                         Spacer(minLength: 0)
                     }
-                    panel(step, r, bottomInset: geo.safeAreaInsets.bottom, maxHeight: geo.size.height * 0.7)
-                        .id(step.n)
-                        .transition(.opacity)
-                        .opacity(handsFree.isActive ? 0.4 : 1)
-                        .offset(y: handsFree.isActive ? 14 : 0)
-                        .animation(Theme.spring, value: handsFree.isActive)
-                        .overlay(alignment: .top) {
-                            HandsFreeCapsule(model: handsFree, maxHeight: geo.size.height * 0.3)
-                                .alignmentGuide(VerticalAlignment.top) { $0[.bottom] + 12 }
+                    Group {
+                        if handsFree.isActive {
+                            compactBar(step, bottomInset: geo.safeAreaInsets.bottom)
+                                .transition(.move(edge: .bottom).combined(with: .opacity))
+                        } else {
+                            panel(step, r, bottomInset: geo.safeAreaInsets.bottom, maxHeight: geo.size.height * 0.7)
+                                .id(step.n)
+                                .transition(.opacity)
                         }
+                    }
+                    .animation(Theme.spring, value: handsFree.isActive)
+                    if handsFree.isActive {
+                        let lay = voicePlacement(r, geo: geo)
+                        HandsFreeCapsule(model: handsFree, maxHeight: lay.voice.height)
+                            .frame(width: geo.size.width, alignment: .bottom)
+                            .frame(height: lay.voice.height, alignment: .bottom)
+                            .padding(.bottom, geo.size.height - lay.voice.maxY)
+                            .transition(.opacity)
+                    }
                     topArea(step, hasStepImage: stepPhoto != nil, topInset: geo.safeAreaInsets.top)
                         .frame(maxHeight: .infinity, alignment: .top)
                         .opacity(handsFree.isActive ? 0.4 : 1)
@@ -149,10 +158,60 @@ struct GuideView: View {
 
     // MARK: Photo
 
-    private func photo(_ step: GuideStep, _ r: AnalyzeResponse, size: CGSize) -> some View {
-        Group {
+    private static let barContentHeight: CGFloat = 50
+    private static let baseAnchor: CGFloat = 0.33
+
+    private func barHeight(_ geo: FullGeo) -> CGFloat { Self.barContentHeight + 14 + max(geo.safeAreaInsets.bottom, 12) }
+
+    /// The work area on screen at the normal anchor: damage bounds scaled by the zoom, padded for stitch overlay and labels.
+    private func workRect(_ r: AnalyzeResponse, size: CGSize) -> CGRect {
+        let boxes = r.segments.filter(\.isDamage).compactMap(\.normalizedBounds).filter { $0.height > 0 }
+        let cy = size.height * Self.baseAnchor
+        guard let img = flow.photo, let first = boxes.first else { return CGRect(x: 0, y: cy - 90, width: size.width, height: 180) }
+        let u = boxes.dropFirst().reduce(first) { $0.union($1) }
+        let zoom = MarkedPhoto<EmptyView>.targetZoom(image: img, focus: DamageFocus.region(for: r.segments), container: size)
+        let fill = AspectFit.fillSize(content: img.size, in: size)
+        let h = u.height * fill.height * zoom, w = u.width * fill.width * zoom
+        let pad: CGFloat = 44
+        return CGRect(x: (size.width - w) / 2 - pad, y: cy - h / 2 - pad, width: w + 2 * pad, height: h + 2 * pad)
+    }
+
+    private func voicePlacement(_ r: AnalyzeResponse, geo: FullGeo) -> VoiceLayout.Placement {
+        let H = geo.size.height
+        let vh: CGFloat = handsFree.answer != nil ? min(H * 0.34, 270) : 80
+        return VoiceLayout.place(container: geo.size, work: workRect(r, size: geo.size), topReserved: geo.safeAreaInsets.top + 70,
+                                 barTop: H - barHeight(geo), voiceHeight: vh)
+    }
+
+    private func photoAnchor(_ r: AnalyzeResponse, geo: FullGeo) -> CGFloat {
+        let size = geo.size
+        guard handsFree.isActive else { return Self.baseAnchor }
+        return Self.baseAnchor - voicePlacement(r, geo: geo).photoShift / max(size.height, 1)
+    }
+
+    /// Collapsed panel while hands-free is on: opaque, same material, step line and Done only.
+    private func compactBar(_ step: GuideStep, bottomInset: CGFloat) -> some View {
+        let last = index == steps.count - 1
+        return HStack(spacing: 12) {
+            Text("Step \(index + 1) of \(steps.count) · \(step.title)")
+                .font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
+                .lineLimit(2).multilineTextAlignment(.leading)
+            Spacer(minLength: 8)
+            Button { advance(last: last) } label: { Text(last ? "Finish" : "Done").lineLimit(1) }
+                .buttonStyle(PrimaryButtonStyle(kind: .primary))
+                .frame(width: 104)
+        }
+        .frame(height: Self.barContentHeight)
+        .padding(.horizontal, Theme.margin).padding(.top, 14).padding(.bottom, max(bottomInset, 12))
+        .frame(maxWidth: .infinity)
+        .background(.regularMaterial, in: UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous))
+    }
+
+    private func photo(_ step: GuideStep, _ r: AnalyzeResponse, geo: FullGeo) -> some View {
+        let size = geo.size
+        return Group {
             if let img = flow.photo {
-                MarkedPhoto(image: img, segments: r.segments, mode: .guide, showLabels: false, focus: DamageFocus.region(for: r.segments), zoomable: false, anchorY: 0.33) { sz in
+                MarkedPhoto(image: img, segments: r.segments, mode: .guide, showLabels: false, focus: DamageFocus.region(for: r.segments), zoomable: false, anchorY: photoAnchor(r, geo: geo)) { sz in
                     StepOverlay(step: step, response: r, size: sz, aspect: img.size.width / max(img.size.height, 1), darningPhase: darningPhase(for: step, in: r))
                 }
             } else { Color.black }

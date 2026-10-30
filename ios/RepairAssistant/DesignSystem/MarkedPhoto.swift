@@ -176,9 +176,9 @@ private struct ZoomedStage<Overlay: View>: View, @preconcurrency Animatable {
     let onTap: ((CGPoint) -> Void)?
     @ViewBuilder var overlay: (CGSize) -> Overlay
 
-    var animatableData: CGFloat {
-        get { zoom }
-        set { zoom = newValue }
+    var animatableData: AnimatablePair<CGFloat, CGFloat> {
+        get { AnimatablePair(zoom, anchorY) }
+        set { zoom = newValue.first; anchorY = newValue.second }
     }
 
     var body: some View {

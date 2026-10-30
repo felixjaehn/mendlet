@@ -191,3 +191,36 @@ struct HandsFreeCapsule: View {
         .accessibilityHint("Double tap to dismiss")
     }
 }
+
+/// Where the voice UI (capsule or answer card) goes while hands-free is on. Rects in screen points, container coordinates.
+/// Rule: the voice UI never intersects the work area (damage, stitch/glue/solder overlay and their labels).
+/// 1. Below the work area and above the collapsed bar if it fits.
+/// 2. Otherwise the photo shifts up (`photoShift`) as far as the top reserve allows.
+/// 3. Otherwise the voice UI moves onto the collapsed bar area (`overBar`) and the photo shifts up so the work stays clear of it.
+enum VoiceLayout {
+    struct Placement: Equatable {
+        var voice: CGRect
+        var photoShift: CGFloat
+        var overBar: Bool
+        /// The work rect after the photo shift.
+        var work: CGRect
+    }
+
+    static func place(container: CGSize, work: CGRect, topReserved: CGFloat, barTop: CGFloat, voiceHeight: CGFloat, gap: CGFloat = 12, margin: CGFloat = 20) -> Placement {
+        let width = container.width - 2 * margin
+        let maxShift = max(0, work.minY - topReserved)
+        func result(_ rect: CGRect, _ shift: CGFloat, _ over: Bool) -> Placement {
+            Placement(voice: rect, photoShift: shift, overBar: over, work: work.offsetBy(dx: 0, dy: -shift))
+        }
+        // 1 / 2: above the bar
+        let top = barTop - gap - voiceHeight
+        let needed = max(0, work.maxY + gap - top)
+        if needed <= maxShift {
+            return result(CGRect(x: margin, y: top, width: width, height: voiceHeight), needed, false)
+        }
+        // 3: over the bar area, photo up so the work ends above it
+        let barRect = CGRect(x: margin, y: barTop + 6, width: width, height: max(0, min(voiceHeight, container.height - barTop - 12)))
+        let shift = min(maxShift, max(0, work.maxY + gap - barRect.minY))
+        return result(barRect, shift, true)
+    }
+}
