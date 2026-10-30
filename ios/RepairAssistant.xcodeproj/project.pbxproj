@@ -229,7 +229,7 @@
 		F4F482E47A76CEDA809866E9 /* ShoeOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoeOverlay.swift; sourceTree = "<group>"; };
 		F840728B0735157F950CDD07 /* StepHelpSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepHelpSheet.swift; sourceTree = "<group>"; };
 		FDC79702C1652A582742CF18 /* AnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisView.swift; sourceTree = "<group>"; };
-		"TEMP_4FDFB9FF-BF04-4995-9B77-EF31021E973A" /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		"TEMP_2DB8E16D-69E0-4E2D-B6CF-87C87F6151CF" /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -440,10 +440,10 @@
 			path = Fixtures;
 			sourceTree = "<group>";
 		};
-		"TEMP_C9A215FE-0B12-4C39-ACD7-1FC270F1544B" /* ios */ = {
+		"TEMP_12EAAC21-B1F7-4F97-B132-C8818852D4CE" /* ios */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_4FDFB9FF-BF04-4995-9B77-EF31021E973A" /* Config.xcconfig */,
+				"TEMP_2DB8E16D-69E0-4E2D-B6CF-87C87F6151CF" /* Config.xcconfig */,
 			);
 			path = ios;
 			sourceTree = "<group>";
@@ -518,12 +518,15 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					3C516FE7FB6FE1C89E2D5008 = {
+						DevelopmentTeam = 4D7QB2HZ25;
 						ProvisioningStyle = Automatic;
 					};
 					B2D8553AE67C35DB45375B30 = {
+						DevelopmentTeam = 4D7QB2HZ25;
 						ProvisioningStyle = Automatic;
 					};
 					E1FC4CB04E4B9ECE2B0B71C7 = {
+						DevelopmentTeam = 4D7QB2HZ25;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -701,7 +704,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.felix.RepairAssistant;
+				PRODUCT_BUNDLE_IDENTIFIER = com.quietdayventures.mendlet;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -717,7 +720,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.felix.RepairAssistant.Widgets;
+				PRODUCT_BUNDLE_IDENTIFIER = com.quietdayventures.mendlet.Widgets;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -726,7 +729,7 @@
 		};
 		88DB0C72E15D4B1747846766 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_4FDFB9FF-BF04-4995-9B77-EF31021E973A" /* Config.xcconfig */;
+			baseConfigurationReference = "TEMP_2DB8E16D-69E0-4E2D-B6CF-87C87F6151CF" /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -763,6 +766,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_LANGUAGE = de;
+				DEVELOPMENT_TEAM = 4D7QB2HZ25;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -802,7 +806,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.felix.RepairAssistantTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.quietdayventures.mendlet.tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RepairAssistant.app/RepairAssistant";
@@ -820,7 +824,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.felix.RepairAssistant;
+				PRODUCT_BUNDLE_IDENTIFIER = com.quietdayventures.mendlet;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -836,7 +840,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.felix.RepairAssistant.Widgets;
+				PRODUCT_BUNDLE_IDENTIFIER = com.quietdayventures.mendlet.Widgets;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -853,7 +857,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.felix.RepairAssistantTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.quietdayventures.mendlet.tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RepairAssistant.app/RepairAssistant";
@@ -862,7 +866,7 @@
 		};
 		FD9CD525F142F5622F8FDCCB /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = "TEMP_4FDFB9FF-BF04-4995-9B77-EF31021E973A" /* Config.xcconfig */;
+			baseConfigurationReference = "TEMP_2DB8E16D-69E0-4E2D-B6CF-87C87F6151CF" /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -899,6 +903,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_LANGUAGE = de;
+				DEVELOPMENT_TEAM = 4D7QB2HZ25;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
