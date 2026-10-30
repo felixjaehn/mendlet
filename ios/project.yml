@@ -37,6 +37,7 @@ targets:
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         NSCameraUsageDescription: "Mendlet uses the camera to find the damage and guide each repair step on your item."
         NSMicrophoneUsageDescription: "Describe the damage or ask for help by voice."
+        NSSpeechRecognitionUsageDescription: "Hands-free mode recognises short spoken commands like next and back on your device."
         NSPhotoLibraryUsageDescription: "Pick an existing photo of the damage."
         NSLocalNetworkUsageDescription: "Mendlet connects to its analysis server on your local network."
         NSSupportsLiveActivities: true

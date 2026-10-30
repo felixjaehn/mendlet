@@ -39,6 +39,8 @@
 	<string>Describe the damage or ask for help by voice.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Pick an existing photo of the damage.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Hands-free mode recognises short spoken commands like next and back on your device.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>PROXY_BASE_URL</key>

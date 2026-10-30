@@ -12,6 +12,7 @@ struct GuideView: View {
     @State private var expanded: Set<Int> = []
     @State private var showStepImage: Set<Int> = []
     @State private var drag: CGFloat = 0
+    @State private var handsFree = HandsFreeModel()
 
     private var steps: [GuideStep] { flow.response?.guide.steps ?? [] }
     private var index: Int { min(max(flow.currentStep, 0), max(steps.count - 1, 0)) }
@@ -45,6 +46,10 @@ struct GuideView: View {
                     panel(step, r, bottomInset: geo.safeAreaInsets.bottom, maxHeight: geo.size.height * 0.7)
                         .id(step.n)
                         .transition(.opacity)
+                        .overlay(alignment: .top) {
+                            HandsFreeCapsule(model: handsFree)
+                                .alignmentGuide(VerticalAlignment.top) { $0[.bottom] + 12 }
+                        }
                     topArea(step, hasStepImage: stepPhoto != nil, topInset: geo.safeAreaInsets.top)
                         .frame(maxHeight: .infinity, alignment: .top)
                 }
@@ -56,12 +61,64 @@ struct GuideView: View {
                 .onChange(of: index) { _, _ in if let s = steps[safe: index] { flow.loadStepImage(for: s) } }
             }
         }
+        .overlay {
+            if handsFree.isActive { HandsFreeGlow(phase: handsFree.phase, level: handsFree.level).transition(.opacity) }
+        }
+        .animation(.easeInOut(duration: 0.6), value: handsFree.isActive)
         .background(Color.black.ignoresSafeArea())
         .navigationBarBackButtonHidden()
         .navigationBarHidden(true)
         .statusBarHidden(false)
         .sheet(isPresented: $showHelp) { if let s = steps[safe: index] { StepHelpSheet(step: s) } }
-        .onAppear { debugStepImage() }
+        .onAppear { debugStepImage(); setUpHandsFree() }
+        .onDisappear { handsFree.stop() }
+    }
+
+    // MARK: Hands-free
+
+    private func setUpHandsFree() {
+        handsFree.service = { [flow] in flow.service }
+        handsFree.context = { [flow] in
+            let steps = flow.response?.guide.steps ?? []
+            guard let r = flow.response, let step = steps[safe: min(max(flow.currentStep, 0), max(steps.count - 1, 0))] else { return nil }
+            return HandsFreeContext(step: StepRef(n: step.n, title: step.title, text: step.text), diagnosisSummary: r.diagnosis.summary,
+                                    riskLevel: r.riskLevel, spoken: spokenText(step, of: steps.count))
+        }
+        handsFree.perform = { cmd in
+            switch cmd {
+            case .next: advance(last: index == steps.count - 1)
+            case .back: if index > 0 { go(to: index - 1) }
+            case .repeatStep, .stop: break
+            }
+        }
+        #if DEBUG
+        if let state = UserDefaults.standard.string(forKey: "uiHandsFree") { handsFree.debugShow(state) }
+        #endif
+    }
+
+    private func spokenText(_ step: GuideStep, of count: Int) -> String {
+        let parts = DoneWhenLine.split(step.text, english: true)
+        let body = CopyPolish.text(parts.body, english: true)
+        return ["Step \(step.n) of \(count).", step.title + ".", body, parts.doneWhen ?? ""]
+            .filter { !$0.isEmpty }.joined(separator: " ")
+    }
+
+    private var handsFreeButton: some View {
+        Button {
+            Haptics.tap()
+            Task { await handsFree.toggle() }
+        } label: {
+            Image(systemName: "waveform")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 44, height: 44)
+                .glass(Circle(), tint: handsFree.isActive ? Theme.thread.opacity(0.75) : nil, interactive: true)
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Hands-free")
+        .accessibilityValue(handsFree.isActive ? "On" : "Off")
+        .accessibilityAddTraits(handsFree.isActive ? .isSelected : [])
     }
 
     // MARK: Swipe
@@ -108,6 +165,10 @@ struct GuideView: View {
             HStack(spacing: 12) {
                 CircleIconButton(systemImage: "xmark", label: "Close", onPhoto: true) { flow.persist(); flow.reset() }
                 SegmentBar(count: steps.count, done: index, current: index, height: 3, onPhoto: true)
+                handsFreeButton
+            }
+            if let hint = handsFree.hint {
+                Text(hint).font(.footnote.weight(.medium)).photoLabel().transition(.opacity)
             }
             if hasStepImage {
                 HStack(spacing: 0) {

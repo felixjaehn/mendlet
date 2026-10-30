@@ -168,6 +168,8 @@ struct MockAPIClient: AnalysisService {
 
     func transcribe(fileURL: URL) async throws -> String {
         try await Task.sleep(for: .milliseconds(700))
+        // Hands-free mode (no microphone in demo mode): a plausible spoken question about the current step.
+        if fileURL.lastPathComponent.hasPrefix("hf-") { return "How tight should I pull the thread?" }
         return tr("Der Riss ist etwa sechs Zentimeter lang und geht quer über das Knie.")
     }
 

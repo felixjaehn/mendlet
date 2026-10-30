@@ -58,6 +58,8 @@ run guide-darning 24 -uiScreen guide -uiScenario textile_tear -uiStep 4 -uiFreez
 run guide-step-image 24 -uiScreen guide -uiScenario textile_tear -uiStep 2 -uiStepImage YES
 run guide-solder 22 -uiScreen guide -uiScenario platine -uiStep 3 -uiFreezeProgress 0.85
 run guide-shoe 22 -uiScreen guide -uiScenario shoe_sole -uiStep 2 -uiFreezeProgress 0.85
+run guide-handsfree-listening 22 -uiScreen guide -uiScenario real_sweater -uiStep 2 -uiFreezeProgress 0.85 -uiHandsFree listening
+run guide-handsfree-answer 22 -uiScreen guide -uiScenario real_sweater -uiStep 2 -uiFreezeProgress 0.85 -uiHandsFree answer
 run completion 22 -uiScreen completion -uiScenario textile_tear
 run block-battery 16 -uiScreen diagnosis -uiScenario battery_jacket
 run block-helmet 16 -uiScreen diagnosis -uiScenario helmet
@@ -67,5 +69,7 @@ run finding-sweater-dark 14 -uiScreen diagnosis -uiScenario real_sweater
 run verdict-repair-dark 18 -uiScreen decision -uiScenario real_sweater
 run checklist-dark 18 -uiScreen checklist -uiScenario real_sweater
 run guide-sweater-dark 22 -uiScreen guide -uiScenario real_sweater -uiStep 2 -uiFreezeProgress 0.85
+run guide-handsfree-listening-dark 22 -uiScreen guide -uiScenario real_sweater -uiStep 2 -uiFreezeProgress 0.85 -uiHandsFree listening
+run guide-handsfree-answer-dark 22 -uiScreen guide -uiScenario real_sweater -uiStep 2 -uiFreezeProgress 0.85 -uiHandsFree answer
 run project-dark 8 -uiScreen project
 xcrun simctl ui "$UDID" appearance light
