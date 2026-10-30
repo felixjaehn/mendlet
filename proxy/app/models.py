@@ -251,6 +251,7 @@ class Diagnosis(Base):
 
 class SecondLife(Base):
     """Replace only: what to do with the old item instead of the bin."""
+
     kind: Literal["upcycle", "recycle", "donate"]
     title: Annotated[str, Field(max_length=80)]
     text: Annotated[str, Field(max_length=300)]

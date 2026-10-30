@@ -1,4 +1,5 @@
 """Electronics outlook (solder pads with polarity): prompts, pad grounding wire, pipeline merge, safety, mock."""
+
 import json
 import uuid
 
@@ -37,6 +38,7 @@ def electronics_handler(seen, sam_text_for=lambda prompt: "", pads=PADS):
         if name == "classify":
             return chat_response(CLASSIFY_EL)
         return chat_response(mock_electronics.plan().model_dump())
+
     return handler
 
 
@@ -86,10 +88,13 @@ async def test_pipeline_merges_text_segments_and_pads_even_with_damage(tmp_path)
     seen, events = [], []
     # SAM text finds the bare wire end (damage) - pads must still be grounded and merged.
     c = client_for(tmp_path, electronics_handler(seen, lambda p: SAM.read_text() if p == "copper wire strands" else ""))
+
     async def progress(stage):
         events.append(stage)
+
     async def grounding():
         events.append("grounding")
+
     try:
         req = prepare_request(make_req(make_image_b64((640, 480)), note="USB-Lampe ohne Funktion"))
         r = await analyze(req, c, progress, grounding)
@@ -109,9 +114,17 @@ async def test_pipeline_merges_text_segments_and_pads_even_with_damage(tmp_path)
 
 def el_resp(category=EL) -> AnalyzeResponse:
     plan = mock_electronics.plan()
-    return AnalyzeResponse(case_id=str(uuid.uuid4()), category=category, risk_level="allowed", safety=Safety(),
-                           segments=mock_electronics.segments(), diagnosis=plan.diagnosis, decision=plan.decision,
-                           shopping_list=plan.shopping_list, guide=plan.guide)
+    return AnalyzeResponse(
+        case_id=str(uuid.uuid4()),
+        category=category,
+        risk_level="allowed",
+        safety=Safety(),
+        segments=mock_electronics.segments(),
+        diagnosis=plan.diagnosis,
+        decision=plan.decision,
+        shopping_list=plan.shopping_list,
+        guide=plan.guide,
+    )
 
 
 def solder_steps(r):
@@ -178,6 +191,7 @@ def test_enforce_drops_overlay_with_unknown_segment():
 @pytest.mark.parametrize("kw", [{"mock_scenario": "electronics_wire"}, {"user_note": "USB Platine Kabel ab"}])
 async def test_mock_electronics_wire_returns_solder_overlays(image_b64, kw):
     from app.mock_client import MockClient
+
     r = await analyze(make_req(image_b64, **kw), MockClient(0.0))
     assert r.category == EL and not r.safety.blocked
     solder = solder_steps(r)

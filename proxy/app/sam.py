@@ -11,7 +11,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .models import Mask, MaskRing, RefinePoint, Segment, TrackFrame, TrackedSegment
+from .models import Mask, MaskRing, RefinePoint, Segment, TrackedSegment, TrackFrame
 
 # Short English noun phrases (SAM handles one concept per request).
 SEGMENT_PROMPTS: dict[str, list[str]] = {
@@ -70,11 +70,18 @@ def geometric_prompt(width: int, height: int, points: list[RefinePoint], box: li
     if box is not None:
         x, y, w, h = box
         left, top = min(width - 1, int(x * width)), min(height - 1, int(y * height))
-        bounds = PromptBox(left, top, min(width, max(left + 1, math.ceil((x + w) * width))),
-                           min(height, max(top + 1, math.ceil((y + h) * height))))
-    pixels = [PromptPoint(min(width - 1, int(p.x * width)), min(height - 1, int(p.y * height)), p.label)
-              for p in points]
-    return build_object_prompt(size=(width, height), objects=[PromptObject(1, [FramePrompt(box=bounds, points=pixels)])])
+        bounds = PromptBox(
+            left,
+            top,
+            min(width, max(left + 1, math.ceil((x + w) * width))),
+            min(height, max(top + 1, math.ceil((y + h) * height))),
+        )
+    pixels = [
+        PromptPoint(min(width - 1, int(p.x * width)), min(height - 1, int(p.y * height)), p.label) for p in points
+    ]
+    return build_object_prompt(
+        size=(width, height), objects=[PromptObject(1, [FramePrompt(box=bounds, points=pixels)])]
+    )
 
 
 # ---- bitmap -> polygon --------------------------------------------------------
@@ -130,7 +137,7 @@ def _simplify(points: list[tuple[float, float]], tol: float) -> list[tuple[float
         if best > tol and idx != -1:
             keep[idx] = True
             stack += [(a, idx), (idx, b)]
-    return [p for p, k in zip(points, keep) if k]
+    return [p for p, k in zip(points, keep, strict=False) if k]
 
 
 def _simplify_closed(pts: list[tuple[float, float]], tol: float) -> list[tuple[float, float]]:
@@ -153,7 +160,7 @@ def bitmap_to_rings(raster: np.ndarray, max_points: int = 80) -> list[MaskRing]:
 
     def add(boundary, dx1, dy1, dx2, dy2):
         ys, xs = np.nonzero(boundary)
-        for y, x in zip(ys.tolist(), xs.tolist()):
+        for y, x in zip(ys.tolist(), xs.tolist(), strict=False):
             edges.setdefault((x + dx1, y + dy1), []).append((x + dx2, y + dy2))
 
     add(mask & ~pad[:-2, 1:-1], 0, 0, 1, 0)
@@ -184,7 +191,7 @@ def bitmap_to_rings(raster: np.ndarray, max_points: int = 80) -> list[MaskRing]:
         return []
 
     def area(ring):
-        return sum(x * yy - xx * y for (x, y), (xx, yy) in zip(ring, ring[1:] + ring[:1]))
+        return sum(x * yy - xx * y for (x, y), (xx, yy) in zip(ring, ring[1:] + ring[:1], strict=False))
 
     result = []
     for pts in sorted(rings, key=lambda r: abs(area(r)), reverse=True):
@@ -194,8 +201,7 @@ def bitmap_to_rings(raster: np.ndarray, max_points: int = 80) -> list[MaskRing]:
             tol *= 1.5
             simp = _simplify_closed(pts, tol)
         if len(simp) >= 3 and area(simp):
-            result.append(MaskRing(points=[[round(x / w, 6), round(y / h, 6)] for x, y in simp],
-                                   hole=area(pts) < 0))
+            result.append(MaskRing(points=[[round(x / w, 6), round(y / h, 6)] for x, y in simp], hole=area(pts) < 0))
     return result
 
 
@@ -228,8 +234,9 @@ def _box_fields(token: str, img_w: int, img_h: int):
         return None
 
 
-def parse_sam_output(text: str, prompt: str, img_w: int, img_h: int, *,
-                     frame_index: int = 0, video: bool = False) -> list[SamDetection]:
+def parse_sam_output(
+    text: str, prompt: str, img_w: int, img_h: int, *, frame_index: int = 0, video: bool = False
+) -> list[SamDetection]:
     """Documented key=value wire records -> validated boxes and polygons.
 
     The official library confirms box-local half-open mask bounds offline. Actual
@@ -239,7 +246,12 @@ def parse_sam_output(text: str, prompt: str, img_w: int, img_h: int, *,
     if img_w <= 0 or img_h <= 0:
         return []
     try:
-        from meta_sam_parser import CompletedOutcome, decode_mask_to_raster, image_segmentation_format, video_segmentation_format
+        from meta_sam_parser import (
+            CompletedOutcome,
+            decode_mask_to_raster,
+            image_segmentation_format,
+            video_segmentation_format,
+        )
     except ImportError:
         image_segmentation_format = None
     dets = []
@@ -247,7 +259,7 @@ def parse_sam_output(text: str, prompt: str, img_w: int, img_h: int, *,
         header = f"<{frame_index}f>"
         if not line.startswith(header):
             continue
-        for match in _RECORD_RE.finditer(line[len(header):].strip()):
+        for match in _RECORD_RE.finditer(line[len(header) :].strip()):
             oid, box_token, mask_token = match.groups()
             parsed = _box_fields(box_token, img_w, img_h)
             if parsed is None:
@@ -271,10 +283,19 @@ def parse_sam_output(text: str, prompt: str, img_w: int, img_h: int, *,
                 raster = np.frombuffer(decode_mask_to_raster(mrec.mask), dtype=np.uint8)
                 raster = raster.reshape(mrec.mask.height, mrec.mask.width)
                 b = mrec.bounds
-                det.rings = [MaskRing(hole=ring.hole, points=[
-                    [round((b.left + u * (b.right - b.left)) / img_w, 6),
-                     round((b.top + v * (b.bottom - b.top)) / img_h, 6)] for u, v in ring.points
-                ]) for ring in bitmap_to_rings(raster)] or None
+                det.rings = [
+                    MaskRing(
+                        hole=ring.hole,
+                        points=[
+                            [
+                                round((b.left + u * (b.right - b.left)) / img_w, 6),
+                                round((b.top + v * (b.bottom - b.top)) / img_h, 6),
+                            ]
+                            for u, v in ring.points
+                        ],
+                    )
+                    for ring in bitmap_to_rings(raster)
+                ] or None
                 det.polygon = next((r.points for r in det.rings or [] if not r.hole), None)
             except (ValueError, ArithmeticError):
                 # InvalidSegmentationMaskError is normally retained as a parser
@@ -291,7 +312,7 @@ def parse_sam_video(text: str, prompt: str) -> list[TrackFrame]:
         if not header or not 0 <= int(header[1]) < 15_000:
             continue
         index = int(header[1])
-        body = line[header.end():].strip()
+        body = line[header.end() :].strip()
         if not body:
             frames.setdefault(index, {})
         for match in _RECORD_RE.finditer(body):
@@ -303,7 +324,8 @@ def parse_sam_video(text: str, prompt: str) -> list[TrackFrame]:
                 records = frames.setdefault(index, {})
                 for seg in detections_to_segments([det]):
                     records[det.object_id] = TrackedSegment(
-                        **{**seg.model_dump(), "id": f"seg_{det.object_id}"}, object_id=det.object_id)
+                        **{**seg.model_dump(), "id": f"seg_{det.object_id}"}, object_id=det.object_id
+                    )
     return [TrackFrame(index=i, segments=list(records.values())) for i, records in sorted(frames.items())]
 
 
@@ -326,8 +348,12 @@ def detections_to_segments(dets: list[SamDetection]) -> list[Segment]:
             continue
         # Deduplicate synonyms across prompts, never distinct instances of one concept.
         label = PROMPT_META.get(d.prompt, (d.prompt, "part"))[0]
-        if any(k.prompt != d.prompt and PROMPT_META.get(k.prompt, (k.prompt, ""))[0] == label
-               and _iou(k.box, d.box) > DEDUP_IOU for k in kept):
+        if any(
+            k.prompt != d.prompt
+            and PROMPT_META.get(k.prompt, (k.prompt, ""))[0] == label
+            and _iou(k.box, d.box) > DEDUP_IOU
+            for k in kept
+        ):
             continue
         kept.append(d)
     segments = []
@@ -341,7 +367,9 @@ def detections_to_segments(dets: list[SamDetection]) -> list[Segment]:
                 kind=kind,  # type: ignore[arg-type]
                 prompt=d.prompt,
                 box=[round(x1, 4), round(y1, 4), round(x2 - x1, 4), round(y2 - y1, 4)],
-                mask=Mask(format="polygon", points=d.polygon, rings=d.rings) if d.polygon and len(d.polygon) >= 3 else None,
+                mask=Mask(format="polygon", points=d.polygon, rings=d.rings)
+                if d.polygon and len(d.polygon) >= 3
+                else None,
                 score=round(d.score, 3),
                 source="text",
             )

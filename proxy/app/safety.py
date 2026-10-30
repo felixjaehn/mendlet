@@ -24,9 +24,9 @@ RISK_ORDER: dict[str, int] = {"allowed": 0, "warn_only": 1, "professional": 2}
 
 _REASON_WARN = {
     "de": "Dieser Gegenstand kann gefährlich sein (zum Beispiel Akku, Netzanschluss oder Gas). "
-          "Dafür gibt es hier keine Reparaturanleitung. Bitte wende dich an den Hersteller oder einen Fachbetrieb.",
+    "Dafür gibt es hier keine Reparaturanleitung. Bitte wende dich an den Hersteller oder einen Fachbetrieb.",
     "en": "This item can be dangerous (for example a battery, mains connection or gas). "
-          "There is no repair guide for it here. Please contact the manufacturer or a professional.",
+    "There is no repair guide for it here. Please contact the manufacturer or a professional.",
 }
 _REASON_PRO = {
     "de": "Dieser Gegenstand ist sicherheitsrelevant. Bitte lass ihn von einem Fachbetrieb prüfen oder ersetzen.",
@@ -47,7 +47,11 @@ _KEYWORDS: list[tuple[re.Pattern[str], RiskLevel, str]] = [
     (re.compile(p, re.IGNORECASE), risk, label)
     for p, risk, label in [
         (r"batter(?:y|ies)|accumulator", "warn_only", "Akku"),
-        (r"power\s?(?:supply|adapter|cord|cable|plug)|\bmains\b|wall\s?(?:outlet|socket)|charger", "warn_only", "Netzanschluss"),
+        (
+            r"power\s?(?:supply|adapter|cord|cable|plug)|\bmains\b|wall\s?(?:outlet|socket)|charger",
+            "warn_only",
+            "Netzanschluss",
+        ),
         (r"\b(?:230|240|110)\s?v\b|\bmains\s?voltage", "warn_only", "Netzspannung"),
         (r"capacitor|flash\s?unit|strobe", "warn_only", "Kondensator"),
         (r"heated\s|heating\s?(?:pad|element|jacket|vest|insole)|heated$", "warn_only", "Heizelement"),
@@ -56,7 +60,11 @@ _KEYWORDS: list[tuple[re.Pattern[str], RiskLevel, str]] = [
         (r"\bhelmets?\b", "professional", "Helm"),
         (r"child\s?(?:car\s?)?seat|car\s?seat|baby\s?(?:seat|carrier shell)", "professional", "Kindersitz"),
         (r"\bbrakes?\b|brake\s?(?:pad|disc|disk)", "professional", "Bremse"),
-        (r"air\s?bag|seat\s?belt|climbing\s?(?:harness|rope)|parachute|harness", "professional", "Sicherheitsausrüstung"),
+        (
+            r"air\s?bag|seat\s?belt|climbing\s?(?:harness|rope)|parachute|harness",
+            "professional",
+            "Sicherheitsausrüstung",
+        ),
         (r"akku", "warn_only", "Akku"),
         (r"lithium|li-?ion|lipo\b", "warn_only", "Lithium"),
         (r"netzteil|ladeger[aä]t|netzbetrieb|steckdose|netzkabel|netzstecker", "warn_only", "Netzanschluss"),
@@ -89,13 +97,24 @@ def stricter(a: RiskLevel, b: RiskLevel) -> RiskLevel:
 # other hazard keyword stays conservative even when negated.
 _NEGATED_BATTERY = re.compile(
     r"\b(?:kein(?:e|en|em|er)?|ohne)\s+(?:\w+\s+){0,2}?(?:akku[\w-]*|lithium[\w-]*|li-?ion[\w-]*|lipo)\b"
-    r"|\b(?:no|without)\s+(?:\w+\s+){0,2}?(?:batter(?:y|ies)|lithium[\w-]*|li-?ion[\w-]*|lipo)\b", re.IGNORECASE)
+    r"|\b(?:no|without)\s+(?:\w+\s+){0,2}?(?:batter(?:y|ies)|lithium[\w-]*|li-?ion[\w-]*|lipo)\b",
+    re.IGNORECASE,
+)
 
 
 LABELS_EN = {
-    "Akku": "Battery", "Lithium": "Lithium", "Netzanschluss": "Mains connection", "Netzspannung": "Mains voltage",
-    "Kondensator": "Capacitor", "Heizelement": "Heating element", "Gas": "Gas", "Elektronik im Schuh": "Electronics in the shoe",
-    "Helm": "Helmet", "Kindersitz": "Child seat", "Bremse": "Brake", "Sicherheitsausrüstung": "Safety equipment",
+    "Akku": "Battery",
+    "Lithium": "Lithium",
+    "Netzanschluss": "Mains connection",
+    "Netzspannung": "Mains voltage",
+    "Kondensator": "Capacitor",
+    "Heizelement": "Heating element",
+    "Gas": "Gas",
+    "Elektronik im Schuh": "Electronics in the shoe",
+    "Helm": "Helmet",
+    "Kindersitz": "Child seat",
+    "Bremse": "Brake",
+    "Sicherheitsausrüstung": "Safety equipment",
 }
 
 
@@ -141,8 +160,9 @@ def _clamp01(value: float) -> float:
     return max(0.0, min(1.0, value))
 
 
-def enforce(resp: AnalyzeResponse, *, has_answers: bool, precheck: PreCheck | None = None,
-            locale: str | None = None) -> AnalyzeResponse:
+def enforce(
+    resp: AnalyzeResponse, *, has_answers: bool, precheck: PreCheck | None = None, locale: str | None = None
+) -> AnalyzeResponse:
     """Apply all contract/safety rules to a response; returns a corrected copy."""
     r = resp.model_copy(deep=True)
 
@@ -206,9 +226,16 @@ def enforce(resp: AnalyzeResponse, *, has_answers: bool, precheck: PreCheck | No
                 targets = [overlay.from_segment_id, overlay.to_segment_id]
                 end = next((s for s in r.segments if s.id == overlay.from_segment_id), None)
                 pad = next((s for s in r.segments if s.id == overlay.to_segment_id), None)
-                if (r.category != "low_voltage_electronics" or end is None or pad is None
-                        or end.kind != "damage" or end.prompt != "copper wire strands"
-                        or pad.kind != "part" or pad.source != "grounding" or pad.polarity not in {"+", "-"}):
+                if (
+                    r.category != "low_voltage_electronics"
+                    or end is None
+                    or pad is None
+                    or end.kind != "damage"
+                    or end.prompt != "copper wire strands"
+                    or pad.kind != "part"
+                    or pad.source != "grounding"
+                    or pad.polarity not in {"+", "-"}
+                ):
                     step.overlay = None
                 # Heat and fumes require acknowledgement even if the model omitted it.
                 step.safety_critical = True
@@ -226,7 +253,10 @@ def enforce(resp: AnalyzeResponse, *, has_answers: bool, precheck: PreCheck | No
 
 # ---- /step-help -------------------------------------------------------------
 
-_ESCALATE = re.compile(r"smok|burn|fire|spark|fume|scorch|melt|overheat|hot\b|battery|rauch|hei(ß|ss)|akku|brenn|brand|funken|qualm|schmor|verbrenn|verätz", re.IGNORECASE)
+_ESCALATE = re.compile(
+    r"smok|burn|fire|spark|fume|scorch|melt|overheat|hot\b|battery|rauch|hei(ß|ss)|akku|brenn|brand|funken|qualm|schmor|verbrenn|verätz",
+    re.IGNORECASE,
+)
 
 
 def step_help_escalation(issue_text: str, risk_level: str) -> bool:

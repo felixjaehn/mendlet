@@ -35,7 +35,8 @@ def inline_schema(cls: type[BaseModel]) -> dict[str, Any]:
                 return walk(defs[node["$ref"].split("/")[-1]])
             return {
                 k: ({name: walk(prop) for name, prop in v.items()} if k == "properties" else walk(v))
-                for k, v in node.items() if k not in {"title", "default"}
+                for k, v in node.items()
+                if k not in {"title", "default"}
             }
         if isinstance(node, list):
             return [walk(v) for v in node]
@@ -60,11 +61,12 @@ def load_prompt(key: str, prompts_dir: Path | None = None, locale: str | None = 
     _, name, _ = PROMPTS[key]
     text = ((prompts_dir or REPO_DIR / "prompts") / name).read_text(encoding="utf-8").strip()
     return text.replace("{language}", i18n.language_name(locale)).replace(
-        "{estimate_note}", i18n.pick(i18n.ESTIMATE_NOTE, locale))
+        "{estimate_note}", i18n.pick(i18n.ESTIMATE_NOTE, locale)
+    )
 
 
 def write_schemas(prompts_dir: Path | None = None) -> None:
-    for key, (_, name, cls) in PROMPTS.items():
+    for _key, (_, name, cls) in PROMPTS.items():
         path = (prompts_dir or REPO_DIR / "prompts") / name
         body = path.read_text(encoding="utf-8").split(MARKER)[0].rstrip()
         path.write_text(body + MARKER + schema_text(cls) + "\n", encoding="utf-8")

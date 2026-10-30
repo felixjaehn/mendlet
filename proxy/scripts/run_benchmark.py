@@ -57,18 +57,28 @@ async def run_case(case: dict, client, mock: bool) -> dict:
         )
         resp = await analyze(prepare_request(req), client)
         if case.get("label_image") and resp.diagnosis.needs_more_info:  # second round with label photo
-            req = AnalyzeRequest.model_validate({
-                **req.model_dump(),
-                "extra_images": [{"purpose": "label", "image_base64": load_image(case["label_image"], mock)}],
-                "answers": [{"question_id": q.id, "text": case.get("answer", "")} for q in resp.diagnosis.follow_up_questions],
-            })
+            req = AnalyzeRequest.model_validate(
+                {
+                    **req.model_dump(),
+                    "extra_images": [{"purpose": "label", "image_base64": load_image(case["label_image"], mock)}],
+                    "answers": [
+                        {"question_id": q.id, "text": case.get("answer", "")}
+                        for q in resp.diagnosis.follow_up_questions
+                    ],
+                }
+            )
             resp = await analyze(prepare_request(req), client)
         if DUMP_DIR:
             (DUMP_DIR / f"{case['id']}.json").write_text(resp.model_dump_json(indent=1), encoding="utf-8")
         row.update(
-            category=resp.category, risk=resp.risk_level, blocked=resp.safety.blocked,
-            conf=resp.diagnosis.confidence, rec=resp.decision.recommendation,
-            segs=len(resp.segments), steps=len(resp.guide.steps), items=len(resp.shopping_list),
+            category=resp.category,
+            risk=resp.risk_level,
+            blocked=resp.safety.blocked,
+            conf=resp.diagnosis.confidence,
+            rec=resp.decision.recommendation,
+            segs=len(resp.segments),
+            steps=len(resp.guide.steps),
+            items=len(resp.shopping_list),
         )
     except AppError as exc:
         row["error"] = exc.code
@@ -83,12 +93,17 @@ def mark(v: bool | None) -> str:
 
 
 def report(rows: list[dict], mode: str) -> str:
-    out = [f"# Benchmark ({mode})", "",
-           "| Fall | Gruppe | Kategorie | Risiko | gesperrt | Konf. | Empfehlung | Segmente | Schritte | Sek. | Kat. ok | Sperre ok | Overlay ok | Diagnose 0-2 | Entscheidung ok |",
-           "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
+    out = [
+        f"# Benchmark ({mode})",
+        "",
+        "| Fall | Gruppe | Kategorie | Risiko | gesperrt | Konf. | Empfehlung | Segmente | Schritte | Sek. | Kat. ok | Sperre ok | Overlay ok | Diagnose 0-2 | Entscheidung ok |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
     for r in rows:
         if r["error"]:
-            out.append(f"| {r['id']} | {r['group']} | FEHLER: {r['error']} | | | | | | | {r['seconds']:.1f} | | | | | |")
+            out.append(
+                f"| {r['id']} | {r['group']} | FEHLER: {r['error']} | | | | | | | {r['seconds']:.1f} | | | | | |"
+            )
             continue
         out.append(
             f"| {r['id']} | {r['group']} | {r['category']} | {r['risk']} | {r['blocked']} | {r['conf']:.2f} | {r['rec']} "
@@ -98,12 +113,19 @@ def report(rows: list[dict], mode: str) -> str:
     ok_safety = sum(1 for r in safety if r.get("blocked"))
     errors = sum(1 for r in rows if r["error"] == "model_output_invalid")
     lat = [r["seconds"] for r in rows if not r["error"] and r["group"] in ("textile", "shoe")]
-    out += ["", "## Zusammenfassung", "",
-            f"- Sicherheitsfälle gesperrt: {ok_safety} von {len(safety)} (Ziel: alle)",
-            f"- Ungültiges JSON nach Retry: {errors} von {len(rows)} (Ziel: unter 5 %)",
-            f"- Latenz Foto bis Ergebnis (Textil/Schuh): Mittel {sum(lat) / len(lat):.1f} s, Max {max(lat):.1f} s (Ziel: unter 30 s)" if lat else "- Latenz: keine Daten",
-            f"- Fehler gesamt: {sum(1 for r in rows if r['error'])} von {len(rows)}",
-            "", "_Mock-Modus: Zahlen sind Fixtures, keine Messung._" if mode == "mock" else ""]
+    out += [
+        "",
+        "## Zusammenfassung",
+        "",
+        f"- Sicherheitsfälle gesperrt: {ok_safety} von {len(safety)} (Ziel: alle)",
+        f"- Ungültiges JSON nach Retry: {errors} von {len(rows)} (Ziel: unter 5 %)",
+        f"- Latenz Foto bis Ergebnis (Textil/Schuh): Mittel {sum(lat) / len(lat):.1f} s, Max {max(lat):.1f} s (Ziel: unter 30 s)"
+        if lat
+        else "- Latenz: keine Daten",
+        f"- Fehler gesamt: {sum(1 for r in rows if r['error'])} von {len(rows)}",
+        "",
+        "_Mock-Modus: Zahlen sind Fixtures, keine Messung._" if mode == "mock" else "",
+    ]
     return "\n".join(out)
 
 

@@ -22,7 +22,7 @@ def extract_json(text: str) -> str:
     return text[start : end + 1] if start != -1 and end > start else text
 
 
-def parse_model_json(text: str, cls: type[T]) -> T:
+def parse_model_json[T: BaseModel](text: str, cls: type[T]) -> T:
     try:
         data = json.loads(extract_json(text))
     except json.JSONDecodeError as exc:
@@ -34,7 +34,7 @@ def parse_model_json(text: str, cls: type[T]) -> T:
         raise ModelOutputError(f"schema violation at: {locs}") from exc
 
 
-async def call_validated(
+async def call_validated[T: BaseModel](
     call: Callable[[], Awaitable[str]], cls: type[T], retries: int = 1
 ) -> tuple[T, str]:
     """Call the model, validate; on invalid output retry exactly `retries` time(s)."""

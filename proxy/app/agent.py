@@ -19,14 +19,13 @@ from openai import APIConnectionError, APIStatusError, APITimeoutError
 from PIL import Image, ImageDraw
 from pydantic import BaseModel, Field, ValidationError
 
-from .budget import muse_cost, wonder_cost
+from . import i18n
+from .budget import wonder_cost
 from .cache import ModelCache
 from .errors import AppError, BudgetExceeded, ModelOutputError
 from .images import downscale_b64
 from .models import AnalyzeRequest, ClassifyResult, DiagnosePlan, LocateResult, RefinePoint, Segment, VerifyResult
 from .parsing import call_validated, parse_model_json
-from . import i18n
-from .prompts import inline_schema, load_prompt
 from .sam import MAX_PARTS, PROMPT_META, _iou, detections_to_segments, geometric_prompt
 
 if TYPE_CHECKING:
@@ -99,29 +98,70 @@ class VerifyArgs(BaseModel):
 
 
 def _tool(name: str, description: str, properties: dict, required: list[str]) -> dict:
-    return {"type": "function", "name": name, "description": description,
-            "parameters": {"type": "object", "properties": properties, "required": required}}
+    return {
+        "type": "function",
+        "name": name,
+        "description": description,
+        "parameters": {"type": "object", "properties": properties, "required": required},
+    }
 
 
 TOOLS: list[dict] = [
-    _tool("segment", "SAM 3.1 text search for ONE short English concept (rip, hole, open seam, frayed edge, "
-          "detached sole, garment, shoe sole, button). Returns found segments with id, score and box.",
-          {"concept": {"type": "string"}, "kind": {"type": "string", "enum": ["damage", "part"]}}, ["concept"]),
-    _tool("segment_at", "SAM 3.1 geometric prompt: segment ONE object from a box and/or points on the 0..1000 grid "
-          "(x, y from the top left). Use a box from `locate` or positive/negative points to refine a failed mask.",
-          {"box_0_1000": {"type": "array", "items": {"type": "number"}, "minItems": 4, "maxItems": 4,
-                          "description": "[x1, y1, x2, y2]"},
-           "points": {"type": "array", "items": {"type": "object", "properties": {
-               "x": {"type": "number"}, "y": {"type": "number"},
-               "label": {"type": "string", "enum": ["positive", "negative"]}}, "required": ["x", "y", "label"]}},
-           "concept": {"type": "string", "description": "short English name of the damage"}}, []),
-    _tool("locate", "Muse Spark grounding: bounding box [x1,y1,x2,y2] (0..1000) of a described damage, or null.",
-          {"description": {"type": "string"}}, ["description"]),
-    _tool("verify_mask", "Muse Spark looks at the photo with the segment's mask drawn on it and answers "
-          "{on_damage, issue}. Call it for every damage segment before finish.",
-          {"segment_id": {"type": "string"}}, ["segment_id"]),
-    _tool("finish", "Ends the run once every remaining damage mask is verified. The repair plan is written by a "
-          "separate model from the kept segments.", {}, []),
+    _tool(
+        "segment",
+        "SAM 3.1 text search for ONE short English concept (rip, hole, open seam, frayed edge, "
+        "detached sole, garment, shoe sole, button). Returns found segments with id, score and box.",
+        {"concept": {"type": "string"}, "kind": {"type": "string", "enum": ["damage", "part"]}},
+        ["concept"],
+    ),
+    _tool(
+        "segment_at",
+        "SAM 3.1 geometric prompt: segment ONE object from a box and/or points on the 0..1000 grid "
+        "(x, y from the top left). Use a box from `locate` or positive/negative points to refine a failed mask.",
+        {
+            "box_0_1000": {
+                "type": "array",
+                "items": {"type": "number"},
+                "minItems": 4,
+                "maxItems": 4,
+                "description": "[x1, y1, x2, y2]",
+            },
+            "points": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "x": {"type": "number"},
+                        "y": {"type": "number"},
+                        "label": {"type": "string", "enum": ["positive", "negative"]},
+                    },
+                    "required": ["x", "y", "label"],
+                },
+            },
+            "concept": {"type": "string", "description": "short English name of the damage"},
+        },
+        [],
+    ),
+    _tool(
+        "locate",
+        "Muse Spark grounding: bounding box [x1,y1,x2,y2] (0..1000) of a described damage, or null.",
+        {"description": {"type": "string"}},
+        ["description"],
+    ),
+    _tool(
+        "verify_mask",
+        "Muse Spark looks at the photo with the segment's mask drawn on it and answers "
+        "{on_damage, issue}. Call it for every damage segment before finish.",
+        {"segment_id": {"type": "string"}},
+        ["segment_id"],
+    ),
+    _tool(
+        "finish",
+        "Ends the run once every remaining damage mask is verified. The repair plan is written by a "
+        "separate model from the kept segments.",
+        {},
+        [],
+    ),
 ]
 
 
@@ -132,8 +172,11 @@ def render_mask_overlay(image_b64: str, seg: Segment) -> str:
     w, h = base.size
     layer = Image.new("RGBA", base.size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(layer)
-    rings = [(r.points, r.hole) for r in seg.mask.rings] if seg.mask and seg.mask.rings else (
-        [(seg.mask.points, False)] if seg.mask and seg.mask.points else [])
+    rings = (
+        [(r.points, r.hole) for r in seg.mask.rings]
+        if seg.mask and seg.mask.rings
+        else ([(seg.mask.points, False)] if seg.mask and seg.mask.points else [])
+    )
     for ring, hole in rings:
         pts = [(px * w, py * h) for px, py in ring]
         if len(pts) >= 3:  # holes are cut out again: ImageDraw writes the RGBA value without blending
@@ -167,9 +210,15 @@ class WonderAgent:
     def _register(self, seg: Segment) -> Segment:
         """Ids are stable for the whole run (the plan refers to them); repeated finds reuse the old id."""
         for old in self.segments.values():
-            if old.prompt == seg.prompt and old.id not in self.rejected and _iou(
+            if (
+                old.prompt == seg.prompt
+                and old.id not in self.rejected
+                and _iou(
                     (old.box[0], old.box[1], old.box[0] + old.box[2], old.box[1] + old.box[3]),
-                    (seg.box[0], seg.box[1], seg.box[0] + seg.box[2], seg.box[1] + seg.box[3])) > 0.8:
+                    (seg.box[0], seg.box[1], seg.box[0] + seg.box[2], seg.box[1] + seg.box[3]),
+                )
+                > 0.8
+            ):
                 return old
         seg = seg.model_copy(update={"id": f"seg_{len(self.segments) + 1}"})
         self.segments[seg.id] = seg
@@ -177,8 +226,13 @@ class WonderAgent:
 
     @staticmethod
     def _summary(seg: Segment) -> dict:
-        return {"segment_id": seg.id, "label": seg.label, "kind": seg.kind, "score": seg.score,
-                "box_0_1000": _box_grid(seg.box)}
+        return {
+            "segment_id": seg.id,
+            "label": seg.label,
+            "kind": seg.kind,
+            "score": seg.score,
+            "box_0_1000": _box_grid(seg.box),
+        }
 
     # ---- tools -------------------------------------------------------------------
 
@@ -209,8 +263,9 @@ class WonderAgent:
             raise ToolError("SAM fand keine Maske für diese Auswahl")
         label = PROMPT_META.get(args.concept, ("Schadstelle", "damage"))[0]
         # A box comes from perception grounding (`locate`), points alone are tap-like manual hints.
-        seg = matches[0].model_copy(update={
-            "label": label, "kind": "damage", "prompt": args.concept, "source": "grounding" if box else "tap"})
+        seg = matches[0].model_copy(
+            update={"label": label, "kind": "damage", "prompt": args.concept, "source": "grounding" if box else "tap"}
+        )
         return {"segments": [self._summary(self._register(seg))]}
 
     async def _locate(self, args: LocateArgs) -> dict:
@@ -226,7 +281,8 @@ class WonderAgent:
                 pass
         if result is None:
             result, raw = await call_validated(
-                lambda: c._chat(LOCATE_PROMPT, text, [self.image], "locate", LocateResult), LocateResult, retries=1)
+                lambda: c._chat(LOCATE_PROMPT, text, [self.image], "locate", LocateResult), LocateResult, retries=1
+            )
             c.cache.set(key, raw)
         if result.box is None:
             return {"box_0_1000": None, "hint": "nicht sichtbar"}
@@ -252,7 +308,8 @@ class WonderAgent:
                 pass
         if result is None:
             result, raw = await call_validated(
-                lambda: c._chat(VERIFY_PROMPT, text, [overlay], "verify_mask", VerifyResult), VerifyResult, retries=1)
+                lambda: c._chat(VERIFY_PROMPT, text, [overlay], "verify_mask", VerifyResult), VerifyResult, retries=1
+            )
             c.cache.set(key, raw)
         if not result.on_damage and seg.kind == "damage":
             self.rejected.add(seg.id)
@@ -284,8 +341,12 @@ class WonderAgent:
         try:
             if name == "finish":
                 return {"kept_segments": [s.id for s in self._final_segments()]}
-            models = {"segment": (SegmentArgs, self._segment), "segment_at": (SegmentAtArgs, self._segment_at),
-                      "locate": (LocateArgs, self._locate), "verify_mask": (VerifyArgs, self._verify)}
+            models = {
+                "segment": (SegmentArgs, self._segment),
+                "segment_at": (SegmentAtArgs, self._segment_at),
+                "locate": (LocateArgs, self._locate),
+                "verify_mask": (VerifyArgs, self._verify),
+            }
             if name not in models:
                 raise ToolError(f"Unbekanntes Tool {name}")
             cls, fn = models[name]
@@ -305,8 +366,16 @@ class WonderAgent:
         except (ToolError, AppError) as exc:
             status = "failed"
             output = {"error": exc.message if isinstance(exc, AppError) else str(exc)}
-        await emit({"n": n, "tool": call.name, "label": label, "model": model, "status": status,
-                    "ms": round((time.perf_counter() - started) * 1000)})
+        await emit(
+            {
+                "n": n,
+                "tool": call.name,
+                "label": label,
+                "model": model,
+                "status": status,
+                "ms": round((time.perf_counter() - started) * 1000),
+            }
+        )
         return call.call_id, output
 
     async def _respond(self, **kw):
@@ -314,15 +383,30 @@ class WonderAgent:
         c.budget.check()
         try:
             resp = await c.oai.responses.create(
-                model=c.s.wonder_model, tools=TOOLS, tool_choice="auto", parallel_tool_calls=True,
+                model=c.s.wonder_model,
+                tools=TOOLS,
+                tool_choice="auto",
+                parallel_tool_calls=True,
                 max_output_tokens=c.s.muse_max_completion_tokens,
                 # docs/reasoning: Responses API nests the effort; "low" keeps the perception loop fast.
-                reasoning={"effort": c.s.wonder_reasoning_effort}, **kw)
+                reasoning={"effort": c.s.wonder_reasoning_effort},
+                **kw,
+            )
         except APITimeoutError as exc:
-            raise AppError("timeout", "Der Agent hat zu lange gebraucht. Bitte versuche es erneut.", 504, en="The agent took too long. Please try again.") from exc
+            raise AppError(
+                "timeout",
+                "Der Agent hat zu lange gebraucht. Bitte versuche es erneut.",
+                504,
+                en="The agent took too long. Please try again.",
+            ) from exc
         except (APIConnectionError, APIStatusError) as exc:
             log.warning("wonder call failed: %s", type(exc).__name__)
-            raise AppError("upstream_error", "Der Modelldienst ist gerade nicht erreichbar.", 502, en="The model service is currently unreachable.") from exc
+            raise AppError(
+                "upstream_error",
+                "Der Modelldienst ist gerade nicht erreichbar.",
+                502,
+                en="The model service is currently unreachable.",
+            ) from exc
         usage = getattr(resp, "usage", None)
         tokens_in = getattr(usage, "input_tokens", None) or 3000
         tokens_out = getattr(usage, "output_tokens", None) or 800
@@ -338,7 +422,9 @@ class WonderAgent:
         with Image.open(io.BytesIO(base64.b64decode(self.image))) as photo:
             self.size = photo.size
         payload = {
-            "category": cls.category, "risk_level": cls.risk_level, "user_note": req.note,
+            "category": cls.category,
+            "risk_level": cls.risk_level,
+            "user_note": req.note,
             "locale": i18n.norm(req.locale),
             "answers": [a.model_dump() for a in req.answers],
             "image_order": ["main"] + [e.purpose for e in req.extra_images],
@@ -346,8 +432,10 @@ class WonderAgent:
         }
         content = [{"type": "input_text", "text": json.dumps(payload, ensure_ascii=False)}]
         content += [{"type": "input_image", "image_url": f"data:image/jpeg;base64,{b}"} for b in c._images(req)]
-        kw: dict = {"instructions": AGENT_PROMPT.replace("{language}", i18n.language_name(req.locale)),
-                    "input": [{"type": "message", "role": "user", "content": content}]}
+        kw: dict = {
+            "instructions": AGENT_PROMPT.replace("{language}", i18n.language_name(req.locale)),
+            "input": [{"type": "message", "role": "user", "content": content}],
+        }
         n = 0
         for _ in range(MAX_ROUNDS):
             resp = await self._respond(**kw)
@@ -367,9 +455,13 @@ class WonderAgent:
                 i, call = finish[0]
                 await self._step(i, call, emit)
                 break
-            kw = {"previous_response_id": resp.id, "input": [
-                {"type": "function_call_output", "call_id": cid, "output": json.dumps(o, ensure_ascii=False)}
-                for cid, o in outputs]}
+            kw = {
+                "previous_response_id": resp.id,
+                "input": [
+                    {"type": "function_call_output", "call_id": cid, "output": json.dumps(o, ensure_ascii=False)}
+                    for cid, o in outputs
+                ],
+            }
         else:
             log.warning("agent hit the %d round cap", MAX_ROUNDS)
         # Live 2026-10-29: plans written inside the loop ignored prompt B v3 (asked for the label again) and the
@@ -379,5 +471,7 @@ class WonderAgent:
 
     def _final_segments(self) -> list[Segment]:
         kept = [s for s in self.segments.values() if s.id not in self.rejected]
-        drop = {s.id for s in sorted((s for s in kept if s.kind == "part"), key=lambda s: s.score, reverse=True)[MAX_PARTS:]}
+        drop = {
+            s.id for s in sorted((s for s in kept if s.kind == "part"), key=lambda s: s.score, reverse=True)[MAX_PARTS:]
+        }
         return [s for s in kept if s.id not in drop]

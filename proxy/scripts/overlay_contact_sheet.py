@@ -37,8 +37,11 @@ def tile(case: dict, resp: dict) -> Image.Image:
 def main() -> None:
     dump, out = Path(sys.argv[1]), Path(sys.argv[2])
     cases = json.loads((TESTDATA / "cases.json").read_text(encoding="utf-8"))["cases"]
-    tiles = [tile(c, json.loads((dump / f"{c['id']}.json").read_text(encoding="utf-8")))
-             for c in cases if (dump / f"{c['id']}.json").is_file()]
+    tiles = [
+        tile(c, json.loads((dump / f"{c['id']}.json").read_text(encoding="utf-8")))
+        for c in cases
+        if (dump / f"{c['id']}.json").is_file()
+    ]
     cols = 4
     rows = (len(tiles) + cols - 1) // cols
     sheet = Image.new("RGB", (cols * TILE, rows * (TILE + 28)), (0, 0, 0))

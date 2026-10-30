@@ -1,8 +1,8 @@
 import pytest
 
 from app.errors import ModelOutputError
-from app.models import ClassifyResult, DiagnosePlan
 from app.mock_data import textile_tear
+from app.models import ClassifyResult, DiagnosePlan
 from app.parsing import call_validated, parse_model_json
 
 GOOD = '{"category":"textile","risk_level":"allowed","reason":"Jeans"}'
@@ -14,13 +14,16 @@ def test_parses_valid_and_fenced_json():
     assert parse_model_json(f"Hier: {GOOD} Fertig.", ClassifyResult).reason == "Jeans"
 
 
-@pytest.mark.parametrize("bad", [
-    "kein json",
-    '{"category":"textile"',
-    '{"category":"bike","risk_level":"allowed","reason":"x"}',
-    '{"category":"textile","risk_level":"maybe","reason":"x"}',
-    '{"category":"textile","risk_level":"allowed"}',
-])
+@pytest.mark.parametrize(
+    "bad",
+    [
+        "kein json",
+        '{"category":"textile"',
+        '{"category":"bike","risk_level":"allowed","reason":"x"}',
+        '{"category":"textile","risk_level":"maybe","reason":"x"}',
+        '{"category":"textile","risk_level":"allowed"}',
+    ],
+)
 def test_invalid_raises(bad):
     with pytest.raises(ModelOutputError):
         parse_model_json(bad, ClassifyResult)

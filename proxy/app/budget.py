@@ -28,8 +28,11 @@ def muse_cost(input_tokens: int, output_tokens: int) -> float:
 
 def wonder_cost(input_tokens: int, output_tokens: int, cached_tokens: int = 0) -> float:
     cached = min(max(cached_tokens, 0), input_tokens)
-    return ((input_tokens - cached) * WONDER_IN_PER_TOKEN + cached * WONDER_CACHED_IN_PER_TOKEN
-            + output_tokens * WONDER_OUT_PER_TOKEN)
+    return (
+        (input_tokens - cached) * WONDER_IN_PER_TOKEN
+        + cached * WONDER_CACHED_IN_PER_TOKEN
+        + output_tokens * WONDER_OUT_PER_TOKEN
+    )
 
 
 def sam_cost(images: int) -> float:

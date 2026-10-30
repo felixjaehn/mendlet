@@ -2,14 +2,12 @@
 
 import json
 
-import pytest
-
 from app import i18n, safety
 from app.agent import WonderAgent
+from app.config import REPO_DIR
 from app.errors import AppError, BudgetExceeded
 from app.mock_client import MockClient
 from app.pipeline import analyze, stage_label
-from app.config import REPO_DIR
 from app.prompts import load_prompt, prompt_version
 from tests.conftest import make_req
 
@@ -24,8 +22,16 @@ def sse_events(client, body):
 
 
 def test_norm_falls_back_to_german():
-    assert [i18n.norm(x) for x in ("en", "en-US", "EN_gb", "de", "de-AT", "fr", "", None)] == \
-        ["en", "en", "en", "de", "de", "de", "de", "de"]
+    assert [i18n.norm(x) for x in ("en", "en-US", "EN_gb", "de", "de-AT", "fr", "", None)] == [
+        "en",
+        "en",
+        "en",
+        "de",
+        "de",
+        "de",
+        "de",
+        "de",
+    ]
 
 
 def test_prompt_versions_and_language_placeholder():
@@ -37,7 +43,9 @@ def test_prompt_versions_and_language_placeholder():
     assert 'estimate_note="Estimate"' in en and 'estimate_note="Schätzung"' in de
     # default stays German, v4 is kept untouched
     assert load_prompt("diagnose") == de
-    assert "Alle Texte sind auf Deutsch" in (REPO_DIR / "prompts" / "prompt_b_diagnose.v4.txt").read_text(encoding="utf-8")
+    assert "Alle Texte sind auf Deutsch" in (REPO_DIR / "prompts" / "prompt_b_diagnose.v4.txt").read_text(
+        encoding="utf-8"
+    )
     for key in ("classify", "step_help"):
         assert "Write" in load_prompt(key, locale="en") and "English" in load_prompt(key, locale="en")
         assert "German" in load_prompt(key, locale="de")
@@ -60,15 +68,18 @@ def test_stage_labels_in_sse(client, image_b64):
     label = lambda events, stage: next(d["label"] for e, d in events if e == "progress" and d["stage"] == stage)  # noqa: E731
     assert label(de, "classify") == "Objekt und Risiko prüfen"
     assert label(en, "classify") == "Checking object and risk"
-    assert [label(en, s) for s in ("segment", "diagnose", "plan")] == [stage_label(s, "en") for s in ("segment", "diagnose", "plan")]
-    assert all("Schadstelle" not in l for l in i18n.STAGE_LABELS["en"].values())
+    assert [label(en, s) for s in ("segment", "diagnose", "plan")] == [
+        stage_label(s, "en") for s in ("segment", "diagnose", "plan")
+    ]
+    assert all("Schadstelle" not in lbl for lbl in i18n.STAGE_LABELS["en"].values())
 
 
 async def test_blocked_reason_in_english_and_german(image_b64):
     c = MockClient(0.0)
     en = await analyze(make_req(image_b64, user_note="My heated jacket battery is broken", locale="en"), c)
-    de = await analyze(make_req(image_b64, user_note="Akku am Ladegerät, Nutzer-Hinweis", locale="de",
-                                mock_scenario="unsupported"), c)
+    de = await analyze(
+        make_req(image_b64, user_note="Akku am Ladegerät, Nutzer-Hinweis", locale="de", mock_scenario="unsupported"), c
+    )
     assert en.safety.blocked and de.safety.blocked
     assert "dangerous" in en.safety.reason and "Hint from your description: Battery" in en.safety.reason
     assert "gefährlich" in de.safety.reason and "Hinweis aus deiner Beschreibung" in de.safety.reason
@@ -87,8 +98,12 @@ def test_precheck_english_keywords_and_negated_battery():
 def test_unsupported_reason_and_step_help(client, image_b64):
     assert safety.blocked_reason("unsupported", "allowed", None, "en").startswith("This object is not supported")
     assert safety.blocked_reason("unsupported", "allowed", None).startswith("Dieses Objekt wird nicht")
-    body = {"step": {"n": 1, "title": "t", "text": "x"}, "diagnosis_summary": "s", "risk_level": "warn_only",
-            "issue_text": "smoke"}
+    body = {
+        "step": {"n": 1, "title": "t", "text": "x"},
+        "diagnosis_summary": "s",
+        "risk_level": "warn_only",
+        "issue_text": "smoke",
+    }
     assert client.post("/step-help", json={**body, "locale": "en"}).json()["answer"].startswith("There is no guide")
     assert client.post("/step-help", json=body).json()["answer"].startswith("Für diesen Fall")
     assert safety.step_help_escalation("it started to smoke", "allowed")
@@ -113,6 +128,11 @@ def test_agent_trace_labels_by_locale():
 
 def test_relabel_covers_sam_prompt_labels():
     from app.sam import PROMPT_META
+
     assert all(label in i18n.LABELS_EN for label, _ in PROMPT_META.values())
-    assert {i18n.label(l, "en") for l in ("Lötpad +", "Lötpad −", "Lötpad")} == {"Solder pad +", "Solder pad −", "Solder pad"}
+    assert {i18n.label(lbl, "en") for lbl in ("Lötpad +", "Lötpad −", "Lötpad")} == {
+        "Solder pad +",
+        "Solder pad −",
+        "Solder pad",
+    }
     assert i18n.label("Riss", "de") == "Riss"

@@ -33,8 +33,7 @@ class BudgetExceeded(AppError):
     def __init__(self, limit_usd: float) -> None:
         super().__init__(
             "budget_exceeded",
-            f"Das Tageslimit für API-Kosten ({limit_usd:.2f} $) ist erreicht. "
-            "Bitte versuche es morgen erneut.",
+            f"Das Tageslimit für API-Kosten ({limit_usd:.2f} $) ist erreicht. Bitte versuche es morgen erneut.",
             429,
             f"The daily API cost limit (${limit_usd:.2f}) has been reached. Please try again tomorrow.",
         )

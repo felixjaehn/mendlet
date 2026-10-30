@@ -1,12 +1,11 @@
 import base64
 import io
 
-import pytest
 import httpx
+import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
 
-from app.budget import Budget
 from app.config import Settings
 from app.main import create_app
 from app.models import AnalyzeRequest
@@ -15,6 +14,7 @@ from app.models import AnalyzeRequest
 @pytest.fixture(autouse=True)
 def forbid_external_http(monkeypatch):
     """Real-mode tests must inject MockTransport; never consume API credits."""
+
     async def blocked_async(*args, **kwargs):
         raise AssertionError("External HTTP forbidden in offline tests")
 

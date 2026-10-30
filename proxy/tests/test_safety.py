@@ -10,9 +10,15 @@ from app.models import AnalyzeResponse, ClassifyResult, FollowUpQuestion, Safety
 def resp(category="textile", risk="allowed", plan=None, segs=None) -> AnalyzeResponse:
     plan = plan or textile_tear()
     return AnalyzeResponse(
-        case_id=str(uuid.uuid4()), category=category, risk_level=risk, safety=Safety(),
+        case_id=str(uuid.uuid4()),
+        category=category,
+        risk_level=risk,
+        safety=Safety(),
         segments=segs if segs is not None else segments("textile_tear"),
-        diagnosis=plan.diagnosis, decision=plan.decision, shopping_list=plan.shopping_list, guide=plan.guide,
+        diagnosis=plan.diagnosis,
+        decision=plan.decision,
+        shopping_list=plan.shopping_list,
+        guide=plan.guide,
     )
 
 
@@ -22,9 +28,15 @@ def test_allowed_keeps_guide():
     assert r.guide.steps and r.shopping_list
 
 
-@pytest.mark.parametrize("category,risk", [
-    ("textile", "warn_only"), ("shoe", "professional"), ("unsupported", "allowed"), ("unsupported", "warn_only"),
-])
+@pytest.mark.parametrize(
+    "category,risk",
+    [
+        ("textile", "warn_only"),
+        ("shoe", "professional"),
+        ("unsupported", "allowed"),
+        ("unsupported", "warn_only"),
+    ],
+)
 def test_blocked_forces_empty(category, risk):
     r = safety.enforce(resp(category, risk), has_answers=False)
     assert r.safety.blocked and r.safety.reason
@@ -42,9 +54,7 @@ def test_needs_more_info_empties_lists_but_not_blocked():
 def test_followup_questions_max_three():
     plan = textile_tear()
     plan.diagnosis.needs_more_info = True
-    plan.diagnosis.follow_up_questions = [
-        FollowUpQuestion(id=f"q{i}", type="choice", prompt="?") for i in range(5)
-    ]
+    plan.diagnosis.follow_up_questions = [FollowUpQuestion(id=f"q{i}", type="choice", prompt="?") for i in range(5)]
     r = safety.enforce(resp(plan=plan), has_answers=False)
     assert len(r.diagnosis.follow_up_questions) == 3
 
@@ -142,20 +152,24 @@ def test_steps_renumbered():
 
 # ---- keyword pre-check -----------------------------------------------------------
 
-@pytest.mark.parametrize("note,risk", [
-    ("Netzteil Kabel kaputt", "warn_only"),
-    ("Akku ist aufgebläht", "warn_only"),
-    ("Lithium-Ionen Zelle", "warn_only"),
-    ("läuft mit 230V", "warn_only"),
-    ("beheizbare Jacke", "warn_only"),
-    ("Kondensator im Blitzgerät", "warn_only"),
-    ("Gasherd Dichtung", "warn_only"),
-    ("Fahrradhelm Riss", "professional"),
-    ("Kindersitz Gurt", "professional"),
-    ("Bremse quietscht", "professional"),
-    ("Sohle löst sich vorne", "allowed"),
-    ("", "allowed"),
-])
+
+@pytest.mark.parametrize(
+    "note,risk",
+    [
+        ("Netzteil Kabel kaputt", "warn_only"),
+        ("Akku ist aufgebläht", "warn_only"),
+        ("Lithium-Ionen Zelle", "warn_only"),
+        ("läuft mit 230V", "warn_only"),
+        ("beheizbare Jacke", "warn_only"),
+        ("Kondensator im Blitzgerät", "warn_only"),
+        ("Gasherd Dichtung", "warn_only"),
+        ("Fahrradhelm Riss", "professional"),
+        ("Kindersitz Gurt", "professional"),
+        ("Bremse quietscht", "professional"),
+        ("Sohle löst sich vorne", "allowed"),
+        ("", "allowed"),
+    ],
+)
 def test_precheck_keywords(note, risk):
     assert safety.precheck_note(note).risk_level == risk
 
@@ -183,6 +197,7 @@ def test_step_help_escalation():
 
 def test_negated_battery_is_not_a_hazard_but_other_negations_stay_conservative():
     from app.safety import precheck_note
+
     assert precheck_note("USB-Lampe, Kabel abgerissen. Kein Akku drin.").risk_level == "allowed"
     assert precheck_note("Gerät ohne Lithium-Akku").risk_level == "allowed"
     assert precheck_note("Der Akku ist aufgebläht").risk_level == "warn_only"
@@ -192,6 +207,7 @@ def test_negated_battery_is_not_a_hazard_but_other_negations_stay_conservative()
 
 def test_second_life_only_for_replace_and_capped_at_three():
     from app.models import SecondLife
+
     ideas = [SecondLife(kind="upcycle", title=f"Idea {i}", text="Cut it into cleaning rags.") for i in range(5)]
     plan = textile_tear()
     plan.decision.recommendation = "replace"

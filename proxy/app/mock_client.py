@@ -8,9 +8,8 @@ import re
 import numpy as np
 from PIL import Image
 
-from . import i18n
+from . import i18n, mock_electronics
 from . import mock_data as md
-from . import mock_electronics
 from .errors import AppError
 from .images import downscale_b64
 from .models import (
@@ -32,9 +31,18 @@ from .video import prepare_video
 
 PLAN_LABEL = {"de": "Plan zusammenstellen", "en": "Assembling the plan"}
 SCENARIOS = {
-    "textile_tear_needs_label", "textile_tear", "textile_hole", "textile_open_seam", "textile_button",
-    "shoe_sole", "battery_jacket", "helmet", "unsupported",
-    "textile_grounding", "textile_multi", "textile_rings",
+    "textile_tear_needs_label",
+    "textile_tear",
+    "textile_hole",
+    "textile_open_seam",
+    "textile_button",
+    "shoe_sole",
+    "battery_jacket",
+    "helmet",
+    "unsupported",
+    "textile_grounding",
+    "textile_multi",
+    "textile_rings",
     "electronics_wire",
 }
 
@@ -89,8 +97,11 @@ class MockClient:
         await self._sleep(0.7)
         scenario = pick_scenario(req)
         if scenario == "electronics_wire":
-            return ClassifyResult(category="low_voltage_electronics", risk_level="allowed",
-                                  reason="USB-Kleinspannungsplatine mit losen Leitungen (Demo ohne Batterie).")
+            return ClassifyResult(
+                category="low_voltage_electronics",
+                risk_level="allowed",
+                reason="USB-Kleinspannungsplatine mit losen Leitungen (Demo ohne Batterie).",
+            )
         if scenario.startswith("shoe"):
             return md.CLASSIFY["shoe"]
         if scenario.startswith("textile"):
@@ -126,22 +137,32 @@ class MockClient:
         if re.search(r"rauch|heiß|heiss|akku|brenn", issue):
             return StepHelpResponse(
                 answer="Brich den Schritt sofort ab, nimm das Teil weg von Hitzequellen und lüfte den Raum. Mach erst weiter, wenn alles abgekühlt ist.",
-                retry_hint=None, escalate=True)
+                retry_hint=None,
+                escalate=True,
+            )
         if re.search(r"kleber|haftet|klebt", issue):
             return StepHelpResponse(
-                answer=f"Beim Schritt \"{title}\" haftet der Kleber meist nicht, weil die Fläche fettig oder zu glatt ist oder die Schichten zu früh zusammenkamen.",
-                retry_hint="Raue die Flächen erneut an, entfette sie und lass den Kleber vor dem Zusammendrücken 10–15 Minuten ablüften.", escalate=False)
+                answer=f'Beim Schritt "{title}" haftet der Kleber meist nicht, weil die Fläche fettig oder zu glatt ist oder die Schichten zu früh zusammenkamen.',
+                retry_hint="Raue die Flächen erneut an, entfette sie und lass den Kleber vor dem Zusammendrücken 10–15 Minuten ablüften.",
+                escalate=False,
+            )
         if re.search(r"faden|reißt|reisst|verknot|verdrill", issue):
             return StepHelpResponse(
                 answer="Der Faden verdrillt oder reißt, wenn er zu lang ist oder zu stramm gezogen wird. Kürze ihn auf etwa 50 cm und ziehe ihn gleichmäßig an.",
-                retry_hint="Fädle neu ein, mach den Knoten kleiner und führe die Nadel in gleichmäßigen Stichen weiter.", escalate=False)
+                retry_hint="Fädle neu ein, mach den Knoten kleiner und führe die Nadel in gleichmäßigen Stichen weiter.",
+                escalate=False,
+            )
         if re.search(r"nadel|durch|dick|hart|steif", issue):
             return StepHelpResponse(
                 answer="Bei dickem Stoff schiebst du die Nadel mit dem Fingerhut durch und stichst senkrecht ein. Ein dünnes Stück Seife auf der Nadel hilft, aber nicht zwingend.",
-                retry_hint="Versuche kleinere Stiche und stich nur durch eine Lage, wenn die Naht sichtbar bleiben darf.", escalate=False)
+                retry_hint="Versuche kleinere Stiche und stich nur durch eine Lage, wenn die Naht sichtbar bleiben darf.",
+                escalate=False,
+            )
         return StepHelpResponse(
-            answer=f"Zum Schritt \"{title}\": Geh ihn noch einmal langsam durch und vergleiche, was der Schritt verlangt, mit deinem Ergebnis. Die übrigen Schritte bleiben unverändert.",
-            retry_hint="Mach ein Foto der Stelle von nahem und schicke es mit, dann sehe ich genauer hin.", escalate=False)
+            answer=f'Zum Schritt "{title}": Geh ihn noch einmal langsam durch und vergleiche, was der Schritt verlangt, mit deinem Ergebnis. Die übrigen Schritte bleiben unverändert.',
+            retry_hint="Mach ein Foto der Stelle von nahem und schicke es mit, dann sehe ich genauer hin.",
+            escalate=False,
+        )
 
     async def transcribe(self, wav: bytes, duration_s: float, locale: str = "de") -> str:
         await self._sleep(0.6)
@@ -153,8 +174,11 @@ class MockClient:
         await self._sleep(0.6)
         if category == "low_voltage_electronics":
             return mock_electronics.segments()[5:]
-        return [md.segments("shoe_sole" if category == "shoe" else "textile_tear")[1].model_copy(
-            update={"source": "grounding"})]
+        return [
+            md.segments("shoe_sole" if category == "shoe" else "textile_tear")[1].model_copy(
+                update={"source": "grounding"}
+            )
+        ]
 
     async def refine(self, req: RefineRequest) -> Segment:
         image = downscale_b64(req.image_base64)
@@ -164,8 +188,10 @@ class MockClient:
         mask = np.zeros((height, width), dtype=bool)
         if req.box:
             x, y, w, h = req.box
-            mask[int(y * height):max(int(y * height) + 1, int(np.ceil((y + h) * height))),
-                 int(x * width):max(int(x * width) + 1, int(np.ceil((x + w) * width)))] = True
+            mask[
+                int(y * height) : max(int(y * height) + 1, int(np.ceil((y + h) * height))),
+                int(x * width) : max(int(x * width) + 1, int(np.ceil((x + w) * width))),
+            ] = True
         for label in ("positive", "negative"):
             for p in (p for p in req.points if p.label == label):
                 cx, cy = min(width - 1, int(p.x * width)), min(height - 1, int(p.y * height))
@@ -173,10 +199,20 @@ class MockClient:
                 mask[region] = label == "positive"
         rings = bitmap_to_rings(mask)
         if not rings:
-            raise AppError("no_segment", "Die markierte Stelle konnte nicht erkannt werden. Bitte markiere sie erneut.", 422, en="The marked area could not be recognized. Please mark it again.")
+            raise AppError(
+                "no_segment",
+                "Die markierte Stelle konnte nicht erkannt werden. Bitte markiere sie erneut.",
+                422,
+                en="The marked area could not be recognized. Please mark it again.",
+            )
         result = md.seg("seg_1", req.label, "damage", req.label, 0.9, rings[0].points)
         ys, xs = np.nonzero(mask)
-        result.box = [min(xs) / width, min(ys) / height, (max(xs) + 1 - min(xs)) / width, (max(ys) + 1 - min(ys)) / height]
+        result.box = [
+            min(xs) / width,
+            min(ys) / height,
+            (max(xs) + 1 - min(xs)) / width,
+            (max(ys) + 1 - min(ys)) / height,
+        ]
         result.mask.rings = rings
         result.source = "tap"
         return result
@@ -197,11 +233,27 @@ class MockClient:
         ]
         for n, (tool, label, model, delay) in enumerate(script, start=1):
             await self._sleep(delay)
-            await emit({"n": n, "tool": tool, "label": label, "model": model, "status": "done",
-                        "ms": round(delay * self.scale * 1000)})
+            await emit(
+                {
+                    "n": n,
+                    "tool": tool,
+                    "label": label,
+                    "model": model,
+                    "status": "done",
+                    "ms": round(delay * self.scale * 1000),
+                }
+            )
         plan = await self.diagnose(req, cls, found)
-        await emit({"n": 6, "tool": "finish", "label": i18n.pick(PLAN_LABEL, req.locale), "model": "muse-wonder-1.0",
-                    "status": "done", "ms": round(1.2 * self.scale * 1000)})
+        await emit(
+            {
+                "n": 6,
+                "tool": "finish",
+                "label": i18n.pick(PLAN_LABEL, req.locale),
+                "model": "muse-wonder-1.0",
+                "status": "done",
+                "ms": round(1.2 * self.scale * 1000),
+            }
+        )
         return found, plan
 
     async def detect(self, req: DetectRequest) -> list[Segment]:
@@ -224,4 +276,6 @@ class MockClient:
                 photo.putpixel((x, y), tuple(v + 3 if v <= 252 else v - 3 for v in photo.getpixel((x, y))))
             out = io.BytesIO()
             photo.save(out, format="PNG")
-        return AfterPreviewResponse(image_base64=base64.b64encode(out.getvalue()).decode("ascii"), model="muse-image-1.0")
+        return AfterPreviewResponse(
+            image_base64=base64.b64encode(out.getvalue()).decode("ascii"), model="muse-image-1.0"
+        )

@@ -14,8 +14,8 @@ from .models import (
     AnalyzeResponse,
     ClassifyResult,
     Decision,
-    Diagnosis,
     DiagnosePlan,
+    Diagnosis,
     Safety,
     Segment,
     Stage,
@@ -30,6 +30,7 @@ STAGE_LABELS: dict[str, str] = i18n.STAGE_LABELS["de"]  # German default; use st
 
 def stage_label(stage: str, locale: str | None = None) -> str:
     return i18n.pick(i18n.STAGE_LABELS, locale)[stage]
+
 
 Progress = Callable[[Stage], Awaitable[None]]
 GroundingProgress = Callable[[], Awaitable[None]]
@@ -115,14 +116,17 @@ def _free_id(segments: list[Segment]) -> str:
     return f"seg_{index}"
 
 
-async def _classic_segments(req: AnalyzeRequest, client: ModelClient, cls: ClassifyResult,
-                            grounding: GroundingProgress) -> list[Segment]:
+async def _classic_segments(
+    req: AnalyzeRequest, client: ModelClient, cls: ClassifyResult, grounding: GroundingProgress
+) -> list[Segment]:
     if cls.category == "low_voltage_electronics":
         # Bare ends are damage, but never replace the independently grounded destination pads.
         await grounding()
         results = await asyncio.gather(
             client.segment(req, cls.category, SEGMENT_PROMPTS[cls.category]),
-            client.ground(req, cls.category), return_exceptions=True)
+            client.ground(req, cls.category),
+            return_exceptions=True,
+        )
         segments = []
         for result in results:
             if isinstance(result, (BudgetExceeded, asyncio.CancelledError)):
@@ -151,13 +155,19 @@ async def _classic_segments(req: AnalyzeRequest, client: ModelClient, cls: Class
             if grounded:
                 # Benchmark 2026-10-29: SAM's uncertain text hits (< 0.7) away from where Spark sees the damage were
                 # buttonholes, intact seams and a sound sole; dropping them removed 8 false positives, no real damage.
-                segments = [s for s in segments if s.kind != "damage" or s.score >= UNSURE_TEXT_DAMAGE
-                            or any(_overlaps(s, g) for g in grounded)]
+                segments = [
+                    s
+                    for s in segments
+                    if s.kind != "damage" or s.score >= UNSURE_TEXT_DAMAGE or any(_overlaps(s, g) for g in grounded)
+                ]
             for segment in grounded:
                 # Real photo 2026-10-29 (leather sole): SAM's "detached sole" box covered the whole sole while Spark's
                 # box sat exactly on the worn-through hole. A far smaller grounded box inside it is the precise one.
-                broad = [s for s in segments if s.kind == "damage" and _overlaps(segment, s)
-                         and _area(segment) < PRECISE_RATIO * _area(s)]
+                broad = [
+                    s
+                    for s in segments
+                    if s.kind == "damage" and _overlaps(segment, s) and _area(segment) < PRECISE_RATIO * _area(s)
+                ]
                 segments = [s for s in segments if s not in broad]
                 if not any(_overlaps(segment, s) for s in segments if s.kind == "damage"):
                     segments.append(segment.model_copy(update={"id": _free_id(segments)}))
@@ -185,9 +195,14 @@ async def _classic_segments(req: AnalyzeRequest, client: ModelClient, cls: Class
     return segments
 
 
-async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress = _noop,
-                  grounding: GroundingProgress = _noop_grounding, segments_ready: SegmentsReady = _noop_segments,
-                  agent_step: AgentStepEvent = _noop_step) -> AnalyzeResponse:
+async def analyze(
+    req: AnalyzeRequest,
+    client: ModelClient,
+    progress: Progress = _noop,
+    grounding: GroundingProgress = _noop_grounding,
+    segments_ready: SegmentsReady = _noop_segments,
+    agent_step: AgentStepEvent = _noop_step,
+) -> AnalyzeResponse:
     """Run the pipeline on an already prepared (downscaled) request."""
     pre = safety.precheck_note("\n".join([req.note, *(a.text for a in req.answers)]), req.locale)
 
@@ -197,7 +212,8 @@ async def analyze(req: AnalyzeRequest, client: ModelClient, progress: Progress =
     except ModelOutputError:
         log.warning("classify output invalid after retry; falling back to warn_only")
         cls = ClassifyResult(
-            category="unsupported", risk_level="warn_only",
+            category="unsupported",
+            risk_level="warn_only",
             reason=i18n.pick(CLASSIFY_FALLBACK_REASON, req.locale),
         )
     cls = safety.apply_precheck(cls, pre)

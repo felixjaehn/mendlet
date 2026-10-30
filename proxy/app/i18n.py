@@ -34,7 +34,7 @@ def current() -> str:
     return _current.get()
 
 
-def pick(pair: dict[str, T], locale: str | None) -> T:
+def pick[T](pair: dict[str, T], locale: str | None) -> T:
     return pair.get(norm(locale), pair[DEFAULT])
 
 
@@ -57,12 +57,29 @@ GROUNDING_LABEL = {"de": "Schadstelle genauer lokalisieren", "en": "Locating the
 
 # German segment label -> English (labels are produced from SAM prompts in sam.PROMPT_META and by the agent).
 LABELS_EN: dict[str, str] = {
-    "Riss": "Tear", "Loch": "Hole", "Offene Naht": "Open seam", "Ausgefranster Rand": "Frayed edge",
-    "Kleidungsstück": "Garment", "Knopf": "Button", "Stoff": "Fabric", "Sohle": "Sole", "Naht": "Seam",
-    "Abgelöste Sohle": "Detached sole", "Absatz": "Heel", "Kabelschaden": "Damaged wire", "Kabel": "Cable",
-    "Stecker": "Connector", "Gehäuse": "Housing", "Rotes Kabel": "Red wire", "Schwarzes Kabel": "Black wire",
-    "Abisoliertes Kabelende": "Stripped wire end", "Platine": "Circuit board", "Schadstelle": "Damaged area",
-    "Lötpad +": "Solder pad +", "Lötpad −": "Solder pad −", "Lötpad": "Solder pad",
+    "Riss": "Tear",
+    "Loch": "Hole",
+    "Offene Naht": "Open seam",
+    "Ausgefranster Rand": "Frayed edge",
+    "Kleidungsstück": "Garment",
+    "Knopf": "Button",
+    "Stoff": "Fabric",
+    "Sohle": "Sole",
+    "Naht": "Seam",
+    "Abgelöste Sohle": "Detached sole",
+    "Absatz": "Heel",
+    "Kabelschaden": "Damaged wire",
+    "Kabel": "Cable",
+    "Stecker": "Connector",
+    "Gehäuse": "Housing",
+    "Rotes Kabel": "Red wire",
+    "Schwarzes Kabel": "Black wire",
+    "Abisoliertes Kabelende": "Stripped wire end",
+    "Platine": "Circuit board",
+    "Schadstelle": "Damaged area",
+    "Lötpad +": "Solder pad +",
+    "Lötpad −": "Solder pad −",
+    "Lötpad": "Solder pad",
     "Etikett": "Label",
 }
 

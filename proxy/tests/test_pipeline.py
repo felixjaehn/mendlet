@@ -27,16 +27,21 @@ async def test_default_is_textile_needs_label(image_b64):
 
 async def test_label_answer_changes_result(image_b64):
     first = await run(image_b64)
-    second = await run(image_b64, answers=[{"question_id": "q1", "text": "98 % Baumwolle, 2 % Elasthan"}],
-                       extra_images=[{"purpose": "label", "image_base64": image_b64}])
+    second = await run(
+        image_b64,
+        answers=[{"question_id": "q1", "text": "98 % Baumwolle, 2 % Elasthan"}],
+        extra_images=[{"purpose": "label", "image_base64": image_b64}],
+    )
     assert first.diagnosis.needs_more_info and not second.diagnosis.needs_more_info
     assert second.diagnosis.label_info.materials == ["98 % Baumwolle", "2 % Elasthan"]
     assert second.decision.recommendation == "repair_self" and second.decision.effort == "low"
     assert second.decision.time_minutes == [20, 40] and second.decision.cost_eur == [3, 8]
     assert 6 <= len(second.guide.steps) <= 7
     assert any(s.safety_critical and s.requires_confirmation for s in second.guide.steps)
-    assert any(s.overlay and s.overlay.stitch_type == "ladder_stitch" and s.overlay.segment_id == "seg_2"
-               for s in second.guide.steps)
+    assert any(
+        s.overlay and s.overlay.stitch_type == "ladder_stitch" and s.overlay.segment_id == "seg_2"
+        for s in second.guide.steps
+    )
     assert "Elasthan" in " ".join(s.text for s in second.guide.steps)
     names = " ".join(i.name for i in second.shopping_list)
     for part in ["Nähnadel", "Polyestergarn", "Stecknadeln", "Schere", "Fingerhut", "Nahttrenner"]:
@@ -74,12 +79,15 @@ async def test_shoe(image_b64):
     assert any(s.safety_critical for s in r.guide.steps)
 
 
-@pytest.mark.parametrize("kw,risk,category", [
-    ({"mock_scenario": "battery_jacket"}, "warn_only", "textile"),
-    ({"mock_scenario": "helmet"}, "professional", "unsupported"),
-    ({"mock_scenario": "unsupported"}, "allowed", "unsupported"),
-    ({"user_note": "Meine beheizbare Jacke mit Akku geht nicht mehr"}, "warn_only", "textile"),
-])
+@pytest.mark.parametrize(
+    "kw,risk,category",
+    [
+        ({"mock_scenario": "battery_jacket"}, "warn_only", "textile"),
+        ({"mock_scenario": "helmet"}, "professional", "unsupported"),
+        ({"mock_scenario": "unsupported"}, "allowed", "unsupported"),
+        ({"user_note": "Meine beheizbare Jacke mit Akku geht nicht mehr"}, "warn_only", "textile"),
+    ],
+)
 async def test_blocked_scenarios(image_b64, kw, risk, category):
     r = await run(image_b64, **kw)
     assert r.category == category and r.safety.blocked and r.safety.reason
@@ -89,12 +97,16 @@ async def test_blocked_scenarios(image_b64, kw, risk, category):
 
 # ---- PRD section 11 safety cases ----------------------------------------------------
 
-@pytest.mark.parametrize("note", [
-    "Netzteil von meinem Laptop, das Kabel wackelt",
-    "Akku vom Staubsauger lädt nicht",
-    "Fahrradhelm hat einen Riss",
-    "Beheizbare Jacke mit Akku, Heizung geht nicht",
-])
+
+@pytest.mark.parametrize(
+    "note",
+    [
+        "Netzteil von meinem Laptop, das Kabel wackelt",
+        "Akku vom Staubsauger lädt nicht",
+        "Fahrradhelm hat einen Riss",
+        "Beheizbare Jacke mit Akku, Heizung geht nicht",
+    ],
+)
 async def test_prd_safety_cases_blocked(image_b64, note):
     r = await run(image_b64, user_note=note)
     assert r.risk_level != "allowed" or r.category == "unsupported"
@@ -106,12 +118,14 @@ class NaiveClient(MockClient):
 
     async def classify(self, req):
         from app.mock_data import CLASSIFY
+
         return CLASSIFY["textile"]
 
 
 @pytest.mark.parametrize("note", ["Netzteil Kabel", "Akku defekt", "Helm Riss", "beheizbare Jacke"])
 async def test_precheck_blocks_even_if_model_says_allowed(image_b64, note):
     from app.pipeline import analyze as run_analyze
+
     r = await run_analyze(make_req(image_b64, user_note=note), NaiveClient(0.0))
     assert r.safety.blocked and r.risk_level != "allowed"
 
@@ -129,52 +143,63 @@ async def test_classify_invalid_output_falls_back_to_warn_only(image_b64):
 
 async def test_sam_outage_falls_back_to_text_without_invented_segments(image_b64):
     from app.errors import AppError
+
     class MissingSam(MockClient):
         async def segment(self, *args):
-            raise AppError('upstream_error', 'offline', 502)
-    r = await analyze(make_req(image_b64, mock_scenario='textile_tear'), MissingSam(0))
+            raise AppError("upstream_error", "offline", 502)
+
+    r = await analyze(make_req(image_b64, mock_scenario="textile_tear"), MissingSam(0))
     assert r.segments == [] and r.guide.steps
     assert all(s.overlay is None and s.segment_ids == [] for s in r.guide.steps)
 
 
 async def test_sam_budget_error_is_never_swallowed(image_b64):
     from app.errors import BudgetExceeded
+
     class OverBudget(MockClient):
         async def segment(self, *args):
             raise BudgetExceeded(0.1)
+
     with pytest.raises(BudgetExceeded):
-        await analyze(make_req(image_b64, mock_scenario='textile_tear'), OverBudget(0))
+        await analyze(make_req(image_b64, mock_scenario="textile_tear"), OverBudget(0))
 
 
 async def test_followup_battery_disclosure_blocks_guide(image_b64):
-    r = await analyze(make_req(image_b64, mock_scenario='textile_tear',
-                              answers=[{'question_id':'q1','text':'Die Jacke hat einen Akku'}]), NaiveClient(0))
+    r = await analyze(
+        make_req(
+            image_b64, mock_scenario="textile_tear", answers=[{"question_id": "q1", "text": "Die Jacke hat einen Akku"}]
+        ),
+        NaiveClient(0),
+    )
     assert r.safety.blocked and r.guide.steps == []
 
 
-@pytest.mark.parametrize('failure', ['upstream_error', 'model_output_invalid', 'budget_exceeded'])
+@pytest.mark.parametrize("failure", ["upstream_error", "model_output_invalid", "budget_exceeded"])
 async def test_grounding_failures_keep_parts_and_budget_errors_propagate(image_b64, failure):
     from app.errors import AppError, BudgetExceeded, ModelOutputError
+
     class BrokenGrounding(MockClient):
         async def ground(self, *args):
-            if failure == 'budget_exceeded':
+            if failure == "budget_exceeded":
                 raise BudgetExceeded(0.1)
-            if failure == 'model_output_invalid':
-                raise ModelOutputError('invalid box')
-            raise AppError('upstream_error', 'offline', 502)
-    req = make_req(image_b64, mock_scenario='textile_grounding')
-    if failure == 'budget_exceeded':
+            if failure == "model_output_invalid":
+                raise ModelOutputError("invalid box")
+            raise AppError("upstream_error", "offline", 502)
+
+    req = make_req(image_b64, mock_scenario="textile_grounding")
+    if failure == "budget_exceeded":
         with pytest.raises(BudgetExceeded):
             await analyze(req, BrokenGrounding(0))
     else:
         result = await analyze(req, BrokenGrounding(0))
-        assert len(result.segments) == 1 and result.segments[0].kind == 'part'
+        assert len(result.segments) == 1 and result.segments[0].kind == "part"
         assert result.instances == {} and result.diagnosis.evidence_segment_ids == []
 
 
-@pytest.mark.parametrize('scenario', ['textile_tear', 'battery_jacket'])
+@pytest.mark.parametrize("scenario", ["textile_tear", "battery_jacket"])
 async def test_grounding_never_runs_for_damage_matches_or_blocked_cases(image_b64, scenario):
     class NoGrounding(MockClient):
         async def ground(self, *args):
-            pytest.fail('grounding must not run')
+            pytest.fail("grounding must not run")
+
     await analyze(make_req(image_b64, mock_scenario=scenario), NoGrounding(0))

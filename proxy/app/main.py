@@ -17,18 +17,30 @@ from .config import PROXY_DIR, Settings, load_dotenv
 from .errors import AppError
 from .images import downscale_b64, prepare_request
 from .models import (
-    AfterPreviewRequest, AfterPreviewResponse, AnalyzeRequest, AnalyzeResponse, DetectRequest, DetectResponse, RefineRequest,
-    Segment, Stage, StepHelpRequest, StepHelpResponse, TrackRequest, TrackResponse,
+    AfterPreviewRequest,
+    AfterPreviewResponse,
+    AnalyzeRequest,
+    AnalyzeResponse,
+    DetectRequest,
+    DetectResponse,
+    RefineRequest,
+    Segment,
+    Stage,
+    StepHelpRequest,
+    StepHelpResponse,
+    TrackRequest,
+    TrackResponse,
 )
 from .pipeline import analyze, stage_label
 
 log = logging.getLogger("proxy")
 
 
-INTERNAL_ERROR = {"de": "Unerwarteter Fehler. Bitte versuche es erneut.",
-                  "en": "Unexpected error. Please try again."}
-STEP_HELP_BLOCKED = {"de": "Für diesen Fall gibt es keine Anleitung. Bitte wende dich an einen Fachbetrieb.",
-                     "en": "There is no guide for this case. Please contact a professional."}
+INTERNAL_ERROR = {"de": "Unerwarteter Fehler. Bitte versuche es erneut.", "en": "Unexpected error. Please try again."}
+STEP_HELP_BLOCKED = {
+    "de": "Für diesen Fall gibt es keine Anleitung. Bitte wende dich an einen Fachbetrieb.",
+    "en": "There is no guide for this case. Please contact a professional.",
+}
 
 
 def _sse(event: str, data: dict) -> str:
@@ -76,10 +88,13 @@ async def _event_stream(req: AnalyzeRequest, client: ModelClient) -> AsyncIterat
         task.cancel()
 
 
-def create_app(settings: Settings | None = None, client: ModelClient | None = None, budget: Budget | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None, client: ModelClient | None = None, budget: Budget | None = None
+) -> FastAPI:
     settings = settings or Settings.from_env()
     budget = budget or Budget(settings.cache_dir / "budget.json", settings.daily_budget_usd)
     client = client or build_client(settings, budget)
+
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         try:
@@ -128,7 +143,8 @@ def create_app(settings: Settings | None = None, client: ModelClient | None = No
         if body.risk_level != "allowed":
             return StepHelpResponse(
                 answer=i18n.pick(STEP_HELP_BLOCKED, body.locale),
-                retry_hint=None, escalate=True,
+                retry_hint=None,
+                escalate=True,
             )
         out = await client.step_help(body)
         out.escalate = out.escalate or safety.step_help_escalation(body.issue_text, body.risk_level)

@@ -14,7 +14,7 @@ from tests.conftest import make_image_b64
 def parse_sse(text: str) -> list[tuple[str, dict]]:
     events = []
     for block in text.strip().split("\n\n"):
-        lines = dict(l.split(": ", 1) for l in block.splitlines())
+        lines = dict(ln.split(": ", 1) for ln in block.splitlines())
         events.append((lines["event"], json.loads(lines["data"])))
     return events
 
@@ -51,8 +51,10 @@ def test_analyze_invalid_image_422(client):
 
 
 def test_large_image_downscaled(settings):
-    from app.images import downscale_b64
     from PIL import Image
+
+    from app.images import downscale_b64
+
     big = make_image_b64((3000, 2000))
     out = Image.open(io.BytesIO(base64.b64decode(downscale_b64(big))))
     assert max(out.size) == 1536
@@ -70,8 +72,12 @@ def test_budget_429(settings):
 
 
 def test_step_help(client):
-    body = {"step": {"n": 3, "title": "Kleber auftragen", "text": "t"}, "diagnosis_summary": "s",
-            "risk_level": "allowed", "issue_text": "Der Kleber haftet nicht"}
+    body = {
+        "step": {"n": 3, "title": "Kleber auftragen", "text": "t"},
+        "diagnosis_summary": "s",
+        "risk_level": "allowed",
+        "issue_text": "Der Kleber haftet nicht",
+    }
     r = client.post("/step-help", json=body)
     assert r.status_code == 200 and r.json()["escalate"] is False and r.json()["answer"]
     for word in ["Rauch", "heiß", "Akku", "brennt"]:
@@ -84,7 +90,9 @@ def test_step_help(client):
 def wav_bytes(rate=16000, channels=1, seconds=0.2) -> bytes:
     buf = io.BytesIO()
     with wave.open(buf, "wb") as w:
-        w.setnchannels(channels); w.setsampwidth(2); w.setframerate(rate)
+        w.setnchannels(channels)
+        w.setsampwidth(2)
+        w.setframerate(rate)
         w.writeframes(b"\x00\x01" * int(rate * seconds) * channels)
     return buf.getvalue()
 
@@ -101,6 +109,7 @@ def test_transcribe_rejects_non_wav(client):
 
 def test_ensure_wav_converts_stereo_44k():
     from app.audio import ensure_wav
+
     out, dur = ensure_wav(wav_bytes(44100, 2))
     with wave.open(io.BytesIO(out)) as w:
         assert (w.getnchannels(), w.getframerate(), w.getsampwidth()) == (1, 16000, 2)
@@ -108,7 +117,8 @@ def test_ensure_wav_converts_stereo_44k():
 
 
 def test_more_than_50_images_rejected_before_any_model_call(client, image_b64):
-    r = client.post('/analyze?stream=false', json={
-        'image_base64': image_b64,
-        'extra_images': [{'purpose':'other', 'image_base64':image_b64}] * 50})
+    r = client.post(
+        "/analyze?stream=false",
+        json={"image_base64": image_b64, "extra_images": [{"purpose": "other", "image_base64": image_b64}] * 50},
+    )
     assert r.status_code == 422

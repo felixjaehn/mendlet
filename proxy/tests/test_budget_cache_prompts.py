@@ -1,10 +1,11 @@
 import json
 
+import pytest
+
 from app.budget import Budget, image_cost, muse_cost, sam_cost, sam_video_cost, transcribe_cost
 from app.cache import ModelCache
 from app.errors import BudgetExceeded
 from app.prompts import MARKER, PROMPTS, load_prompt, schema_text
-import pytest
 
 
 def test_prices():
@@ -53,16 +54,18 @@ def test_prompt_files_have_current_schema(key):
 def test_schema_preserves_actual_title_property():
     from app.models import DiagnosePlan
     from app.prompts import inline_schema, prompt_version
-    step = inline_schema(DiagnosePlan)['properties']['guide']['properties']['steps']['items']
-    assert step['properties']['title'] == {'type': 'string'}
-    assert set(step['required']) <= set(step['properties'])
-    assert prompt_version('diagnose') == 'v8'
+
+    step = inline_schema(DiagnosePlan)["properties"]["guide"]["properties"]["steps"]["items"]
+    assert step["properties"]["title"] == {"type": "string"}
+    assert set(step["required"]) <= set(step["properties"])
+    assert prompt_version("diagnose") == "v8"
 
 
 def test_prompt_b_v3_label_and_safety_rules():
     """Live 2026-10-28: v2 asked for the label on obvious denim and flagged every sewing step as safety-critical."""
-    from app.prompts import load_prompt
     from app.config import Settings
-    text = load_prompt('diagnose', Settings.from_env({}).prompts_dir)
-    assert 'NICHT routinemäßig nach dem Etikett' in text
-    assert 'Normales Nähen mit der Handnadel' in text
+    from app.prompts import load_prompt
+
+    text = load_prompt("diagnose", Settings.from_env({}).prompts_dir)
+    assert "NICHT routinemäßig nach dem Etikett" in text
+    assert "Normales Nähen mit der Handnadel" in text
