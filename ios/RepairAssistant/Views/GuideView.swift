@@ -15,17 +15,19 @@ struct GuideView: View {
         GeometryReader { geo in
             if let step = steps[safe: index], let r = flow.response {
                 VStack(spacing: 0) {
-                    photo(step, r, geo: geo).frame(height: geo.size.height * 0.46)
+                    topBand(geo: geo)
+                    photo(step, r, geo: geo).frame(height: geo.size.height * 0.36)
                     ScrollView {
                         stepContent(step, r)
                             .id(step.n)
                             .transition(.asymmetric(insertion: .move(edge: forward ? .trailing : .leading).combined(with: .opacity),
                                                     removal: .opacity))
-                            .padding(.horizontal, Theme.margin).padding(.top, 20).padding(.bottom, 28)
+                            .padding(.horizontal, Theme.margin).padding(.top, 16).padding(.bottom, 24)
                     }
                     .scrollIndicators(.hidden)
-                    .contentMargins(.bottom, 16, for: .scrollContent)
+                    .contentMargins(.bottom, 24, for: .scrollContent)
                     .clipped()
+                    .mask(VStack(spacing: 0) { Color.black; LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom).frame(height: 20) })
                     bottomBar(step)
                 }
                 .background(Theme.surface)
@@ -48,19 +50,19 @@ struct GuideView: View {
                         .transition(.opacity)
                 }
             } else { Color.black }
-            LinearGradient(colors: [.black.opacity(0.28), .clear], startPoint: .top, endPoint: .bottom)
-                .frame(height: geo.safeAreaInsets.top + 60).allowsHitTesting(false)
-            VStack(spacing: 10) {
-                SegmentBar(count: steps.count, done: index, current: index, onPhoto: true)
-                HStack {
-                    CircleIconButton(systemImage: "xmark", label: "Close", onPhoto: true) { flow.persist(); flow.reset() }
-                    Spacer()
-                }
-            }
-            .padding(.horizontal, Theme.margin).padding(.top, geo.safeAreaInsets.top + 8)
         }
         .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: Theme.heroRadius, bottomTrailingRadius: Theme.heroRadius, style: .continuous))
         .animation(.easeInOut(duration: 0.25), value: step.n)
+    }
+
+    /// Close and progress live in their own band above the photo, never on top of the overlay.
+    private func topBand(geo: GeometryProxy) -> some View {
+        HStack(spacing: 12) {
+            CircleIconButton(systemImage: "xmark", label: "Close") { flow.persist(); flow.reset() }
+            SegmentBar(count: steps.count, done: index, current: index)
+        }
+        .padding(.horizontal, Theme.margin).padding(.top, geo.safeAreaInsets.top).padding(.bottom, 8)
+        .background(Theme.surface)
     }
 
     private func darningPhase(for step: GuideStep, in r: AnalyzeResponse) -> DarningPhase {
@@ -77,13 +79,15 @@ struct GuideView: View {
         let polishedBody = CopyPolish.text(parts.body, english: english)
         let words = polishedBody.split(separator: " ").count
         let sentences = CopyPolish.sentences(polishedBody)
-        let long = words > 45 && sentences.count > 2
+        let long = words > 30 && sentences.count > 1
+        var collapsed: [String] = []
+        for s in sentences { if collapsed.isEmpty || (collapsed + [s]).joined(separator: " ").split(separator: " ").count <= 30 { collapsed.append(s) } else { break } }
         let showAll = expanded.contains(step.n) || !long
         return VStack(alignment: .leading, spacing: 14) {
             Text("Step \(index + 1) of \(steps.count)").overline()
             Text(step.title).font(.serif(.title2)).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
             VStack(alignment: .leading, spacing: 6) {
-                Text(showAll ? polishedBody : sentences.prefix(2).joined(separator: " "))
+                Text(showAll ? polishedBody : collapsed.joined(separator: " "))
                     .font(.body).lineSpacing(4).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                 if !showAll {
                     Button("More") { withAnimation(Theme.spring) { _ = expanded.insert(step.n) } }.font(.body.weight(.medium))

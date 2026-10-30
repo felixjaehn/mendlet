@@ -14,12 +14,11 @@ struct DiagnosisView: View {
         @Bindable var flow = flow
         let r = flow.response
         GeometryReader { geo in
-            let photoHeight = geo.size.height * 0.56
             ZStack(alignment: .top) {
                 Theme.surface.ignoresSafeArea()
                 VStack(spacing: 0) {
-                    hero(r, geo: geo).frame(height: photoHeight)
-                    sheet(r)
+                    hero(r, geo: geo).frame(maxHeight: .infinity)
+                    sheet(r, maxHeight: geo.size.height * 0.5)
                         .padding(.top, -Theme.heroRadius)
                         .offset(y: sheetShown ? 0 : 24).opacity(sheetShown ? 1 : 0)
                 }
@@ -106,8 +105,18 @@ struct DiagnosisView: View {
 
     // MARK: Sheet
 
-    private func sheet(_ r: AnalyzeResponse?) -> some View {
-        ScrollView {
+    private func sheet(_ r: AnalyzeResponse?, maxHeight: CGFloat) -> some View {
+        // shrinks to its content; scrolls only when the content is taller than half the screen
+        ViewThatFits(in: .vertical) {
+            sheetBody(r).padding(.bottom, 8)
+            ScrollView { sheetBody(r) }.scrollIndicators(.hidden)
+        }
+        .frame(maxHeight: maxHeight)
+        .background(Theme.surface, in: UnevenRoundedRectangle(topLeadingRadius: Theme.heroRadius, topTrailingRadius: Theme.heroRadius, style: .continuous))
+    }
+
+    private func sheetBody(_ r: AnalyzeResponse?) -> some View {
+        Group {
             VStack(alignment: .leading, spacing: 14) {
                 if let r {
                     if r.diagnosis.needsMoreInfo {
@@ -131,7 +140,7 @@ struct DiagnosisView: View {
                             }.foregroundStyle(Theme.inkSecondary)
                         }
                         if !flow.changedItemIds.isEmpty { changedLine(r) }
-                        if !r.diagnosis.likelyCauses.isEmpty { causeRow(r.diagnosis.likelyCauses) }
+                        detailsList(r)
                         if flow.labelBusy { labelBusyRow } else if flow.labelOfferAvailable { labelOfferRow }
                     }
                 }
@@ -139,47 +148,48 @@ struct DiagnosisView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, Theme.margin).padding(.top, 24).padding(.bottom, 24)
         }
-        .scrollIndicators(.hidden)
-        .background(Theme.surface, in: UnevenRoundedRectangle(topLeadingRadius: Theme.heroRadius, topTrailingRadius: Theme.heroRadius, style: .continuous))
     }
 
-    /// One line collapsed; more causes on tap (Warby Parker expandable row).
-    private func causeRow(_ causes: [String]) -> some View {
-        let shown = Array(causes.prefix(3))
-        return VStack(alignment: .leading, spacing: 0) {
-            Rectangle().fill(Theme.hairline).frame(height: 0.5)
-            Button {
-                guard shown.count > 1 else { return }
-                withAnimation(Theme.spring) { causesOpen.toggle() }
-                Haptics.selection()
-            } label: {
-                HStack(alignment: .firstTextBaseline, spacing: 12) {
-                    Text("Cause").font(.subheadline).foregroundStyle(Theme.inkSecondary).frame(width: 64, alignment: .leading)
-                    Text(CopyPolish.sentence(shown[0], english: Lang.shared.isEnglish).trimmingCharacters(in: CharacterSet(charactersIn: ".")))
-                        .font(.subheadline.weight(.medium)).foregroundStyle(Theme.ink).multilineTextAlignment(.leading)
-                    Spacer(minLength: 0)
-                    if shown.count > 1 {
-                        Image(systemName: "chevron.down").font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkTertiary)
-                            .rotationEffect(.degrees(causesOpen ? 180 : 0))
-                    }
-                }
-                .frame(minHeight: 48)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            if causesOpen {
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(Array(shown.dropFirst().enumerated()), id: \.offset) { _, c in
-                        Text(CopyPolish.sentence(c, english: Lang.shared.isEnglish).trimmingCharacters(in: CharacterSet(charactersIn: ".")))
-                            .font(.subheadline).foregroundStyle(Theme.ink)
-                    }
-                }
-                .padding(.leading, 76).padding(.bottom, 12)
-                .transition(.opacity)
-            }
-            Rectangle().fill(Theme.hairline).frame(height: 0.5)
+    /// Quiet inset-grouped list: cause, size (only when it can be scaled from a known part), material.
+    private func detailRows(_ r: AnalyzeResponse) -> [(String, String)] {
+        let english = Lang.shared.isEnglish
+        var rows: [(String, String)] = []
+        if let c = r.diagnosis.likelyCauses.first {
+            rows.append(("Cause", CopyPolish.sentence(c, english: english).trimmingCharacters(in: CharacterSet(charactersIn: "."))))
         }
-        .accessibilityElement(children: .combine)
+        if let img = flow.photo, let dim = DamageDimension.layout(segments: r.segments, size: img.size) {
+            let cm = dim.cm.truncatingRemainder(dividingBy: 1) == 0 ? String(Int(dim.cm)) : String(format: "%.1f", dim.cm)
+            rows.append(("Size", "about \(cm) cm"))
+        }
+        if let m = materialText(r) { rows.append(("Material", m)) }
+        return rows
+    }
+
+    @ViewBuilder private func detailsList(_ r: AnalyzeResponse) -> some View {
+        let rows = detailRows(r)
+        if !rows.isEmpty {
+            VStack(spacing: 0) {
+                ForEach(Array(rows.enumerated()), id: \.offset) { i, row in
+                    if i > 0 { Rectangle().fill(Theme.hairline).frame(height: 0.5).padding(.leading, 16) }
+                    HStack(alignment: .firstTextBaseline, spacing: 12) {
+                        Text(tr(row.0)).font(.subheadline).foregroundStyle(Theme.inkSecondary).frame(width: 72, alignment: .leading)
+                        Text(row.1).font(.subheadline.weight(.medium)).foregroundStyle(Theme.ink).multilineTextAlignment(.leading)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal, 16).frame(minHeight: 46)
+                }
+            }
+            .background(Theme.fill, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .accessibilityElement(children: .combine)
+        }
+    }
+
+    private func materialText(_ r: AnalyzeResponse) -> String? {
+        if let m = r.diagnosis.labelInfo?.materials.first, !m.isEmpty { return m }
+        let t = (r.diagnosis.summary + " " + r.diagnosis.likelyCauses.joined(separator: " ")).lowercased()
+        let table: [(String, String)] = [("knit", "Knit"), ("denim", "Denim"), ("jeans", "Denim"), ("leather", "Leather"), ("wool", "Wool"),
+                                         ("cotton", "Cotton"), ("fleece", "Fleece"), ("canvas", "Canvas"), ("rubber", "Rubber"), ("circuit", "Circuit board")]
+        return table.first { t.contains($0.0) }.map { tr($0.1) }
     }
 
     private func changedLine(_ r: AnalyzeResponse) -> some View {

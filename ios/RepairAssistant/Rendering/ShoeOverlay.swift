@@ -117,19 +117,20 @@ struct ShoeOverlay: View {
     // MARK: Drawing
 
     static func draw(_ ctx: inout GraphicsContext, size sz: CGSize, segment: Segment, kind: ShoeStepKind, time t: Double, clip: CGRect? = nil) {
-        if let clip { ctx.clip(to: Path(roundedRect: clip.insetBy(dx: 14, dy: 14), cornerRadius: 10)) }
         let pts = contour(of: segment, in: sz)
         guard pts.count >= 3 else { return }
-        var path = Path()
-        path.move(to: pts[0])
-        for q in pts.dropFirst() { path.addLine(to: q) }
-        path.closeSubpath()
         let amber = Theme.caution
 
-        // glue band: a calm translucent strip along the contour, no hatch, no extra marks
+        // glue band: a calm translucent strip along the contour with round caps. Where the contour leaves the
+        // visible photo the band ends inside it (never cut by the frame edge).
         let w: CGFloat = max(12, min(sz.width, sz.height) * 0.035)
-        let band = path.strokedPath(StrokeStyle(lineWidth: w, lineJoin: .round))
-        ctx.fill(band, with: .color(amber.opacity(kind.glue ? 0.30 : 0.18)))
+        let vis = (clip ?? CGRect(origin: .zero, size: sz)).insetBy(dx: 18 + w / 2, dy: 18 + w / 2)
+        for run in visibleRuns(of: pts, in: vis) {
+            var path = Path()
+            path.move(to: run[0])
+            for q in run.dropFirst() { path.addLine(to: q) }
+            ctx.stroke(path, with: .color(amber.opacity(kind.glue ? 0.30 : 0.18)), style: StrokeStyle(lineWidth: w, lineCap: .round, lineJoin: .round))
+        }
 
         // press arrows perpendicular to the sole edge
         if kind.press {
@@ -144,6 +145,25 @@ struct ShoeOverlay: View {
                       to: CGPoint(x: tip.x - ax.normal.dx * 14, y: tip.y - ax.normal.dy * 14), dir: ax.normal)
             }
         }
+    }
+
+    /// The closed contour, resampled every ~3 px, split into runs that stay inside `rect`.
+    static func visibleRuns(of pts: [CGPoint], in rect: CGRect) -> [[CGPoint]] {
+        var dense: [CGPoint] = []
+        for i in 0..<pts.count {
+            let a = pts[i], b = pts[(i + 1) % pts.count]
+            let n = max(1, Int(hypot(b.x - a.x, b.y - a.y) / 3))
+            for k in 0..<n { let f = CGFloat(k) / CGFloat(n); dense.append(CGPoint(x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f)) }
+        }
+        let inside = dense.map { rect.contains($0) }
+        guard let start = inside.firstIndex(of: false) else { return dense.isEmpty ? [] : [dense + [dense[0]]] }
+        var runs: [[CGPoint]] = [], cur: [CGPoint] = []
+        for off in 1...dense.count {
+            let i = (start + off) % dense.count
+            if inside[i] { cur.append(dense[i]) } else if !cur.isEmpty { runs.append(cur); cur = [] }
+        }
+        if !cur.isEmpty { runs.append(cur) }
+        return runs.filter { $0.count >= 2 }
     }
 
     private static func arrow(_ ctx: inout GraphicsContext, from a: CGPoint, to b: CGPoint, dir: CGVector) {

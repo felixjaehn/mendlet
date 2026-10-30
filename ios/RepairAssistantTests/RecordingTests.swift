@@ -66,7 +66,7 @@ final class RecordingTests: XCTestCase {
         let items = layer.items()
         let holes = items.filter { $0.text.contains("Löcher") }
         XCTAssertEqual(holes.count, 1)
-        XCTAssertEqual(holes.first?.dots.count, 3)
+        XCTAssertEqual(holes.first?.dots.count, 0)   // one leader to the group, no fan-out
         XCTAssertEqual(items.filter { $0.text == "Loch" }.count, 0)
     }
 

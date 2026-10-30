@@ -21,17 +21,23 @@ struct BlockView: View {
     private var reason: String {
         if let r = flow.response?.safety.reason, !r.isEmpty { return CopyPolish.text(r, english: Lang.shared.isEnglish) }
         switch variant {
-        case .battery: return "This one has a lithium battery. A damaged cell can ignite, and no guide can make that safe at home."
+        case .battery: return "This \(itemNoun) has a lithium battery. Repairs near it can cause a fire."
         case .professional: return "A repair here can fail without showing it. Please leave it to a professional."
         case .unsupported: return "Mendlet helps with clothes, shoes and simple low-voltage electronics."
         }
     }
     private var note: String {
         switch variant {
-        case .battery: "If it's a battery, bring it to a recycling point. Don't charge it or open it."
+        case .battery: "This \(itemNoun) has a lithium battery. Repairs near it can cause a fire. Bring the battery to a recycling point and don't charge or open it."
         case .professional: "Ask the maker or a specialist shop about an inspection or a replacement. Don't use it until then."
         case .unsupported: "Take a new photo of the item you want to repair, close up and in daylight."
         }
+    }
+
+    private var itemNoun: String {
+        let t = ProjectTitle.title(summary: flow.response?.diagnosis.summary ?? "", english: Lang.shared.isEnglish)
+        let w = t.split(separator: " ").last.map { String($0).lowercased() } ?? ""
+        return w.isEmpty ? "item" : w
     }
 
     var body: some View {

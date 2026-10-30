@@ -212,4 +212,20 @@ final class StitchPathPlannerTests: XCTestCase {
         let w = AspectFit.rect(content: CGSize(width: 1000, height: 500), in: CGSize(width: 400, height: 400))
         XCTAssertEqual(w.height, 200, accuracy: 0.001); XCTAssertEqual(w.minY, 100, accuracy: 0.001)
     }
+
+    func testAllPointsStayInsideExpandedMaskBounds() {
+        let diag: [CGPoint] = [CGPoint(x: 0.40, y: 0.10), CGPoint(x: 0.46, y: 0.10), CGPoint(x: 0.62, y: 0.85), CGPoint(x: 0.56, y: 0.85)]
+        let polys = [diag, rect(0.3, 0.3, 0.5, 0.45), rect(0.1, 0.49, 0.9, 0.51)]
+        for poly in polys {
+            let ex = StitchPathPlanner.expanded(CGRect(x: poly.map(\.x).min()!, y: poly.map(\.y).min()!,
+                                                       width: poly.map(\.x).max()! - poly.map(\.x).min()!,
+                                                       height: poly.map(\.y).max()! - poly.map(\.y).min()!)).insetBy(dx: -1e-9, dy: -1e-9)
+            for type in [StitchType.darning, .runningStitch, .ladderStitch] {
+                let plan = StitchPathPlanner.plan(polygon: poly, box: nil, stitchType: type, aspect: 0.75)
+                var pts = plan.centerline + plan.stitches.map(\.position) + plan.gridLines.flatMap { $0 }
+                pts += (plan.warpStrokes + plan.weftStrokes).flatMap(\.points)
+                for p in pts { XCTAssertTrue(ex.contains(p), "\(type) point \(p) outside \(ex)") }
+            }
+        }
+    }
 }

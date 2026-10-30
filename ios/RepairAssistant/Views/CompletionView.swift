@@ -10,7 +10,6 @@ struct CompletionView: View {
 
     var body: some View {
         let est = flow.impact()
-        let isShoe = flow.response?.category == .shoe
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 HStack {
@@ -21,8 +20,6 @@ struct CompletionView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Mended.").font(.serif(.largeTitle)).foregroundStyle(Theme.ink)
                     Text(usedAgain).font(.body).foregroundStyle(Theme.inkSecondary)
-                    Text(isShoe ? "About \(ImpactEstimator.format(kg: est.kilograms)) kg kept out of the bin." : "About \(ImpactEstimator.format(kg: est.kilograms)) kg of textile kept in use.")
-                        .font(.subheadline).foregroundStyle(Theme.inkSecondary)
                 }
                 VStack(spacing: 0) {
                     ShareLink(item: shareText(est)) {
@@ -60,11 +57,11 @@ struct CompletionView: View {
         if let before = flow.photo {
             let after = flow.resultPhoto ?? (flow.afterState == .ready ? flow.afterImage : nil)
             if let after {
-                BeforeAfterSlider(before: before, after: after, aspect: 0.8, cornerRadius: Theme.heroRadius)
+                BeforeAfterSlider(before: before, after: after, aspect: 1.05, cornerRadius: Theme.heroRadius)
                     .id(after.hashValue)
             } else {
                 Image(uiImage: before).resizable().scaledToFill()
-                    .aspectRatio(0.8, contentMode: .fit)
+                    .aspectRatio(1.05, contentMode: .fit)
                     .clipShape(RoundedRectangle(cornerRadius: Theme.heroRadius, style: .continuous))
             }
         }

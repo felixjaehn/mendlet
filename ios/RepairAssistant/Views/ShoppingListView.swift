@@ -62,7 +62,7 @@ struct ShoppingListView: View {
                 .monospacedDigit().contentTransition(.numericText())
             ProgressLine(value: items.isEmpty ? 0 : Double(ready) / Double(items.count))
             if let hi = flow.response?.decision?.costEur.last, hi > 0, let lo = flow.response?.decision?.costEur.first {
-                Text("About \(Fmt.number(lo))–\(Fmt.number(hi)) EUR if you buy everything").font(.footnote).foregroundStyle(Theme.inkTertiary)
+                Text("About \(Fmt.euro([lo, hi])) if you buy everything").font(.footnote).foregroundStyle(Theme.inkTertiary)
             }
         }
         .animation(Theme.spring, value: ready)

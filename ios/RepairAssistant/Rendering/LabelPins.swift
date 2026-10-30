@@ -101,7 +101,10 @@ struct LabelPinsLayer {
         let pts = s.ringPolygons.filter { !$0.hole }.flatMap(\.points).map { CGPoint(x: $0.x * size.width, y: $0.y * size.height) }
         func nearest(_ t: CGPoint) -> CGPoint { pts.min { hypot($0.x - t.x, $0.y - t.y) < hypot($1.x - t.x, $1.y - t.y) } ?? t }
         let centroid = pts.isEmpty ? CGPoint(x: b.midX, y: b.midY) : CGPoint(x: pts.map(\.x).reduce(0, +) / CGFloat(pts.count), y: pts.map(\.y).reduce(0, +) / CGFloat(pts.count))
-        return (pts.isEmpty ? CGPoint(x: b.midX, y: b.minY) : nearest(centroid), b, pts)
+        // anchor on the topmost contour point near the centre: the label sits right above it with a short leader
+        let near = pts.filter { abs($0.x - centroid.x) < b.width * 0.3 }
+        let top = (near.isEmpty ? pts : near).min { $0.y < $1.y }
+        return (pts.isEmpty ? CGPoint(x: b.midX, y: b.minY) : (top ?? nearest(centroid)), b, pts)
     }
 
     func items() -> [LabelPlacer.Item] {
@@ -120,11 +123,12 @@ struct LabelPinsLayer {
             let score: String? = nil
             let text = g.count > 1 ? Self.plural(s0.label, g.count) : tr(s0.label)
             let b = infos.dropFirst().reduce(first.bounds) { $0.union($1.bounds) }
-            let anchor = g.count > 1 ? CGPoint(x: infos.map(\.anchor.x).reduce(0, +) / CGFloat(infos.count), y: infos.map(\.anchor.y).reduce(0, +) / CGFloat(infos.count)) : first.anchor
+            // groups: one label, one leader to the top of the group (above its centre)
+            let anchor = g.count > 1 ? CGPoint(x: b.midX, y: b.minY) : first.anchor
             let badge: String? = nil
             out.append(LabelPlacer.Item(id: s0.id, text: text, score: score, badge: badge, anchor: anchor, bounds: b,
                                         width: LabelPlacer.width(text: text, score: score, badge: badge), large: false,
-                                        dots: g.count > 1 ? infos.map(\.anchor) : []))
+                                        dots: []))
         }
         for s in labelled where !s.isDamage {
             guard let i = info(s) else { continue }

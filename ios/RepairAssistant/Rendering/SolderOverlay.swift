@@ -106,7 +106,7 @@ struct SolderOverlay: View {
             }
             .allowsHitTesting(false)
             if let pad, let r = SolderStyle.rect(pad, in: size), let pol = pad.polarity {
-                let d: CGFloat = 40
+                let d: CGFloat = 32
                 let x = pol == "+" ? r.minX - d / 2 - 8 : r.maxX + d / 2 + 8
                 PolarityDisc(polarity: pol, diameter: d)
                     .position(x: min(max(x, d / 2 + 4), size.width - d / 2 - 4), y: r.midY)
@@ -177,113 +177,48 @@ struct SolderOverlay: View {
 
     static func draw(_ ctx: inout GraphicsContext, size sz: CGSize, wire: Segment?, end: Segment?, pad: Segment?,
                      time t: Double, animated: Bool, hold: Double) {
-        let pulse = 0.5 + 0.5 * sin(t * 5)
-
-        // 1. wire mask in its own colour
-        if let wire {
-            let tone = SolderStyle.tone(wire)
-            let fill: Color = tone == .red ? SolderStyle.red : (tone == .black ? .black : Theme.highlight)
-            let edge: Color = tone == .black ? .white : fill
-            var all = Path(); for r in SegmentLayer.ringPaths(for: wire, in: sz) { all.addPath(r.path) }
-            ctx.fill(all, with: .color(fill.opacity(tone == .black ? 0.5 : 0.38)), style: FillStyle(eoFill: true))
-            ctx.drawLayer { l in
-                l.addFilter(.blur(radius: 5))
-                l.stroke(all, with: .color(edge.opacity(tone == .black ? 0.75 : 0.85)), style: StrokeStyle(lineWidth: 5, lineJoin: .round))
-            }
-            ctx.stroke(all, with: .color(edge.opacity(0.95)), style: StrokeStyle(lineWidth: 1.8, lineJoin: .round))
-        }
-
-        // 2. bare end pulses
-        if let end {
-            let rings = SegmentLayer.ringPaths(for: end, in: sz)
+        // One white style (docs/design/REDESIGN-SPEC.md 4.4): outlines of wire, bare end and pad, one route with an arrow,
+        // a progress ring only while the hold timer runs. Polarity discs are drawn by the view.
+        func outline(_ seg: Segment, corner: CGFloat, dashed: Bool = false) {
+            let rings = SegmentLayer.ringPaths(for: seg, in: sz)
             var all = Path(); for r in rings { all.addPath(r.path) }
-            if rings.isEmpty, let r = SolderStyle.rect(end, in: sz) { all = Path(roundedRect: r, cornerRadius: 8) }
-            ctx.fill(all, with: .color(SolderStyle.copper.opacity(0.25 + 0.25 * pulse)), style: FillStyle(eoFill: true))
-            ctx.drawLayer { l in
-                l.addFilter(.blur(radius: 4 + 4 * pulse))
-                l.stroke(all, with: .color(SolderStyle.copper.opacity(0.5 + 0.3 * pulse)), style: StrokeStyle(lineWidth: 4, lineJoin: .round))
-            }
-            ctx.stroke(all, with: .color(SolderStyle.copper), style: StrokeStyle(lineWidth: 1.4, lineJoin: .round))
-            if let c = SolderStyle.centroid(end, in: sz), animated {
-                let k = CGFloat((t * 1.2).truncatingRemainder(dividingBy: 1))
-                let rr = 8 + 16 * k
-                ctx.stroke(Path(ellipseIn: CGRect(x: c.x - rr, y: c.y - rr, width: rr * 2, height: rr * 2)),
-                           with: .color(SolderStyle.copper.opacity(Double(1 - k))), lineWidth: 2)
-            }
+            if rings.isEmpty, let r = SolderStyle.rect(seg, in: sz) { all = Path(roundedRect: r, cornerRadius: corner) }
+            ctx.stroke(all, with: .color(.black.opacity(0.25)), style: StrokeStyle(lineWidth: 3.5, lineCap: .round, lineJoin: .round))
+            ctx.stroke(all, with: .color(.white), style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round, dash: dashed ? [5, 5] : []))
         }
-
-        // 3. pad
-        let padTint = SolderStyle.padColor(pad?.polarity) ?? Theme.highlight
-        if let pad {
-            let rings = SegmentLayer.ringPaths(for: pad, in: sz)
-            var all = Path(); for r in rings { all.addPath(r.path) }
-            if rings.isEmpty, let r = SolderStyle.rect(pad, in: sz) { all = Path(roundedRect: r, cornerRadius: 6) }
-            let isDark = pad.polarity == "-"
-            ctx.fill(all, with: .color(padTint.opacity(isDark ? 0.55 : 0.45)), style: FillStyle(eoFill: true))
-            ctx.drawLayer { l in
-                l.addFilter(.blur(radius: 5))
-                l.stroke(all, with: .color((isDark ? Color.white : padTint).opacity(0.7 + 0.2 * pulse)), style: StrokeStyle(lineWidth: 5, lineJoin: .round))
-            }
-            ctx.stroke(all, with: .color(isDark ? .white : padTint), style: StrokeStyle(lineWidth: 2.2, lineJoin: .round))
-        }
+        if let wire { outline(wire, corner: 6) }
+        if let end { outline(end, corner: 8, dashed: true) }
+        if let pad { outline(pad, corner: 6) }
 
         guard let a = end.flatMap({ SolderStyle.centroid($0, in: sz) }), let b = pad.flatMap({ SolderStyle.centroid($0, in: sz) }) else { return }
 
-        // 4. curved, animated route end -> pad
+        // route end -> pad: 2 pt white, 8 pt arrow head before the pad
         let dx = b.x - a.x, dy = b.y - a.y, len = max(1, hypot(dx, dy))
         var nrm = CGVector(dx: -dy / len, dy: dx / len)
         if nrm.dy > 0 { nrm = CGVector(dx: -nrm.dx, dy: -nrm.dy) }   // bulge upwards
-        let ctrl = CGPoint(x: (a.x + b.x) / 2 + nrm.dx * len * 0.28, y: (a.y + b.y) / 2 + nrm.dy * len * 0.28)
+        let ctrl = CGPoint(x: (a.x + b.x) / 2 + nrm.dx * len * 0.2, y: (a.y + b.y) / 2 + nrm.dy * len * 0.2)
         var route = Path()
         route.move(to: a); route.addQuadCurve(to: b, control: ctrl)
-        let phase: CGFloat = animated ? CGFloat(-t * 36) : 0
-        ctx.stroke(route, with: .color(.black.opacity(0.4)), style: StrokeStyle(lineWidth: 6.5, lineCap: .round))
-        ctx.stroke(route, with: .color(padTint), style: StrokeStyle(lineWidth: 4.5, lineCap: .round, dash: [9, 8], dashPhase: phase))
-        ctx.stroke(route, with: .color(.white.opacity(0.9)), style: StrokeStyle(lineWidth: 1.6, lineCap: .round, dash: [9, 8], dashPhase: phase))
-        // arrow head near the pad (tangent of the quad at its end)
+        ctx.stroke(route, with: .color(.black.opacity(0.25)), style: StrokeStyle(lineWidth: 4.5, lineCap: .round))
+        ctx.stroke(route, with: .color(.white), style: StrokeStyle(lineWidth: 2, lineCap: .round))
         let tv = CGVector(dx: b.x - ctrl.x, dy: b.y - ctrl.y), tl = max(1, hypot(tv.dx, tv.dy))
-        let u = CGVector(dx: tv.dx / tl, dy: tv.dy / tl), s = CGVector(dx: -u.dy, dy: u.dx), h: CGFloat = 12
-        let tip = CGPoint(x: b.x - u.dx * 34, y: b.y - u.dy * 34)
+        let u = CGVector(dx: tv.dx / tl, dy: tv.dy / tl), sd = CGVector(dx: -u.dy, dy: u.dx), h: CGFloat = 8
+        let tip = CGPoint(x: b.x - u.dx * 14, y: b.y - u.dy * 14)
         var head = Path()
-        head.move(to: CGPoint(x: tip.x - u.dx * h + s.dx * h * 0.7, y: tip.y - u.dy * h + s.dy * h * 0.7))
+        head.move(to: CGPoint(x: tip.x - u.dx * h + sd.dx * h * 0.7, y: tip.y - u.dy * h + sd.dy * h * 0.7))
         head.addLine(to: tip)
-        head.addLine(to: CGPoint(x: tip.x - u.dx * h - s.dx * h * 0.7, y: tip.y - u.dy * h - s.dy * h * 0.7))
-        ctx.stroke(head, with: .color(.black.opacity(0.45)), style: StrokeStyle(lineWidth: 7, lineCap: .round, lineJoin: .round))
-        ctx.stroke(head, with: .color(.white), style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
+        head.addLine(to: CGPoint(x: tip.x - u.dx * h - sd.dx * h * 0.7, y: tip.y - u.dy * h - sd.dy * h * 0.7))
+        ctx.stroke(head, with: .color(.black.opacity(0.25)), style: StrokeStyle(lineWidth: 4.5, lineCap: .round, lineJoin: .round))
+        ctx.stroke(head, with: .color(.white), style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
 
-        // 5. hold ring around the pad, 6. iron on top
-        let R: CGFloat = 30
-        let ring = Path(ellipseIn: CGRect(x: b.x - R, y: b.y - R, width: R * 2, height: R * 2))
-        ctx.stroke(ring, with: .color(.black.opacity(0.45)), lineWidth: 7)
-        ctx.stroke(ring, with: .color(.white.opacity(0.4)), lineWidth: 4)
+        // hold progress ring, only while the timer runs
         if hold > 0 {
+            let R: CGFloat = 26
+            ctx.stroke(Path(ellipseIn: CGRect(x: b.x - R, y: b.y - R, width: R * 2, height: R * 2)), with: .color(.white.opacity(0.35)), lineWidth: 2)
             var arc = Path()
             arc.addArc(center: b, radius: R, startAngle: .degrees(-90), endAngle: .degrees(-90 + 360 * hold), clockwise: false)
-            ctx.stroke(arc, with: .color(hold >= 1 ? Theme.highlight : Theme.caution), style: StrokeStyle(lineWidth: 4, lineCap: .round))
+            ctx.stroke(arc, with: .color(.white), style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
         }
-        drawIron(&ctx, at: b, time: t, animated: animated, active: hold > 0 && hold < 1)
-    }
-
-    /// Slim iron: tip touches `p`, body leans up-right, glowing tip.
-    private static func drawIron(_ ctx: inout GraphicsContext, at p: CGPoint, time t: Double, animated: Bool, active: Bool) {
-        let dir = CGVector(dx: 0.55, dy: -0.835)    // from the tip upwards
-        let hover: CGFloat = animated ? CGFloat(sin(t * 3)) * 1.5 : 0
-        let tip = CGPoint(x: p.x + dir.dx * hover, y: p.y + dir.dy * hover)
-        func pt(_ d: CGFloat) -> CGPoint { CGPoint(x: tip.x + dir.dx * d, y: tip.y + dir.dy * d) }
-        func seg(_ a: CGFloat, _ b: CGFloat, _ w: CGFloat, _ c: Color) {
-            var l = Path(); l.move(to: pt(a)); l.addLine(to: pt(b))
-            ctx.stroke(l, with: .color(c), style: StrokeStyle(lineWidth: w, lineCap: .round))
-        }
-        seg(0, 70, 11, .black.opacity(0.4))
-        seg(2, 22, 5, Color(hex: 0xC9CDD3))
-        seg(22, 34, 8, Color(hex: 0x6D737D))
-        seg(34, 76, 12, Color(hex: 0x2B2F36))
-        seg(38, 72, 2, .white.opacity(0.35))
-        ctx.drawLayer { l in
-            l.addFilter(.blur(radius: active ? 7 : 4))
-            l.fill(Path(ellipseIn: CGRect(x: tip.x - 5, y: tip.y - 5, width: 10, height: 10)), with: .color(Theme.caution.opacity(active ? 0.95 : 0.6)))
-        }
-        ctx.fill(Path(ellipseIn: CGRect(x: tip.x - 2.5, y: tip.y - 2.5, width: 5, height: 5)), with: .color(.white))
     }
 }
 

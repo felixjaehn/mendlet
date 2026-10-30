@@ -21,6 +21,16 @@ struct StitchPlan: Equatable, Sendable {
     var weftStrokes: [StitchPathPlanner.DarnStroke] = []
     var isFallback = false
     static let empty = StitchPlan()
+
+    /// Keeps every point inside `r` (normalized image coordinates).
+    mutating func clamp(to r: CGRect) {
+        func c(_ p: CGPoint) -> CGPoint { CGPoint(x: min(max(p.x, r.minX), r.maxX), y: min(max(p.y, r.minY), r.maxY)) }
+        centerline = centerline.map(c)
+        for i in stitches.indices { stitches[i].position = c(stitches[i].position) }
+        gridLines = gridLines.map { $0.map(c) }
+        for i in warpStrokes.indices { warpStrokes[i].points = warpStrokes[i].points.map(c) }
+        for i in weftStrokes.indices { weftStrokes[i].points = weftStrokes[i].points.map(c) }
+    }
 }
 
 /// Pure geometry. No model calls (PRD FR-23, §16).
@@ -35,7 +45,23 @@ enum StitchPathPlanner {
         var smoothPasses = 3
     }
 
+    /// Margin around the mask bounds (fraction of mask size) that no planned point may leave.
+    static let boundsMargin: CGFloat = 0.08
+
     static func plan(polygon: [CGPoint], box: CGRect?, stitchType: StitchType, aspect: CGFloat = 1, config: Config = Config()) -> StitchPlan {
+        var p = rawPlan(polygon: polygon, box: box, stitchType: stitchType, aspect: aspect, config: config)
+        let clean = polygon.filter { $0.x.isFinite && $0.y.isFinite }
+        var r: CGRect? = clean.count >= 3 ? bounds(clean) : box
+        if let b = r, b.width <= 1e-5 || b.height <= 1e-5 { r = box }
+        if let b = r { p.clamp(to: expanded(b)) }
+        return p
+    }
+
+    static func expanded(_ b: CGRect) -> CGRect {
+        b.insetBy(dx: -b.width * boundsMargin, dy: -b.height * boundsMargin)
+    }
+
+    private static func rawPlan(polygon: [CGPoint], box: CGRect?, stitchType: StitchType, aspect: CGFloat, config: Config) -> StitchPlan {
         let a: CGFloat = (aspect.isFinite && aspect > 0.05 && aspect < 20) ? aspect : 1
         let clean = polygon.filter { $0.x.isFinite && $0.y.isFinite && abs($0.x) < 1e4 && abs($0.y) < 1e4 }
         let poly = clean.map { CGPoint(x: $0.x * a, y: $0.y) }
@@ -220,7 +246,7 @@ enum StitchPathPlanner {
         for k in 0..<warpCount {
             let t = tLo + (tHi - tLo) * CGFloat(k) / CGFloat(warpCount - 1)
             guard let (lo, hi) = span(t, alongS: true) else { continue }
-            let ext = max(0.012, (hi - lo) * 0.15)
+            let ext = max(0.008, (hi - lo) * 0.08)
             let s0 = lo - ext, s1 = hi + ext
             warp.append(Line(s0: s0, s1: s1, t0: t, t1: t, coreFrom: ext / (s1 - s0), coreTo: 1 - ext / (s1 - s0)))
         }
@@ -240,7 +266,7 @@ enum StitchPathPlanner {
             let s = coreLo + (coreHi - coreLo) * CGFloat(k) / CGFloat(weftCount - 1)
             let sv = min(max(s, b.minX + 1e-4), b.maxX - 1e-4)
             guard let (lo, hi) = span(sv, alongS: false) else { continue }
-            let ext = max(0.010, (hi - lo) * 0.15)
+            let ext = max(0.008, (hi - lo) * 0.08)
             let t0 = lo - ext, t1 = hi + ext
             weft.append(Line(s0: s, s1: s, t0: t0, t1: t1, coreFrom: ext / (t1 - t0), coreTo: 1 - ext / (t1 - t0)))
         }

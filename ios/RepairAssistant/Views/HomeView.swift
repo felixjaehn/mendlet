@@ -24,6 +24,7 @@ struct HomeView: View {
                                 ProjectCard(project: c) { flow.openProject(c) }
                                     .transition(.opacity.combined(with: .offset(y: 12)))
                             }
+                            belowCards(done)
                         } else {
                             if done.isEmpty { quiet("Finished repairs show up here.") }
                             VStack(spacing: 0) {
@@ -92,6 +93,39 @@ struct HomeView: View {
             Spacer()
         }
         .overlay(alignment: .bottom) { Rectangle().fill(Theme.hairline).frame(height: 0.5) }
+    }
+
+    /// Under the cards: a calm preview of finished repairs, or one hint row when there are none yet.
+    @ViewBuilder private func belowCards(_ done: [SavedCase]) -> some View {
+        if done.isEmpty {
+            Button { flow.showScan = true } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "camera").font(.system(size: 20)).foregroundStyle(Theme.inkSecondary).frame(width: 28)
+                    Text("Scan something that needs fixing").font(.body).foregroundStyle(Theme.ink)
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkTertiary)
+                }
+                .padding(.horizontal, 16).frame(minHeight: 56)
+                .background(Theme.card, in: RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
+            }
+            .buttonStyle(PressScaleStyle()).padding(.top, 8)
+        } else {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack {
+                    Text("Done").overline()
+                    Spacer()
+                    if done.count > 2 {
+                        Button("See all") { withAnimation(Theme.spring) { tab = .done } }.font(.subheadline).foregroundStyle(Theme.thread)
+                    }
+                }
+                .padding(.bottom, 4)
+                ForEach(Array(done.prefix(2).enumerated()), id: \.element.id) { i, c in
+                    DoneRow(project: c) { flow.openProject(c) }
+                    if i < min(done.count, 2) - 1 { Rectangle().fill(Theme.hairline).frame(height: 0.5).padding(.leading, 72) }
+                }
+            }
+            .padding(.top, 16)
+        }
     }
 
     private func quiet(_ text: String) -> some View {
@@ -180,11 +214,16 @@ struct ProjectCard: View {
                     .clipShape(UnevenRoundedRectangle(topLeadingRadius: Theme.cardRadius, topTrailingRadius: Theme.cardRadius, style: .continuous))
                 VStack(alignment: .leading, spacing: 4) {
                     if let v = ProjectInfo.verdict(project) { Text(v).overline().padding(.bottom, 2) }
-                    Text(ProjectInfo.title(project)).font(.headline).foregroundStyle(Theme.ink)
-                    Text(ProjectInfo.subtitle(project)).font(.subheadline).foregroundStyle(Theme.inkSecondary)
+                    HStack(alignment: .center, spacing: 12) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(ProjectInfo.title(project)).font(.headline).foregroundStyle(Theme.ink)
+                            Text(ProjectInfo.subtitle(project)).font(.subheadline).foregroundStyle(Theme.inkSecondary)
+                        }
+                        Spacer(minLength: 0)
+                        if !parked && steps > 0 { StepRing(done: project.completedSteps.count, total: steps) }
+                    }
                     if !parked && steps > 0 {
-                        SegmentBar(count: steps, done: project.completedSteps.count).padding(.top, 8)
-                        Text(ProjectInfo.progressLine(project)).font(.footnote).foregroundStyle(Theme.inkSecondary).padding(.top, 4)
+                        Text(ProjectInfo.progressLine(project)).font(.footnote).foregroundStyle(Theme.inkSecondary).padding(.top, 8)
                         if let need = ProjectInfo.stillNeeded(project) {
                             Text(need).font(.subheadline).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true).padding(.top, 2)
                         } else if !ProjectInfo.started(project) && !project.response.shoppingList.isEmpty {
@@ -205,6 +244,21 @@ struct ProjectCard: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(ProjectInfo.title(project)), \(ProjectInfo.progressLine(project).lowercased())\(ProjectInfo.stillNeeded(project).map { ", " + $0.lowercased() } ?? "")")
         .accessibilityAddTraits(.isButton)
+    }
+}
+
+/// Small progress ring with "2/6" inside, right-aligned on a project card.
+struct StepRing: View {
+    let done: Int, total: Int
+    var body: some View {
+        ZStack {
+            Circle().stroke(Theme.fill, lineWidth: 3)
+            Circle().trim(from: 0, to: total > 0 ? CGFloat(done) / CGFloat(total) : 0)
+                .stroke(Theme.thread, style: StrokeStyle(lineWidth: 3, lineCap: .round)).rotationEffect(.degrees(-90))
+            Text("\(done)/\(total)").font(.caption2.weight(.semibold)).monospacedDigit().foregroundStyle(Theme.ink)
+        }
+        .frame(width: 44, height: 44)
+        .accessibilityHidden(true)
     }
 }
 

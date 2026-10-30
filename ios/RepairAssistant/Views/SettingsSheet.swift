@@ -34,7 +34,7 @@ struct SettingsSheet: View {
                         .contentShape(Rectangle())
                         .onTapGesture { taps += 1; if taps >= 5 { dev = true } }
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Powered by Meta SAM 3.1, Muse Spark, Muse Image")
+                        Text("Powered by Meta SAM 3.1, Muse Spark, Muse Wonder, Muse Image and Muse Voice")
                             .font(.subheadline).foregroundStyle(Theme.inkSecondary)
                     }
                 } header: {

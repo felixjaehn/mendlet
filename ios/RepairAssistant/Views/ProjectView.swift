@@ -37,7 +37,7 @@ struct ProjectView: View {
                         if !finished && !steps.isEmpty { stepsSection }
                     }
                 }
-                .padding(.horizontal, Theme.margin).padding(.top, 8).padding(.bottom, 24)
+                .padding(.horizontal, Theme.margin).padding(.top, 8).padding(.bottom, 40)
             }
         }
         .scrollIndicators(.hidden)
@@ -66,10 +66,10 @@ struct ProjectView: View {
         if let photo = flow.photo {
             Group {
                 if finished, flow.afterState == .ready, let after = flow.afterImage {
-                    BeforeAfterSlider(before: photo, after: after, aspect: 16.0 / 10.0, cornerRadius: Theme.heroRadius)
+                    BeforeAfterSlider(before: photo, after: after, aspect: 2.0, cornerRadius: Theme.heroRadius)
                 } else {
                     Button { showViewer = true } label: {
-                        Color(uiColor: .secondarySystemFill).aspectRatio(16.0 / 10.0, contentMode: .fit)
+                        Color(uiColor: .secondarySystemFill).aspectRatio(2.0, contentMode: .fit)
                             .overlay { MarkedPhoto(image: photo, segments: r.segments, mode: .thumb, showLabels: false, zoomable: false) }
                             .clipShape(RoundedRectangle(cornerRadius: Theme.heroRadius, style: .continuous))
                     }
@@ -123,9 +123,7 @@ struct ProjectView: View {
                             HStack(spacing: 12) {
                                 Text(it.name).font(.body).foregroundStyle(Theme.ink).multilineTextAlignment(.leading)
                                 Spacer(minLength: 8)
-                                if it.required {
-                                    HStack(spacing: 6) { Circle().fill(Theme.thread).frame(width: 8, height: 8); Text("Required").font(.footnote).foregroundStyle(Theme.thread) }
-                                } else { Text("Optional").font(.footnote).foregroundStyle(Theme.inkTertiary) }
+                                Text(it.required ? "Needed" : "Optional").font(.footnote).foregroundStyle(Theme.inkSecondary)
                                 Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkTertiary)
                             }
                             .padding(.vertical, 10).frame(minHeight: 56).contentShape(Rectangle())

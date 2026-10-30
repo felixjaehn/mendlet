@@ -48,6 +48,7 @@ run finding-jeans 14 -uiScreen diagnosis -uiScenario textile_tear -recoveryTrace
 run finding-holes 14 -uiScreen diagnosis -uiScenario textile_hole
 run finding-sole 14 -uiScreen diagnosis -uiScenario real_sole
 run verdict-repair 18 -uiScreen decision -uiScenario real_sweater
+run verdict-repaired 20 -uiScreen decision -uiScenario real_sweater -uiRepaired YES
 run verdict-repair-jeans 18 -uiScreen decision -uiScenario textile_tear
 run verdict-pro 18 -uiScreen decision -uiScenario real_sole
 run verdict-replace 18 -uiScreen decision -uiScenario worn_shirt

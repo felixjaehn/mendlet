@@ -12,7 +12,11 @@ enum Fmt {
         }
     }
     static func minutes(_ a: [Int]) -> String { range(a.map(Double.init), unit: tr("Min.")) }
-    static func euro(_ a: [Double]) -> String { range(a, unit: "€") }
+    static func euro(_ a: [Double]) -> String {
+        guard let lo = a.first else { return "–" }
+        let hi = a.count > 1 ? a[1] : lo
+        return lo == hi ? "€\(number(lo))" : "€\(number(lo))–\(number(hi))"
+    }
 
     /// "About 1 h", "20 to 45 min", "1 to 2 h" (English UI); the German format keeps the old range.
     static func duration(_ a: [Int]) -> String {
@@ -27,13 +31,12 @@ enum Fmt {
         return "\(lo) to \(hi) min"
     }
 
-    /// "€ 5–12"; "None" when nothing is needed.
+    /// "€5–12"; "None" when nothing is needed.
     static func cost(_ a: [Double]) -> String {
         guard Lang.shared.isEnglish else { return euro(a) }
         guard let lo = a.first else { return "–" }
-        let hi = a.count > 1 ? a[1] : lo
-        if hi <= 0 { return "None" }
-        return lo == hi ? "€ \(number(lo))" : "€ \(number(lo))–\(number(hi))"
+        if (a.count > 1 ? a[1] : lo) <= 0 { return "None" }
+        return euro(a)
     }
 }
 
@@ -67,7 +70,13 @@ extension SecondLife {
 /// Verdict: a confident recommendation with the marked photo still the hero, time and cost as quiet facts, one next action.
 struct DecisionView: View {
     @Environment(FlowModel.self) private var flow
-    @State private var repaired = false
+    @State private var repaired: Bool = {
+        #if DEBUG
+        return UserDefaults.standard.bool(forKey: "uiRepaired")
+        #else
+        return false
+        #endif
+    }()
     @State private var factsShown = false
 
     var body: some View {
@@ -99,13 +108,15 @@ struct DecisionView: View {
             if let photo = flow.photo, let r = flow.response {
                 if repaired, let after = flow.afterImage {
                     BeforeAfterSlider(before: photo, after: after, aspect: nil, cornerRadius: 0, labels: false)
-                        .overlay(alignment: .bottomLeading) {
-                            Text("Preview").font(.footnote.weight(.semibold)).foregroundStyle(.white).shadow(color: .black.opacity(0.4), radius: 2)
-                                .padding(.leading, Theme.margin).padding(.bottom, Theme.heroRadius + 12)
+                        .overlay(alignment: .bottom) {
+                            Text("Preview").font(.caption.weight(.medium)).foregroundStyle(.white)
+                                .padding(.horizontal, 10).padding(.vertical, 3)
+                                .background(Color.black.opacity(0.35), in: Capsule())
+                                .padding(.bottom, Theme.heroRadius + 56)
                         }
                         .transition(.opacity)
                 } else {
-                    MarkedPhoto(image: photo, segments: r.segments, showDimension: true, focus: DamageFocus.region(for: r.segments))
+                    MarkedPhoto(image: photo, segments: r.segments, showLabels: r.decision?.recommendation != .replace, showDimension: true, focus: DamageFocus.region(for: r.segments))
                         .transition(.opacity)
                 }
             } else {
@@ -146,7 +157,7 @@ struct DecisionView: View {
                     case .replace:
                         if !d.secondLife.isEmpty { secondLife(d.secondLife) }
                         if let hi = d.costEur.last, hi > 0 {
-                            Text("A replacement costs about \(Fmt.number(d.costEur.first ?? hi))–\(Fmt.number(hi)) EUR.").font(.subheadline).foregroundStyle(Theme.inkSecondary)
+                            Text("A replacement costs about \(Fmt.euro(d.costEur)).").font(.subheadline).foregroundStyle(Theme.inkSecondary)
                         }
                     }
                 }
@@ -234,10 +245,10 @@ struct DecisionView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Give it a second life").overline().padding(.bottom, 4)
             ForEach(Array(ideas.prefix(3).enumerated()), id: \.offset) { i, idea in
-                if i > 0 { Rectangle().fill(Theme.hairline).frame(height: 0.5).padding(.leading, 52) }
+                if i > 0 { Rectangle().fill(Theme.hairline).frame(height: 0.5).padding(.leading, 44) }
                 HStack(alignment: .top, spacing: 16) {
-                    Image(systemName: idea.symbol).font(.system(size: 17, weight: .regular)).foregroundStyle(Theme.ink)
-                        .frame(width: 36, height: 36).background(Theme.fill, in: Circle())
+                    Image(systemName: idea.symbol).font(.system(size: 20, weight: .regular)).foregroundStyle(Theme.inkSecondary)
+                        .frame(width: 28, height: 28, alignment: .leading)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(idea.title).font(.body.weight(.semibold)).foregroundStyle(Theme.ink)
                         Text(idea.text).font(.subheadline).foregroundStyle(Theme.inkSecondary).fixedSize(horizontal: false, vertical: true)
