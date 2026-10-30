@@ -58,7 +58,7 @@ struct DiagnosisView: View {
     @ViewBuilder private func hero(_ r: AnalyzeResponse?, geo: GeometryProxy) -> some View {
         ZStack(alignment: .top) {
             if let photo = flow.photo, let r {
-                MarkedPhoto(image: photo, segments: r.segments, focus: DamageFocus.region(for: r.segments),
+                MarkedPhoto(image: photo, segments: r.segments, labelTopInset: 110, focus: DamageFocus.region(for: r.segments),
                             onTap: flow.refineMode ? { p in flow.refine(at: p) } : nil)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 if flow.refineBusy { ProgressView().controlSize(.large).tint(.white) }

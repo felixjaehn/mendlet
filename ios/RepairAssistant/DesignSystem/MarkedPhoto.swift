@@ -19,6 +19,8 @@ struct MarkedPhoto<Overlay: View>: View {
     var mode: Mode = .resting
     var showLabels = true
     var showDimension = false
+    /// Full-bleed photos run under the status bar and the floating close/adjust buttons: keep labels below them.
+    var labelTopInset: CGFloat = 0
     /// Normalized region to zoom to (small damage). Nil = no zoom.
     var focus: CGRect? = nil
     /// Tap in normalized photo coordinates (tap to refine).
@@ -68,7 +70,7 @@ struct MarkedPhoto<Overlay: View>: View {
             let state = frameState(now: tl.date)
             ZoomedStage(image: image, segments: segments, damage: damage, container: container, state: state,
                         zoom: zoomedOut ? 1 : Self.targetZoom(image: image, focus: focus, container: container), focusCenter: focusCenter, showLabels: showLabels && mode != .thumb && mode != .guide,
-                        showDimension: showDimension, ripple: ripple, onTap: onTap.map { cb in { p in
+                        showDimension: showDimension, labelTopInset: labelTopInset, ripple: ripple, onTap: onTap.map { cb in { p in
                             ripple = (p, Date()); cb(p)
                         } }, overlay: overlay)
         }
@@ -125,8 +127,8 @@ struct MarkedPhoto<Overlay: View>: View {
 
 extension MarkedPhoto where Overlay == EmptyView {
     init(image: UIImage, segments: [Segment], mode: Mode = .resting, showLabels: Bool = true, showDimension: Bool = false,
-         focus: CGRect? = nil, onTap: ((CGPoint) -> Void)? = nil, zoomable: Bool = true) {
-        self.init(image: image, segments: segments, mode: mode, showLabels: showLabels, showDimension: showDimension, focus: focus,
+         labelTopInset: CGFloat = 0, focus: CGRect? = nil, onTap: ((CGPoint) -> Void)? = nil, zoomable: Bool = true) {
+        self.init(image: image, segments: segments, mode: mode, showLabels: showLabels, showDimension: showDimension, labelTopInset: labelTopInset, focus: focus,
                   onTap: onTap, zoomable: zoomable, overlay: { _ in EmptyView() })
     }
 }
@@ -158,6 +160,7 @@ private struct ZoomedStage<Overlay: View>: View, @preconcurrency Animatable {
     let focusCenter: CGPoint?
     let showLabels: Bool
     let showDimension: Bool
+    let labelTopInset: CGFloat
     let ripple: (point: CGPoint, date: Date)?
     let onTap: ((CGPoint) -> Void)?
     @ViewBuilder var overlay: (CGSize) -> Overlay
@@ -179,7 +182,7 @@ private struct ZoomedStage<Overlay: View>: View, @preconcurrency Animatable {
                 Image(uiImage: image).resizable().frame(width: size.width, height: size.height)
                 MarkCanvas(segments: damage, size: size, state: state)
                 if showLabels && state.label > 0 {
-                    MarkLabels(segments: damage, size: size, visible: CGRect(x: -origin.x, y: -origin.y, width: container.width, height: container.height))
+                    MarkLabels(segments: damage, size: size, visible: CGRect(x: -origin.x, y: -origin.y + labelTopInset, width: container.width, height: max(0, container.height - labelTopInset)))
                         .opacity(state.label)
                     if showDimension, let dim = DamageDimension.layout(segments: segments.filter { _ in true }, size: size) {
                         DimensionLineView(layout: dim).opacity(state.label)

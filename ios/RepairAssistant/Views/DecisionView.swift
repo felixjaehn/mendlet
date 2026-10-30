@@ -127,7 +127,7 @@ struct DecisionView: View {
                     }
                     .transition(.opacity)
                 } else {
-                    MarkedPhoto(image: photo, segments: r.segments, showLabels: r.decision?.recommendation != .replace, showDimension: true, focus: DamageFocus.region(for: r.segments))
+                    MarkedPhoto(image: photo, segments: r.segments, showLabels: r.decision?.recommendation != .replace, showDimension: true, labelTopInset: 110, focus: DamageFocus.region(for: r.segments))
                         .transition(.opacity)
                 }
             } else {
