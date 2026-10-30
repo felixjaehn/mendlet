@@ -23,6 +23,11 @@ struct SettingsSheet: View {
                     Text("Photos are sent to the analysis server only to assess the repair.")
                 }
                 Section {
+                    NavigationLink("How Mendlet works") { HowItWorksView() }
+                } footer: {
+                    Text("See the steps behind your last analysis.")
+                }
+                Section {
                     Button("Delete all repairs", role: .destructive) { confirmClear = true }
                 } header: {
                     Text("Data")
@@ -33,12 +38,10 @@ struct SettingsSheet: View {
                     HStack { Text("Mendlet"); Spacer(); Text(version).foregroundStyle(Theme.inkSecondary) }
                         .contentShape(Rectangle())
                         .onTapGesture { taps += 1; if taps >= 5 { dev = true } }
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Powered by Meta SAM 3.1, Muse Spark, Muse Wonder, Muse Image and Muse Voice")
-                            .font(.subheadline).foregroundStyle(Theme.inkSecondary)
-                    }
                 } header: {
                     Text("About")
+                } footer: {
+                    Text("Powered by Meta SAM 3.1, Muse Spark, Muse Wonder, Muse Image and Muse Voice.")
                 }
                 if dev {
                     Section("Developer") {
@@ -75,5 +78,31 @@ struct SettingsSheet: View {
         let ok = await LiveAPIClient(baseURL: url).health()
         checking = false
         status = ok ? "OK" : "No response"
+    }
+}
+
+/// The hidden "What happened" trace for the last analysis: every tool call with model and time.
+struct HowItWorksView: View {
+    @Environment(FlowModel.self) private var flow
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                if flow.agentSteps.isEmpty {
+                    Text("Scan something and the steps of the analysis show up here.")
+                        .font(.body).foregroundStyle(Theme.inkSecondary).lineSpacing(4)
+                } else {
+                    Text("Every analysis runs as a short chain of steps. This is the last one.")
+                        .font(.body).foregroundStyle(Theme.ink).lineSpacing(4)
+                    AgentTraceView(steps: flow.agentSteps, active: nil, replay: flow.settings.demoMode)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, Theme.margin).padding(.top, 16).padding(.bottom, 24)
+        }
+        .scrollIndicators(.hidden)
+        .background(Theme.paper)
+        .navigationTitle("How Mendlet works")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

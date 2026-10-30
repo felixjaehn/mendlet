@@ -39,7 +39,7 @@ run home-done 6 -uiScreen home -uiTab done
 run project 8 -uiScreen project
 run project-done 8 -uiScreen projectDone
 run scan 6 -uiScreen scan
-run settings 4 -uiScreen settings
+run settings 7 -uiScreen settings
 run analysis-sweep 3 -uiScreen analysis -uiScenario real_sweater
 run analysis-reveal 5.8 -uiScreen analysis -uiScenario textile_tear
 run analysis-agent 8 -uiScreen analysis -uiScenario textile_tear -recoveryTrace YES

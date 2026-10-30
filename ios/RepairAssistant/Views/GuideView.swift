@@ -60,6 +60,10 @@ struct GuideView: View {
         HStack(spacing: 12) {
             CircleIconButton(systemImage: "xmark", label: "Close") { flow.persist(); flow.reset() }
             SegmentBar(count: steps.count, done: index, current: index)
+            if steps[safe: index]?.needsConfirmation == true {
+                Button("Not working?") { showHelp = true }
+                    .font(.subheadline.weight(.medium)).foregroundStyle(Theme.thread)
+            }
         }
         .padding(.horizontal, Theme.margin).padding(.top, geo.safeAreaInsets.top).padding(.bottom, 8)
         .background(Theme.surface)
@@ -99,6 +103,17 @@ struct GuideView: View {
                     Text(d).font(.subheadline).foregroundStyle(Theme.inkSecondary).fixedSize(horizontal: false, vertical: true)
                 }
             }
+            let items = step.usesItems.compactMap { id in r.shoppingList.first { $0.id == id } }
+            if !items.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Uses").overline()
+                    VStack(alignment: .leading, spacing: 2) {
+                        ForEach(Array(items.enumerated()), id: \.offset) { _, it in
+                            Text(Self.shortName(it.name)).font(.footnote).foregroundStyle(Theme.ink)
+                        }
+                    }
+                }
+            }
             if let m = step.commonMistake, !m.isEmpty {
                 HStack(alignment: .top, spacing: 12) {
                     Rectangle().fill(Theme.thread).frame(width: 2)
@@ -110,16 +125,18 @@ struct GuideView: View {
                 .fixedSize(horizontal: false, vertical: true)
             }
             if r.category == .shoe, let t = timerMinutes(step) { TimerRow(minutes: t).id(step.n) }
-            let items = step.usesItems.compactMap { id in r.shoppingList.first { $0.id == id } }
-            if !items.isEmpty {
-                Text("Uses: " + items.map { ($0.name.components(separatedBy: ",").first ?? $0.name).lowercasedFirst }.joined(separator: ", "))
-                    .font(.footnote).foregroundStyle(Theme.inkSecondary).fixedSize(horizontal: false, vertical: true)
-            }
             if step.overlay?.type == .stitchPath, let image = flow.photo {
                 LiveStitchButton(image: image, step: step, response: r, phase: darningPhase(for: step, in: r), demoMode: flow.settings.demoMode)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// "soldering iron 25-40W with fine tip and stand" -> "soldering iron 25-40W"
+    private static func shortName(_ n: String) -> String {
+        var t = n.components(separatedBy: ",").first ?? n
+        for sep in [" with ", " for "] { if let r = t.range(of: sep) { t = String(t[..<r.lowerBound]) } }
+        return t.lowercasedFirst
     }
 
     private func timerMinutes(_ step: GuideStep) -> Int? {
@@ -128,47 +145,45 @@ struct GuideView: View {
         return m
     }
 
-    private func safetyRow(_ step: GuideStep) -> some View {
-        let on = confirmed.contains(step.n)
-        return Button {
-            if on { confirmed.remove(step.n) } else { confirmed.insert(step.n); Haptics.selection() }
-        } label: {
-            HStack(spacing: 12) {
-                CheckCircle(on: on)
-                Text("I've done this safely").font(.body.weight(.medium)).foregroundStyle(Theme.ink)
-                Spacer(minLength: 0)
-                Image(systemName: "exclamationmark.triangle").font(.system(size: 16)).foregroundStyle(Theme.inkSecondary)
-            }
-            .frame(minHeight: 44)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(on ? .isSelected : [])
-    }
-
-    // MARK: Bottom
-
     private func bottomBar(_ step: GuideStep) -> some View {
         let last = index == steps.count - 1
         let locked = step.needsConfirmation && !confirmed.contains(step.n)
-        return VStack(spacing: 6) {
-            if step.needsConfirmation { safetyRow(step).padding(.horizontal, Theme.margin) }
-            HStack(spacing: 12) {
-                if index > 0 {
-                    CircleIconButton(systemImage: "chevron.left", label: "Back") {
-                        forward = false
-                        withAnimation(Theme.spring) { flow.currentStep = index - 1 }
-                    }
+        let on = confirmed.contains(step.n)
+        return HStack(spacing: 12) {
+            if index > 0 {
+                CircleIconButton(systemImage: "chevron.left", label: "Back") {
+                    forward = false
+                    withAnimation(Theme.spring) { flow.currentStep = index - 1 }
                 }
+            }
+            if step.needsConfirmation {
+                // one compact bar: the safety check on the left, Done on the right
+                Button {
+                    if on { confirmed.remove(step.n) } else { confirmed.insert(step.n); Haptics.selection() }
+                } label: {
+                    HStack(spacing: 10) {
+                        CheckCircle(on: on)
+                        Text("I've done this safely").font(.subheadline.weight(.medium)).foregroundStyle(Theme.ink)
+                            .multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
+                    }
+                    .frame(minHeight: 44).contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(on ? .isSelected : [])
+                Spacer(minLength: 0)
                 Button { advance(last: last) } label: { Text(last ? "Finish" : "Done") }
                     .buttonStyle(PrimaryButtonStyle(kind: .primary))
+                    .frame(width: 112)
                     .disabled(locked)
+            } else {
+                Button { advance(last: last) } label: { Text(last ? "Finish" : "Done") }
+                    .buttonStyle(PrimaryButtonStyle(kind: .primary))
                 Button("Not working?") { showHelp = true }
                     .font(.subheadline.weight(.medium)).foregroundStyle(Theme.thread)
                     .frame(minWidth: 88, minHeight: 44)
             }
-            .padding(.horizontal, Theme.margin)
         }
+        .padding(.horizontal, Theme.margin)
         .padding(.vertical, 10)
         .background(.bar)
         .overlay(alignment: .top) { Rectangle().fill(Theme.hairline).frame(height: 0.5) }
