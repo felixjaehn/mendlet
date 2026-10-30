@@ -98,7 +98,7 @@ struct ProjectView: View {
                 SegmentBar(count: steps.count, done: doneCount, current: cur)
                 if let next = steps[safe: cur + 1] {
                     HStack(spacing: 8) {
-                        Text("Next").overline()
+                        Text("Next").font(.subheadline.weight(.medium)).foregroundStyle(Theme.inkSecondary)
                         Text(next.title).font(.subheadline).foregroundStyle(Theme.inkSecondary).lineLimit(1)
                     }
                 }
@@ -111,7 +111,7 @@ struct ProjectView: View {
 
     private var needSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("What you still need" + (needed.isEmpty ? "" : " · \(needed.count)")).overline()
+            Text("What you still need" + (needed.isEmpty ? "" : " · \(needed.count)")).sectionHeader()
             if needed.isEmpty {
                 Text("You have everything you need.").font(.subheadline).foregroundStyle(Theme.inkSecondary).padding(.vertical, 4)
             } else {
@@ -151,7 +151,7 @@ struct ProjectView: View {
 
     private var stepsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Steps").overline()
+            Text("Steps").sectionHeader()
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(Array(steps.enumerated()), id: \.offset) { i, s in
                     let isDone = flow.completedSteps.contains(i) || i < flow.currentStep

@@ -55,7 +55,7 @@ struct FollowUpSheet: View {
 
     private var header: some View {
         HStack {
-            Text("One question").overline()
+            Text("One question").sectionHeader()
             Spacer()
             if current != nil { Button("Skip") { skip() }.font(.body.weight(.medium)) }
         }

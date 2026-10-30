@@ -62,6 +62,8 @@ extension Font {
 }
 
 extension View {
+    /// Sentence-case section header (the all-caps overline is reserved for "Step N of M" and the finding sheet).
+    func sectionHeader() -> some View { self.font(.headline).foregroundStyle(Theme.ink) }
     /// Small caps label above a block of content ("What we found").
     func overline() -> some View {
         self.font(.overline).tracking(0.8).textCase(.uppercase).foregroundStyle(Theme.inkSecondary)

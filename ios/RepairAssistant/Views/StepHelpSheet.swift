@@ -30,7 +30,7 @@ struct StepHelpSheet: View {
                     if let r = result {
                         if r.escalate { escalateBlock(r) } else { answerBlock(r) }
                     } else {
-                        Text("What's happening?").overline()
+                        Text("What's happening?").sectionHeader()
                         VoiceTextField(placeholder: "e.g. The thread pulls the fabric together", text: $issue, lines: 2...4)
                         let attached = extraPhoto != nil
                         PhotosPicker(selection: $pickerItem, matching: .images) {
@@ -70,7 +70,7 @@ struct StepHelpSheet: View {
                 HStack(alignment: .top, spacing: 12) {
                     Rectangle().fill(Theme.thread).frame(width: 2)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Try this").overline()
+                        Text("Try this").sectionHeader()
                         Text(hint).font(.subheadline).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                     }
                 }

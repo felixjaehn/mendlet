@@ -112,7 +112,7 @@ struct HomeView: View {
         } else {
             VStack(alignment: .leading, spacing: 0) {
                 HStack {
-                    Text("Done").overline()
+                    Text("Done").sectionHeader()
                     Spacer()
                     if done.count > 2 {
                         Button("See all") { withAnimation(Theme.spring) { tab = .done } }.font(.subheadline).foregroundStyle(Theme.thread)
@@ -213,7 +213,7 @@ struct ProjectCard: View {
                     .aspectRatio(16.0 / 10.0, contentMode: .fit)
                     .clipShape(UnevenRoundedRectangle(topLeadingRadius: Theme.cardRadius, topTrailingRadius: Theme.cardRadius, style: .continuous))
                 VStack(alignment: .leading, spacing: 4) {
-                    if let v = ProjectInfo.verdict(project) { Text(v).overline().padding(.bottom, 2) }
+                    if let v = ProjectInfo.verdict(project) { Text(v).font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkSecondary).padding(.bottom, 2) }
                     HStack(alignment: .center, spacing: 12) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(ProjectInfo.title(project)).font(.headline).foregroundStyle(Theme.ink)
@@ -274,7 +274,7 @@ struct DoneRow: View {
                     .frame(width: 56, height: 56)
                     .clipShape(RoundedRectangle(cornerRadius: Theme.thumbRadius, style: .continuous))
                 VStack(alignment: .leading, spacing: 2) {
-                    if let v = ProjectInfo.verdict(project) { Text(v).overline() }
+                    if let v = ProjectInfo.verdict(project) { Text(v).font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkSecondary) }
                     Text(ProjectInfo.title(project)).font(.body.weight(.semibold)).foregroundStyle(Theme.ink)
                     Text("Repaired " + (project.finishedAt ?? project.createdAt).formatted(.dateTime.day().month(.abbreviated).locale(Lang.shared.locale)))
                         .font(.subheadline).foregroundStyle(Theme.inkSecondary)

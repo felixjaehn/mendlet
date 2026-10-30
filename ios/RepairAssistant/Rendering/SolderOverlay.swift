@@ -105,11 +105,14 @@ struct SolderOverlay: View {
                 }
             }
             .allowsHitTesting(false)
-            if let pad, let r = SolderStyle.rect(pad, in: size), let pol = pad.polarity {
-                let d: CGFloat = 32
-                let x = pol == "+" ? r.minX - d / 2 - 8 : r.maxX + d / 2 + 8
-                PolarityDisc(polarity: pol, diameter: d)
-                    .position(x: min(max(x, d / 2 + 4), size.width - d / 2 - 4), y: r.midY)
+            // exactly one red "+" and one dark "−" disc
+            ForEach(["+", "-"], id: \.self) { pol in
+                if let seg = response.segments.first(where: { $0.polarity == pol }), let r = SolderStyle.rect(seg, in: size) {
+                    let d: CGFloat = 30
+                    let x = pol == "+" ? r.minX - d / 2 - 8 : r.maxX + d / 2 + 8
+                    PolarityDisc(polarity: pol, diameter: d)
+                        .position(x: min(max(x, d / 2 + 4), size.width - d / 2 - 4), y: r.midY)
+                }
             }
             if pad != nil { holdControl }
         }
@@ -183,8 +186,7 @@ struct SolderOverlay: View {
             let rings = SegmentLayer.ringPaths(for: seg, in: sz)
             var all = Path(); for r in rings { all.addPath(r.path) }
             if rings.isEmpty, let r = SolderStyle.rect(seg, in: sz) { all = Path(roundedRect: r, cornerRadius: corner) }
-            ctx.stroke(all, with: .color(.black.opacity(0.25)), style: StrokeStyle(lineWidth: 3.5, lineCap: .round, lineJoin: .round))
-            ctx.stroke(all, with: .color(.white), style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round, dash: dashed ? [5, 5] : []))
+            ctx.stroke(all, with: .color(.white.opacity(0.35)), style: StrokeStyle(lineWidth: 1, lineCap: .round, lineJoin: .round))
         }
         if let wire { outline(wire, corner: 6) }
         if let end { outline(end, corner: 8, dashed: true) }

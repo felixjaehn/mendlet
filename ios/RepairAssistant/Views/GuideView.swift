@@ -16,16 +16,16 @@ struct GuideView: View {
             if let step = steps[safe: index], let r = flow.response {
                 VStack(spacing: 0) {
                     topBand(geo: geo)
-                    photo(step, r, geo: geo).frame(height: geo.size.height * 0.36)
+                    photo(step, r, geo: geo).frame(height: geo.size.height * 0.31)
                     ScrollView {
                         stepContent(step, r)
                             .id(step.n)
                             .transition(.asymmetric(insertion: .move(edge: forward ? .trailing : .leading).combined(with: .opacity),
                                                     removal: .opacity))
-                            .padding(.horizontal, Theme.margin).padding(.top, 16).padding(.bottom, 24)
+                            .padding(.horizontal, Theme.margin).padding(.top, 14).padding(.bottom, 16)
                     }
                     .scrollIndicators(.hidden)
-                    .contentMargins(.bottom, 24, for: .scrollContent)
+                    .contentMargins(.bottom, 20, for: .scrollContent)
                     .clipped()
                     .mask(VStack(spacing: 0) { Color.black; LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom).frame(height: 20) })
                     bottomBar(step)
@@ -60,10 +60,6 @@ struct GuideView: View {
         HStack(spacing: 12) {
             CircleIconButton(systemImage: "xmark", label: "Close") { flow.persist(); flow.reset() }
             SegmentBar(count: steps.count, done: index, current: index)
-            if steps[safe: index]?.needsConfirmation == true {
-                Button("Not working?") { showHelp = true }
-                    .font(.subheadline.weight(.medium)).foregroundStyle(Theme.thread)
-            }
         }
         .padding(.horizontal, Theme.margin).padding(.top, geo.safeAreaInsets.top).padding(.bottom, 8)
         .background(Theme.surface)
@@ -106,7 +102,7 @@ struct GuideView: View {
             let items = step.usesItems.compactMap { id in r.shoppingList.first { $0.id == id } }
             if !items.isEmpty {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Uses").overline()
+                    Text("Uses").font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
                     Text(items.map { Self.shortName($0.name) }.joined(separator: ", "))
                         .font(.footnote).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                 }
@@ -115,7 +111,7 @@ struct GuideView: View {
                 HStack(alignment: .top, spacing: 12) {
                     Rectangle().fill(Theme.thread).frame(width: 2)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Watch out").overline()
+                        Text("Watch out").font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
                         Text(CopyPolish.mistake(m, english: english)).font(.subheadline).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                     }
                 }
@@ -146,39 +142,38 @@ struct GuideView: View {
         let last = index == steps.count - 1
         let locked = step.needsConfirmation && !confirmed.contains(step.n)
         let on = confirmed.contains(step.n)
-        return HStack(spacing: 12) {
-            if index > 0 {
-                CircleIconButton(systemImage: "chevron.left", label: "Back") {
-                    forward = false
-                    withAnimation(Theme.spring) { flow.currentStep = index - 1 }
-                }
+        return HStack(spacing: 10) {
+            Button {
+                forward = false
+                withAnimation(Theme.spring) { flow.currentStep = index - 1 }
+            } label: {
+                Image(systemName: "chevron.left").font(.system(size: 17, weight: .semibold)).foregroundStyle(Theme.ink).frame(width: 32, height: 44)
             }
+            .accessibilityLabel(tr("Back"))
+            .opacity(index > 0 ? 1 : 0).disabled(index == 0)
+            // the safety gate always sits left of the secondary action, same compact control
             if step.needsConfirmation {
-                // one compact bar: the safety check on the left, Done on the right
                 Button {
                     if on { confirmed.remove(step.n) } else { confirmed.insert(step.n); Haptics.selection() }
                 } label: {
-                    HStack(spacing: 10) {
-                        CheckCircle(on: on)
-                        Text("I've done this safely").font(.subheadline.weight(.medium)).foregroundStyle(Theme.ink)
-                            .multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
+                    HStack(spacing: 6) {
+                        CheckCircle(on: on, size: 24)
+                        Text("Done safely").font(.footnote.weight(.medium)).foregroundStyle(Theme.ink).lineLimit(1)
                     }
                     .frame(minHeight: 44).contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(tr("I've done this safely"))
                 .accessibilityAddTraits(on ? .isSelected : [])
-                Spacer(minLength: 0)
-                Button { advance(last: last) } label: { Text(last ? "Finish" : "Done") }
-                    .buttonStyle(PrimaryButtonStyle(kind: .primary))
-                    .frame(width: 112)
-                    .disabled(locked)
-            } else {
-                Button { advance(last: last) } label: { Text(last ? "Finish" : "Done") }
-                    .buttonStyle(PrimaryButtonStyle(kind: .primary))
-                Button("Not working?") { showHelp = true }
-                    .font(.subheadline.weight(.medium)).foregroundStyle(Theme.thread)
-                    .frame(minWidth: 88, minHeight: 44)
             }
+            Spacer(minLength: 0)
+            Button("Not working?") { showHelp = true }
+                .font(.footnote.weight(.medium)).foregroundStyle(Theme.thread)
+                .lineLimit(1).fixedSize().frame(minHeight: 44)
+            Button { advance(last: last) } label: { Text(last ? "Finish" : "Done") }
+                .buttonStyle(PrimaryButtonStyle(kind: .primary))
+                .frame(width: 92)
+                .disabled(locked)
         }
         .padding(.horizontal, Theme.margin)
         .padding(.vertical, 10)

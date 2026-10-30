@@ -15,7 +15,7 @@ struct ShoppingListView: View {
                     let group = items.filter { $0.kind == kind }
                     if !group.isEmpty {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text(kind == .material ? "Materials" : "Tools").overline().padding(.leading, 4)
+                            Text(kind == .material ? "Materials" : "Tools").sectionHeader().padding(.leading, 4)
                             VStack(spacing: 0) {
                                 ForEach(Array(group.enumerated()), id: \.element.id) { i, item in
                                     row(item)

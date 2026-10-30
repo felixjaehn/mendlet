@@ -16,16 +16,11 @@ struct SettingsSheet: View {
         NavigationStack {
             List {
                 Section {
-                    HStack { Text("Photo analysis"); Spacer(); Text("On our server").foregroundStyle(Theme.inkSecondary) }
+                    Toggle("Precision mode", isOn: $settings.precisionMode)
                 } header: {
-                    Text("Server")
+                    Text("Analysis")
                 } footer: {
-                    Text("Photos are sent to the analysis server only to assess the repair.")
-                }
-                Section {
-                    NavigationLink("How Mendlet works") { HowItWorksView() }
-                } footer: {
-                    Text("See the steps behind your last analysis.")
+                    Text("Uses Muse Wonder to double-check every outline. Slower.")
                 }
                 Section {
                     Button("Delete all repairs", role: .destructive) { confirmClear = true }
@@ -35,7 +30,8 @@ struct SettingsSheet: View {
                     Text("Removes every photo and all progress from this device.")
                 }
                 Section {
-                    HStack { Text("Mendlet"); Spacer(); Text(version).foregroundStyle(Theme.inkSecondary) }
+                    NavigationLink("How Mendlet works") { HowItWorksView() }
+                    HStack { Text("Version"); Spacer(); Text(version).foregroundStyle(Theme.inkSecondary) }
                         .contentShape(Rectangle())
                         .onTapGesture { taps += 1; if taps >= 5 { dev = true } }
                 } header: {
@@ -54,13 +50,11 @@ struct SettingsSheet: View {
                             } label: {
                                 HStack { Text("Test connection"); Spacer(); if checking { ProgressView() } else if let status { Text(status).foregroundStyle(Theme.inkSecondary) } }
                             }
-                            Toggle("Precision mode", isOn: $settings.precisionMode)
                         }
                     }
                 }
             }
-            .scrollContentBackground(.hidden)
-            .background(Theme.paper)
+            .listStyle(.insetGrouped)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } } }

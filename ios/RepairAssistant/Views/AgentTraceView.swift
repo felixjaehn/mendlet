@@ -30,7 +30,7 @@ enum ModelStyle {
         return model
     }
     static func seconds(_ ms: Int) -> String {
-        ms < 100 ? "\(ms) ms" : String(format: "%.1f s", locale: Lang.shared.locale, Double(ms) / 1000)
+        ms < 50 ? "" : (ms < 100 ? "\(ms) ms" : String(format: "%.1f s", locale: Lang.shared.locale, Double(ms) / 1000))
     }
 }
 
@@ -57,88 +57,87 @@ struct AgentTraceView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 8) {
                 SectionLabel(text: "What happened")
                 Spacer()
                 if !steps.isEmpty {
-                    Text(tr("%lld Schritte · %@", steps.count, ModelStyle.seconds(steps.map(\.ms).reduce(0, +))))
-                        .font(.caption.monospacedDigit().weight(.semibold)).foregroundStyle(Theme.inkSecondary)
+                    let total = ModelStyle.seconds(steps.map(\.ms).reduce(0, +))
+                    Text(total.isEmpty ? tr("%lld Schritte", steps.count) : tr("%lld Schritte · %@", steps.count, total))
+                        .font(.caption.monospacedDigit()).foregroundStyle(Theme.inkSecondary)
                 }
             }
-            .padding(.bottom, 4)
+            .padding(.bottom, 10)
             if hiddenCount > 0 {
                 Text(tr("+%lld frühere Schritte", hiddenCount))
-                    .font(.caption.weight(.semibold)).foregroundStyle(Theme.inkSecondary).padding(.leading, 30).padding(.bottom, 2)
+                    .font(.caption).foregroundStyle(Theme.inkSecondary).padding(.leading, 32).padding(.bottom, 8)
             }
             ForEach(visible) { s in
-                row(s)
-                    .transition(reduceMotion ? .opacity : .asymmetric(insertion: .move(edge: .bottom).combined(with: .opacity), removal: .opacity))
+                row(s, last: active == nil && s.id == visible.last?.id)
             }
-            if let active {
-                activeRow(active).transition(.opacity)
-            }
+            if let active { activeRow(active) }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .card(padding: 12)
-        .animation(reduceMotion ? .easeOut(duration: 0.2) : Theme.spring, value: steps.map(\.n))
-        .animation(.easeInOut(duration: 0.25), value: active?.label)
+        .card(padding: 16)
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.25), value: steps.map(\.n))
     }
 
-    /// One leading glyph style for every row: a small status mark, never a model icon.
-    private func glyph(_ state: GlyphState) -> some View {
-        Group {
-            switch state {
-            case .done: Image(systemName: "checkmark").foregroundStyle(Theme.inkSecondary)
-            case .failed: Image(systemName: "xmark").foregroundStyle(Theme.stop)
-            case .running: ProgressView().controlSize(.mini)
+    /// Timeline column: a small status mark with a hairline running down to the next row.
+    private func rail(_ state: GlyphState, last: Bool) -> some View {
+        VStack(spacing: 0) {
+            Group {
+                switch state {
+                case .done: Image(systemName: "checkmark").foregroundStyle(Theme.inkSecondary)
+                case .failed: Image(systemName: "xmark").foregroundStyle(Theme.stop)
+                case .running: ProgressView().controlSize(.mini)
+                }
             }
+            .font(.system(size: 11, weight: .bold)).frame(width: 20, height: 20)
+            if !last { Rectangle().fill(Theme.hairline).frame(width: 1).frame(maxHeight: .infinity).padding(.vertical, 2) }
         }
-        .font(.system(size: 12, weight: .bold)).frame(width: 20, height: 20)
+        .frame(width: 20)
     }
     private enum GlyphState { case done, failed, running }
 
-    /// Same plain caption for every model: "SAM 3.1", "Muse Spark", "Muse Wonder". Steps without a model are on-device work.
-    private func modelLabel(_ model: String) -> some View {
-        Text(model.isEmpty ? "On device" : ModelStyle.display(model))
-            .font(.caption.weight(.medium)).foregroundStyle(Theme.inkSecondary)
+    /// Plain secondary text: "SAM 3.1", "Muse Spark" ... Steps without a model are on-device work. Durations under 50 ms are left out.
+    private func detail(_ model: String, ms: Int?) -> String {
+        let name = model.isEmpty ? "On device" : ModelStyle.display(model)
+        let t = ms.map { ModelStyle.seconds($0) } ?? ""
+        return t.isEmpty ? name : "\(name) · \(t)"
     }
 
-    private func row(_ s: AgentStep) -> some View {
+    private func row(_ s: AgentStep, last: Bool) -> some View {
         let ok = s.status == .done
-        return HStack(spacing: 10) {
-            glyph(ok ? .done : .failed)
-            Group {
-                if ok && recoveredIDs.contains(s.n) {
-                    Text(AgentLabel.localized(s.label)).foregroundStyle(Theme.ink)
-                        + Text("\n✓ " + tr("Fehler behoben – Agent hat umgeplant")).font(.caption.weight(.semibold)).foregroundStyle(Theme.safe)
-                } else if ok { Text(AgentLabel.localized(s.label)).foregroundStyle(Theme.ink) }
-                else { Text(AgentLabel.localized(s.label)).foregroundStyle(Theme.ink) + Text("\nServerfehler – Agent weicht aus").font(.caption.weight(.semibold)).foregroundStyle(Theme.stop) }
+        let recovered = ok && recoveredIDs.contains(s.n)
+        return HStack(alignment: .top, spacing: 12) {
+            rail(ok ? .done : .failed, last: last)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(AgentLabel.localized(s.label)).font(.subheadline.weight(.medium)).foregroundStyle(Theme.ink)
+                    .lineLimit(3).fixedSize(horizontal: false, vertical: true)
+                Text(detail(s.model, ms: s.ms)).font(.caption.monospacedDigit()).foregroundStyle(Theme.inkSecondary)
+                if recovered {
+                    Text(tr("Fehler behoben – Agent hat umgeplant")).font(.caption).foregroundStyle(Theme.inkSecondary)
+                } else if !ok {
+                    Text("Serverfehler – Agent weicht aus").font(.caption).foregroundStyle(Theme.stop)
+                }
             }
-            .font(.subheadline.weight(.semibold)).lineLimit(3).fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: 6)
-            VStack(alignment: .trailing, spacing: 2) {
-                modelLabel(s.model)
-                Text(ModelStyle.seconds(s.ms)).font(.caption.monospacedDigit()).foregroundStyle(Theme.inkTertiary)
-            }
+            .padding(.bottom, last ? 0 : 12)
+            Spacer(minLength: 0)
         }
-        .padding(.vertical, 3)
-        .padding(.horizontal, ok ? 0 : 6)
-        .background(ok ? Color.clear : Theme.stop.opacity(0.07), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(AgentLabel.localized(s.label)), \(ModelStyle.display(s.model)), \(ModelStyle.seconds(s.ms)), \(ok ? tr("fertig") : tr("fehlgeschlagen, Serverfehler, Agent weicht aus"))")
     }
 
     private func activeRow(_ a: (label: String, model: String)) -> some View {
-        HStack(spacing: 10) {
-            glyph(.running)
-            Text(AgentLabel.localized(a.label)).font(.subheadline.weight(.semibold)).foregroundStyle(Theme.inkSecondary).lineLimit(3).fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: 6)
-            VStack(alignment: .trailing, spacing: 2) {
-                modelLabel(a.model)
+        HStack(alignment: .top, spacing: 12) {
+            rail(.running, last: true)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(AgentLabel.localized(a.label)).font(.subheadline.weight(.medium)).foregroundStyle(Theme.inkSecondary)
+                    .lineLimit(3).fixedSize(horizontal: false, vertical: true)
+                Text(detail(a.model, ms: nil)).font(.caption).foregroundStyle(Theme.inkSecondary)
             }
+            Spacer(minLength: 0)
         }
-        .padding(.vertical, 3)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(tr("%@, läuft", AgentLabel.localized(a.label)))
     }

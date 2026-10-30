@@ -155,7 +155,7 @@ struct DecisionView: View {
         ScrollView {
             if let d = flow.response?.decision, let r = flow.response {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("My advice").overline()
+                    Text("My advice").sectionHeader()
                     Text(d.recommendation.headline).font(.serif(.title)).foregroundStyle(Theme.ink)
                     reasonText(d)
                     switch d.recommendation {
@@ -193,7 +193,7 @@ struct DecisionView: View {
         return Group {
             if s.count > 1 {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("What to ask for").overline()
+                    Text("What to ask for").sectionHeader()
                     Text(s.dropFirst().joined(separator: " ")).font(.body).foregroundStyle(Theme.ink).lineSpacing(4)
                 }
             }
@@ -244,7 +244,7 @@ struct DecisionView: View {
 
     private func secondLife(_ ideas: [SecondLife]) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Give it a second life").overline().padding(.bottom, 4)
+            Text("Give it a second life").sectionHeader().padding(.bottom, 4)
             ForEach(Array(ideas.prefix(3).enumerated()), id: \.offset) { i, idea in
                 if i > 0 { Rectangle().fill(Theme.hairline).frame(height: 0.5).padding(.leading, 44) }
                 HStack(alignment: .top, spacing: 16) {
