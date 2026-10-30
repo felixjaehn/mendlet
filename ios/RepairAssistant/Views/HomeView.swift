@@ -12,12 +12,14 @@ struct HomeView: View {
     var body: some View {
         @Bindable var flow = flow
         let progress = flow.inProgress, done = flow.doneProjects
+        let savings = Savings.totals(for: done)
         ZStack(alignment: .bottom) {
             Theme.paper.ignoresSafeArea()
             if progress.isEmpty && done.isEmpty { emptyState } else {
               VStack(spacing: 0) {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 16) {
+                        if !savings.isEmpty { SavingsCard(totals: savings) { flow.path.append(.impact) }.padding(.top, 4) }
                         tabs
                         if tab == .inProgress {
                             if progress.isEmpty { quiet("Nothing in progress. Start a scan to begin.") }
@@ -373,6 +375,7 @@ extension HomeView {
         if screen == "scan" { try? await Task.sleep(for: .milliseconds(400)); flow.showScan = true; return }
         if screen == "liveScan" { try? await Task.sleep(for: .milliseconds(400)); flow.showScan = true; return }
         if screen == "settings" { try? await Task.sleep(for: .milliseconds(400)); flow.showSettings = true; return }
+        if screen == "impact" { _ = await DebugSeed.projects(flow); try? await Task.sleep(for: .milliseconds(500)); flow.path = [.impact]; return }
         if ["home", "project", "projectDone"].contains(screen) {
             let (a, b) = await DebugSeed.projects(flow)
             tab = screen == "home" && d.string(forKey: "uiTab") == "done" ? .done : .inProgress
@@ -426,6 +429,13 @@ extension HomeView {
         b.finished = true; b.finishedAt = Calendar.current.date(byAdding: .day, value: -2, to: Date())
         b.currentStep = max(b.response.guide.steps.count - 1, 0); b.completedSteps = Array(0..<b.response.guide.steps.count)
         flow.store.upsert(b)
+        // more finished repairs (with new prices) so the savings card and the impact screen are populated
+        for (s, id, days) in [(DemoScenario.realSweater, "seed-sweater-done", 5), (.textileTear, "seed-jeans", 9)] {
+            guard var c = await make(s, id: id) else { continue }
+            c.finished = true; c.finishedAt = Calendar.current.date(byAdding: .day, value: -days, to: Date())
+            c.currentStep = max(c.response.guide.steps.count - 1, 0); c.completedSteps = Array(0..<c.response.guide.steps.count)
+            flow.store.upsert(c)
+        }
         return (a, b)
     }
 }

@@ -34,7 +34,8 @@ ONLY="${ONLY:-}"   # ONLY="home project" re-takes just those shots
 run() { [[ -z "$ONLY" || " $ONLY " == *" $1 "* ]] && shot "$@" || true; }
 
 xcrun simctl ui "$UDID" appearance light
-run home 6 -uiScreen home
+run home 12 -uiScreen home
+run impact 12 -uiScreen impact
 run home-done 6 -uiScreen home -uiTab done
 run project 8 -uiScreen project
 run project-done 8 -uiScreen projectDone
@@ -64,7 +65,8 @@ run completion 22 -uiScreen completion -uiScenario textile_tear
 run block-battery 16 -uiScreen diagnosis -uiScenario battery_jacket
 run block-helmet 16 -uiScreen diagnosis -uiScenario helmet
 xcrun simctl ui "$UDID" appearance dark
-run home-dark 6 -uiScreen home
+run home-dark 12 -uiScreen home
+run impact-dark 12 -uiScreen impact
 run finding-sweater-dark 14 -uiScreen diagnosis -uiScenario real_sweater
 run verdict-repair-dark 18 -uiScreen decision -uiScenario real_sweater
 run checklist-dark 18 -uiScreen checklist -uiScenario real_sweater

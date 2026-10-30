@@ -4,7 +4,7 @@ import Observation
 @MainActor
 @Observable
 final class FlowModel {
-    enum Route: Hashable { case analysis, diagnosis, decision, shopping, guide, block, completion, project(String) }
+    enum Route: Hashable { case analysis, diagnosis, decision, shopping, guide, block, completion, project(String), impact }
 
     let settings: AppSettings
     let store: CaseStore
@@ -371,7 +371,7 @@ final class FlowModel {
         case .guide: .guide
         case .block: .block
         case .completion: .completion
-        case .project: .guide
+        case .project, .impact: .guide
         }
         guard route == .analysis || FlowGate.canNavigate(to: gateRoute, response: response) else { Haptics.warning(); return }
         path.append(route)

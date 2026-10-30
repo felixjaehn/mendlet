@@ -18,6 +18,7 @@ struct RootView: View {
                     case .block: BlockView()
                     case .completion: CompletionView()
                     case .project(let id): ProjectView(caseId: id)
+                    case .impact: ImpactView()
                     }
                 }
         }

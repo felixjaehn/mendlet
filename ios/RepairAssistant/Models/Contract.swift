@@ -299,8 +299,10 @@ struct Decision: Codable, Sendable, Hashable {
     var costEur: [Double]
     var estimateNote: String
     var secondLife: [SecondLife] = []
+    /// Typical price range of a comparable new item, in euro. Empty when the proxy gave none.
+    var newPriceEur: [Double] = []
 
-    private enum CodingKeys: String, CodingKey { case recommendation, reasoning, effort, timeMinutes, costEur, estimateNote, secondLife }
+    private enum CodingKeys: String, CodingKey { case recommendation, reasoning, effort, timeMinutes, costEur, estimateNote, secondLife, newPriceEur }
     init(recommendation: Recommendation, reasoning: String, effort: Effort, timeMinutes: [Int], costEur: [Double], estimateNote: String = "Schätzung") {
         self.recommendation = recommendation; self.reasoning = reasoning; self.effort = effort
         self.timeMinutes = timeMinutes; self.costEur = costEur; self.estimateNote = estimateNote
@@ -315,6 +317,7 @@ struct Decision: Codable, Sendable, Hashable {
         let note = (try? c.decode(String.self, forKey: .estimateNote)) ?? ""
         estimateNote = note.isEmpty ? "Schätzung" : note
         secondLife = (try? c.decode([SecondLife].self, forKey: .secondLife)) ?? []
+        newPriceEur = (try? c.decode([Double].self, forKey: .newPriceEur))?.filter { $0.isFinite && $0 >= 0 } ?? []
     }
 }
 
