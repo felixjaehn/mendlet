@@ -39,7 +39,7 @@ flowchart LR
   M --> D[Muse Spark plan<br/>diagnosis, decision,<br/>shopping list, steps]
   M --> GEO[App geometry<br/>skeleton → stitch path,<br/>darning grid, glue band,<br/>wire → pad route]
   D --> I[Muse Image edit<br/>your item, repaired]
-  V[Muse Voice<br/>dictation, 'weiter'] --> D
+  V[Muse Voice<br/>dictation: note, answers,<br/>'Not working?'] --> D
 ```
 
 The key finding from our live tests: **SAM 3.1 cannot find a tear by name** ("tear" = 0 matches on an obvious tear), because a tear is a gap, not an object. Muse Spark locates the damage on its perception-grounding grid and hands SAM a box, and SAM returns a pixel-accurate mask (score 0.94). The app then computes the stitch path from that mask with its own geometry; no model outputs coordinates for stitches. Details: [`docs/benchmark.md`](docs/benchmark.md).
@@ -52,7 +52,7 @@ The key finding from our live tests: **SAM 3.1 cannot find a tear by name** ("te
 | **Muse Spark** (`muse-spark-1.3`) | Safety and category check; perception grounding for damage and solder pads (reads the +/− silkscreen); diagnosis, decision, shopping list and steps as schema-validated JSON; reads care labels | Plan in ~13–16 s at `reasoning_effort=low` |
 | **Muse Image** (`muse-image-1.0`) | Edits your own photo into the repaired state for the before/after slider | Jeans and sweater, 11–12 s |
 | **Muse Wonder** (`muse-wonder-1.0`) | **Precision mode** (Settings toggle or `"agent": true`): plans the search, verifies every damage mask with Spark, re-segments with box/points on failure | 10/10 masks on damage with **0 false positives** (classic path: 3 cases with extras), ~60–90 s vs ~25 s; recovered from a live SAM HTTP 500 |
-| **Muse Voice Transcribe** (`muse-voice-transcribe-1.0`) | Dictation and hands-free step control ("weiter") with keyword biasing for repair vocabulary | Error-free German transcript, 2.9 s |
+| **Muse Voice Transcribe** (`muse-voice-transcribe-1.0`) | Dictation of the damage note, follow-up answers and "Not working?" during a step, with keyword biasing for repair vocabulary | Error-free transcript, 2.9 s |
 
 Open-weight models (Muse Glimmer, Muse Spark Open) are not used.
 
