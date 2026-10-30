@@ -67,6 +67,11 @@ extension SecondLife {
     }
 }
 
+struct SheetHeightKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = max(value, nextValue()) }
+}
+
 /// Verdict: a confident recommendation with the marked photo still the hero, time and cost as quiet facts, one next action.
 struct DecisionView: View {
     @Environment(FlowModel.self) private var flow
@@ -78,10 +83,13 @@ struct DecisionView: View {
         #endif
     }()
     @State private var factsShown = false
+    @State private var sheetHeight: CGFloat = 0
 
     var body: some View {
         GeometryReader { geo in
-            let photoHeight = geo.size.height * 0.40
+            // the photo takes whatever the sheet content and the CTA bar do not need
+            let free = geo.size.height - sheetHeight + Theme.heroRadius
+            let photoHeight = sheetHeight > 0 ? min(max(free, geo.size.height * 0.36), geo.size.height * 0.64) : geo.size.height * 0.45
             ZStack(alignment: .top) {
                 Theme.surface.ignoresSafeArea()
                 VStack(spacing: 0) {
@@ -107,14 +115,17 @@ struct DecisionView: View {
         ZStack(alignment: .top) {
             if let photo = flow.photo, let r = flow.response {
                 if repaired, let after = flow.afterImage {
-                    BeforeAfterSlider(before: photo, after: after, aspect: nil, cornerRadius: 0, labels: false)
-                        .overlay(alignment: .bottom) {
-                            Text("Preview").font(.caption.weight(.medium)).foregroundStyle(.white)
-                                .padding(.horizontal, 10).padding(.vertical, 3)
-                                .background(Color.black.opacity(0.35), in: Capsule())
-                                .padding(.bottom, Theme.heroRadius + 56)
-                        }
-                        .transition(.opacity)
+                    GeometryReader { g in
+                        Image(uiImage: after).resizable().scaledToFill()
+                            .frame(width: g.size.width, height: g.size.height).clipped()
+                    }
+                    .overlay(alignment: .topTrailing) {
+                        Text("Preview").font(.caption.weight(.semibold)).foregroundStyle(.white)
+                            .padding(.horizontal, 10).padding(.vertical, 4)
+                            .background(Color.black.opacity(0.4), in: Capsule())
+                            .padding(.trailing, Theme.margin).padding(.top, geo.safeAreaInsets.top + 18)
+                    }
+                    .transition(.opacity)
                 } else {
                     MarkedPhoto(image: photo, segments: r.segments, showLabels: r.decision?.recommendation != .replace, showDimension: true, focus: DamageFocus.region(for: r.segments))
                         .transition(.opacity)
@@ -163,8 +174,10 @@ struct DecisionView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, Theme.margin).padding(.top, 24).padding(.bottom, 24)
+                .background(GeometryReader { g in Color.clear.preference(key: SheetHeightKey.self, value: g.size.height) })
             }
         }
+        .onPreferenceChange(SheetHeightKey.self) { sheetHeight = $0 }
         .scrollIndicators(.hidden)
         .background(Theme.surface, in: UnevenRoundedRectangle(topLeadingRadius: Theme.heroRadius, topTrailingRadius: Theme.heroRadius, style: .continuous))
     }
@@ -187,31 +200,19 @@ struct DecisionView: View {
         }
     }
 
-    /// Effort / time / cost as quiet columns separated by hairlines (Zopa rows, no cards).
+    /// One calm sentence-row: "About 30 min · Low effort · €3–8".
     private func facts(_ d: Decision, pro: Bool = false) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top, spacing: 0) {
-                fact("Effort", pro ? "Pro job" : effortText(d.effort))
-                divider
-                fact("Time", pro ? "At the shop" : Fmt.duration(d.timeMinutes))
-                divider
-                fact("Cost", Fmt.cost(d.costEur))
-            }
-            Text("Estimates, not quotes.").font(.footnote).foregroundStyle(Theme.inkTertiary)
+        let sep = Text("  ·  ").foregroundStyle(Theme.inkTertiary)
+        let time = Text(pro ? "At the shop" : Fmt.duration(d.timeMinutes))
+        let effort = Text(pro ? "Pro job" : tr("\(effortText(d.effort)) effort"))
+        let cost = Text(Fmt.cost(d.costEur))
+        return VStack(alignment: .leading, spacing: 6) {
+            (time + sep + effort + sep + cost)
+                .font(.headline).foregroundStyle(Theme.ink).monospacedDigit()
+                .fixedSize(horizontal: false, vertical: true)
+            Text("Estimates, not quotes.").font(.footnote).foregroundStyle(Theme.inkSecondary)
         }
         .opacity(factsShown ? 1 : 0)
-    }
-
-    private var divider: some View { Rectangle().fill(Theme.hairline).frame(width: 0.5, height: 40).padding(.horizontal, 16) }
-
-    private func fact(_ label: String, _ value: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(label).overline()
-            Text(value).font(.title3.weight(.semibold)).monospacedDigit().foregroundStyle(Theme.ink)
-                .minimumScaleFactor(0.8).lineLimit(1).contentTransition(.numericText())
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityElement(children: .combine)
     }
 
     private func effortText(_ e: Effort) -> String {
