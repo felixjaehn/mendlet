@@ -27,6 +27,7 @@ struct HomeView: View {
                             belowCards(done)
                         } else {
                             if done.isEmpty { quiet("Finished repairs show up here.") }
+                            else { Text(doneSummary(done)).font(.subheadline).foregroundStyle(Theme.inkSecondary) }
                             VStack(spacing: 0) {
                                 ForEach(Array(done.enumerated()), id: \.element.id) { i, c in
                                     DoneRow(project: c) { flow.openProject(c) }
@@ -39,7 +40,7 @@ struct HomeView: View {
                     .animation(Theme.spring, value: tab)
                 }
                 .scrollIndicators(.hidden)
-                .safeAreaInset(edge: .bottom) { Color.clear.frame(height: 120) }
+                .safeAreaInset(edge: .bottom) { Color.clear.frame(height: 150) }
                 scanButton.padding(.bottom, 24)
             }
         }
@@ -126,6 +127,17 @@ struct HomeView: View {
             }
             .padding(.top, 16)
         }
+    }
+
+    private func doneSummary(_ done: [SavedCase]) -> String {
+        let n = done.count
+        let head = n == 1 ? "1 repair done" : "\(n) repairs done"
+        let saved = done.compactMap { c -> Double? in
+            guard c.response.decision?.recommendation == .repairSelf, let hi = c.response.decision?.costEur.last, hi > 0 else { return nil }
+            let lo = c.response.decision?.costEur.first ?? hi
+            return (lo + hi) / 2
+        }.reduce(0, +)
+        return saved >= 5 ? head + " · about €\(Int((saved / 5).rounded() * 5)) saved vs. buying new" : head
     }
 
     private func quiet(_ text: String) -> some View {

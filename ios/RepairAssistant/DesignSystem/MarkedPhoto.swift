@@ -26,6 +26,8 @@ struct MarkedPhoto<Overlay: View>: View {
     /// Tap in normalized photo coordinates (tap to refine).
     var onTap: ((CGPoint) -> Void)? = nil
     var zoomable = true
+    /// Subtle top gradient so the status bar stays legible on full-bleed photos.
+    var topScrim = true
     @ViewBuilder var overlay: (CGSize) -> Overlay
 
     @State private var zoomedOut = false
@@ -38,6 +40,12 @@ struct MarkedPhoto<Overlay: View>: View {
     var body: some View {
         GeometryReader { geo in
             content(container: geo.size)
+        }
+        .overlay(alignment: .top) {
+            if topScrim && mode != .thumb {
+                LinearGradient(colors: [.black.opacity(0.35), .clear], startPoint: .top, endPoint: .bottom)
+                    .frame(height: 120).allowsHitTesting(false)
+            }
         }
         .clipped()
         .accessibilityElement(children: .ignore)
@@ -127,9 +135,9 @@ struct MarkedPhoto<Overlay: View>: View {
 
 extension MarkedPhoto where Overlay == EmptyView {
     init(image: UIImage, segments: [Segment], mode: Mode = .resting, showLabels: Bool = true, showDimension: Bool = false,
-         labelTopInset: CGFloat = 0, focus: CGRect? = nil, onTap: ((CGPoint) -> Void)? = nil, zoomable: Bool = true) {
+         labelTopInset: CGFloat = 0, focus: CGRect? = nil, onTap: ((CGPoint) -> Void)? = nil, zoomable: Bool = true, topScrim: Bool = true) {
         self.init(image: image, segments: segments, mode: mode, showLabels: showLabels, showDimension: showDimension, labelTopInset: labelTopInset, focus: focus,
-                  onTap: onTap, zoomable: zoomable, overlay: { _ in EmptyView() })
+                  onTap: onTap, zoomable: zoomable, topScrim: topScrim, overlay: { _ in EmptyView() })
     }
 }
 

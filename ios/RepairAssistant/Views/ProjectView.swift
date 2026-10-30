@@ -33,11 +33,11 @@ struct ProjectView: View {
                         Text("A pro will take this one. Come back after the repair to log it.").font(.body).foregroundStyle(Theme.inkSecondary).lineSpacing(4)
                     } else {
                         progress(c)
-                        if !finished { needSection }
                         if !finished && !steps.isEmpty { stepsSection }
+                        if !finished { needSection }
                     }
                 }
-                .padding(.horizontal, Theme.margin).padding(.top, 8).padding(.bottom, 40)
+                .padding(.horizontal, Theme.margin).padding(.top, 8).padding(.bottom, 48)
             }
         }
         .scrollIndicators(.hidden)

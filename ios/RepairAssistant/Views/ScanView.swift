@@ -40,7 +40,7 @@ struct ScanView: View {
                 Color.black.ignoresSafeArea()
                 preview.frame(maxWidth: .infinity, maxHeight: .infinity).clipped().ignoresSafeArea()
                 if let frozen { Image(uiImage: frozen).resizable().scaledToFill().frame(maxWidth: .infinity, maxHeight: .infinity).clipped().ignoresSafeArea().transition(.opacity) }
-                LinearGradient(colors: [.black.opacity(0.28), .clear], startPoint: .top, endPoint: .bottom).frame(height: 140).frame(maxHeight: .infinity, alignment: .top).ignoresSafeArea().allowsHitTesting(false)
+                LinearGradient(colors: [.black.opacity(0.35), .clear], startPoint: .top, endPoint: .bottom).frame(height: 120).frame(maxHeight: .infinity, alignment: .top).ignoresSafeArea().allowsHitTesting(false)
                 LinearGradient(colors: [.clear, .black.opacity(0.4)], startPoint: .top, endPoint: .bottom).frame(height: 220).frame(maxHeight: .infinity, alignment: .bottom).ignoresSafeArea().allowsHitTesting(false)
 
                 if phase == .running || phase == .unavailable || phase == .starting {

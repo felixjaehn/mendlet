@@ -85,7 +85,7 @@ final class LocalizationTests: XCTestCase {
         XCTAssertEqual(AgentLabel.localized("SAM sucht „rip“", english: false), "SAM sucht „rip“")
         Lang.shared.choice = "en"
         XCTAssertEqual(AgentLabel.localized("SAM sucht „rip“", english: true), "SAM is looking for “rip”")
-        XCTAssertEqual(AgentLabel.localized("Spark prüft Maske seg_1", english: true), "Spark is checking mask seg_1")
+        XCTAssertEqual(AgentLabel.localized("Spark prüft Maske seg_1", english: true), "Spark is checking the outline")
         XCTAssertEqual(AgentLabel.localized("Plan zusammenstellen", english: true), "Assembling the plan")
         XCTAssertEqual(AgentLabel.localized("Riss", english: true), "Tear")
     }

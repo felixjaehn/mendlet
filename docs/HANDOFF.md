@@ -1,21 +1,34 @@
-# Übergabe (Stand 29.10.2026, abends)
+# Übergabe (Stand 30.10.2026, früh)
 
-Ziel: unabhängige Jury bewertet 10/10 (Briefing: `docs/JUDGING-BRIEF.md`). Letzte Gesamt-Jury 7,1/10, letzte Demo-Jury 8/10. Beide noch vor dem iOS-27-Umbau und dem PDF-Export.
+Ziel: Eine unabhängige Jury bewertet 10/10 (Briefing: `docs/JUDGING-BRIEF.md`).
+
+Jury-Verlauf in der Nacht (jede Runde ein frischer Agent, alle v8-Screenshots, README, Briefing):
+
+| Runde | Gesamt | "Wirkt KI-generiert?" |
+| --- | --- | --- |
+| 1 | 7,6 | ja, leicht |
+| 2 | 7,4 | ja, leicht |
+| 3 | 7,0 | ja, leicht |
+| 4 | 7,4 | **nein** |
+| 5 | 7,2 | **nein** |
+
+Die Werte schwanken je nach Juror um etwa ±0,3. Gedeckelt sind sie durch zwei Punkte, die kein Design-Fix löst:
+
+1. **Impact (30 %) liegt bei 6–7.** Echte Nutzer und eine echte, gefilmte Reparatur fehlen. Nutzergeschichten werden bewusst nicht erfunden.
+2. **Use of Meta tooling bleibt unter 9.** Open-Weight-Modelle sind nicht eingebaut. Die Entscheidungsvorlage liegt in `docs/OPEN-WEIGHTS-PLAN.md`: Muse Glimmer lokal im Proxy für "Not working?", etwa 20 GB Download auf die SSD, Aufwand 4–6 Stunden. **Freigabe offen.**
 
 ## Stand
-- Proxy (252 Tests offline grün) und iOS (82 Tests grün), letzter Commit `6dc3cd7`.
-- Live verifiziert: SAM 3.1, Muse Spark (Grounding → SAM-Box), Muse Image (Vorher/Nachher), Muse Wonder (Präzisionsmodus), Muse Voice. Benchmark mit 16 Fällen in `docs/benchmark.md`.
-- App ist nur noch Englisch, iOS-27-Design (Systemfarben, Liquid Glass, kein Orange, weiße Visual-Intelligence-Masken). Bebilderter PDF-Export der Anleitung ist eingebaut, aber **noch nicht angesehen**.
-- Abgabe-Repo: `~/Desktop/repair-assistant` (Subtree-Split, MIT). Vor der Abgabe neu splitten und dorthin pullen (siehe Memory `standalone-submission-repo`).
-- Proxy starten: `cd proxy && uv run uvicorn app.main:app --port 8787` (Key in `proxy/.env`). Screenshots: `./scripts/screenshots.sh`. Demo für Juroren: `./scripts/run-demo.sh`.
+- Redesign nach `docs/design/REDESIGN-SPEC.md`: 28 Mobbin-Suchen, 69 Referenzbilder in `docs/design/refs/`. Home mit Projekten, Scan, Markierung, Befund, Urteil, "Before you start", Anleitung, Projekt, Abschluss, Sicherheitsstopp, Einstellungen. Name **Mendlet**, Icon `docs/branding/icon-b.png`.
+- Nur Englisch, auch auf einem deutschen iPhone. Akzent System-Blau, kein Orange. Der PDF-Export ist entfernt.
+- Diagnose-Prompt v7 sorgt für natürliche, kurze Texte mit "Done when". Live neu aufgenommen: Pulli (echtes Foto), Ledersohle (echtes Foto), verschlissenes Shirt (Replace mit "second life"), Sneaker, Pulli mit 3 Löchern, Jeans mit Etikett, Heizjacke, Helm.
+- Tests: iOS 91 grün, Proxy 254 grün. Screenshots `docs/screenshots/v8-en-*.png` (32 Stück, frisch).
+- Proxy-Fix: Eine präzise Spark-Box schlägt eine breite SAM-Schadensbox (Sohlenloch).
 
-## Nächste Schritte (Reihenfolge)
-1. **Echte Fotos live analysieren** und in den Benchmark aufnehmen: `testdata/real/01_ledersohle_loch.jpg` (Sohle bis zum Loch durchgelaufen, eher "Profi/neu besohlen") und `testdata/real/02_pulli_kleines_loch.jpg` (kleines, schwer sichtbares Loch). Wenn SAM/Grounding das Pulli-Loch nicht findet: Grounding-Prompt für kleine Löcher schärfen, Tap-to-refine (`/refine`) in der Diagnose sichtbar anbieten.
-2. **Demo-Fix "schwer zu erkennen":** Bei kleinen Schäden auf dem Foto automatisch auf die Schadstelle zoomen (Diagnose und Anleitung: Ausschnitt um die Damage-Box mit Rand, Pinch-to-zoom), Maske kräftiger zeichnen. Die echten Fotos als Demo-Aufnahmen speichern (`ios/RepairAssistant/Resources/LiveRecordings/`, inkl. `.en.json`).
-3. ~~PDF-Export~~ entfällt (Owner 29.10.: "PDF brauche ich nicht. raus damit"), wird im Redesign entfernt.
-4. Screenshots neu aufnehmen und alle Screens gegen die Mobbin-Collection prüfen (`https://mobbin.com/collections/175c3475-f7b6-41b6-af7c-3dc3a68df769`).
-5. Bei Empfehlung "Replace": Upcycling-, Recycling- und Spendehinweise (Spark, optional Muse-Image-Vorschau der Upcycling-Idee).
-6. Schlanke Jury-Runde (nur Demo bzw. Kerndokumente, kurzer Bericht).
+## Bekannte Lücken
+- **Codex-Login:** Der Status meldet "aktiv", das Token lässt sich aber nicht erneuern, und Jobs scheitern sofort. Bitte `codex login` ausführen. Codex nie für Design einsetzen.
+- **Muse Image:** Lieferte um ca. 05:00 HTTP 400 auf jede Anfrage, auch eine schlichte. Die Pulli-Vorschau zeigt deshalb noch die X-förmige Stopfstelle. Später neu erzeugen (Skript-Muster: `after_preview` mit `stitch_type=darning`).
+- **Platine:** Die Aufnahme mit v7 hat die Polarität verloren. Die alte Aufnahme mit längeren Texten bleibt drin.
+- **Shirt:** SAM markiert nur 1 von vielen Löchern. Beim Urteil "Replace" wird deshalb kein Label gezeigt.
 
 ## Nur durch den Menschen
-Video nach `docs/demo-script.md` drehen, Live-Scan auf echtem iPhone testen, GitHub-Repo veröffentlichen, Discord-Fragen (Arbeit nach Kickoff 26.10., starten Juroren die App?).
+Video drehen: ein echtes, unbekanntes Teil am echten iPhone gegen den Live-Proxy. Das bringt laut Jury den größten Gewinn bei "Demo". Außerdem: Live-Scan auf dem Gerät testen, Repo veröffentlichen (vorher Subtree-Split nach `~/Desktop/repair-assistant` erneuern), Discord-Fragen klären, Open Weights freigeben oder ablehnen, `codex login`.

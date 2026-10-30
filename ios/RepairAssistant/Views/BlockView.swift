@@ -46,7 +46,7 @@ struct BlockView: View {
                 if let photo = flow.photo {
                     Group {
                         if let r = flow.response, !r.segments.isEmpty {
-                            MarkedPhoto(image: photo, segments: r.segments, mode: .resting, showLabels: true, focus: DamageFocus.region(for: r.segments), zoomable: false)
+                            MarkedPhoto(image: photo, segments: r.segments, mode: .resting, showLabels: true, focus: DamageFocus.region(for: r.segments), zoomable: false, topScrim: false)
                         } else {
                             Image(uiImage: photo).resizable().scaledToFill()
                         }

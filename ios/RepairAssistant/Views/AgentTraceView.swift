@@ -181,7 +181,19 @@ enum AgentLabel {
         ("Spark prüft Maske ", "", "Spark prüft Maske %@"),
     ]
 
+    /// Display-only: internal segment ids ("mask seg_3", "seg_3") never reach the user.
+    static func scrub(_ label: String) -> String {
+        var t = label
+        t = t.replacingOccurrences(of: #"(?i)(mask|maske)\s+seg_\w+"#, with: "the outline", options: .regularExpression)
+        t = t.replacingOccurrences(of: #"seg_\w+"#, with: "the outline", options: .regularExpression)
+        return t
+    }
+
     static func localized(_ label: String, english: Bool = Lang.shared.isEnglish) -> String {
+        scrub(localizedRaw(label, english: english))
+    }
+
+    private static func localizedRaw(_ label: String, english: Bool) -> String {
         guard english else { return label }
         let direct = tr(label)
         if direct != label { return direct }
