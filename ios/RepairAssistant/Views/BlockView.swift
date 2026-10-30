@@ -14,8 +14,8 @@ struct BlockView: View {
 
     private var title: String {
         switch variant {
-        case .battery, .professional: "This needs a specialist."
-        case .unsupported: "Not something we can mend."
+        case .battery, .professional: "This needs a specialist"
+        case .unsupported: "Not something we can mend"
         }
     }
     private var reason: String {
@@ -28,7 +28,7 @@ struct BlockView: View {
     }
     private var note: String {
         switch variant {
-        case .battery: "This \(itemNoun) has a lithium battery. Repairs near it can cause a fire. Bring the battery to a recycling point and don't charge or open it."
+        case .battery: "Bring the battery to a recycling point and don't charge or open it."
         case .professional: "Ask the maker or a specialist shop about an inspection or a replacement. Don't use it until then."
         case .unsupported: "Take a new photo of the item you want to repair, close up and in daylight."
         }
@@ -42,24 +42,35 @@ struct BlockView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(alignment: .leading, spacing: 20) {
                 if let photo = flow.photo {
-                    Image(uiImage: photo).resizable().scaledToFill().frame(height: 120).frame(maxWidth: .infinity).clipped()
-                        .clipShape(RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
-                        .accessibilityHidden(true)
+                    Group {
+                        if let r = flow.response, !r.segments.isEmpty {
+                            MarkedPhoto(image: photo, segments: r.segments, mode: .resting, showLabels: true, focus: DamageFocus.region(for: r.segments), zoomable: false)
+                        } else {
+                            Image(uiImage: photo).resizable().scaledToFill()
+                        }
+                    }
+                    .frame(height: 340).frame(maxWidth: .infinity).clipped()
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .accessibilityLabel(tr("Photo of your item"))
                 }
-                Image(systemName: "hand.raised").font(.system(size: 40, weight: .thin)).foregroundStyle(Theme.inkTertiary)
-                    .padding(.top, 8).accessibilityHidden(true)
-                VStack(spacing: 10) {
-                    Text(title).font(.serif(.title)).foregroundStyle(Theme.ink).multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Text(reason).font(.body).foregroundStyle(Theme.inkSecondary).multilineTextAlignment(.center).lineSpacing(4)
-                        .fixedSize(horizontal: false, vertical: true)
+                HStack(spacing: 8) {
+                    Image(systemName: "hand.raised").font(.system(size: 14, weight: .semibold))
+                    Text("Safety stop").font(.subheadline.weight(.semibold))
                 }
-                Text(note).font(.subheadline).foregroundStyle(Theme.ink).lineSpacing(3)
-                    .frame(maxWidth: .infinity, alignment: .leading).padding(16)
-                    .background(Theme.fill, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .foregroundStyle(Theme.inkSecondary).padding(.top, 4)
+                Text(title).font(.serif(.title)).foregroundStyle(Theme.ink)
+                    .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(reason).font(.body).foregroundStyle(Theme.ink).lineSpacing(4)
+                    Text(note).font(.body).foregroundStyle(Theme.ink).lineSpacing(4)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.leading, 14)
+                .overlay(alignment: .leading) { Capsule().fill(Theme.ink).frame(width: 3) }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, Theme.margin).padding(.top, 16).padding(.bottom, 24)
         }
         .scrollIndicators(.hidden)
@@ -67,8 +78,11 @@ struct BlockView: View {
         .navigationBarBackButtonHidden()
         .navigationBarHidden(true)
         .floatingBar {
-            PrimaryButton(title: "Back to Repairs") { flow.reset() }
-                .padding(.horizontal, Theme.margin).padding(.vertical, 12)
+            VStack(spacing: 0) {
+                PrimaryButton(title: "Scan something else") { flow.reset(); flow.showScan = true }
+                PrimaryButton(title: "Back to Repairs", kind: .secondary) { flow.reset() }
+            }
+            .padding(.horizontal, Theme.margin).padding(.vertical, 12)
         }
         .onAppear { Haptics.warning() }
     }

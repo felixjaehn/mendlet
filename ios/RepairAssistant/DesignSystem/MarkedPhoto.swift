@@ -356,7 +356,9 @@ struct MarkLabels: View {
                 let beside = p.dot.y >= r.minY && p.dot.y <= r.maxY
                 let tail = beside ? CGPoint(x: p.dot.x < r.midX ? r.minX - 4 : r.maxX + 4, y: r.midY)
                                   : CGPoint(x: min(max(p.dot.x, r.minX + 8), r.maxX - 8), y: p.dot.y < r.midY ? r.minY : r.maxY)
-                let dots = p.item.dots.isEmpty ? [p.dot] : p.item.dots
+                let all = p.item.dots.isEmpty ? [p.dot] : p.item.dots
+                // leaders only to dots inside the visible photo area, never a line running off-screen
+                let dots = visible.map { v in all.filter { v.insetBy(dx: 6, dy: 6).contains($0) } }.flatMap { $0.isEmpty ? nil : $0 } ?? [p.dot]
                 Path { path in for d in dots { path.move(to: d); path.addLine(to: tail) } }
                     .stroke(.white.opacity(0.8), style: StrokeStyle(lineWidth: 0.75, lineCap: .round))
                     .shadow(color: .black.opacity(0.35), radius: 1.5)

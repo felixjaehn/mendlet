@@ -56,7 +56,7 @@ struct ShoppingListView: View {
 
     private func header(_ items: [ShoppingItem], ready: Int) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(ready == items.count ? "All set." : "Gather these first.")
+            Text(ready == items.count ? "All set" : "Gather these first")
                 .font(.serif(.largeTitle)).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
             Text("\(ready) of \(items.count) ready").font(.subheadline).foregroundStyle(Theme.inkSecondary)
                 .monospacedDigit().contentTransition(.numericText())

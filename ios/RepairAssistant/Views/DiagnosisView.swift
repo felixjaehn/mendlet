@@ -18,14 +18,18 @@ struct DiagnosisView: View {
                 Theme.surface.ignoresSafeArea()
                 VStack(spacing: 0) {
                     hero(r, geo: geo).frame(maxHeight: .infinity)
-                    sheet(r, maxHeight: geo.size.height * 0.5)
+                    sheet(r, maxHeight: geo.size.height * 0.58)
                         .padding(.top, -Theme.heroRadius)
                         .offset(y: sheetShown ? 0 : 24).opacity(sheetShown ? 1 : 0)
                 }
             }
             .ignoresSafeArea(edges: .top)
         }
-        .floatingBar { ctaBar(r) }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if r?.diagnosis.needsMoreInfo ?? false {
+                ctaBar(r).background(.bar).overlay(alignment: .top) { Rectangle().fill(Theme.hairline).frame(height: 0.5) }
+            }
+        }
         .navigationBarBackButtonHidden()
         .navigationBarHidden(true)
         .sheet(isPresented: $flow.showFollowUp) { FollowUpSheet() }
@@ -128,7 +132,7 @@ struct DiagnosisView: View {
                     } else {
                         let t = CopyPolish.headlineAndBody(r.diagnosis.summary, english: Lang.shared.isEnglish)
                         Text("What we found").overline()
-                        Text(t.headline).font(.serif(.title)).foregroundStyle(Theme.ink)
+                        Text(t.headline.trimmingCharacters(in: CharacterSet(charactersIn: "."))).font(.serif(.title)).foregroundStyle(Theme.ink)
                             .fixedSize(horizontal: false, vertical: true)
                         if !t.body.isEmpty {
                             Text(t.body).font(.body).foregroundStyle(Theme.ink).lineSpacing(4).fixedSize(horizontal: false, vertical: true)
@@ -142,6 +146,7 @@ struct DiagnosisView: View {
                         if !flow.changedItemIds.isEmpty { changedLine(r) }
                         detailsList(r)
                         if flow.labelBusy { labelBusyRow } else if flow.labelOfferAvailable { labelOfferRow }
+                        optionsButton
                     }
                 }
             }
@@ -226,6 +231,21 @@ struct DiagnosisView: View {
     }
 
     // MARK: CTA
+
+    /// The sheet's own button: an accent bar with an arrow, part of the sheet rather than a floating pill.
+    private var optionsButton: some View {
+        Button { flow.go(.decision) } label: {
+            HStack {
+                Text("See my options").font(.headline)
+                Spacer()
+                Image(systemName: "arrow.right").font(.headline)
+            }
+            .foregroundStyle(.white).padding(.horizontal, 20).frame(height: 56)
+            .background(Theme.thread, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        }
+        .buttonStyle(PressScaleStyle())
+        .padding(.top, 4)
+    }
 
     @ViewBuilder private func ctaBar(_ r: AnalyzeResponse?) -> some View {
         if let r {
