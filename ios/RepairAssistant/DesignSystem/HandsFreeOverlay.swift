@@ -8,11 +8,15 @@ struct HandsFreeGlow: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private static let colors: [Color] = [
-        Color(red: 1.00, green: 0.37, blue: 0.64),   // #FF5FA2
-        Color(red: 1.00, green: 0.62, blue: 0.26),   // #FF9F43
-        Color(red: 0.35, green: 0.78, blue: 0.98),   // #5AC8FA
-        Color(red: 0.48, green: 0.42, blue: 1.00),   // #7B6CFF
-        Color(red: 0.20, green: 0.78, blue: 0.35),   // #34C759
+        Color(red: 0.55, green: 0.38, blue: 1.00),   // violet
+        Color(red: 0.20, green: 0.80, blue: 1.00),   // cyan
+        Color(red: 0.98, green: 0.30, blue: 0.80),   // magenta
+        Color(red: 1.00, green: 0.55, blue: 0.20),   // orange
+        Color(red: 0.30, green: 0.55, blue: 1.00),   // blue
+        Color(red: 0.55, green: 0.38, blue: 1.00),   // violet
+        Color(red: 0.20, green: 0.80, blue: 1.00),   // cyan
+        Color(red: 0.98, green: 0.30, blue: 0.80),   // magenta
+        Color(red: 1.00, green: 0.55, blue: 0.20),   // orange
     ]
 
     var body: some View {
@@ -57,7 +61,9 @@ struct HandsFreeGlow: View {
             func conic(_ shift: Double) -> GraphicsContext.Shading {
                 var cs = Self.colors
                 cs.append(cs[0])
-                return .conicGradient(Gradient(colors: cs), center: center, angle: .radians(shift))
+                let r = max(size.width, size.height) * 0.5
+                let d = CGPoint(x: cos(shift) * r, y: sin(shift) * r)
+                return .linearGradient(Gradient(colors: cs), startPoint: CGPoint(x: center.x - d.x, y: center.y - d.y), endPoint: CGPoint(x: center.x + d.x, y: center.y + d.y))
             }
             let a = t * 2 * .pi / 6
             ctx.drawLayer { l in
@@ -77,6 +83,15 @@ struct HandsFreeGlow: View {
                 l.stroke(path(inset: 1.5), with: conic(a), lineWidth: 3)
             }
         }
+        .mask {
+            // No bleed into the bottom bar: fade to 0.4 over the bottom 190 pt.
+            GeometryReader { g in
+                VStack(spacing: 0) {
+                    Color.white.frame(height: max(0, g.size.height - 190))
+                    LinearGradient(colors: [.white, .white.opacity(0.4)], startPoint: .top, endPoint: .bottom).frame(height: min(190, g.size.height))
+                }
+            }
+        }
         .ignoresSafeArea()
         .allowsHitTesting(false)
         .accessibilityHidden(true)
@@ -93,10 +108,10 @@ private struct HandsFreeGlass<S: InsettableShape>: ViewModifier {
     var shape: S
     func body(content: Content) -> some View {
         content
+            .background(Color.black.opacity(0.10), in: shape)
             .background(.ultraThinMaterial, in: shape)
-            .background(Color.black.opacity(0.22), in: shape)
-            .overlay(shape.fill(LinearGradient(colors: [.white.opacity(0.14), .clear], startPoint: .top, endPoint: UnitPoint(x: 0.5, y: 0.45))).allowsHitTesting(false))
-            .overlay(shape.strokeBorder(LinearGradient(colors: [.white.opacity(0.55), .white.opacity(0.08), .white.opacity(0.22)], startPoint: .top, endPoint: .bottom), lineWidth: 0.5))
+            .overlay(shape.fill(LinearGradient(colors: [.white.opacity(0.22), .clear], startPoint: .top, endPoint: UnitPoint(x: 0.5, y: 0.45))).allowsHitTesting(false))
+            .overlay(shape.strokeBorder(LinearGradient(colors: [.white.opacity(0.45), .white.opacity(0.08), .white.opacity(0.22)], startPoint: .top, endPoint: .bottom), lineWidth: 0.75))
             .shadow(color: .black.opacity(0.3), radius: 22, y: 8)
     }
 }
@@ -137,12 +152,14 @@ struct HandsFreeCapsule: View {
     private var orbState: OrbState { model.phase == .thinking ? .working : .listening }
 
     private var capsule: some View {
-        HStack(spacing: 12) {
-            ThinkingOrb(state: orbState, size: 56, tempo: model.phase == .hearing ? 1.0 : 0.7, level: model.phase == .hearing ? model.level : 0)
-                .frame(width: 60, height: 60)
+        let twoLines = statusText.count > 26
+        let content = HStack(spacing: 10) {
+            ThinkingOrb(state: orbState, size: 72, tempo: model.phase == .hearing ? 1.0 : 0.7, level: model.phase == .hearing ? model.level : 0)
+                .frame(width: 76, height: 76)
+                .background(Circle().fill(Color.black.opacity(0.45)).frame(width: 66, height: 66))
             VStack(alignment: .leading, spacing: 2) {
                 if model.phase == .thinking, !model.caption.isEmpty, model.notice == nil {
-                    Text(model.caption).font(.system(size: 13)).foregroundStyle(.white.opacity(0.55)).lineLimit(1)
+                    Text(model.caption).font(.system(size: 14)).foregroundStyle(.white.opacity(0.7)).lineLimit(1)
                 }
                 Text(statusText)
                     .font(.body.weight(.medium))
@@ -151,40 +168,47 @@ struct HandsFreeCapsule: View {
                     .multilineTextAlignment(.leading)
                     .contentTransition(.opacity)
             }
-            Spacer(minLength: 0)
+            .frame(maxWidth: 260, alignment: .leading)
         }
-        .padding(.leading, 8).padding(.trailing, 20).padding(.vertical, 6)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .modifier(HandsFreeGlass(shape: Capsule()))
+        .padding(.leading, 6).padding(.trailing, 22).padding(.vertical, 4)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(statusText)
+        return HStack(spacing: 0) {
+            Group {
+                if twoLines { content.modifier(HandsFreeGlass(shape: RoundedRectangle(cornerRadius: 28, style: .continuous))) }
+                else { content.modifier(HandsFreeGlass(shape: Capsule())) }
+            }
+            Spacer(minLength: 0)
+        }
     }
 
     private func answerCard(_ text: String) -> some View {
         Button { model.dismissAnswer() } label: {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 8) {
-                    ThinkingOrb(state: .listening, size: 28, tempo: 0.7).frame(width: 34, height: 34)
+                    ThinkingOrb(state: .listening, size: 36, tempo: 0.7).frame(width: 40, height: 40)
+                        .background(Circle().fill(Color.black.opacity(0.45)).frame(width: 34, height: 34))
                     if !model.caption.isEmpty {
-                        Text(model.caption).font(.system(size: 13)).foregroundStyle(.white.opacity(0.55)).lineLimit(1)
+                        Text(model.caption).font(.system(size: 14)).foregroundStyle(.white.opacity(0.7)).lineLimit(1)
                     }
                     Spacer(minLength: 0)
                 }
                 Text(text)
-                    .font(.title3.weight(.medium))
-                    .lineSpacing(4)
+                    .font(.system(size: 22, weight: .regular))
+                    .lineSpacing(3)
                     .foregroundStyle(.white)
-                    .lineLimit(6)
+                    .lineLimit(nil)
                     .minimumScaleFactor(0.8)
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.trailing, 36)
             }
             .padding(.horizontal, 20).padding(.vertical, 18)
             .frame(maxWidth: .infinity, maxHeight: maxHeight, alignment: .topLeading)
             .fixedSize(horizontal: false, vertical: true)
-            .modifier(HandsFreeGlass(shape: RoundedRectangle(cornerRadius: 30, style: .continuous)))
-            .contentShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
+            .modifier(HandsFreeGlass(shape: RoundedRectangle(cornerRadius: 28, style: .continuous)))
+            .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         }
         .buttonStyle(.plain)
         .accessibilityLabel(text)

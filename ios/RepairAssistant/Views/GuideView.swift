@@ -127,7 +127,8 @@ struct GuideView: View {
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(width: 44, height: 44)
-                .glass(Circle(), tint: handsFree.isActive ? Theme.thread.opacity(0.75) : nil, interactive: true)
+                .glass(Circle(), tint: nil, interactive: true)
+                .overlay { if handsFree.isActive { Circle().fill(Color.white.opacity(0.16)) } }
                 .contentShape(Circle())
         }
         .buttonStyle(.plain)
@@ -158,10 +159,10 @@ struct GuideView: View {
 
     // MARK: Photo
 
-    private static let barContentHeight: CGFloat = 50
+    private static let barContentHeight: CGFloat = 46
     private static let baseAnchor: CGFloat = 0.33
 
-    private func barHeight(_ geo: FullGeo) -> CGFloat { Self.barContentHeight + 14 + max(geo.safeAreaInsets.bottom, 12) }
+    private func barHeight(_ geo: FullGeo) -> CGFloat { Self.barContentHeight + 10 + 8 + geo.safeAreaInsets.bottom }
 
     /// The work area on screen at the normal anchor: damage bounds scaled by the zoom, padded for stitch overlay and labels.
     private func workRect(_ r: AnalyzeResponse, size: CGSize) -> CGRect {
@@ -178,7 +179,7 @@ struct GuideView: View {
 
     private func voicePlacement(_ r: AnalyzeResponse, geo: FullGeo) -> VoiceLayout.Placement {
         let H = geo.size.height
-        let vh: CGFloat = handsFree.answer != nil ? min(H * 0.34, 270) : 80
+        let vh: CGFloat = handsFree.answer != nil ? min(H * 0.34, 270) : 92
         return VoiceLayout.place(container: geo.size, work: workRect(r, size: geo.size), topReserved: geo.safeAreaInsets.top + 70,
                                  barTop: H - barHeight(geo), voiceHeight: vh)
     }
@@ -194,17 +195,21 @@ struct GuideView: View {
         let last = index == steps.count - 1
         return HStack(spacing: 12) {
             Text("Step \(index + 1) of \(steps.count) · \(step.title)")
-                .font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
-                .lineLimit(2).multilineTextAlignment(.leading)
+                .font(.subheadline.weight(.semibold)).foregroundStyle(.white)
+                .lineLimit(1).minimumScaleFactor(0.8).multilineTextAlignment(.leading)
             Spacer(minLength: 8)
-            Button { advance(last: last) } label: { Text(last ? "Finish" : "Done").lineLimit(1) }
-                .buttonStyle(PrimaryButtonStyle(kind: .primary))
-                .frame(width: 104)
+            Button { advance(last: last) } label: {
+                Text(last ? "Finish" : "Done").font(.subheadline.weight(.semibold)).foregroundStyle(.white).lineLimit(1)
+                    .frame(width: 88, height: 38).background(Capsule().fill(Color.white.opacity(0.18)))
+            }
+            .buttonStyle(.plain)
         }
         .frame(height: Self.barContentHeight)
-        .padding(.horizontal, Theme.margin).padding(.top, 14).padding(.bottom, max(bottomInset, 12))
+        .padding(.horizontal, Theme.margin).padding(.top, 10).padding(.bottom, bottomInset + 8)
         .frame(maxWidth: .infinity)
-        .background(.regularMaterial, in: UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous))
+        .background(.ultraThinMaterial, in: UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous))
+        .background(Color.black.opacity(0.35), in: UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous))
+        .environment(\.colorScheme, .dark)
     }
 
     private func photo(_ step: GuideStep, _ r: AnalyzeResponse, geo: FullGeo) -> some View {
