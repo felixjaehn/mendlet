@@ -65,6 +65,7 @@ struct CircleIconButton: View {
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(onPhoto ? Color.white : Theme.ink)
                 .frame(width: 44, height: 44)
+                .background(Color.black.opacity(onPhoto ? 0.3 : 0), in: Circle())
                 .glass(Circle(), interactive: true)
                 .contentShape(Circle())
         }
@@ -89,12 +90,12 @@ struct SegmentBar: View {
             ForEach(0..<max(count, 1), id: \.self) { i in
                 let filled = i < done
                 let isCurrent = current == i && !filled
-                Capsule().fill(onPhoto ? Color.white.opacity(0.32) : Theme.fill)
+                Capsule().fill(onPhoto ? Color.white.opacity(0.45) : Theme.fill)
                     .overlay(alignment: .leading) {
                         GeometryReader { g in
                             Capsule().fill(onPhoto ? Color.white : Theme.thread)
                                 .frame(width: filled ? g.size.width : (isCurrent ? g.size.width * 0.5 : 0))
-                                .opacity(isCurrent ? 0.6 : 1)
+                                .opacity(isCurrent && !onPhoto ? 0.6 : 1)
                         }
                     }
                     .frame(height: height)

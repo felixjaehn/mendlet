@@ -77,7 +77,7 @@ struct GuideView: View {
             }
         }
         .overlay {
-            if handsFree.isActive { HandsFreeGlow(phase: handsFree.phase, level: handsFree.level).transition(.opacity) }
+            if handsFree.isActive { HandsFreeGlow(phase: handsFree.phase, level: handsFree.level, answerShown: handsFree.answer != nil).transition(.opacity) }
         }
         .animation(.easeInOut(duration: 0.6), value: handsFree.isActive)
         .background(Color.black.ignoresSafeArea())
@@ -127,6 +127,7 @@ struct GuideView: View {
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(width: 44, height: 44)
+                .background(Color.black.opacity(0.3), in: Circle())
                 .glass(Circle(), tint: nil, interactive: true)
                 .overlay { if handsFree.isActive { Circle().fill(Color.white.opacity(0.16)) } }
                 .contentShape(Circle())
@@ -160,9 +161,11 @@ struct GuideView: View {
     // MARK: Photo
 
     private static let barContentHeight: CGFloat = 46
+    /// Floating bar: 8 pt from the screen edge, lifted a little above the home indicator.
+    private static func barBottomGap(_ inset: CGFloat) -> CGFloat { max(8, inset - 12) }
     private static let baseAnchor: CGFloat = 0.33
 
-    private func barHeight(_ geo: FullGeo) -> CGFloat { Self.barContentHeight + 10 + 8 + geo.safeAreaInsets.bottom }
+    private func barHeight(_ geo: FullGeo) -> CGFloat { Self.barContentHeight + 20 + Self.barBottomGap(geo.safeAreaInsets.bottom) }
 
     /// The work area on screen at the normal anchor: damage bounds scaled by the zoom, padded for stitch overlay and labels.
     private func workRect(_ r: AnalyzeResponse, size: CGSize) -> CGRect {
@@ -205,11 +208,11 @@ struct GuideView: View {
             .buttonStyle(.plain)
         }
         .frame(height: Self.barContentHeight)
-        .padding(.horizontal, Theme.margin).padding(.top, 10).padding(.bottom, bottomInset + 8)
+        .padding(.horizontal, Theme.margin).padding(.vertical, 10)
         .frame(maxWidth: .infinity)
-        .background(.ultraThinMaterial, in: UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous))
-        .background(Color.black.opacity(0.35), in: UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous))
+        .modifier(HandsFreeGlass(shape: RoundedRectangle(cornerRadius: 28, style: .continuous)))
         .environment(\.colorScheme, .dark)
+        .padding(.horizontal, 8).padding(.bottom, Self.barBottomGap(bottomInset))
     }
 
     private func photo(_ step: GuideStep, _ r: AnalyzeResponse, geo: FullGeo) -> some View {
@@ -234,7 +237,7 @@ struct GuideView: View {
         VStack(spacing: 10) {
             HStack(spacing: 12) {
                 CircleIconButton(systemImage: "xmark", label: "Close", onPhoto: true) { flow.persist(); flow.reset() }
-                SegmentBar(count: steps.count, done: index, current: index, height: 3, onPhoto: true)
+                SegmentBar(count: steps.count, done: index, current: index, height: 4, onPhoto: true)
                 handsFreeButton
             }
             if let hint = handsFree.hint {

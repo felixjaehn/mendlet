@@ -7,89 +7,47 @@ struct HandsFreeGlow: View {
     var level: Float
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    /// Answer card shown: same colours, dimmer (0.35 instead of 0.55).
+    var answerShown = false
+
     private static let colors: [Color] = [
         Color(red: 0.55, green: 0.38, blue: 1.00),   // violet
+        Color(red: 0.25, green: 0.55, blue: 1.00),   // blue
         Color(red: 0.20, green: 0.80, blue: 1.00),   // cyan
-        Color(red: 0.98, green: 0.30, blue: 0.80),   // magenta
-        Color(red: 1.00, green: 0.55, blue: 0.20),   // orange
-        Color(red: 0.30, green: 0.55, blue: 1.00),   // blue
-        Color(red: 0.55, green: 0.38, blue: 1.00),   // violet
-        Color(red: 0.20, green: 0.80, blue: 1.00),   // cyan
-        Color(red: 0.98, green: 0.30, blue: 0.80),   // magenta
-        Color(red: 1.00, green: 0.55, blue: 0.20),   // orange
+        Color(red: 0.98, green: 0.35, blue: 0.80),   // magenta
+        Color(red: 1.00, green: 0.55, blue: 0.25),   // orange
+        Color(red: 0.55, green: 0.38, blue: 1.00),   // violet (closes the loop)
     ]
 
     var body: some View {
         if reduceMotion {
-            canvas(t: 1.0, breath: 0.5)
+            canvas(t: 0)
         } else {
-            TimelineView(.animation) { tl in
-                let t = tl.date.timeIntervalSinceReferenceDate
-                canvas(t: t, breath: 0.5 + 0.5 * sin(t * 1.4))
-            }
+            TimelineView(.animation) { tl in canvas(t: tl.date.timeIntervalSinceReferenceDate) }
         }
     }
 
-    /// Calmer while the answer is spoken or the model thinks, brighter and mic-reactive while the user speaks.
-    private var intensity: Double {
-        switch phase {
-        case .off: return 0
-        case .idle: return 0.55
-        case .hearing: return 0.75 + 0.25 * Double(level)
-        case .thinking: return 0.7
-        case .speaking: return 0.6
-        }
+    /// One soft inner stroke: 0.55 opacity (0.35 while the answer card is up), a touch brighter with the mic level.
+    private var opacity: Double {
+        if phase == .off { return 0 }
+        if answerShown { return 0.35 }
+        return 0.55 + (phase == .hearing ? 0.15 * Double(level) : 0)
     }
 
-    private func canvas(t: Double, breath: Double) -> some View {
-        let pulse: Double = {
-            switch phase {
-            case .hearing: return 0.9 + 0.1 * breath + 0.25 * Double(level)
-            case .speaking, .thinking: return 0.86 + 0.14 * breath
-            default: return 1
-            }
-        }()
-        let k = intensity * pulse
-        let wide = 1 + (phase == .hearing ? 0.35 * Double(level) : 0)
+    private func canvas(t: Double) -> some View {
+        let k = opacity
         return Canvas { ctx, size in
             let rect = CGRect(origin: .zero, size: size)
             let radius = max(8, UIScreen.main.displayCornerRadiusApprox)
-            func path(inset: CGFloat) -> Path {
-                RoundedRectangle(cornerRadius: max(8, radius - inset), style: .continuous).path(in: rect.insetBy(dx: inset, dy: inset))
-            }
-            let center = CGPoint(x: size.width / 2, y: size.height / 2)
-            func conic(_ shift: Double) -> GraphicsContext.Shading {
-                var cs = Self.colors
-                cs.append(cs[0])
-                let r = max(size.width, size.height) * 0.5
-                let d = CGPoint(x: cos(shift) * r, y: sin(shift) * r)
-                return .linearGradient(Gradient(colors: cs), startPoint: CGPoint(x: center.x - d.x, y: center.y - d.y), endPoint: CGPoint(x: center.x + d.x, y: center.y + d.y))
-            }
-            let a = t * 2 * .pi / 6
+            let width: CGFloat = 24
+            // Stroke centre line sits half a stroke inside the display edge, so the outer edge follows the display corners.
+            let inset = width / 2
+            let path = RoundedRectangle(cornerRadius: max(8, radius - inset), style: .continuous).path(in: rect.insetBy(dx: inset, dy: inset))
+            let angle = Angle.radians(t * 2 * .pi / 8)   // 8 s per revolution
             ctx.drawLayer { l in
-                l.opacity = 0.35 * k
-                l.addFilter(.blur(radius: 28))
-                l.stroke(path(inset: 6), with: conic(a), lineWidth: 24 * wide)
-            }
-            ctx.drawLayer { l in
-                l.opacity = 0.7 * k
-                l.blendMode = .plusLighter
-                l.addFilter(.blur(radius: 10))
-                l.stroke(path(inset: 3), with: conic(a), lineWidth: 10 * wide)
-            }
-            ctx.drawLayer { l in
-                l.opacity = min(1, k + 0.1)
-                l.addFilter(.blur(radius: 2))
-                l.stroke(path(inset: 1.5), with: conic(a), lineWidth: 3)
-            }
-        }
-        .mask {
-            // No bleed into the bottom bar: fade to 0.4 over the bottom 190 pt.
-            GeometryReader { g in
-                VStack(spacing: 0) {
-                    Color.white.frame(height: max(0, g.size.height - 190))
-                    LinearGradient(colors: [.white, .white.opacity(0.4)], startPoint: .top, endPoint: .bottom).frame(height: min(190, g.size.height))
-                }
+                l.opacity = k
+                l.addFilter(.blur(radius: 9))
+                l.stroke(path, with: .conicGradient(Gradient(colors: Self.colors), center: CGPoint(x: size.width / 2, y: size.height / 2), angle: angle), lineWidth: width)
             }
         }
         .ignoresSafeArea()
@@ -103,16 +61,17 @@ private extension UIScreen {
     var displayCornerRadiusApprox: CGFloat { bounds.height >= 800 ? 52 : 12 }
 }
 
-/// Real glass: ultra thin material, light tint, inner gradient stroke and a soft top highlight.
-private struct HandsFreeGlass<S: InsettableShape>: ViewModifier {
+/// One Liquid Glass material for the capsule, the answer card and the collapsed bar: thin material, ~12 % white tint,
+/// 0.5 pt white 25 % inner stroke and a soft specular top edge.
+struct HandsFreeGlass<S: InsettableShape>: ViewModifier {
     var shape: S
     func body(content: Content) -> some View {
         content
-            .background(Color.black.opacity(0.10), in: shape)
-            .background(.ultraThinMaterial, in: shape)
-            .overlay(shape.fill(LinearGradient(colors: [.white.opacity(0.22), .clear], startPoint: .top, endPoint: UnitPoint(x: 0.5, y: 0.45))).allowsHitTesting(false))
-            .overlay(shape.strokeBorder(LinearGradient(colors: [.white.opacity(0.45), .white.opacity(0.08), .white.opacity(0.22)], startPoint: .top, endPoint: .bottom), lineWidth: 0.75))
-            .shadow(color: .black.opacity(0.3), radius: 22, y: 8)
+            .background(Color.white.opacity(0.12), in: shape)
+            .background(.thinMaterial, in: shape)
+            .overlay(shape.fill(LinearGradient(colors: [.white.opacity(0.16), .clear], startPoint: .top, endPoint: UnitPoint(x: 0.5, y: 0.35))).allowsHitTesting(false))
+            .overlay(shape.strokeBorder(Color.white.opacity(0.25), lineWidth: 0.5).allowsHitTesting(false))
+            .shadow(color: .black.opacity(0.22), radius: 18, y: 6)
     }
 }
 
@@ -133,7 +92,7 @@ struct HandsFreeCapsule: View {
             }
         }
         .environment(\.colorScheme, .dark)
-        .padding(.horizontal, Theme.margin)
+        .padding(.horizontal, 8)
         .animation(Theme.spring, value: model.phase)
         .animation(Theme.spring, value: model.answer)
         .animation(Theme.spring, value: model.caption.isEmpty)
@@ -156,10 +115,10 @@ struct HandsFreeCapsule: View {
         let content = HStack(spacing: 10) {
             ThinkingOrb(state: orbState, size: 72, tempo: model.phase == .hearing ? 1.0 : 0.7, level: model.phase == .hearing ? model.level : 0)
                 .frame(width: 76, height: 76)
-                .background(Circle().fill(Color.black.opacity(0.45)).frame(width: 66, height: 66))
+                .background(Circle().fill(Color.black.opacity(0.45)).overlay(Circle().strokeBorder(Color.white.opacity(0.25), lineWidth: 0.5)).frame(width: 66, height: 66))
             VStack(alignment: .leading, spacing: 2) {
                 if model.phase == .thinking, !model.caption.isEmpty, model.notice == nil {
-                    Text(model.caption).font(.system(size: 14)).foregroundStyle(.white.opacity(0.7)).lineLimit(1)
+                    Text(model.caption).font(.system(size: 15, weight: .semibold)).foregroundStyle(.white.opacity(0.7)).lineLimit(1)
                 }
                 Text(statusText)
                     .font(.body.weight(.medium))
@@ -169,8 +128,9 @@ struct HandsFreeCapsule: View {
                     .contentTransition(.opacity)
             }
             .frame(maxWidth: 260, alignment: .leading)
+            .fixedSize(horizontal: true, vertical: false)
         }
-        .padding(.leading, 6).padding(.trailing, 22).padding(.vertical, 4)
+        .padding(.leading, 6).padding(.trailing, 16).padding(.vertical, 4)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(statusText)
         return HStack(spacing: 0) {
@@ -187,9 +147,9 @@ struct HandsFreeCapsule: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 8) {
                     ThinkingOrb(state: .listening, size: 36, tempo: 0.7).frame(width: 40, height: 40)
-                        .background(Circle().fill(Color.black.opacity(0.45)).frame(width: 34, height: 34))
+                        .background(Circle().fill(Color.black.opacity(0.45)).overlay(Circle().strokeBorder(Color.white.opacity(0.25), lineWidth: 0.5)).frame(width: 34, height: 34))
                     if !model.caption.isEmpty {
-                        Text(model.caption).font(.system(size: 14)).foregroundStyle(.white.opacity(0.7)).lineLimit(1)
+                        Text(model.caption).font(.system(size: 15, weight: .semibold)).foregroundStyle(.white.opacity(0.7)).lineLimit(1)
                     }
                     Spacer(minLength: 0)
                 }
