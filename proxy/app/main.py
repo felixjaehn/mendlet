@@ -166,6 +166,14 @@ def create_app(settings: Settings | None = None, client: ModelClient | None = No
         budget.check()
         return await client.after_preview(body)
 
+    @app.post("/step-image")
+    async def step_image(body: AfterPreviewRequest) -> AfterPreviewResponse:
+        if not body.step_title:
+            raise AppError("bad_request", "step_title fehlt.", 422, en="step_title is required.")
+        i18n.set_current(body.locale)
+        budget.check()
+        return await client.after_preview(body)
+
     return app
 
 

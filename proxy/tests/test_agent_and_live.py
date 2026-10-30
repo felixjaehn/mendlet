@@ -502,3 +502,10 @@ async def test_small_grounded_hole_replaces_broad_sam_damage_around_it(image_b64
 
     result = await analyze(make_req(image_b64, user_note='Sole worn through'), Sole(0.0))
     assert [(s.prompt, s.source) for s in result.segments if s.kind == 'damage'] == [('hole', 'grounding')]
+
+
+def test_step_prompt_shows_mid_repair_state_only():
+    p = preview_prompt(AfterPreviewRequest(image_base64='x', diagnosis_summary='Small hole', step_title='Weave lengthwise threads',
+                                           step_text='Lay parallel threads.'))
+    assert 'Weave lengthwise threads' in p and 'nothing from later steps' in p and 'repaired state' not in p
+    assert 'same framing' in p.lower()

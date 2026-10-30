@@ -71,6 +71,13 @@ def _data_url(b64: str) -> str:
 
 
 def preview_prompt(req: AfterPreviewRequest) -> str:
+    if req.step_title:
+        # Photo guide: one image per step, showing the item mid-repair, not the finished result.
+        return (f"Same photo of the same item, during the repair of: {req.diagnosis_summary}. "
+                f"Show exactly the state right after this step: {req.step_title.strip()}. {(req.step_text or '').strip()} "
+                "Show hands-free work in progress (needle, thread, pins, glue or tape where the step uses them), "
+                "nothing from later steps. Keep the same framing, crop, object, exact colours, material, lighting and "
+                "background; nothing else changed.")
     prompt = f"Same photo, show the repaired state of this damage: {req.diagnosis_summary}. "
     if req.category == "shoe":
         prompt += ("The sole is cleanly re-glued and sits flat and tight against the upper: "

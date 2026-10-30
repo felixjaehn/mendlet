@@ -136,3 +136,12 @@ def test_new_endpoints_respect_budget_before_model_calls(settings, path, body):
     with TestClient(create_app(settings, budget=budget)) as client:
         result = client.post(path, json=body)
     assert result.status_code == 429 and result.json()['error']['code'] == 'budget_exceeded'
+
+
+def test_step_image_needs_a_step_and_returns_an_image(client, image_b64):
+    body = {'image_base64': image_b64, 'diagnosis_summary': 'Small hole in grey knit', 'step_title': 'Weave lengthwise threads',
+            'step_text': 'Lay parallel threads across the hole.'}
+    response = client.post('/step-image', json=body)
+    assert response.status_code == 200 and set(response.json()) == {'image_base64', 'model'}
+    missing = client.post('/step-image', json={k: v for k, v in body.items() if k != 'step_title'})
+    assert missing.status_code == 422 and missing.json()['error']['code'] == 'bad_request'

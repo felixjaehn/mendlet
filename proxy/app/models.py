@@ -117,6 +117,9 @@ class AfterPreviewRequest(Base):
     category: Literal["textile", "shoe"] | None = None  # None = textile wording (backwards compatible)
     repair_hint: Annotated[str, Field(max_length=200)] | None = None
     locale: str = "de"  # accepted for symmetry; the image prompt is English either way
+    # /step-image: the item right after this guide step (photo guide). None = finished repair (/after-preview).
+    step_title: Annotated[str, Field(max_length=120)] | None = None
+    step_text: Annotated[str, Field(max_length=600)] | None = None
 
 
 class AfterPreviewResponse(Base):
