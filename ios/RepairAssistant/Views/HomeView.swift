@@ -15,6 +15,7 @@ struct HomeView: View {
         ZStack(alignment: .bottom) {
             Theme.paper.ignoresSafeArea()
             if progress.isEmpty && done.isEmpty { emptyState } else {
+              VStack(spacing: 0) {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 16) {
                         tabs
@@ -34,14 +35,21 @@ struct HomeView: View {
                                     if i < done.count - 1 { Rectangle().fill(Theme.hairline).frame(height: 0.5).padding(.leading, 76) }
                                 }
                             }
+                            if done.count > 0 && done.count < 4 {
+                                Text("Finished repairs stay here with their before and after.")
+                                    .font(.footnote).foregroundStyle(Theme.inkSecondary).multilineTextAlignment(.center)
+                                    .frame(maxWidth: .infinity).padding(.top, 20)
+                            }
                         }
                     }
                     .padding(.horizontal, Theme.margin).padding(.top, 4)
                     .animation(Theme.spring, value: tab)
                 }
                 .scrollIndicators(.hidden)
-                .safeAreaInset(edge: .bottom) { Color.clear.frame(height: 150) }
-                scanButton.padding(.bottom, 24)
+                .contentMargins(.bottom, 16, for: .scrollContent)
+                // the pill sits below the list in layout, so rows can never run under it
+                scanButton.padding(.top, 12).padding(.bottom, 24)
+              }
             }
         }
         .navigationTitle("Repairs")

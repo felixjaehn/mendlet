@@ -4,6 +4,9 @@ import Foundation
 /// German text is returned untouched. No other rewriting happens on the device.
 enum CopyPolish {
     private static let hedges = ["presumably ", "assumed ", "likely ", "probably ", "apparently "]
+    /// Owner 2026-10-30: no safety boilerplate in steps (older recordings still contain it). Whole sentences starting so are dropped.
+    private static let safetyLeads = ["wear gloves", "wear disposable gloves", "ventilate", "work in a well-ventilated", "work in a ventilated",
+                                      "keep your fingers", "keep fingers", "be careful", "take care"]
 
     static func sentences(_ text: String) -> [String] {
         var out: [String] = [], cur = ""
@@ -27,7 +30,8 @@ enum CopyPolish {
         var s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !s.isEmpty else { return "" }
         guard english else { return s }
-        if s.lowercased().hasPrefix("assumed ") { return "" }
+        let lower = s.lowercased()
+        if lower.hasPrefix("assumed ") || safetyLeads.contains(where: lower.hasPrefix) { return "" }
         for h in hedges { s = s.replacingOccurrences(of: h, with: "", options: .caseInsensitive) }
         s = s.replacingOccurrences(of: "looks intact", with: "is intact", options: .caseInsensitive)
         s = s.replacingOccurrences(of: "looks like", with: "is", options: .caseInsensitive)

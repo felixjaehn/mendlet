@@ -119,11 +119,15 @@ struct DecisionView: View {
                         Image(uiImage: after).resizable().scaledToFill()
                             .frame(width: g.size.width, height: g.size.height).clipped()
                     }
+                    .overlay(alignment: .top) {
+                        LinearGradient(colors: [.black.opacity(0.35), .clear], startPoint: .top, endPoint: .bottom)
+                            .frame(height: 120).allowsHitTesting(false)
+                    }
                     .overlay(alignment: .topTrailing) {
-                        Text("Preview").font(.caption.weight(.semibold)).foregroundStyle(.white)
-                            .padding(.horizontal, 10).padding(.vertical, 4)
-                            .background(Color.black.opacity(0.4), in: Capsule())
-                            .padding(.trailing, Theme.margin).padding(.top, geo.safeAreaInsets.top + 18)
+                        Text("Preview").font(.footnote.weight(.semibold)).foregroundStyle(Theme.ink)
+                            .padding(.horizontal, 12).frame(height: 30)
+                            .background(.regularMaterial, in: Capsule())
+                            .padding(.trailing, Theme.margin).padding(.top, geo.safeAreaInsets.top + 15)
                     }
                     .transition(.opacity)
                 } else {

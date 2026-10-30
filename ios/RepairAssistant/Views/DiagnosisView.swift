@@ -233,19 +233,10 @@ struct DiagnosisView: View {
 
     // MARK: CTA
 
-    /// The sheet's own button: an accent bar with an arrow, part of the sheet rather than a floating pill.
+    /// The sheet's own primary: the same ink capsule as everywhere else.
     private var optionsButton: some View {
-        Button { flow.go(.decision) } label: {
-            HStack {
-                Text("See my options").font(.headline)
-                Spacer()
-                Image(systemName: "arrow.right").font(.headline)
-            }
-            .foregroundStyle(.white).padding(.horizontal, 20).frame(height: 56)
-            .background(Theme.thread, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-        }
-        .buttonStyle(PressScaleStyle())
-        .padding(.top, 4)
+        PrimaryButton(title: "See my options") { flow.go(.decision) }
+            .padding(.top, 4)
     }
 
     @ViewBuilder private func ctaBar(_ r: AnalyzeResponse?) -> some View {

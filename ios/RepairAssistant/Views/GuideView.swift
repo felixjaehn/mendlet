@@ -3,7 +3,6 @@ import SwiftUI
 /// Step player: one step per screen, the stitch path / glue zone / solder points drawn on the user's own photo.
 struct GuideView: View {
     @Environment(FlowModel.self) private var flow
-    @State private var confirmed: Set<Int> = []
     @State private var showHelp = false
     @State private var forward = true
     @State private var expanded: Set<Int> = []
@@ -138,45 +137,28 @@ struct GuideView: View {
         return m
     }
 
+    /// Owner 2026-10-30: no safety checkbox or "confirm safe" gate on steps. Dangerous items are blocked before any guide exists.
     private func bottomBar(_ step: GuideStep) -> some View {
         let last = index == steps.count - 1
-        let locked = step.needsConfirmation && !confirmed.contains(step.n)
-        let on = confirmed.contains(step.n)
-        return HStack(spacing: 10) {
+        return HStack(spacing: 8) {
             Button {
                 forward = false
                 withAnimation(Theme.spring) { flow.currentStep = index - 1 }
             } label: {
-                Image(systemName: "chevron.left").font(.system(size: 17, weight: .semibold)).foregroundStyle(Theme.ink).frame(width: 32, height: 44)
+                Image(systemName: "chevron.left").font(.system(size: 17, weight: .semibold)).foregroundStyle(Theme.ink).frame(width: 36, height: 44)
             }
             .accessibilityLabel(tr("Back"))
             .opacity(index > 0 ? 1 : 0).disabled(index == 0)
-            // the safety gate always sits left of the secondary action, same compact control
-            if step.needsConfirmation {
-                Button {
-                    if on { confirmed.remove(step.n) } else { confirmed.insert(step.n); Haptics.selection() }
-                } label: {
-                    HStack(spacing: 6) {
-                        CheckCircle(on: on, size: 24)
-                        Text("Done safely").font(.footnote.weight(.medium)).foregroundStyle(Theme.ink).lineLimit(1)
-                    }
-                    .frame(minHeight: 44).contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(tr("I've done this safely"))
-                .accessibilityAddTraits(on ? .isSelected : [])
-            }
-            Spacer(minLength: 0)
             Button("Not working?") { showHelp = true }
-                .font(.footnote.weight(.medium)).foregroundStyle(Theme.thread)
-                .lineLimit(1).fixedSize().frame(minHeight: 44)
-            Button { advance(last: last) } label: { Text(last ? "Finish" : "Done") }
+                .font(.subheadline.weight(.medium)).foregroundStyle(Theme.thread)
+                .lineLimit(1).fixedSize().frame(minHeight: 44).padding(.horizontal, 6)
+            Spacer(minLength: 8)
+            Button { advance(last: last) } label: { Text(last ? "Finish" : "Done").lineLimit(1) }
                 .buttonStyle(PrimaryButtonStyle(kind: .primary))
-                .frame(width: 92)
-                .disabled(locked)
+                .frame(width: 104)
         }
         .padding(.horizontal, Theme.margin)
-        .padding(.vertical, 10)
+        .padding(.vertical, 8)
         .background(.bar)
         .overlay(alignment: .top) { Rectangle().fill(Theme.hairline).frame(height: 0.5) }
     }

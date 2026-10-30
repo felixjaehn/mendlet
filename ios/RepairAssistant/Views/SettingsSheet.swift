@@ -16,11 +16,15 @@ struct SettingsSheet: View {
         NavigationStack {
             List {
                 Section {
-                    Toggle("Precision mode", isOn: $settings.precisionMode)
+                    NavigationLink("How Mendlet works") { HowItWorksView() }
+                    Toggle(isOn: $settings.precisionMode) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Precision mode")
+                            Text("Double-checks every outline. Slower.").font(.footnote).foregroundStyle(Theme.inkSecondary)
+                        }
+                    }
                 } header: {
                     Text("Analysis")
-                } footer: {
-                    Text("Uses Muse Wonder to double-check every outline. Slower.")
                 }
                 Section {
                     Button("Delete all repairs", role: .destructive) { confirmClear = true }
@@ -30,7 +34,6 @@ struct SettingsSheet: View {
                     Text("Removes every photo and all progress from this device.")
                 }
                 Section {
-                    NavigationLink("How Mendlet works") { HowItWorksView() }
                     HStack { Text("Version"); Spacer(); Text(version).foregroundStyle(Theme.inkSecondary) }
                         .contentShape(Rectangle())
                         .onTapGesture { taps += 1; if taps >= 5 { dev = true } }

@@ -48,4 +48,10 @@ final class RedesignTests: XCTestCase {
         XCTAssertTrue(c[0].closed)
         XCTAssertEqual(c[0].points.first?.y ?? 1, 0.3, accuracy: 0.02)  // starts at the top-most point
     }
+
+    func testCopyPolishDropsSafetyBoilerplate() {
+        XCTAssertEqual(CopyPolish.text("Wear gloves and ventilate the room. Apply a thin 1 mm layer of shoe adhesive."),
+                       "Apply a thin 1 mm layer of shoe adhesive.")
+        XCTAssertEqual(CopyPolish.text("Ventilate the room. Keep your fingers clear. Trim the loose ends."), "Trim the loose ends.")
+    }
 }
