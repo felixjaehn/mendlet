@@ -430,7 +430,7 @@ extension HomeView {
         b.currentStep = max(b.response.guide.steps.count - 1, 0); b.completedSteps = Array(0..<b.response.guide.steps.count)
         flow.store.upsert(b)
         // more finished repairs (with new prices) so the savings card and the impact screen are populated
-        for (s, id, days) in [(DemoScenario.realSweater, "seed-sweater-done", 5), (.textileTear, "seed-jeans", 9)] {
+        for (s, id, days) in [(DemoScenario.textileHole, "seed-green-sweater", 5), (.textileTear, "seed-jeans", 9)] {
             guard var c = await make(s, id: id) else { continue }
             c.finished = true; c.finishedAt = Calendar.current.date(byAdding: .day, value: -days, to: Date())
             c.currentStep = max(c.response.guide.steps.count - 1, 0); c.completedSteps = Array(0..<c.response.guide.steps.count)
