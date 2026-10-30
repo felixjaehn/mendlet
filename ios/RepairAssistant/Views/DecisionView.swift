@@ -129,7 +129,8 @@ struct DecisionView: View {
                     }
                     .transition(.opacity)
                 } else {
-                    MarkedPhoto(image: photo, segments: r.segments, showLabels: r.decision?.recommendation != .replace, showDimension: true, labelTopInset: 110, focus: DamageFocus.region(for: r.segments))
+                    // Replace: a mask on one of dozens of holes misleads (jury 8), so the photo stays unmarked.
+                    MarkedPhoto(image: photo, segments: r.decision?.recommendation == .replace ? [] : r.segments, showLabels: r.decision?.recommendation != .replace, showDimension: r.decision?.recommendation != .replace, labelTopInset: 110, focus: r.decision?.recommendation == .replace ? nil : DamageFocus.region(for: r.segments))
                         .transition(.opacity)
                 }
             } else {
