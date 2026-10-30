@@ -35,6 +35,8 @@ def tile(case: dict, resp: dict) -> Image.Image:
 
 
 def main() -> None:
+    if len(sys.argv) != 3:
+        sys.exit("usage: overlay_contact_sheet.py <dump_dir> <out.jpg>")
     dump, out = Path(sys.argv[1]), Path(sys.argv[2])
     cases = json.loads((TESTDATA / "cases.json").read_text(encoding="utf-8"))["cases"]
     tiles = [

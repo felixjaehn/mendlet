@@ -4,6 +4,7 @@ import asyncio
 import base64
 import io
 import re
+from collections.abc import Awaitable, Callable
 
 import numpy as np
 from PIL import Image
@@ -217,7 +218,9 @@ class MockClient:
         result.source = "tap"
         return result
 
-    async def agent_run(self, req: AnalyzeRequest, cls: ClassifyResult, emit) -> tuple[list[Segment], DiagnosePlan]:
+    async def agent_run(
+        self, req: AnalyzeRequest, cls: ClassifyResult, emit: Callable[[dict], Awaitable[None]]
+    ) -> tuple[list[Segment], DiagnosePlan]:
         """Scripted Wonder run (six steps) so the iOS trace can be demoed without a key."""
         found = md.segments(pick_scenario(req))
         damage = next((s for s in found if s.kind == "damage"), None)

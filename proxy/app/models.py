@@ -1,6 +1,6 @@
 """Pydantic models mirroring the JSON API contract (see API.md)."""
 
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -86,7 +86,7 @@ class RefineRequest(Base):
     locale: str = "de"
 
     @model_validator(mode="after")
-    def valid_geometry(self):
+    def valid_geometry(self) -> Self:
         if self.box is not None:
             x, y, w, h = self.box
             if w <= 0 or h <= 0 or x + w > 1 + 1e-9 or y + h > 1 + 1e-9:
@@ -146,7 +146,7 @@ class GroundingResult(Base):
     box: Annotated[list[Annotated[float, Field(allow_inf_nan=False)]], Field(min_length=4, max_length=4)] | None
 
     @model_validator(mode="after")
-    def valid_box(self):
+    def valid_box(self) -> Self:
         if self.box is not None:
             x1, y1, x2, y2 = [max(0.0, min(1000.0, v)) for v in self.box]
             if x2 <= x1 or y2 <= y1:
@@ -159,7 +159,7 @@ class GroundedPad(Base):
     box_0_1000: Annotated[list[Annotated[float, Field(allow_inf_nan=False)]], Field(min_length=4, max_length=4)]
 
     @model_validator(mode="after")
-    def valid_box(self):
+    def valid_box(self) -> Self:
         self.box_0_1000 = [max(0.0, min(1000.0, v)) for v in self.box_0_1000]
         x1, y1, x2, y2 = self.box_0_1000
         if x2 <= x1 or y2 <= y1:
@@ -286,7 +286,7 @@ class Overlay(Base):
     hold_seconds: Annotated[int, Field(strict=True, ge=2, le=3)] | None = None
 
     @model_validator(mode="after")
-    def required_targets(self):
+    def required_targets(self) -> Self:
         if self.type == "solder":
             if not self.from_segment_id or not self.to_segment_id or self.from_segment_id == self.to_segment_id:
                 raise ValueError("Ein Löt-Overlay braucht zwei verschiedene Segment-IDs.")
