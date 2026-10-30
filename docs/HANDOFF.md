@@ -16,7 +16,7 @@ Jury-Verlauf in der Nacht (jede Runde ein frischer Agent, alle v8-Screenshots, R
 Die Werte schwanken je nach Juror um etwa ±0,3. Gedeckelt sind sie durch zwei Punkte, die kein Design-Fix löst:
 
 1. **Impact (30 %) liegt bei 6–7.** Echte Nutzer und eine echte, gefilmte Reparatur fehlen. Nutzergeschichten werden bewusst nicht erfunden.
-2. **Use of Meta tooling bleibt unter 9.** Open-Weight-Modelle sind nicht eingebaut. Die Entscheidungsvorlage liegt in `docs/OPEN-WEIGHTS-PLAN.md`: Muse Glimmer lokal im Proxy für "Not working?", etwa 20 GB Download auf die SSD, Aufwand 4–6 Stunden. **Freigabe offen.**
+2. **Use of Meta tooling bleibt unter 9.** Open-Weight-Modelle sind nicht eingebaut. Die Entscheidungsvorlage liegt in `docs/OPEN-WEIGHTS-PLAN.md`: Muse Glimmer lokal im Proxy für "Not working?", etwa 20 GB Download auf die SSD, Aufwand 4–6 Stunden. **Freigabe offen.** Geprüft 30.10.: Die Meta Model API bietet Glimmer und Spark Open nicht gehostet an (`/v1/models` listet nur Wonder, SAM 3.1, Spark 1.1–1.3, Voice, Image), es geht also nur lokal.
 
 ## Stand
 - Redesign nach `docs/design/REDESIGN-SPEC.md`: 28 Mobbin-Suchen, 69 Referenzbilder in `docs/design/refs/`. Home mit Projekten, Scan, Markierung, Befund, Urteil, "Before you start", Anleitung, Projekt, Abschluss, Sicherheitsstopp, Einstellungen. Name **Mendlet**, Icon `docs/branding/icon-b.png`.
