@@ -39,7 +39,7 @@ struct HomeView: View {
                     .animation(Theme.spring, value: tab)
                 }
                 .scrollIndicators(.hidden)
-                .safeAreaInset(edge: .bottom) { Color.clear.frame(height: 96) }
+                .safeAreaInset(edge: .bottom) { Color.clear.frame(height: 120) }
                 scanButton.padding(.bottom, 24)
             }
         }
