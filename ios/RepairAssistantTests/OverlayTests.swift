@@ -44,3 +44,21 @@ final class OverlayTests: XCTestCase {
         XCTAssertEqual(l?.cm ?? 0, 10, accuracy: 0.6)
     }
 }
+
+final class CureActivityTests: XCTestCase {
+    func testStateProgressAndRemaining() {
+        let t0 = Date(timeIntervalSince1970: 1000)
+        let s = CureActivityController.state(seconds: 600, from: t0)
+        XCTAssertEqual(s.total, 600)
+        XCTAssertEqual(s.remaining(at: t0.addingTimeInterval(150)), 450)
+        XCTAssertEqual(s.progress(at: t0.addingTimeInterval(300)), 0.5, accuracy: 0.001)
+        XCTAssertEqual(s.progress(at: t0.addingTimeInterval(9999)), 1)
+        XCTAssertEqual(s.range.lowerBound, t0)
+    }
+
+    func testAttributesRoundTrip() throws {
+        let a = CureActivityAttributes(itemName: "Sneaker", stepTitle: "Press", kind: .solder)
+        let d = try JSONEncoder().encode(a)
+        XCTAssertEqual(try JSONDecoder().decode(CureActivityAttributes.self, from: d).kind, .solder)
+    }
+}

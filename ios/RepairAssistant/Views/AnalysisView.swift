@@ -44,6 +44,7 @@ struct AnalysisView: View {
                         mode: failed ? .thumb : .analysis(arrival: flow.marksArrivedAt),
                         focus: DamageFocus.region(for: flow.earlySegments), zoomable: false)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .heroSource()
         } else {
             Color.black
         }

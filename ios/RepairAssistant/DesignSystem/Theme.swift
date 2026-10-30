@@ -113,3 +113,31 @@ extension EnvironmentValues {
     /// Visible part of the photo in overlay coordinates (the overlay can be larger than the frame when zoomed).
     @Entry var photoVisibleRect: CGRect? = nil
 }
+
+// MARK: Hero continuity
+
+extension EnvironmentValues {
+    /// Shared namespace so the user's photo can zoom from one screen to the next (iOS 18+).
+    @Entry var heroNamespace: Namespace.ID?
+}
+
+extension View {
+    /// Marks the photo as the origin of the next push. No-op below iOS 18.
+    @ViewBuilder func heroSource() -> some View { modifier(HeroSource()) }
+    /// The pushed screen zooms out of the photo. No-op below iOS 18.
+    @ViewBuilder func heroDestination() -> some View { modifier(HeroDestination()) }
+}
+
+private struct HeroSource: ViewModifier {
+    @Environment(\.heroNamespace) private var ns
+    func body(content: Content) -> some View {
+        if #available(iOS 18.0, *), let ns { content.matchedTransitionSource(id: "hero", in: ns) } else { content }
+    }
+}
+
+private struct HeroDestination: ViewModifier {
+    @Environment(\.heroNamespace) private var ns
+    func body(content: Content) -> some View {
+        if #available(iOS 18.0, *), let ns { content.navigationTransition(.zoom(sourceID: "hero", in: ns)) } else { content }
+    }
+}

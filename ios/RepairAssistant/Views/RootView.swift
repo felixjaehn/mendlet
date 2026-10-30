@@ -2,6 +2,7 @@ import SwiftUI
 
 struct RootView: View {
     @Environment(FlowModel.self) private var flow
+    @Namespace private var heroNS
 
     var body: some View {
         @Bindable var flow = flow
@@ -9,9 +10,9 @@ struct RootView: View {
             HomeView()
                 .navigationDestination(for: FlowModel.Route.self) { route in
                     switch route {
-                    case .analysis: AnalysisView()
-                    case .diagnosis: DiagnosisView()
-                    case .decision: DecisionView()
+                    case .analysis: AnalysisView().heroDestination()
+                    case .diagnosis: DiagnosisView().heroDestination()
+                    case .decision: DecisionView().heroDestination()
                     case .shopping: ShoppingListView()
                     case .guide: GuideView()
                     case .block: BlockView()
@@ -20,6 +21,7 @@ struct RootView: View {
                     }
                 }
         }
+        .environment(\.heroNamespace, heroNS)
         .tint(Theme.thread)
         .sheet(isPresented: $flow.showSettings) { SettingsSheet() }
         .task { await DemoBootstrap.run(flow) }

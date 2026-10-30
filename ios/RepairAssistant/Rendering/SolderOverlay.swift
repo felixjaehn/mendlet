@@ -117,7 +117,8 @@ struct SolderOverlay: View {
             if pad != nil { holdControl }
         }
         .frame(width: size.width, height: size.height)
-        .onChange(of: step.n) { holdStart = nil; finished = false }
+        .onChange(of: step.n) { holdStart = nil; finished = false; CureActivityController.shared.end() }
+        .onDisappear { CureActivityController.shared.end() }
     }
 
     // MARK: Hold control
@@ -166,6 +167,8 @@ struct SolderOverlay: View {
         let began = Date()
         holdStart = began
         let secs = hold
+        CureActivityController.shared.start(itemName: ProjectTitle.title(summary: response.diagnosis.summary, english: Lang.shared.isEnglish),
+                                            stepTitle: step.title, kind: .solder, seconds: secs)
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(Int(secs * 1000)))
             guard holdStart == began else { return }

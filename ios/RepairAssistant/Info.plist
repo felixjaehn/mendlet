@@ -37,6 +37,8 @@
 	<string>Describe the damage or ask for help by voice.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Pick an existing photo of the damage.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>PROXY_BASE_URL</key>
 	<string>$(PROXY_BASE_URL)</string>
 	<key>UILaunchScreen</key>

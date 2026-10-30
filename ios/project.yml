@@ -20,6 +20,7 @@ targets:
     type: application
     platform: iOS
     sources:
+      - path: Shared
       - path: RepairAssistant
         excludes:
           - Resources/LiveRecordings
@@ -37,14 +38,36 @@ targets:
         NSMicrophoneUsageDescription: "Describe the damage or ask for help by voice."
         NSPhotoLibraryUsageDescription: "Pick an existing photo of the damage."
         NSLocalNetworkUsageDescription: "Mendlet connects to its analysis server on your local network."
+        NSSupportsLiveActivities: true
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
         PROXY_BASE_URL: $(PROXY_BASE_URL)
+    dependencies:
+      - target: RepairWidgets
+        embed: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.felix.RepairAssistant
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+  RepairWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: RepairWidgets
+      - path: Shared
+    info:
+      path: RepairWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: Mendlet
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.felix.RepairAssistant.Widgets
+        TARGETED_DEVICE_FAMILY: "1"
+        SKIP_INSTALL: YES
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
   RepairAssistantTests:
     type: bundle.unit-test

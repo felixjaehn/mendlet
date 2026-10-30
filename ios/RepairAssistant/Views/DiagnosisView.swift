@@ -61,6 +61,7 @@ struct DiagnosisView: View {
                 MarkedPhoto(image: photo, segments: r.segments, labelTopInset: 110, focus: DamageFocus.region(for: r.segments),
                             onTap: flow.refineMode ? { p in flow.refine(at: p) } : nil)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .heroSource()
                 if flow.refineBusy { ProgressView().controlSize(.large).tint(.white) }
             } else {
                 Color.black

@@ -117,7 +117,7 @@ struct GuideView: View {
                 }
                 .fixedSize(horizontal: false, vertical: true)
             }
-            if r.category == .shoe, let t = timerMinutes(step) { TimerRow(minutes: t).id(step.n) }
+            if r.category == .shoe, let t = timerMinutes(step) { TimerRow(minutes: t, itemName: ProjectTitle.title(summary: r.diagnosis.summary, english: Lang.shared.isEnglish), stepTitle: step.title).id(step.n) }
             if step.overlay?.type == .stitchPath, let image = flow.photo {
                 LiveStitchButton(image: image, step: step, response: r, phase: darningPhase(for: step, in: r), demoMode: flow.settings.demoMode)
             }
@@ -195,6 +195,8 @@ struct GuideView: View {
 /// "Wait 10 min" with a start button and a monospaced countdown (HelloFresh timer row).
 struct TimerRow: View {
     let minutes: Int
+    var itemName = ""
+    var stepTitle = ""
     @State private var endsAt: Date?
     @State private var tick = Date()
 
@@ -208,7 +210,10 @@ struct TimerRow: View {
                 if let left {
                     Text(left == 0 ? "Ready" : String(format: "%d:%02d", left / 60, left % 60)).font(.body.monospacedDigit()).foregroundStyle(Theme.ink)
                 } else {
-                    Button("Start timer") { endsAt = Date().addingTimeInterval(Double(minutes) * 60); Haptics.tap() }
+                    Button("Start timer") {
+                        endsAt = Date().addingTimeInterval(Double(minutes) * 60); Haptics.tap()
+                        CureActivityController.shared.start(itemName: itemName, stepTitle: stepTitle, kind: .cure, seconds: Double(minutes) * 60)
+                    }
                         .font(.body.weight(.medium)).foregroundStyle(Theme.thread)
                 }
             }
@@ -216,6 +221,9 @@ struct TimerRow: View {
             .background(Theme.fill, in: RoundedRectangle(cornerRadius: Theme.thumbRadius + 4, style: .continuous))
         }
         .accessibilityElement(children: .combine)
+        // leaving the step or closing the guide ends the Live Activity
+        .onDisappear { CureActivityController.shared.end() }
+        .onChange(of: (endsAt.map { max(0, Int($0.timeIntervalSinceNow.rounded(.up))) } ?? -1) == 0) { _, ready in if ready { Haptics.success() } }
     }
 }
 
