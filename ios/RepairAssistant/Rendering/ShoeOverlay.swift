@@ -66,12 +66,12 @@ struct ShoeOverlay: View {
         let pts = Self.contour(of: s, in: size)
         let vis = (visibleRect ?? CGRect(origin: .zero, size: size)).insetBy(dx: 14, dy: 14)
         let inside = pts.filter { vis.contains($0) }
-        if let anchor = inside.min(by: { $0.y < $1.y }) {
+        if let anchor = inside.max(by: { $0.y < $1.y }) {
             let text = tr("Glue here")
             let w = LabelPlacer.width(text: text, score: nil, badge: nil), h = LabelPlacer.chipHeight
-            let rect = CGRect(x: min(max(anchor.x - w / 2, vis.minX), vis.maxX - w), y: max(vis.minY, anchor.y - 44 - h / 2), width: w, height: h)
+            let rect = CGRect(x: min(max(anchor.x - w / 2, vis.minX), vis.maxX - w), y: min(anchor.y + 44 - h / 2, vis.maxY - h), width: w, height: h)
             ZStack(alignment: .topLeading) {
-                Path { p in p.move(to: anchor); p.addLine(to: CGPoint(x: min(max(anchor.x, rect.minX + 8), rect.maxX - 8), y: rect.maxY)) }
+                Path { p in p.move(to: anchor); p.addLine(to: CGPoint(x: min(max(anchor.x, rect.minX + 8), rect.maxX - 8), y: rect.minY)) }
                     .stroke(.white.opacity(0.8), style: StrokeStyle(lineWidth: 0.75, lineCap: .round)).shadow(color: .black.opacity(0.35), radius: 1.5)
                 Circle().fill(.white).frame(width: 4, height: 4).shadow(color: .black.opacity(0.35), radius: 1.5).position(anchor)
                 Text(text).font(.footnote.weight(.semibold)).foregroundStyle(.white).shadow(color: .black.opacity(0.35), radius: 2)
@@ -130,7 +130,6 @@ struct ShoeOverlay: View {
         let w: CGFloat = max(12, min(sz.width, sz.height) * 0.035)
         let band = path.strokedPath(StrokeStyle(lineWidth: w, lineJoin: .round))
         ctx.fill(band, with: .color(amber.opacity(kind.glue ? 0.30 : 0.18)))
-        ctx.stroke(band, with: .color(amber.opacity(0.9)), lineWidth: 1)
 
         // press arrows perpendicular to the sole edge
         if kind.press {
