@@ -32,4 +32,4 @@ case "${1:-home}" in
   jeans_guide) xcrun simctl launch "$UDID" "$BUNDLE" -uiScreen guide -uiScenario textile_tear -uiStep 3 ;;
   home|*)      xcrun simctl launch "$UDID" "$BUNDLE" ;;
 esac
-echo "Running in demo mode. Settings (gear icon) → 'Schnell' shortens the replay."
+echo "Running in demo mode with recorded Meta API responses."
