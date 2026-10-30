@@ -93,11 +93,19 @@ struct SolderOverlay: View {
     private var pad: Segment? { step.overlay?.toSegmentId.flatMap { response.segment($0) } }
     private var wire: Segment? { end.flatMap { SolderStyle.wire(for: $0, in: response.segments) } }
     private var hold: Double { max(1, step.overlay?.holdSeconds ?? 3) }
+    /// Loop: route draws from wire to pad (1.4 s), polarity discs pop (0.5 s), rest, fade. Static / Reduce Motion: complete.
+    static func phase(time t: Double, animated: Bool) -> (route: Double, pop: Double, alpha: Double) {
+        if let f = OverlayDebug.freeze { return (min(1, f / 0.6), f > 0.6 ? 1 : 0, 1) }
+        guard animated else { return (1, 1, 1) }
+        let cycle = 4.2, u = t.truncatingRemainder(dividingBy: cycle)
+        let a = u > cycle - 0.4 ? max(0, 1 - (u - (cycle - 0.4)) / 0.4) : 1
+        return (min(1, u / 1.4), min(1, max(0, (u - 1.4) / 0.5)), a)
+    }
     private var padPoint: CGPoint? { pad.flatMap { SolderStyle.centroid($0, in: size) } }
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion && holdStart == nil)) { tl in
+            TimelineView(.animation(minimumInterval: 1.0 / 30, paused: (reduceMotion || OverlayDebug.freeze != nil) && holdStart == nil)) { tl in
                 let t = reduceMotion ? 0.6 : tl.date.timeIntervalSinceReferenceDate
                 let frac = holdFraction(at: tl.date)
                 Canvas { ctx, sz in
@@ -106,20 +114,31 @@ struct SolderOverlay: View {
             }
             .allowsHitTesting(false)
             // exactly one red "+" and one dark "−" disc
-            ForEach(["+", "-"], id: \.self) { pol in
-                if let seg = response.segments.first(where: { $0.polarity == pol }), let r = SolderStyle.rect(seg, in: size) {
-                    let d: CGFloat = 30
-                    let x = pol == "+" ? r.minX - d / 2 - 8 : r.maxX + d / 2 + 8
-                    PolarityDisc(polarity: pol, diameter: d)
-                        .position(x: min(max(x, d / 2 + 4), size.width - d / 2 - 4), y: r.midY)
+            TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion || OverlayDebug.freeze != nil)) { tl in
+                let ph = Self.phase(time: tl.date.timeIntervalSinceReferenceDate, animated: !reduceMotion)
+                ZStack(alignment: .topLeading) {
+                    ForEach(["+", "-"], id: \.self) { pol in
+                        if let seg = response.segments.first(where: { $0.polarity == pol }), let r = SolderStyle.rect(seg, in: size) {
+                            let d: CGFloat = 30
+                            let x = pol == "+" ? r.minX - d / 2 - 8 : r.maxX + d / 2 + 8
+                            PolarityDisc(polarity: pol, diameter: d)
+                                .scaleEffect(max(0.001, ph.pop >= 1 ? 1 : Self.popCurve(ph.pop)))
+                                .opacity(ph.alpha)
+                                .position(x: min(max(x, d / 2 + 4), size.width - d / 2 - 4), y: r.midY)
+                        }
+                    }
                 }
+                .frame(width: size.width, height: size.height)
             }
+            .allowsHitTesting(false)
             if pad != nil { holdControl }
         }
         .frame(width: size.width, height: size.height)
         .onChange(of: step.n) { holdStart = nil; finished = false; CureActivityController.shared.end() }
         .onDisappear { CureActivityController.shared.end() }
     }
+
+    static func popCurve(_ x: Double) -> Double { let c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * pow(x - 1, 3) + c1 * pow(x - 1, 2) }
 
     // MARK: Hold control
 
@@ -204,8 +223,19 @@ struct SolderOverlay: View {
         let ctrl = CGPoint(x: (a.x + b.x) / 2 + nrm.dx * len * 0.2, y: (a.y + b.y) / 2 + nrm.dy * len * 0.2)
         var route = Path()
         route.move(to: a); route.addQuadCurve(to: b, control: ctrl)
-        ctx.stroke(route, with: .color(.black.opacity(0.25)), style: StrokeStyle(lineWidth: 4.5, lineCap: .round))
-        ctx.stroke(route, with: .color(.white), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+        let ph = phase(time: t, animated: animated)
+        ctx.opacity = ph.alpha
+        let shown = ph.route >= 1 ? route : route.trimmedPath(from: 0, to: max(0.001, ph.route))
+        ctx.stroke(shown, with: .color(.black.opacity(0.25)), style: StrokeStyle(lineWidth: 4.5, lineCap: .round))
+        ctx.stroke(shown, with: .color(.white), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+        // entry dot on the wire end; a bright head while the route is still drawing
+        ctx.fill(Path(ellipseIn: CGRect(x: a.x - 3.5, y: a.y - 3.5, width: 7, height: 7)), with: .color(.white))
+        ctx.stroke(Path(ellipseIn: CGRect(x: a.x - 3.5, y: a.y - 3.5, width: 7, height: 7)), with: .color(.black.opacity(0.4)), lineWidth: 1)
+        if ph.route < 1, let h = shown.currentPoint {
+            ctx.fill(Path(ellipseIn: CGRect(x: h.x - 4.5, y: h.y - 4.5, width: 9, height: 9)), with: .color(.white))
+            ctx.stroke(Path(ellipseIn: CGRect(x: h.x - 4.5, y: h.y - 4.5, width: 9, height: 9)), with: .color(.black.opacity(0.4)), lineWidth: 1)
+        }
+        guard ph.route >= 0.97 else { return }
         let tv = CGVector(dx: b.x - ctrl.x, dy: b.y - ctrl.y), tl = max(1, hypot(tv.dx, tv.dy))
         let u = CGVector(dx: tv.dx / tl, dy: tv.dy / tl), sd = CGVector(dx: -u.dy, dy: u.dx), h: CGFloat = 8
         let tip = CGPoint(x: b.x - u.dx * 14, y: b.y - u.dy * 14)

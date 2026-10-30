@@ -1,67 +1,134 @@
 import SwiftUI
 
-/// Step player: one step per screen, the stitch path / glue zone / solder points drawn on the user's own photo.
+/// Photo step guide: every step is a full-bleed photo (the user's own, zoomed to the damage, with the animated overlay,
+/// or the Muse Image picture of the step) and the step text sits on a material panel at the bottom.
+/// Full-screen size plus the real safe-area insets (the guide draws edge to edge).
+private struct FullGeo { var size: CGSize; var safeAreaInsets: EdgeInsets }
+
 struct GuideView: View {
     @Environment(FlowModel.self) private var flow
     @State private var showHelp = false
     @State private var forward = true
     @State private var expanded: Set<Int> = []
+    @State private var showStepImage: Set<Int> = []
+    @State private var drag: CGFloat = 0
 
     private var steps: [GuideStep] { flow.response?.guide.steps ?? [] }
     private var index: Int { min(max(flow.currentStep, 0), max(steps.count - 1, 0)) }
 
     var body: some View {
-        GeometryReader { geo in
+        GeometryReader { safe in
+            let inset = safe.safeAreaInsets
+            let geo = FullGeo(size: CGSize(width: safe.size.width, height: safe.size.height + inset.top + inset.bottom), safeAreaInsets: inset)
             if let step = steps[safe: index], let r = flow.response {
-                VStack(spacing: 0) {
-                    topBand(geo: geo)
-                    photo(step, r, geo: geo).frame(height: geo.size.height * 0.31)
-                    ScrollView {
-                        stepContent(step, r)
-                            .id(step.n)
-                            .transition(.asymmetric(insertion: .move(edge: forward ? .trailing : .leading).combined(with: .opacity),
-                                                    removal: .opacity))
-                            .padding(.horizontal, Theme.margin).padding(.top, 14).padding(.bottom, 16)
+                let stepPhoto = flow.stepImage(for: step)
+                let showMuse = stepPhoto != nil && showStepImage.contains(step.n)
+                ZStack(alignment: .bottom) {
+                    Color.black
+                    ZStack {
+                        if showMuse, let stepPhoto {
+                            Image(uiImage: stepPhoto).resizable().scaledToFill()
+                                .frame(width: geo.size.width, height: geo.size.height).clipped()
+                                .overlay(alignment: .topTrailing) { previewTag.padding(.top, geo.safeAreaInsets.top + 112).padding(.trailing, Theme.margin) }
+                        } else {
+                            photo(step, r, size: geo.size)
+                        }
                     }
-                    .scrollIndicators(.hidden)
-                    .contentMargins(.bottom, 20, for: .scrollContent)
-                    .clipped()
-                    .mask(VStack(spacing: 0) { Color.black; LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom).frame(height: 20) })
-                    bottomBar(step)
+                    .id("\(step.n)-\(showMuse)")
+                    .transition(.asymmetric(insertion: .move(edge: forward ? .trailing : .leading).combined(with: .opacity), removal: .opacity))
+                    .offset(x: drag * 0.25)
+                    VStack(spacing: 0) {
+                        LinearGradient(colors: [.black.opacity(0.4), .clear], startPoint: .top, endPoint: .bottom)
+                            .frame(height: geo.safeAreaInsets.top + 90).allowsHitTesting(false)
+                        Spacer(minLength: 0)
+                    }
+                    panel(step, r, bottomInset: geo.safeAreaInsets.bottom, maxHeight: geo.size.height * 0.7)
+                        .id(step.n)
+                        .transition(.opacity)
+                    topArea(step, hasStepImage: stepPhoto != nil, topInset: geo.safeAreaInsets.top)
+                        .frame(maxHeight: .infinity, alignment: .top)
                 }
-                .background(Theme.surface)
-                .ignoresSafeArea(edges: .top)
+                .frame(width: geo.size.width, height: geo.size.height)
+                .offset(y: -inset.top)
+                .contentShape(Rectangle())
+                .gesture(swipe)
+                .onAppear { flow.loadStepImage(for: step) }
+                .onChange(of: index) { _, _ in if let s = steps[safe: index] { flow.loadStepImage(for: s) } }
             }
         }
+        .background(Color.black.ignoresSafeArea())
         .navigationBarBackButtonHidden()
         .navigationBarHidden(true)
+        .statusBarHidden(false)
         .sheet(isPresented: $showHelp) { if let s = steps[safe: index] { StepHelpSheet(step: s) } }
+        .onAppear { debugStepImage() }
+    }
+
+    // MARK: Swipe
+
+    private var swipe: some Gesture {
+        DragGesture(minimumDistance: 24)
+            .onChanged { v in if abs(v.translation.width) > abs(v.translation.height) { drag = v.translation.width } }
+            .onEnded { v in
+                let dx = v.translation.width
+                withAnimation(Theme.spring) { drag = 0 }
+                guard abs(dx) > 60, abs(dx) > abs(v.translation.height) else { return }
+                if dx < 0, index < steps.count - 1 { go(to: index + 1) } else if dx > 0, index > 0 { go(to: index - 1) }
+            }
+    }
+
+    private func go(to i: Int) {
+        forward = i > index
+        Haptics.soft()
+        withAnimation(Theme.spring) { flow.currentStep = i }
+        flow.persist()
     }
 
     // MARK: Photo
 
-    private func photo(_ step: GuideStep, _ r: AnalyzeResponse, geo: GeometryProxy) -> some View {
-        ZStack(alignment: .top) {
+    private func photo(_ step: GuideStep, _ r: AnalyzeResponse, size: CGSize) -> some View {
+        Group {
             if let img = flow.photo {
-                MarkedPhoto(image: img, segments: r.segments, mode: .guide, showLabels: false, focus: DamageFocus.region(for: r.segments)) { size in
-                    StepOverlay(step: step, response: r, size: size, aspect: img.size.width / max(img.size.height, 1), darningPhase: darningPhase(for: step, in: r))
-                        .id(step.n)
-                        .transition(.opacity)
+                MarkedPhoto(image: img, segments: r.segments, mode: .guide, showLabels: false, focus: DamageFocus.region(for: r.segments), zoomable: false, anchorY: 0.33) { sz in
+                    StepOverlay(step: step, response: r, size: sz, aspect: img.size.width / max(img.size.height, 1), darningPhase: darningPhase(for: step, in: r))
                 }
             } else { Color.black }
         }
-        .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: Theme.heroRadius, bottomTrailingRadius: Theme.heroRadius, style: .continuous))
-        .animation(.easeInOut(duration: 0.25), value: step.n)
+        .frame(width: size.width, height: size.height)
     }
 
-    /// Close and progress live in their own band above the photo, never on top of the overlay.
-    private func topBand(geo: GeometryProxy) -> some View {
-        HStack(spacing: 12) {
-            CircleIconButton(systemImage: "xmark", label: "Close") { flow.persist(); flow.reset() }
-            SegmentBar(count: steps.count, done: index, current: index)
+    private var previewTag: some View {
+        Text("Preview").font(.caption.weight(.semibold)).photoLabel()
+    }
+
+    // MARK: Top
+
+    private func topArea(_ step: GuideStep, hasStepImage: Bool, topInset: CGFloat) -> some View {
+        VStack(spacing: 10) {
+            HStack(spacing: 12) {
+                CircleIconButton(systemImage: "xmark", label: "Close", onPhoto: true) { flow.persist(); flow.reset() }
+                SegmentBar(count: steps.count, done: index, current: index, height: 3, onPhoto: true)
+            }
+            if hasStepImage {
+                HStack(spacing: 0) {
+                    ForEach([false, true], id: \.self) { muse in
+                        let on = showStepImage.contains(step.n) == muse
+                        Button {
+                            Haptics.tap()
+                            withAnimation(.easeInOut(duration: 0.25)) { if muse { _ = showStepImage.insert(step.n) } else { showStepImage.remove(step.n) } }
+                        } label: {
+                            Text(muse ? "This step" : "Your photo").font(.footnote.weight(.semibold))
+                                .foregroundStyle(on ? Color.black : Color.white)
+                                .padding(.horizontal, 14).frame(height: 30)
+                                .background { if on { Capsule().fill(Color.white) } }
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(2).glass(Capsule())
+            }
         }
-        .padding(.horizontal, Theme.margin).padding(.top, geo.safeAreaInsets.top).padding(.bottom, 8)
-        .background(Theme.surface)
+        .padding(.horizontal, Theme.margin).padding(.top, topInset + 6)
     }
 
     private func darningPhase(for step: GuideStep, in r: AnalyzeResponse) -> DarningPhase {
@@ -70,58 +137,89 @@ struct GuideView: View {
         return i == 0 ? .first : (i == 1 ? .second : .all)
     }
 
-    // MARK: Content
+    // MARK: Panel
 
-    private func stepContent(_ step: GuideStep, _ r: AnalyzeResponse) -> some View {
+    private func panel(_ step: GuideStep, _ r: AnalyzeResponse, bottomInset: CGFloat, maxHeight: CGFloat) -> some View {
         let english = Lang.shared.isEnglish
         let parts = DoneWhenLine.split(step.text, english: english)
-        let polishedBody = CopyPolish.text(parts.body, english: english)
-        let words = polishedBody.split(separator: " ").count
-        let sentences = CopyPolish.sentences(polishedBody)
-        let long = words > 30 && sentences.count > 1
-        var collapsed: [String] = []
-        for s in sentences { if collapsed.isEmpty || (collapsed + [s]).joined(separator: " ").split(separator: " ").count <= 30 { collapsed.append(s) } else { break } }
-        let showAll = expanded.contains(step.n) || !long
-        return VStack(alignment: .leading, spacing: 14) {
-            Text("Step \(index + 1) of \(steps.count)").overline()
-            Text(step.title).font(.serif(.title2)).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
-            VStack(alignment: .leading, spacing: 6) {
-                Text(showAll ? polishedBody : collapsed.joined(separator: " "))
-                    .font(.body).lineSpacing(4).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
-                if !showAll {
-                    Button("More") { withAnimation(Theme.spring) { _ = expanded.insert(step.n) } }.font(.body.weight(.medium))
-                }
-            }
-            if let d = parts.doneWhen {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Image(systemName: "checkmark").font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkTertiary)
-                    Text(d).font(.subheadline).foregroundStyle(Theme.inkSecondary).fixedSize(horizontal: false, vertical: true)
-                }
-            }
-            let items = step.usesItems.compactMap { id in r.shoppingList.first { $0.id == id } }
-            if !items.isEmpty {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Uses").font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
-                    Text(items.map { Self.shortName($0.name) }.joined(separator: ", "))
-                        .font(.footnote).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
-                }
-            }
-            if let m = step.commonMistake, !m.isEmpty {
-                HStack(alignment: .top, spacing: 12) {
-                    Rectangle().fill(Theme.thread).frame(width: 2)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Watch out").font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
-                        Text(CopyPolish.mistake(m, english: english)).font(.subheadline).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
+        let body = CopyPolish.text(parts.body, english: english)
+        let open = expanded.contains(step.n)
+        let items = step.usesItems.compactMap { id in r.shoppingList.first { $0.id == id } }
+        let last = index == steps.count - 1
+        return VStack(alignment: .leading, spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Step \(index + 1) of \(steps.count)").overline()
+                    Text(step.title).font(.title2.weight(.semibold)).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
+                    Text(body).font(.body).lineSpacing(3).foregroundStyle(Theme.ink)
+                        .lineLimit(open ? nil : 3).fixedSize(horizontal: false, vertical: true)
+                    if !open && body.count > 130 {
+                        Button("More") { withAnimation(Theme.spring) { _ = expanded.insert(step.n) } }.font(.subheadline.weight(.medium))
+                    }
+                    if let d = parts.doneWhen {
+                        HStack(alignment: .firstTextBaseline, spacing: 8) {
+                            Image(systemName: "checkmark").font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkTertiary)
+                            Text(d).font(.subheadline).foregroundStyle(Theme.inkSecondary).fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    if open {
+                        if !items.isEmpty {
+                            Text("Uses  " + items.map { Self.shortName($0.name) }.joined(separator: ", "))
+                                .font(.footnote).foregroundStyle(Theme.inkSecondary).fixedSize(horizontal: false, vertical: true)
+                        }
+                        if let m = step.commonMistake, !m.isEmpty {
+                            HStack(alignment: .top, spacing: 12) {
+                                Rectangle().fill(Theme.thread).frame(width: 2)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Watch out").font(.subheadline.weight(.semibold)).foregroundStyle(Theme.ink)
+                                    Text(CopyPolish.mistake(m, english: english)).font(.subheadline).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
+                                }
+                            }
+                            .fixedSize(horizontal: false, vertical: true)
+                        }
+                        Button("Less") { withAnimation(Theme.spring) { _ = expanded.remove(step.n) } }.font(.subheadline.weight(.medium))
+                    }
+                    if r.category == .shoe, let t = timerMinutes(step) {
+                        TimerRow(minutes: t, itemName: ProjectTitle.title(summary: r.diagnosis.summary, english: english), stepTitle: step.title).id(step.n)
+                    }
+                    if step.overlay?.type == .stitchPath, let image = flow.photo {
+                        LiveStitchButton(image: image, step: step, response: r, phase: darningPhase(for: step, in: r), demoMode: flow.settings.demoMode, compact: true)
                     }
                 }
-                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, Theme.margin).padding(.top, 20)
             }
-            if r.category == .shoe, let t = timerMinutes(step) { TimerRow(minutes: t, itemName: ProjectTitle.title(summary: r.diagnosis.summary, english: Lang.shared.isEnglish), stepTitle: step.title).id(step.n) }
-            if step.overlay?.type == .stitchPath, let image = flow.photo {
-                LiveStitchButton(image: image, step: step, response: r, phase: darningPhase(for: step, in: r), demoMode: flow.settings.demoMode)
-            }
+            .scrollIndicators(.hidden)
+            .scrollBounceBehavior(.basedOnSize)
+            .frame(maxHeight: maxHeight - 90)
+            .fixedSize(horizontal: false, vertical: true)
+            actions(last: last)
+                .padding(.horizontal, Theme.margin).padding(.top, 10).padding(.bottom, max(bottomInset, 12))
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity)
+        .background(.regularMaterial, in: UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous))
+        .overlay(alignment: .top) {
+            Capsule().fill(Theme.inkTertiary.opacity(0.5)).frame(width: 36, height: 4).padding(.top, 8)
+        }
+        .animation(Theme.spring, value: open)
+    }
+
+    /// Owner 2026-10-30: no safety checkbox or "confirm safe" gate on steps. Dangerous items are blocked before any guide exists.
+    private func actions(last: Bool) -> some View {
+        HStack(spacing: 8) {
+            Button { go(to: index - 1) } label: {
+                Image(systemName: "chevron.left").font(.system(size: 17, weight: .semibold)).foregroundStyle(Theme.ink).frame(width: 36, height: 44)
+            }
+            .accessibilityLabel(tr("Back"))
+            .opacity(index > 0 ? 1 : 0).disabled(index == 0)
+            Button("Not working?") { showHelp = true }
+                .font(.subheadline.weight(.medium)).foregroundStyle(Theme.thread)
+                .lineLimit(1).fixedSize().frame(minHeight: 44).padding(.horizontal, 6)
+            Spacer(minLength: 8)
+            Button { advance(last: last) } label: { Text(last ? "Finish" : "Done").lineLimit(1) }
+                .buttonStyle(PrimaryButtonStyle(kind: .primary))
+                .frame(width: 104)
+        }
     }
 
     /// "soldering iron 25-40W with fine tip and stand" -> "soldering iron 25-40W"
@@ -137,32 +235,6 @@ struct GuideView: View {
         return m
     }
 
-    /// Owner 2026-10-30: no safety checkbox or "confirm safe" gate on steps. Dangerous items are blocked before any guide exists.
-    private func bottomBar(_ step: GuideStep) -> some View {
-        let last = index == steps.count - 1
-        return HStack(spacing: 8) {
-            Button {
-                forward = false
-                withAnimation(Theme.spring) { flow.currentStep = index - 1 }
-            } label: {
-                Image(systemName: "chevron.left").font(.system(size: 17, weight: .semibold)).foregroundStyle(Theme.ink).frame(width: 36, height: 44)
-            }
-            .accessibilityLabel(tr("Back"))
-            .opacity(index > 0 ? 1 : 0).disabled(index == 0)
-            Button("Not working?") { showHelp = true }
-                .font(.subheadline.weight(.medium)).foregroundStyle(Theme.thread)
-                .lineLimit(1).fixedSize().frame(minHeight: 44).padding(.horizontal, 6)
-            Spacer(minLength: 8)
-            Button { advance(last: last) } label: { Text(last ? "Finish" : "Done").lineLimit(1) }
-                .buttonStyle(PrimaryButtonStyle(kind: .primary))
-                .frame(width: 104)
-        }
-        .padding(.horizontal, Theme.margin)
-        .padding(.vertical, 8)
-        .background(.bar)
-        .overlay(alignment: .top) { Rectangle().fill(Theme.hairline).frame(height: 0.5) }
-    }
-
     private func advance(last: Bool) {
         flow.markStepDone(index)
         Haptics.success()
@@ -171,6 +243,13 @@ struct GuideView: View {
             withAnimation(Theme.spring) { flow.currentStep = index + 1 }
             flow.persist()
         }
+    }
+
+    /// Screenshot helper: `-uiStepImage YES` opens the "This step" state of the shown step.
+    private func debugStepImage() {
+        #if DEBUG
+        if UserDefaults.standard.bool(forKey: "uiStepImage"), let s = steps[safe: index] { showStepImage.insert(s.n) }
+        #endif
     }
 }
 

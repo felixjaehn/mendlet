@@ -247,7 +247,7 @@ struct NoteSheet: View {
     var body: some View {
         @Bindable var flow = flow
         VStack(alignment: .leading, spacing: 16) {
-            Text("What's wrong?").font(.serif(.title2)).foregroundStyle(Theme.ink).padding(.top, 28)
+            Text("What's wrong?").font(.title2.weight(.semibold)).foregroundStyle(Theme.ink).padding(.top, 28)
             VoiceTextField(placeholder: "Optional, e.g. the sole came off yesterday", text: $flow.note)
             Spacer(minLength: 0)
             PrimaryButton(title: "Save note") { dismiss() }

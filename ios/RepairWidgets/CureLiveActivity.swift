@@ -49,7 +49,7 @@ struct LockScreenView: View {
         VStack(alignment: .leading, spacing: 10) {
             Text(attributes.itemName).font(.footnote).foregroundStyle(.secondary).lineLimit(1)
             HStack(alignment: .firstTextBaseline) {
-                Text(attributes.stepTitle).font(.system(.headline, design: .serif)).lineLimit(2)
+                Text(attributes.stepTitle).font(.headline).lineLimit(2)
                 Spacer(minLength: 12)
                 Text(timerInterval: state.range, countsDown: true)
                     .font(.title.monospacedDigit().weight(.medium)).multilineTextAlignment(.trailing)

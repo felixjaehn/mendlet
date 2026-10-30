@@ -28,6 +28,8 @@ struct MarkedPhoto<Overlay: View>: View {
     var zoomable = true
     /// Subtle top gradient so the status bar stays legible on full-bleed photos.
     var topScrim = true
+    /// Where the damage should sit vertically in the container (0.5 = centre). The guide lifts it above its bottom panel.
+    var anchorY: CGFloat = 0.5
     @ViewBuilder var overlay: (CGSize) -> Overlay
 
     @State private var zoomedOut = false
@@ -77,7 +79,7 @@ struct MarkedPhoto<Overlay: View>: View {
         TimelineView(.animation(minimumInterval: 1.0 / 60, paused: !animating)) { tl in
             let state = frameState(now: tl.date)
             ZoomedStage(image: image, segments: segments, damage: damage, container: container, state: state,
-                        zoom: zoomedOut ? 1 : Self.targetZoom(image: image, focus: focus, container: container), focusCenter: focusCenter, showLabels: showLabels && mode != .thumb && mode != .guide,
+                        zoom: zoomedOut ? 1 : Self.targetZoom(image: image, focus: focus, container: container), focusCenter: focusCenter, anchorY: anchorY, showLabels: showLabels && mode != .thumb && mode != .guide,
                         showDimension: showDimension, labelTopInset: labelTopInset, ripple: ripple, onTap: onTap.map { cb in { p in
                             ripple = (p, Date()); cb(p)
                         } }, overlay: overlay)
@@ -135,9 +137,9 @@ struct MarkedPhoto<Overlay: View>: View {
 
 extension MarkedPhoto where Overlay == EmptyView {
     init(image: UIImage, segments: [Segment], mode: Mode = .resting, showLabels: Bool = true, showDimension: Bool = false,
-         labelTopInset: CGFloat = 0, focus: CGRect? = nil, onTap: ((CGPoint) -> Void)? = nil, zoomable: Bool = true, topScrim: Bool = true) {
+         labelTopInset: CGFloat = 0, focus: CGRect? = nil, onTap: ((CGPoint) -> Void)? = nil, zoomable: Bool = true, topScrim: Bool = true, anchorY: CGFloat = 0.5) {
         self.init(image: image, segments: segments, mode: mode, showLabels: showLabels, showDimension: showDimension, labelTopInset: labelTopInset, focus: focus,
-                  onTap: onTap, zoomable: zoomable, topScrim: topScrim, overlay: { _ in EmptyView() })
+                  onTap: onTap, zoomable: zoomable, topScrim: topScrim, anchorY: anchorY, overlay: { _ in EmptyView() })
     }
 }
 
@@ -166,6 +168,7 @@ private struct ZoomedStage<Overlay: View>: View, @preconcurrency Animatable {
     let state: MarkFrameState
     var zoom: CGFloat           // used as the "autoZoom" mix target when > 0, see `effective`
     let focusCenter: CGPoint?
+    var anchorY: CGFloat = 0.5
     let showLabels: Bool
     let showDimension: Bool
     let labelTopInset: CGFloat
@@ -217,11 +220,11 @@ private struct ZoomedStage<Overlay: View>: View, @preconcurrency Animatable {
 
     private func stageCenter(size: CGSize) -> CGPoint {
         let f = focusCenter ?? CGPoint(x: 0.5, y: 0.5)
-        func axis(_ c: CGFloat, _ len: CGFloat, _ box: CGFloat) -> CGFloat {
-            let p = box / 2 - (c - 0.5) * len
+        func axis(_ c: CGFloat, _ len: CGFloat, _ box: CGFloat, _ anchor: CGFloat = 0.5) -> CGFloat {
+            let p = box * anchor - (c - 0.5) * len
             return len >= box ? min(len / 2, max(box - len / 2, p)) : box / 2
         }
-        return CGPoint(x: axis(f.x, size.width, container.width), y: axis(f.y, size.height, container.height))
+        return CGPoint(x: axis(f.x, size.width, container.width), y: axis(f.y, size.height, container.height, anchorY))
     }
 }
 
@@ -376,9 +379,8 @@ struct MarkLabels: View {
                 ForEach(Array(dots.enumerated()), id: \.offset) { _, d in
                     Circle().fill(.white).frame(width: 4, height: 4).shadow(color: .black.opacity(0.35), radius: 1.5).position(d)
                 }
-                Text(p.item.text).font(.footnote.weight(.semibold)).foregroundStyle(.white)
-                    .shadow(color: .black.opacity(0.35), radius: 2)
-                    .lineLimit(1).fixedSize()
+                Text(p.item.text).font(.footnote.weight(.semibold))
+                    .lineLimit(1).fixedSize().photoLabel()
                     .position(x: r.midX, y: r.midY)
             }
         }

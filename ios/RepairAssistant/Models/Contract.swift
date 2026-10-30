@@ -615,6 +615,9 @@ struct AfterPreviewRequest: Codable, Sendable {
     /// Optional: "shoe" for glued soles.
     var category: String?
     var repairHint: String?
+    /// /step-image only: the guide step whose result the picture shows.
+    var stepTitle: String?
+    var stepText: String?
     var locale: String = Lang.apiCode
 }
 

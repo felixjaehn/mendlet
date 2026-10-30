@@ -28,7 +28,7 @@ struct FollowUpSheet: View {
                         }
                     }
                     if let q = current {
-                        Text(q.prompt).font(.serif(.title2)).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
+                        Text(q.prompt).font(.title2.weight(.semibold)).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

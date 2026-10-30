@@ -40,7 +40,7 @@ final class AppSettings {
     var baseURL: URL? { URL(string: baseURLString.trimmingCharacters(in: .whitespaces)) }
 
     func makeService() -> AnalysisService {
-        if demoMode { return MockAPIClient(fast: fastReplay, recovery: recoveryTrace) }
+        if demoMode { return MockAPIClient(fast: fastReplay, recovery: recoveryTrace, scenario: scenario) }
         if let url = baseURL { return LiveAPIClient(baseURL: url) }
         return MockAPIClient()
     }

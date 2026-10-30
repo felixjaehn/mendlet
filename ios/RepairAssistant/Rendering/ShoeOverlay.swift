@@ -49,9 +49,9 @@ struct ShoeOverlay: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             if let s = target {
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion || OverlayDebug.freeze != nil)) { tl in
                     Canvas { ctx, sz in
-                        Self.draw(&ctx, size: sz, segment: s, kind: kind, time: reduceMotion ? 1.2 : tl.date.timeIntervalSinceReferenceDate, clip: visibleRect)
+                        Self.draw(&ctx, size: sz, segment: s, kind: kind, time: reduceMotion ? -1 : tl.date.timeIntervalSinceReferenceDate, clip: visibleRect)
                     }
                 }
                 .allowsHitTesting(false)
@@ -66,16 +66,16 @@ struct ShoeOverlay: View {
         let pts = Self.contour(of: s, in: size)
         let vis = (visibleRect ?? CGRect(origin: .zero, size: size)).insetBy(dx: 14, dy: 14)
         let inside = pts.filter { vis.contains($0) }
-        if let anchor = inside.max(by: { $0.y < $1.y }) {
+        if let anchor = inside.min(by: { $0.y < $1.y }) {
             let text = tr("Glue here")
             let w = LabelPlacer.width(text: text, score: nil, badge: nil), h = LabelPlacer.chipHeight
-            let rect = CGRect(x: min(max(anchor.x - w / 2, vis.minX), vis.maxX - w), y: min(anchor.y + 44 - h / 2, vis.maxY - h), width: w, height: h)
+            let rect = CGRect(x: min(max(anchor.x - w / 2, vis.minX), vis.maxX - w), y: max(anchor.y - 44 - h / 2, vis.minY), width: w, height: h)
             ZStack(alignment: .topLeading) {
                 Path { p in p.move(to: anchor); p.addLine(to: CGPoint(x: min(max(anchor.x, rect.minX + 8), rect.maxX - 8), y: rect.minY)) }
                     .stroke(.white.opacity(0.8), style: StrokeStyle(lineWidth: 0.75, lineCap: .round)).shadow(color: .black.opacity(0.35), radius: 1.5)
                 Circle().fill(.white).frame(width: 4, height: 4).shadow(color: .black.opacity(0.35), radius: 1.5).position(anchor)
-                Text(text).font(.footnote.weight(.semibold)).foregroundStyle(.white).shadow(color: .black.opacity(0.35), radius: 2)
-                    .lineLimit(1).fixedSize().position(x: rect.midX, y: rect.midY)
+                Text(text).font(.footnote.weight(.semibold))
+                    .lineLimit(1).fixedSize().photoLabel().position(x: rect.midX, y: rect.midY)
             }
             .frame(width: size.width, height: size.height, alignment: .topLeading).allowsHitTesting(false)
         }
@@ -125,17 +125,48 @@ struct ShoeOverlay: View {
         // visible photo the band ends inside it (never cut by the frame edge).
         let w: CGFloat = max(12, min(sz.width, sz.height) * 0.035)
         let vis = (clip ?? CGRect(origin: .zero, size: sz)).insetBy(dx: 18 + w / 2, dy: 18 + w / 2)
-        for run in visibleRuns(of: pts, in: vis) {
+        // loop: the band fills along its path (1.8 s), pulses once, rests, fades. -1 = static, complete.
+        let cycle = 4.2
+        var fill = 1.0, pulse = 0.0, alpha = 1.0
+        if let f = OverlayDebug.freeze { fill = min(1, f / 0.4); pulse = 0 }
+        else if t >= 0 {
+            let u = t.truncatingRemainder(dividingBy: cycle)
+            fill = min(1, u / 1.8)
+            if u > 1.8 && u < 2.5 { pulse = sin(.pi * (u - 1.8) / 0.7) }
+            if u > cycle - 0.4 { alpha = max(0, 1 - (u - (cycle - 0.4)) / 0.4) }
+        }
+        let runs = visibleRuns(of: pts, in: vis)
+        let lens = runs.map { run in (1..<run.count).reduce(CGFloat(0)) { $0 + hypot(run[$1].x - run[$1 - 1].x, run[$1].y - run[$1 - 1].y) } }
+        let total = max(lens.reduce(0, +), 1)
+        var consumed: CGFloat = 0
+        var head: CGPoint?
+        let base = kind.glue ? 0.55 : 0.24
+        for (run, len) in zip(runs, lens) {
             var path = Path()
             path.move(to: run[0])
             for q in run.dropFirst() { path.addLine(to: q) }
-            ctx.stroke(path, with: .color(amber.opacity(kind.glue ? 0.30 : 0.18)), style: StrokeStyle(lineWidth: w, lineCap: .round, lineJoin: .round))
+            let from = consumed / total, to = (consumed + len) / total
+            consumed += len
+            let frac = min(1, max(0, (CGFloat(fill) - from) / max(to - from, 0.0001)))
+            guard frac > 0 else { continue }
+            let drawn = frac >= 1 ? path : path.trimmedPath(from: 0, to: frac)
+            if frac < 1 { head = drawn.currentPoint }
+            var l = ctx
+            l.opacity = alpha
+            l.stroke(drawn, with: .color(.black.opacity(0.18)), style: StrokeStyle(lineWidth: w * (1 + 0.35 * pulse) + 3, lineCap: .round, lineJoin: .round))
+            l.stroke(drawn, with: .color((kind.glue ? Theme.thread : .white).opacity(base + 0.30 * pulse)), style: StrokeStyle(lineWidth: w * (1 + 0.35 * pulse), lineCap: .round, lineJoin: .round))
+            l.stroke(drawn, with: .color(.white.opacity(0.85)), style: StrokeStyle(lineWidth: 1.2, lineCap: .round, lineJoin: .round))
         }
+        if let h = head, kind.glue {   // brush tip while the band is still filling
+            ctx.fill(Path(ellipseIn: CGRect(x: h.x - 5, y: h.y - 5, width: 10, height: 10)), with: .color(.white))
+            ctx.stroke(Path(ellipseIn: CGRect(x: h.x - 5, y: h.y - 5, width: 10, height: 10)), with: .color(.black.opacity(0.4)), lineWidth: 1)
+        }
+        _ = amber
 
         // press arrows perpendicular to the sole edge
         if kind.press {
             let ax = axes(pts)
-            let bounce = CGFloat(sin(t * 4) * 4 + 4)
+            let bounce = CGFloat(sin(max(t, 1.2) * 4) * 4 + 4)
             for f in [-0.6, 0, 0.6] as [CGFloat] {
                 let base = CGPoint(x: ax.center.x + ax.along.dx * ax.half * f, y: ax.center.y + ax.along.dy * ax.half * f)
                 let tip = CGPoint(x: base.x + ax.normal.dx * (6 + bounce), y: base.y + ax.normal.dy * (6 + bounce))
@@ -202,7 +233,7 @@ struct CureRing: View {
                     Circle().trim(from: 0, to: frac).stroke(done ? Theme.highlight : Theme.caution, style: StrokeStyle(lineWidth: 6, lineCap: .round))
                         .rotationEffect(.degrees(-90)).animation(reduceMotion ? nil : .linear(duration: 0.5), value: frac)
                     VStack(spacing: 0) {
-                        Text(done ? tr("Fertig") : Self.format(remaining)).font(.system(size: 17, weight: .bold, design: .rounded)).monospacedDigit().foregroundStyle(.white)
+                        Text(done ? tr("Fertig") : Self.format(remaining)).font(.system(size: 17, weight: .bold)).monospacedDigit().foregroundStyle(.white)
                         Text(startedAt == nil && pausedRemaining == nil ? tr("Start") : label).font(.system(size: 10, weight: .semibold)).foregroundStyle(.white.opacity(0.75))
                     }
                 }

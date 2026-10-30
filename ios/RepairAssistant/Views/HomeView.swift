@@ -165,7 +165,7 @@ struct HomeView: View {
     private var emptyState: some View {
         VStack(spacing: 12) {
             Spacer()
-            Text("Nothing to mend yet.").font(.serif(.title)).foregroundStyle(Theme.ink).multilineTextAlignment(.center)
+            Text("Nothing to mend yet.").font(.title.bold()).foregroundStyle(Theme.ink).multilineTextAlignment(.center)
             Text("Photograph a tear, a loose sole or a broken cable.").font(.body).foregroundStyle(Theme.inkSecondary).multilineTextAlignment(.center)
             Spacer().frame(height: 12)
             Button { flow.showScan = true } label: { Text("Scan something") }

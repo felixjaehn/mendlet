@@ -8,6 +8,8 @@ struct LiveStitchButton: View {
     let response: AnalyzeResponse
     let phase: DarningPhase
     let demoMode: Bool
+    /// Small text button (inside the guide panel) instead of the full-width secondary button.
+    var compact = false
     @State private var presentation: LiveStitchPresentation?
     @State private var preparing = false
 
@@ -17,18 +19,29 @@ struct LiveStitchButton: View {
         return response.segments.first(where: \.isDamage)
     }
 
+    private func start() {
+        guard let segment, let reference = LiveImage.upright(image) else { return }
+        preparing = true
+        let type = step.overlay?.stitchType ?? .runningStitch
+        let aspect = CGFloat(reference.width) / CGFloat(reference.height)
+        Task {
+            let plan = await Task.detached(priority: .userInitiated) {
+                StitchPathPlanner.plan(for: segment, stitchType: type, aspect: aspect)
+            }.value
+            presentation = LiveStitchPresentation(reference: reference, plan: plan)
+            preparing = false
+        }
+    }
+
     var body: some View {
-        PrimaryButton(title: preparing ? "Stichpfad vorbereiten…" : "Live auf dem Stoff", systemImage: "viewfinder", kind: .secondary) {
-            guard let segment, let reference = LiveImage.upright(image) else { return }
-            preparing = true
-            let type = step.overlay?.stitchType ?? .runningStitch
-            let aspect = CGFloat(reference.width) / CGFloat(reference.height)
-            Task {
-                let plan = await Task.detached(priority: .userInitiated) {
-                    StitchPathPlanner.plan(for: segment, stitchType: type, aspect: aspect)
-                }.value
-                presentation = LiveStitchPresentation(reference: reference, plan: plan)
-                preparing = false
+        Group {
+            if compact {
+                Button(action: start) {
+                    Label(preparing ? "Stichpfad vorbereiten…" : "Live auf dem Stoff", systemImage: "viewfinder")
+                        .font(.subheadline.weight(.medium)).foregroundStyle(Theme.thread).frame(minHeight: 36)
+                }
+            } else {
+                PrimaryButton(title: preparing ? "Stichpfad vorbereiten…" : "Live auf dem Stoff", systemImage: "viewfinder", kind: .secondary, action: start)
             }
         }
         .disabled(preparing || segment == nil)

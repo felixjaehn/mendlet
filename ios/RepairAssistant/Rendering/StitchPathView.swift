@@ -2,6 +2,18 @@ import SwiftUI
 
 enum DarningPhase: Sendable { case all, first, second }
 
+/// Screenshot helper (DEBUG): `-uiFreezeProgress 0.8` freezes every guide overlay animation at that progress of its loop.
+enum OverlayDebug {
+    static var freeze: Double? {
+        #if DEBUG
+        let d = UserDefaults.standard
+        return d.object(forKey: "uiFreezeProgress") == nil ? nil : d.double(forKey: "uiFreezeProgress")
+        #else
+        return nil
+        #endif
+    }
+}
+
 /// Animated stitch path: a thin thread is drawn progressively with a needle at its head.
 /// Darning: warp threads first (down one line, U-turn outside the hole, back up the next), then the weft woven over/under.
 /// Running/ladder stitch: zig-zag thread across the centerline with sparse numbered markers.
@@ -21,6 +33,8 @@ struct StitchPathView: View {
     var body: some View {
         if plan.kind == .none {
             Color.clear
+        } else if let f = OverlayDebug.freeze, !reduceMotion {
+            Canvas { ctx, size in draw(&ctx, size, progress: f, alpha: 1) }.accessibilityHidden(true)
         } else if reduceMotion {
             Canvas { ctx, size in draw(&ctx, size, progress: 1, alpha: 1) }
                 .accessibilityHidden(true)
@@ -40,10 +54,10 @@ struct StitchPathView: View {
 
     private var drawDuration: Double {
         switch plan.kind {
-        case .stitches: return 1.2 + 0.30 * Double(plan.stitches.count)
+        case .stitches: let n = max(plan.stitches.count - 1, 1); return 0.6 + Double(n) * min(0.25, 4.0 / Double(n))
         case .darning:
             let n = (phase == .second ? 0 : plan.warpStrokes.count) + (phase == .first ? 0 : plan.weftStrokes.count)
-            return 1.2 + 0.11 * Double(n)
+            return 0.6 + Double(n) * min(0.25, 4.5 / Double(max(n, 1)))
         case .none: return 1
         }
     }
@@ -203,6 +217,27 @@ struct StitchPathView: View {
         ctx.stroke(path, with: .color(.white), style: StrokeStyle(lineWidth: 1.5, lineCap: .butt, dash: dash, dashPhase: phase))
     }
 
+    /// Entry / exit point of a row: tiny white dot with a dark rim.
+    private func drawDot(_ ctx: inout GraphicsContext, _ p: CGPoint) {
+        let r: CGFloat = 2.0
+        ctx.fill(Path(ellipseIn: CGRect(x: p.x - r - 1, y: p.y - r - 1, width: (r + 1) * 2, height: (r + 1) * 2)), with: .color(.black.opacity(0.45)))
+        ctx.fill(Path(ellipseIn: CGRect(x: p.x - r, y: p.y - r, width: r * 2, height: r * 2)), with: .color(.white))
+    }
+
+    /// Small needle with an eye, travelling along the active row, its thread trailing behind.
+    private func drawNeedle(_ ctx: inout GraphicsContext, at m: CGPoint, from a: CGPoint, to b: CGPoint) {
+        let ang = atan2(b.y - a.y, b.x - a.x)
+        var c = ctx
+        c.translateBy(x: m.x, y: m.y); c.rotate(by: .radians(Double(ang)))
+        let body = Path(roundedRect: CGRect(x: -15, y: -1.2, width: 26, height: 2.4), cornerRadius: 1.2)
+        var tip = Path(); tip.move(to: CGPoint(x: 11, y: -1.2)); tip.addLine(to: CGPoint(x: 17, y: 0)); tip.addLine(to: CGPoint(x: 11, y: 1.2)); tip.closeSubpath()
+        c.fill(body.applying(CGAffineTransform(translationX: 0.6, y: 1.2)), with: .color(.black.opacity(0.35)))
+        c.fill(body, with: .color(.white)); c.fill(tip, with: .color(.white))
+        c.fill(Path(ellipseIn: CGRect(x: -13.5, y: -0.7, width: 5, height: 1.4)), with: .color(.black.opacity(0.55)))
+        var thread = Path(); thread.move(to: CGPoint(x: -11, y: 0)); thread.addCurve(to: CGPoint(x: -30, y: 5), control1: CGPoint(x: -18, y: 0), control2: CGPoint(x: -22, y: 6))
+        c.stroke(thread, with: .color(.white.opacity(0.9)), style: StrokeStyle(lineWidth: 1.2, lineCap: .round))
+    }
+
     private func drawArrow(_ ctx: inout GraphicsContext, at m: CGPoint, from a: CGPoint, to b: CGPoint) {
         let ang = atan2(b.y - a.y, b.x - a.x)
         var c = ctx
@@ -240,9 +275,15 @@ struct StitchPathView: View {
                 strokeDashed(&l, p, phase: i % 2 == 0 ? 0 : 2.5, dash: dash)
             }
         }
-        if rows.indices.contains(activeIdx) {
+        for i in staticRows { drawDot(&ctx, rows[i].0); drawDot(&ctx, rows[i].1) }
+        for k in 0..<shown {
+            let i = animated.lowerBound + k
+            drawDot(&ctx, rows[i].0)
+            if !(k == shown - 1 && progress < 1) { drawDot(&ctx, rows[i].1) }
+        }
+        if progress < 1, rows.indices.contains(activeIdx) {
             let r = rows[activeIdx]
-            drawArrow(&ctx, at: lerp(r.0, r.1, progress >= 1 ? 0.5 : max(0.1, CGFloat(rowProgress) * 0.9)), from: r.0, to: r.1)
+            drawNeedle(&ctx, at: lerp(r.0, r.1, max(0.02, CGFloat(rowProgress))), from: r.0, to: r.1)
         }
     }
 
@@ -256,10 +297,8 @@ struct StitchPathView: View {
             let d = max(hypot(b.x - a.x, b.y - a.y), 1)
             let inset = min(3 / d, 0.3)
             let s = lerp(a, b, inset), e = lerp(a, b, 1 - inset)
-            // hole at the entry point of every leg
-            let r: CGFloat = 2.2
-            let hole = Path(ellipseIn: CGRect(x: a.x - r, y: a.y - r, width: r * 2, height: r * 2))
-            if i < shown { ctx.stroke(hole, with: .color(.white.opacity(0.9)), lineWidth: 1); }
+            // entry point of every leg, plus the last exit
+            if i < shown { drawDot(&ctx, a); if i == legs - 1 && progress >= 1 { drawDot(&ctx, b) } }
             if plan.running && i % 2 == 1 { continue }
             guard i < shown else { continue }
             let f: CGFloat = (i == shown - 1 && progress < 1) ? CGFloat(min(1, max(0.1, progress * Double(legs) - Double(i)))) : 1
@@ -267,8 +306,11 @@ struct StitchPathView: View {
             ctx.stroke(p, with: .color(.black.opacity(0.6)), style: StrokeStyle(lineWidth: 3.2, lineCap: .round))
             ctx.stroke(p, with: .color(.white), style: StrokeStyle(lineWidth: 1.7, lineCap: .round))
         }
-        let ai = min(legs - 1, progress >= 1 ? legs / 2 : shown - 1)
-        drawArrow(&ctx, at: lerp(pts[ai], pts[ai + 1], 0.5), from: pts[ai], to: pts[ai + 1])
+        if progress < 1 {
+            let ai = min(legs - 1, shown - 1)
+            let f = CGFloat(min(1, max(0.05, progress * Double(legs) - Double(ai))))
+            drawNeedle(&ctx, at: lerp(pts[ai], pts[ai + 1], f), from: pts[ai], to: pts[ai + 1])
+        }
     }
 
     private func draw(_ ctx: inout GraphicsContext, _ size: CGSize, progress: Double, alpha: Double) {

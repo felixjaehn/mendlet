@@ -97,6 +97,8 @@ struct MockAPIClient: AnalysisService {
     var useRecordings = true
     /// Jeans: replay the real run with the SAM server error and the agent's recovery.
     var recovery = false
+    /// Demo scenario, so `stepImage` can return that recording's step pictures.
+    var scenario: DemoScenario?
 
     func analyze(_ request: AnalyzeRequest) -> AsyncThrowingStream<AnalyzeEvent, Error> {
         AsyncThrowingStream { continuation in
@@ -196,5 +198,14 @@ struct MockAPIClient: AnalysisService {
         let raw = request.imageBase64
         let b64 = raw.range(of: "base64,").map { String(raw[$0.upperBound...]) } ?? raw
         return AfterPreviewResponse(imageBase64: b64, model: "muse-image-1.0")
+    }
+
+    /// The recording's Muse Image step picture (`<recording>_step<n>.jpg`) when the demo scenario has one for this step title.
+    func stepImage(_ request: AfterPreviewRequest) async throws -> AfterPreviewResponse {
+        try await Task.sleep(for: .milliseconds(Int(900 / speed)))
+        guard let scenario, let name = LiveRecordings.name(for: scenario), let title = request.stepTitle,
+              let n = LiveRecordings.response(file: name)?.guide.steps.first(where: { $0.title == title })?.n,
+              let url = LiveRecordings.url("\(name)_step\(n)", "jpg"), let data = try? Data(contentsOf: url) else { throw APIError.emptyResult }
+        return AfterPreviewResponse(imageBase64: data.base64EncodedString(), model: "muse-image-1.0")
     }
 }

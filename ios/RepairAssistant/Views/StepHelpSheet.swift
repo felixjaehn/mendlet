@@ -17,7 +17,7 @@ struct StepHelpSheet: View {
         VStack(spacing: 0) {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Not working?").font(.serif(.title2)).foregroundStyle(Theme.ink)
+                    Text("Not working?").font(.title2.weight(.semibold)).foregroundStyle(Theme.ink)
                     Text("Step \(step.n): \(step.title)").font(.subheadline).foregroundStyle(Theme.inkSecondary).lineLimit(1)
                 }
                 Spacer()
@@ -82,7 +82,7 @@ struct StepHelpSheet: View {
 
     private func escalateBlock(_ r: StepHelpResponse) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Please stop here.").font(.serif(.title2)).foregroundStyle(Theme.ink)
+            Text("Please stop here.").font(.title2.weight(.semibold)).foregroundStyle(Theme.ink)
             Text(r.answer).font(.body).foregroundStyle(Theme.ink).lineSpacing(4).fixedSize(horizontal: false, vertical: true)
             PrimaryButton(title: "Stop the repair", kind: .destructive) { dismiss(); flow.reset() }
         }

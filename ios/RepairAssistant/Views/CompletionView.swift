@@ -18,7 +18,7 @@ struct CompletionView: View {
                 }
                 slider
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Mended.").font(.serif(.largeTitle)).foregroundStyle(Theme.ink)
+                    Text("Mended.").font(.largeTitle.bold()).foregroundStyle(Theme.ink)
                     Text(usedAgain).font(.body).foregroundStyle(Theme.inkSecondary)
                 }
                 VStack(spacing: 0) {

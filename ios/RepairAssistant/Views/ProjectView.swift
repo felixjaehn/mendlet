@@ -26,7 +26,7 @@ struct ProjectView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     hero(r)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(ProjectInfo.title(c)).font(.serif(.title)).foregroundStyle(Theme.ink)
+                        Text(ProjectInfo.title(c)).font(.title.bold()).foregroundStyle(Theme.ink)
                         Text(ProjectInfo.subtitle(c)).font(.subheadline).foregroundStyle(Theme.inkSecondary)
                     }
                     if parked {

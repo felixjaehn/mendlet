@@ -60,7 +60,7 @@ struct BlockView: View {
                     Text("Safety stop").font(.subheadline.weight(.semibold))
                 }
                 .foregroundStyle(Theme.inkSecondary).padding(.top, 4)
-                Text(title).font(.serif(.title)).foregroundStyle(Theme.ink)
+                Text(title).font(.title.bold()).foregroundStyle(Theme.ink)
                     .fixedSize(horizontal: false, vertical: true)
                 VStack(alignment: .leading, spacing: 12) {
                     Text(reason).font(.body).foregroundStyle(Theme.ink).lineSpacing(4)

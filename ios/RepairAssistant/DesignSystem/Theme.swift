@@ -13,7 +13,7 @@ extension Color {
 }
 
 /// Mendlet design tokens (docs/design/REDESIGN-SPEC.md 1.1): neutral ink and paper, one accent (system blue, state only),
-/// white for everything drawn on photos. Serif (New York) only for editorial moments.
+/// white for everything drawn on photos.  One typeface: SF Pro.
 enum Theme {
     static let paper = Color(uiColor: .systemGroupedBackground)
     static let surface = Color(uiColor: .systemBackground)
@@ -57,7 +57,6 @@ extension Color {
 }
 
 extension Font {
-    static func serif(_ style: Font.TextStyle, weight: Font.Weight = .semibold) -> Font { .system(style, design: .serif, weight: weight) }
     static let overline = Font.caption.weight(.semibold)
 }
 
@@ -92,6 +91,13 @@ extension View {
         } else {
             self.background(tint ?? Color.clear, in: shape).background(.ultraThinMaterial, in: shape)
         }
+    }
+
+    /// Text on top of a photo (mark labels, "Glue here", "Preview"): owner 2026-10-30 — always on a dark backing for legibility.
+    func photoLabel() -> some View {
+        self.foregroundStyle(.white)
+            .padding(.horizontal, 8).padding(.vertical, 3)
+            .background(Color.black.opacity(0.55), in: Capsule())
     }
 
     func screenBackground() -> some View {

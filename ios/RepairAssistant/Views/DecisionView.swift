@@ -124,9 +124,7 @@ struct DecisionView: View {
                             .frame(height: 120).allowsHitTesting(false)
                     }
                     .overlay(alignment: .topTrailing) {
-                        Text("Preview").font(.footnote.weight(.semibold)).foregroundStyle(Theme.ink)
-                            .padding(.horizontal, 12).frame(height: 30)
-                            .background(.regularMaterial, in: Capsule())
+                        Text("Preview").font(.footnote.weight(.semibold)).photoLabel()
                             .padding(.trailing, Theme.margin).padding(.top, geo.safeAreaInsets.top + 15)
                     }
                     .transition(.opacity)
@@ -160,7 +158,7 @@ struct DecisionView: View {
             if let d = flow.response?.decision, let r = flow.response {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("My advice").sectionHeader()
-                    Text(d.recommendation.headline).font(.serif(.title)).foregroundStyle(Theme.ink)
+                    Text(d.recommendation.headline).font(.title.bold()).foregroundStyle(Theme.ink)
                     reasonText(d)
                     switch d.recommendation {
                     case .repairSelf:

@@ -121,7 +121,7 @@ struct AnalysisView: View {
         let offline = err.lowercased().contains("connect") || err.lowercased().contains("offline") || err.lowercased().contains("network") || err.lowercased().contains("verbind")
         return VStack(spacing: 8) {
             Text(offline ? "No connection." : "We couldn't find the damage.")
-                .font(.serif(.title2)).foregroundStyle(Theme.ink).multilineTextAlignment(.center)
+                .font(.title2.weight(.semibold)).foregroundStyle(Theme.ink).multilineTextAlignment(.center)
             Text(offline ? "Your photo is saved. Try again when you're back online." : "Try a closer photo in daylight, with the damage in the middle.")
                 .font(.subheadline).foregroundStyle(Theme.inkSecondary).multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)

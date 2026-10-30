@@ -75,7 +75,7 @@ struct DiagnosisView: View {
             .frame(maxHeight: .infinity, alignment: .top)
             if flow.refineMode {
                 VStack(spacing: 8) {
-                    if let e = flow.refineError { Text(e).font(.footnote.weight(.medium)).foregroundStyle(.white).shadow(color: .black.opacity(0.4), radius: 2) }
+                    if let e = flow.refineError { Text(e).font(.footnote.weight(.medium)).photoLabel() }
                     Text("Tap the damage").font(.footnote.weight(.medium)).foregroundStyle(Theme.ink)
                         .padding(.horizontal, 14).padding(.vertical, 8).glass(Capsule())
                 }
@@ -127,13 +127,13 @@ struct DiagnosisView: View {
                     if r.diagnosis.needsMoreInfo {
                         Text("One more detail").overline()
                         Text(flow.followUpUsed ? "We need a sharper photo." : "One question first.")
-                            .font(.serif(.title)).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
+                            .font(.title.bold()).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                         Text(flow.followUpUsed ? "Take a new photo and we will look again." : "A short answer lets us pick the right needle, thread and stitch.")
                             .font(.body).foregroundStyle(Theme.inkSecondary).lineSpacing(4).fixedSize(horizontal: false, vertical: true)
                     } else {
                         let t = CopyPolish.headlineAndBody(r.diagnosis.summary, english: Lang.shared.isEnglish)
                         Text("What we found").overline()
-                        Text(t.headline.trimmingCharacters(in: CharacterSet(charactersIn: "."))).font(.serif(.title)).foregroundStyle(Theme.ink)
+                        Text(t.headline.trimmingCharacters(in: CharacterSet(charactersIn: "."))).font(.title.bold()).foregroundStyle(Theme.ink)
                             .fixedSize(horizontal: false, vertical: true)
                         if !t.body.isEmpty {
                             Text(t.body).font(.body).foregroundStyle(Theme.ink).lineSpacing(4).fixedSize(horizontal: false, vertical: true)

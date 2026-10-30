@@ -57,6 +57,8 @@ protocol AnalysisService: Sendable {
     func refine(_ request: RefineRequest) async throws -> Segment
     func track(_ request: TrackRequest) async throws -> TrackResponse
     func afterPreview(_ request: AfterPreviewRequest) async throws -> AfterPreviewResponse
+    /// Muse Image: the item right after one guide step (request carries step_title / step_text).
+    func stepImage(_ request: AfterPreviewRequest) async throws -> AfterPreviewResponse
 }
 
 // MARK: - SSE
@@ -255,6 +257,10 @@ struct LiveAPIClient: AnalysisService {
 
     func afterPreview(_ request: AfterPreviewRequest) async throws -> AfterPreviewResponse {
         try await postJSON("after-preview", request, as: AfterPreviewResponse.self)
+    }
+
+    func stepImage(_ request: AfterPreviewRequest) async throws -> AfterPreviewResponse {
+        try await postJSON("step-image", request, as: AfterPreviewResponse.self, timeout: 90)
     }
 
     func transcribe(fileURL: URL) async throws -> String {

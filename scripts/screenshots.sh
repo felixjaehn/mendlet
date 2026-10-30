@@ -53,10 +53,11 @@ run verdict-repair-jeans 18 -uiScreen decision -uiScenario textile_tear
 run verdict-pro 18 -uiScreen decision -uiScenario real_sole
 run verdict-replace 18 -uiScreen decision -uiScenario worn_shirt
 run checklist 18 -uiScreen checklist -uiScenario textile_tear
-run guide-sweater 22 -uiScreen guide -uiScenario real_sweater -uiStep 2
-run guide-darning 24 -uiScreen guide -uiScenario textile_tear -uiStep 4
-run guide-solder 22 -uiScreen guide -uiScenario platine -uiStep 3
-run guide-shoe 22 -uiScreen guide -uiScenario shoe_sole -uiStep 2
+run guide-sweater 22 -uiScreen guide -uiScenario real_sweater -uiStep 2 -uiFreezeProgress 0.85
+run guide-darning 24 -uiScreen guide -uiScenario textile_tear -uiStep 4 -uiFreezeProgress 0.85
+run guide-step-image 24 -uiScreen guide -uiScenario textile_tear -uiStep 2 -uiStepImage YES
+run guide-solder 22 -uiScreen guide -uiScenario platine -uiStep 3 -uiFreezeProgress 0.85
+run guide-shoe 22 -uiScreen guide -uiScenario shoe_sole -uiStep 2 -uiFreezeProgress 0.85
 run completion 22 -uiScreen completion -uiScenario textile_tear
 run block-battery 16 -uiScreen diagnosis -uiScenario battery_jacket
 run block-helmet 16 -uiScreen diagnosis -uiScenario helmet
@@ -65,6 +66,6 @@ run home-dark 6 -uiScreen home
 run finding-sweater-dark 14 -uiScreen diagnosis -uiScenario real_sweater
 run verdict-repair-dark 18 -uiScreen decision -uiScenario real_sweater
 run checklist-dark 18 -uiScreen checklist -uiScenario real_sweater
-run guide-sweater-dark 22 -uiScreen guide -uiScenario real_sweater -uiStep 2
+run guide-sweater-dark 22 -uiScreen guide -uiScenario real_sweater -uiStep 2 -uiFreezeProgress 0.85
 run project-dark 8 -uiScreen project
 xcrun simctl ui "$UDID" appearance light

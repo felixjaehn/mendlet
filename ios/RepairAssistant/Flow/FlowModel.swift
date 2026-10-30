@@ -49,6 +49,11 @@ final class FlowModel {
     var afterImage: UIImage?
     private var afterCaseId: String?
     private var afterTask: Task<Void, Never>?
+    // Muse Image step pictures (guide): in-memory cache per case + step number; a failed step stays hidden.
+    var stepImages: [Int: UIImage] = [:]
+    private var stepImagePending: Set<Int> = []
+    private var stepImageFailed: Set<Int> = []
+    private var stepImageCaseId: String?
     private var analysisTask: Task<Void, Never>?
 
     // Shopping & guide
@@ -322,6 +327,33 @@ final class FlowModel {
         }
     }
 
+    /// Demo: the recording's `<name>_step<n>.jpg` if bundled. Live: nil until `loadStepImage` has fetched it.
+    func stepImage(for step: GuideStep) -> UIImage? {
+        if settings.demoMode {
+            guard let name = LiveRecordings.name(for: settings.scenario) else { return nil }
+            return LiveRecordings.image(file: "\(name)_step\(step.n)")
+        }
+        return stepImages[step.n]
+    }
+
+    /// Live mode only, lazily when a step is shown: POST /step-image. Failure just leaves the toggle hidden.
+    func loadStepImage(for step: GuideStep) {
+        guard !settings.demoMode, let r = response, let photo, !FlowGate.isBlocked(r) else { return }
+        if stepImageCaseId != r.caseId { stepImageCaseId = r.caseId; stepImages = [:]; stepImagePending = []; stepImageFailed = [] }
+        guard stepImages[step.n] == nil, !stepImagePending.contains(step.n), !stepImageFailed.contains(step.n) else { return }
+        stepImagePending.insert(step.n)
+        var req = Self.afterPreviewRequest(for: r, photo: photo)
+        req.stepTitle = String(step.title.prefix(120)); req.stepText = String(step.text.prefix(600))
+        let svc = service, caseId = r.caseId, n = step.n
+        Task { [weak self] in
+            var image: UIImage?
+            if let resp = try? await svc.stepImage(req), let d = resp.imageData { image = UIImage(data: d) }
+            guard let self, self.stepImageCaseId == caseId else { return }
+            self.stepImagePending.remove(n)
+            if let image { self.stepImages[n] = image } else { self.stepImageFailed.insert(n) }
+        }
+    }
+
     /// Textile: stitch type of the first stitch_path step. Shoe: category "shoe" and no stitch type.
     static func afterPreviewRequest(for r: AnalyzeResponse, photo: UIImage) -> AfterPreviewRequest {
         let b64 = ImageResizer.base64(photo)
@@ -405,6 +437,7 @@ final class FlowModel {
         newInfoBanner = nil; projectStarted = false; projectParked = false
         agentSteps = []; labelBusy = false; changedItemIds = []; labelBaseline = nil
         afterTask?.cancel(); afterState = .idle; afterImage = nil; afterCaseId = nil
+        stepImages = [:]; stepImagePending = []; stepImageFailed = []; stepImageCaseId = nil
     }
 
     // MARK: Persistence
