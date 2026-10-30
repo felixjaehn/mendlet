@@ -200,7 +200,7 @@ struct StitchPathView: View {
 
     // MARK: Crafted stitch diagram
 
-    private let stitchLen: CGFloat = 3, stitchGap: CGFloat = 2
+    private let stitchLen: CGFloat = 7, stitchGap: CGFloat = 4  // owner: 3/2 pt read as noise on knit
 
     private func maskPath(_ size: CGSize) -> Path? {
         guard !plan.mask.isEmpty else { return nil }
@@ -213,13 +213,13 @@ struct StitchPathView: View {
 
     /// Dark under-stroke plus white thread, both dashed.
     private func strokeDashed(_ ctx: inout GraphicsContext, _ path: Path, phase: CGFloat, dash: [CGFloat]) {
-        ctx.stroke(path, with: .color(.black.opacity(0.6)), style: StrokeStyle(lineWidth: 3.0, lineCap: .butt, dash: dash, dashPhase: phase))
-        ctx.stroke(path, with: .color(.white), style: StrokeStyle(lineWidth: 1.5, lineCap: .butt, dash: dash, dashPhase: phase))
+        ctx.stroke(path, with: .color(.black.opacity(0.7)), style: StrokeStyle(lineWidth: 5.5, lineCap: .round, dash: dash, dashPhase: phase))
+        ctx.stroke(path, with: .color(.white), style: StrokeStyle(lineWidth: 3, lineCap: .round, dash: dash, dashPhase: phase))
     }
 
     /// Entry / exit point of a row: tiny white dot with a dark rim.
     private func drawDot(_ ctx: inout GraphicsContext, _ p: CGPoint) {
-        let r: CGFloat = 2.0
+        let r: CGFloat = 3.0
         ctx.fill(Path(ellipseIn: CGRect(x: p.x - r - 1, y: p.y - r - 1, width: (r + 1) * 2, height: (r + 1) * 2)), with: .color(.black.opacity(0.45)))
         ctx.fill(Path(ellipseIn: CGRect(x: p.x - r, y: p.y - r, width: r * 2, height: r * 2)), with: .color(.white))
     }
@@ -262,6 +262,8 @@ struct StitchPathView: View {
         let activeIdx = progress >= 1 ? animated.lowerBound + animated.count / 2 : animated.lowerBound + shown - 1
         let rowProgress = progress >= 1 ? 1 : (progress * Double(animated.count)) - Double(shown - 1)
         let dash = [stitchLen, stitchGap]
+        // Darken the damage area behind the stitches so white thread reads on light and busy fabric.
+        if let m = maskPath(size) { ctx.fill(m, with: .color(.black.opacity(0.35)), style: FillStyle(eoFill: true)) }
         ctx.drawLayer { l in
             if let m = maskPath(size) { l.clip(to: m, style: FillStyle(eoFill: true)) }
             for i in staticRows {
@@ -303,8 +305,8 @@ struct StitchPathView: View {
             guard i < shown else { continue }
             let f: CGFloat = (i == shown - 1 && progress < 1) ? CGFloat(min(1, max(0.1, progress * Double(legs) - Double(i)))) : 1
             var p = Path(); p.move(to: s); p.addLine(to: lerp(s, e, f))
-            ctx.stroke(p, with: .color(.black.opacity(0.6)), style: StrokeStyle(lineWidth: 3.2, lineCap: .round))
-            ctx.stroke(p, with: .color(.white), style: StrokeStyle(lineWidth: 1.7, lineCap: .round))
+            ctx.stroke(p, with: .color(.black.opacity(0.7)), style: StrokeStyle(lineWidth: 5.5, lineCap: .round))
+            ctx.stroke(p, with: .color(.white), style: StrokeStyle(lineWidth: 3, lineCap: .round))
         }
         if progress < 1 {
             let ai = min(legs - 1, shown - 1)
