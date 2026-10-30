@@ -38,6 +38,7 @@ struct GuideView: View {
                     .id("\(step.n)-\(showMuse)")
                     .transition(.asymmetric(insertion: .move(edge: forward ? .trailing : .leading).combined(with: .opacity), removal: .opacity))
                     .offset(x: drag * 0.25)
+                    .overlay { Color.black.opacity(handsFree.isActive ? 0.18 : 0).allowsHitTesting(false).animation(.easeInOut(duration: 0.4), value: handsFree.isActive) }
                     VStack(spacing: 0) {
                         LinearGradient(colors: [.black.opacity(0.4), .clear], startPoint: .top, endPoint: .bottom)
                             .frame(height: geo.safeAreaInsets.top + 90).allowsHitTesting(false)
@@ -46,12 +47,17 @@ struct GuideView: View {
                     panel(step, r, bottomInset: geo.safeAreaInsets.bottom, maxHeight: geo.size.height * 0.7)
                         .id(step.n)
                         .transition(.opacity)
+                        .opacity(handsFree.isActive ? 0.4 : 1)
+                        .offset(y: handsFree.isActive ? 14 : 0)
+                        .animation(Theme.spring, value: handsFree.isActive)
                         .overlay(alignment: .top) {
-                            HandsFreeCapsule(model: handsFree)
+                            HandsFreeCapsule(model: handsFree, maxHeight: geo.size.height * 0.3)
                                 .alignmentGuide(VerticalAlignment.top) { $0[.bottom] + 12 }
                         }
                     topArea(step, hasStepImage: stepPhoto != nil, topInset: geo.safeAreaInsets.top)
                         .frame(maxHeight: .infinity, alignment: .top)
+                        .opacity(handsFree.isActive ? 0.4 : 1)
+                        .animation(Theme.spring, value: handsFree.isActive)
                 }
                 .frame(width: geo.size.width, height: geo.size.height)
                 .offset(y: -inset.top)
