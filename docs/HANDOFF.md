@@ -11,6 +11,7 @@ Jury-Verlauf in der Nacht (jede Runde ein frischer Agent, alle v8-Screenshots, R
 | 3 | 7,0 | ja, leicht |
 | 4 | 7,4 | **nein** |
 | 5 | 7,2 | **nein** |
+| 6 | 7,2 | **nein** (nach Live Activity, Übergängen, Haptik) |
 
 Die Werte schwanken je nach Juror um etwa ±0,3. Gedeckelt sind sie durch zwei Punkte, die kein Design-Fix löst:
 

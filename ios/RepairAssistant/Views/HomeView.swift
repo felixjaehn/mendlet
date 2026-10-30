@@ -130,14 +130,7 @@ struct HomeView: View {
     }
 
     private func doneSummary(_ done: [SavedCase]) -> String {
-        let n = done.count
-        let head = n == 1 ? "1 repair done" : "\(n) repairs done"
-        let saved = done.compactMap { c -> Double? in
-            guard c.response.decision?.recommendation == .repairSelf, let hi = c.response.decision?.costEur.last, hi > 0 else { return nil }
-            let lo = c.response.decision?.costEur.first ?? hi
-            return (lo + hi) / 2
-        }.reduce(0, +)
-        return saved >= 5 ? head + " · about €\(Int((saved / 5).rounded() * 5)) saved vs. buying new" : head
+        done.count == 1 ? "1 repair done" : "\(done.count) repairs done"
     }
 
     private func quiet(_ text: String) -> some View {
