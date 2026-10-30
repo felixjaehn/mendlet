@@ -21,7 +21,7 @@ Mendlet answers the "where do I start" part, on the item itself.
 3. **Get an honest verdict.** *Repair it yourself*, *Take it to a pro* or *Replace it*, with time, effort and a cost estimate. "Replace" comes with ideas for a second life (cleaning rags, textile recycling). If the thing is dangerous to repair at home, like a cracked bike helmet or anything with a lithium battery, you get no instructions at all.
 4. **See it repaired first.** One tap shows *your own* item mended, before you've threaded a needle.
 5. **Gather what you need.** A short checklist: needle, yarn, scissors, with a shop search for anything missing.
-6. **Repair, step by step.** A full-screen photo guide. Stitch rows draw themselves over the hole, the glue zone fills along the sole, the solder route runs from wire to pad. Some steps also show a generated photo of what it should look like at that point. Stuck? Say what's wrong ("the yarn pulls the knit together") and get an answer for exactly this step.
+6. **Repair, step by step.** A full-screen photo guide. Stitch rows draw themselves over the hole, the glue zone fills along the sole, the solder route runs from wire to pad. Some steps also show a generated photo of what it should look like at that point. Your hands are busy, so there is a **hands-free mode**: say "next" or "back" to move between steps, or just ask ("how tight should I pull the thread?"). Muse Voice transcribes the question and Muse Spark answers for exactly this step, out loud.
 7. **Come back later.** Unfinished repairs wait on the home screen as projects, with what you still need and where you left off. Glue curing and solder timers run as a Live Activity on the Lock Screen.
 
 | Repairs | Outlined damage | Verdict | Before you start | Step guide |
@@ -63,7 +63,7 @@ Optional, switchable in Settings. Instead of the fixed pipeline, a Wonder agent 
 
 ### Muse Voice Transcribe: talking while your hands are busy
 
-When you're holding a needle you don't want to type. Voice transcribes the damage note, follow-up answers and questions during a step. It is biased towards repair vocabulary such as *darning*, *hem*, *patch* and *solder pad*, so those words come through correctly.
+When you're holding a needle you don't want to type. In hands-free mode the phone listens: short commands like "next" are recognised on the device so they react instantly, and real questions go to Muse Voice for an accurate transcript, then to Muse Spark for the answer, which the app reads aloud. Voice also transcribes the damage note and follow-up answers. It is biased towards repair vocabulary such as *darning*, *hem*, *patch* and *solder pad*, so those words come through correctly.
 
 ## How it's built
 
