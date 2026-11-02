@@ -14,8 +14,11 @@ DEVICE_NAME="${DEVICE_NAME:-iPhone 17 Pro}"
 
 command -v xcodegen >/dev/null && (cd "$IOS" && xcodegen generate >/dev/null)
 
-UDID=$(xcrun simctl list devices available | grep -F "$DEVICE_NAME (" | head -1 | grep -oE '[A-F0-9-]{36}')
-[[ -n "$UDID" ]] || { echo "No simulator named '$DEVICE_NAME'. Set DEVICE_NAME=…"; exit 1; }
+UDID=$(xcrun simctl list devices available | grep -F "$DEVICE_NAME (" | head -1 | grep -oE '[A-F0-9-]{36}' || true)
+if [[ -z "$UDID" ]]; then   # fall back to the first available iPhone simulator
+  UDID=$(xcrun simctl list devices available | grep -E '^ +iPhone' | head -1 | grep -oE '[A-F0-9-]{36}' || true)
+fi
+[[ -n "$UDID" ]] || { echo "No iPhone simulator found. Install one in Xcode › Settings › Components, or set DEVICE_NAME=…"; exit 1; }
 xcrun simctl boot "$UDID" 2>/dev/null || true
 open "$(xcode-select -p)/Applications/Simulator.app" 2>/dev/null || true
 

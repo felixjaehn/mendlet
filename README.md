@@ -4,6 +4,12 @@
 
 > Meta Global AI Developer Hackathon 2026 · Indie track · Theme: *Build for Your World*
 
+[![CI](https://github.com/felixjaehn/mendlet/actions/workflows/ci.yml/badge.svg)](https://github.com/felixjaehn/mendlet/actions/workflows/ci.yml)
+
+<!-- DEMO VIDEO: replace VIDEO_URL and remove these comment markers before submitting
+**▶ [Watch the 3-minute demo](VIDEO_URL)**
+-->
+
 ![Repairs, scan, the outlined damage and the verdict](docs/screenshots/v8-en-finding-sweater.png)
 
 ## Why I built this
@@ -12,7 +18,7 @@ I kept throwing away clothes that had one small hole. Not because I couldn't sew
 
 That's a common story. Every person in the EU throws away about **16 kg of textiles a year** (EEA, 2022), and worldwide a garbage truck of clothing is landfilled or burned **every second** (Ellen MacArthur Foundation). Wearing a garment nine months longer cuts its footprint by up to 20 % (WRAP). Sources and how I checked them: [`docs/impact.md`](docs/impact.md).
 
-Mendlet answers the "where do I start" part, on the item itself.
+Repair is the most direct kind of sustainability: every garment that gets mended instead of replaced stays out of landfill and saves the water, energy and CO₂ of a new one. That's the circular economy at the scale of one person and one sweater. Mendlet answers the "where do I start" part, on the item itself.
 
 ## What it does
 
@@ -67,16 +73,34 @@ When you're holding a needle you don't want to type. In hands-free mode the phon
 
 ## How it's built
 
-```
- iPhone app (SwiftUI)                       Proxy (Python, FastAPI)                    Meta Model API
-┌───────────────────────────┐   HTTPS/SSE  ┌──────────────────────────────────┐       ┌───────────────┐
-│ Scan · Analysis · Verdict │ ───────────▶ │ 1 safety + category  ─ Spark     │ ────▶ │ Muse Spark    │
-│ Checklist · Photo guide   │ ◀─────────── │ 2 masks  ─ SAM text ∥ Spark box  │       │ SAM 3.1       │
-│ Projects · Live Activity  │  progress,   │      → SAM box (merge, dedupe)   │       │ Muse Image    │
-│                           │  masks, plan │ 3 diagnosis + plan ─ Spark (JSON)│       │ Muse Wonder   │
-│ Stitch / glue / solder    │              │ 4 safety enforcement (rules)     │       │ Muse Voice    │
-│ geometry from the masks   │              │ budget cap · cache · mock mode   │       └───────────────┘
-└───────────────────────────┘              └──────────────────────────────────┘
+```mermaid
+flowchart LR
+  subgraph App["iPhone app (SwiftUI)"]
+    A1["Scan · Analysis · Verdict<br/>Checklist · Photo guide<br/>Projects · Live Activity"]
+    A2["Stitch / glue / solder geometry<br/>computed from the masks"]
+  end
+  subgraph Proxy["Proxy (Python, FastAPI)"]
+    P1["1 · Safety + category"]
+    P2["2 · Masks: SAM text ∥ Spark box<br/>→ SAM box prompt, merge, dedupe"]
+    P3["3 · Diagnosis + plan (JSON schema)"]
+    P4["4 · Safety enforcement (rules)"]
+    P5["Budget cap · cache · mock mode"]
+    P1 --> P2 --> P3 --> P4
+  end
+  subgraph Meta["Meta Model API"]
+    M1["Muse Spark"]
+    M2["SAM 3.1"]
+    M3["Muse Image"]
+    M4["Muse Wonder"]
+    M5["Muse Voice Transcribe"]
+  end
+  A1 -- "photo, note, voice (HTTPS)" --> P1
+  P4 -- "progress, masks, plan (SSE)" --> A1
+  A1 --> A2
+  P1 & P3 --> M1
+  P2 --> M2
+  P2 --> M1
+  Proxy --> M3 & M4 & M5
 ```
 
 **Why a proxy?** The API key must never ship inside an app, where anyone could pull it out of the binary. The proxy holds the key and runs the multi-step pipeline in one tested place. Safety rules are enforced on the server where they can't be bypassed. A daily spend cap and a disk cache keep costs predictable, and a mock mode makes everything testable without a key.
@@ -113,7 +137,7 @@ Mendlet only gives instructions where a mistake stays harmless. Lithium batterie
 The app starts in demo mode. It replays **real, unedited Meta API responses** I recorded during the hackathon (`ios/RepairAssistant/Resources/LiveRecordings/`), so it runs on the iOS Simulator with no key and no server.
 
 ```bash
-# Xcode 27 + XcodeGen (brew install xcodegen)
+# Xcode 27 with an iPhone simulator. XcodeGen is optional (the .xcodeproj is checked in).
 ./scripts/run-demo.sh
 ```
 
@@ -135,7 +159,7 @@ To point the app at your proxy, copy `ios/Config.example.xcconfig` to `ios/Confi
 ## Tests and quality
 
 ```bash
-# Proxy: 257 tests, fully offline (real network calls are blocked in tests)
+# Proxy: 258 tests, fully offline (real network calls are blocked in tests)
 cd proxy && uv run pytest -q
 uv run ruff check . && uv run ruff format --check .
 
@@ -146,6 +170,8 @@ xcodebuild test -project ios/RepairAssistant.xcodeproj -scheme RepairAssistant \
 # Screenshots of every screen in demo mode
 ./scripts/screenshots.sh
 ```
+
+GitHub Actions runs the proxy tests, lint and format check on every push ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
 
 The proxy tests check the exact requests sent to the Meta API, SSE parsing, the SAM mask decoder, caching, the budget cap, the safety rules and the full pipeline. The app tests cover the contract decoding, navigation gates, the stitch-path geometry (every stitch stays inside the damage), the display text polish and the recordings.
 
@@ -160,6 +186,7 @@ prompts/      Versioned prompts for classification, diagnosis and step help
 testdata/     Benchmark photos and cases (see SOURCES.md)
 docs/         Benchmark, impact sources, API notes, screenshots
 scripts/      run-demo.sh, screenshots.sh
+.github/      CI: proxy tests, lint, format
 ```
 
 ## Built during the hackathon
