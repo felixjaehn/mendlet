@@ -20,6 +20,13 @@ xcrun simctl install "$UDID" "$APP"
 xcrun simctl launch "$UDID" "$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$APP/Info.plist")" >/dev/null; sleep 4
 xcrun simctl status_bar "$UDID" override --time 9:41 --batteryState charged --batteryLevel 100 2>/dev/null || true
 
+# Half resolution plus palette compression: ~0.2 MB instead of ~4 MB per PNG, sharp enough for the README.
+# Skipped silently if pngquant is missing (brew install pngquant).
+shrink() {
+  sips --resampleWidth 603 "$1" >/dev/null
+  command -v pngquant >/dev/null && pngquant --quality 70-90 --speed 1 --force --ext .png --skip-if-larger "$1" || true
+}
+
 shot() {  # name, wait seconds, launch args…
   local name=$1 wait=$2; shift 2
   xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
@@ -27,6 +34,7 @@ shot() {  # name, wait seconds, launch args…
   sleep "$wait"
   rm -f "$OUT/v8-$LANG_CODE-$name.png"   # simctl cannot overwrite an existing PNG (error 513)
   xcrun simctl io "$UDID" screenshot "$OUT/v8-$LANG_CODE-$name.png" >/dev/null
+  shrink "$OUT/v8-$LANG_CODE-$name.png"
   echo "v8-$LANG_CODE-$name.png"
 }
 
