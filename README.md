@@ -163,7 +163,7 @@ To point the app at your proxy, copy `ios/Config.example.xcconfig` to `ios/Confi
 cd proxy && uv run pytest -q
 uv run ruff check . && uv run ruff format --check .
 
-# App: unit tests on the simulator
+# App: 115 unit tests on the simulator
 xcodebuild test -project ios/RepairAssistant.xcodeproj -scheme RepairAssistant \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
 

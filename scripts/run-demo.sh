@@ -1,7 +1,7 @@
 #!/bin/zsh
 # One command for judges: build the iOS app and start it in demo mode on an iPhone simulator.
 # Demo mode replays real, unedited Meta API responses (ios/RepairAssistant/Resources/LiveRecordings/),
-# so no API key and no proxy are needed. Requires Xcode 27 and XcodeGen (`brew install xcodegen`).
+# so no API key and no proxy are needed. Requires Xcode 27 with an iPhone simulator.
 #
 #   ./scripts/run-demo.sh                  # Home screen, pick a scenario
 #   ./scripts/run-demo.sh jeans_guide      # jump straight to the stitch-path step of the jeans tear
@@ -12,7 +12,7 @@ IOS="$ROOT/ios"
 DERIVED="${TMPDIR:-/tmp}/repair-assistant-demo-build"
 DEVICE_NAME="${DEVICE_NAME:-iPhone 17 Pro}"
 
-command -v xcodegen >/dev/null && (cd "$IOS" && xcodegen generate >/dev/null)
+# The .xcodeproj is checked in. After adding source files, regenerate it with `cd ios && xcodegen generate`.
 
 UDID=$(xcrun simctl list devices available | grep -F "$DEVICE_NAME (" | head -1 | grep -oE '[A-F0-9-]{36}' || true)
 if [[ -z "$UDID" ]]; then   # fall back to the first available iPhone simulator

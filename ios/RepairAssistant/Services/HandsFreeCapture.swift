@@ -35,7 +35,7 @@ final class HandsFreeCapture: @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }
         guard !running else { return }
         let session = AVAudioSession.sharedInstance()
-        try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
+        try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothHFP])
         try session.setActive(true)
         let input = engine.inputNode
         input.removeTap(onBus: 0)
