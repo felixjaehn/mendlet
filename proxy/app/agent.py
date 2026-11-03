@@ -24,7 +24,7 @@ from .budget import wonder_cost
 from .cache import ModelCache
 from .errors import AppError, BudgetExceeded, ModelOutputError
 from .images import downscale_b64
-from .models import AnalyzeRequest, ClassifyResult, DiagnosePlan, LocateResult, RefinePoint, Segment, VerifyResult
+from .models import AnalyzeRequest, ClassifyResult, LocateResult, RefinePoint, Segment, VerifyResult
 from .parsing import call_validated, parse_model_json
 from .sam import MAX_PARTS, PROMPT_META, _iou, detections_to_segments, geometric_prompt
 
@@ -416,7 +416,7 @@ class WonderAgent:
             raise ModelOutputError("Wonder response not completed")
         return resp
 
-    async def run(self, req: AnalyzeRequest, cls: ClassifyResult, emit: StepEmit) -> tuple[list[Segment], DiagnosePlan]:
+    async def run(self, req: AnalyzeRequest, cls: ClassifyResult, emit: StepEmit) -> tuple[list[Segment], None]:
         c = self.c
         self.image = downscale_b64(req.image_base64, AGENT_IMAGE_EDGE)
         with Image.open(io.BytesIO(base64.b64decode(self.image))) as photo:
@@ -467,7 +467,8 @@ class WonderAgent:
         # Live 2026-10-29: plans written inside the loop ignored prompt B v3 (asked for the label again) and the
         # loop took 94 s. Wonder now only finds and verifies masks; prompt B v3 writes the plan as in the classic path.
         segments = self._final_segments()
-        return segments, await c.diagnose(req, cls, segments)
+        # The pipeline publishes the verified masks before starting the diagnosis.
+        return segments, None
 
     def _final_segments(self) -> list[Segment]:
         kept = [s for s in self.segments.values() if s.id not in self.rejected]

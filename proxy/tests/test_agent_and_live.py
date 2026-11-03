@@ -629,3 +629,27 @@ def test_step_prompt_shows_mid_repair_state_only():
 def test_textile_preview_asks_for_a_barely_visible_mend():
     p = preview_prompt(AfterPreviewRequest(image_base64="x", diagnosis_summary="Small hole", stitch_type="darning"))
     assert "barely visible" in p and "no contrasting thread" in p and "no X" in p
+
+
+async def test_agent_publishes_masks_before_waiting_for_spark(tmp_path, monkeypatch):
+    def rounds(n, data):
+        if n == 1:
+            return wonder_response(n, fc("segment", {"concept": "rip"}, "c1"))
+        return wonder_response(n, fc("finish", {}, "c2"))
+
+    client = agent_client(tmp_path, Script(rounds))
+    received = []
+
+    async def ready(segments):
+        received.append(segments)
+
+    async def diagnose(req, cls, segments):
+        assert segments and received == [segments]
+        return textile_tear(stretch=False)
+
+    monkeypatch.setattr(client, "diagnose", diagnose)
+    try:
+        result = await analyze(prepare_request(make_req(IMAGE)), client, segments_ready=ready)
+        assert result.guide.steps
+    finally:
+        await client.aclose()

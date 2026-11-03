@@ -38,7 +38,7 @@ from .models import (
     TrackResponse,
 )
 from .parsing import call_validated, parse_model_json
-from .prompts import inline_schema, load_prompt, prompt_version
+from .prompts import PROMPTS, inline_schema, load_prompt, prompt_version
 from .sam import (
     SamDetection,
     detect_segments,
@@ -70,7 +70,7 @@ class ModelClient(Protocol):
     async def detect(self, req: DetectRequest) -> list[Segment]: ...
     async def agent_run(
         self, req: AnalyzeRequest, cls: ClassifyResult, emit: Callable[[dict], Awaitable[None]]
-    ) -> tuple[list[Segment], DiagnosePlan]: ...
+    ) -> tuple[list[Segment], DiagnosePlan | None]: ...
 
 
 def _data_url(b64: str) -> str:
@@ -169,6 +169,12 @@ class RealMetaClient:
         self.agent_enabled = settings.agent_mode == "wonder"
         self.budget = budget
         self.cache = ModelCache(settings.cache_dir, settings.cache_model_calls)
+        # Keep this process's prompts available even if a checkout removes an older version.
+        self._prompts = {
+            (key, locale): load_prompt(key, settings.prompts_dir, locale)
+            for key in PROMPTS
+            for locale in i18n.LANGUAGE_NAMES
+        }
         # SDK defaults retry billable requests. Application validation owns its one retry.
         self.http = http_client or httpx.AsyncClient(timeout=60.0)
         self.oai = AsyncOpenAI(
@@ -231,7 +237,7 @@ class RealMetaClient:
         return resp.choices[0].message.content or ""
 
     async def _json_call(self, key: str, text: str, images: list[str], cls: type[T], locale: str = "de") -> T:
-        system = load_prompt(key, self.s.prompts_dir, locale)
+        system = self._prompts[key, i18n.norm(locale)]
         cache_key = ModelCache.key(
             prompt_version(key), self.s.muse_model, system, text, [ModelCache.key(i) for i in images]
         )
@@ -514,7 +520,7 @@ class RealMetaClient:
 
     async def agent_run(
         self, req: AnalyzeRequest, cls: ClassifyResult, emit: Callable[[dict], Awaitable[None]]
-    ) -> tuple[list[Segment], DiagnosePlan]:
+    ) -> tuple[list[Segment], DiagnosePlan | None]:
         from .agent import WonderAgent  # lazy: only needed in agent mode
 
         return await WonderAgent(self).run(req, cls, emit)
